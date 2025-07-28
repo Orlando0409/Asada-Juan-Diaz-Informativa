@@ -40,7 +40,8 @@
             "ruta": "/"
     },
     "navbar": {
-      "SobreNosotros": {
+      "SobreNosotros": "/SobreNosotros", 
+      "Opciones": {
         "Historia": "SobreNosotros/Historia",
         "MisionVision": "SobreNosotros/MisionVision",
         "CalidadAgua": "SobreNosotros/CalidadAgua",
@@ -48,14 +49,18 @@
       },
       "Solicitudes": "/Solicitudes",
       "Consulta": "/Consulta",
-      "Contacto": {
+      "Contacto": "/Contacto",
+      "SubOpciones": {
         "Quejas": "Contacto/Quejas",
         "Sugerencias": "Contacto/Sugerencias",
         "Reportes": "Contacto/Reportes",
         "PreguntasFrecuentes": "Contacto/PreguntasFrecuentes"
       }
     },
-    "IncioSesion": "/login"
+    "IncioSesion": {
+      "Texto": "Iniciar Sesión",
+      "Ruta": "/login"
+    }
   },
   "footer": {
     "contacto": {
