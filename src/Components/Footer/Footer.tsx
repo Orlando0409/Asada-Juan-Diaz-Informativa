@@ -1,5 +1,5 @@
 import Mapa from './mapa'
-import Redes from './redes';
+import Redes from './Redes';
 
 const Footer = () => {
     const year = new Date().getFullYear();
