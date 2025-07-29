@@ -7,7 +7,7 @@ const Redes = () => {
   return (
 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 w-full lg:w-auto">
   {/* Contacto */}
-  <div className="min-w-[220px]">
+  <div className="min-w-[220px] flex flex-col gap-2">
     <h4 className="font-semibold mb-2 sm:text-sm md:text-md xl:text-lg xxl:text-xl">Contacto</h4>
     <p className="flex items-center gap-2">
       <FaPhone className="text-green-500" /> {contacto.telefono}
@@ -18,13 +18,13 @@ const Redes = () => {
   </div>
 
   {/* Horario */}
-  <div className="min-w-[220px]">
+  <div className="min-w-[220px] flex flex-col gap-2">
     <h4 className="font-semibold mb-2 text-sm md:text-md xl:text-lg xxl:text-xl">Horario de Atención</h4>
     <p>{horarioAtencion}</p>
   </div>
 
   {/* Redes Sociales */}
-  <div className="min-w-[220px]">
+  <div className="min-w-[220px] flex flex-col gap-2">
     <h4 className="font-semibold mb-2 text-sm md:text-md xl:text-lg xxl:text-xl">Redes Sociales</h4>
     <a
       href={redesSociales.WhatsApp}
