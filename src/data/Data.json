@@ -37,25 +37,35 @@
   "header": {
     "logo": {
         "src": "/Logo_ASADA_Juan_Díaz.png",
-            "ruta": "/"
+        "ruta": "/"
     },
     "navbar": {
-      "SobreNosotros": {
-        "Historia": "SobreNosotros/Historia",
-        "MisionVision": "SobreNosotros/MisionVision",
-        "CalidadAgua": "SobreNosotros/CalidadAgua",
-        "DatosGenerales": "SobreNosotros/DatosGenerales"
+      "SobreNosotros":{
+        "texto": "Sobre Nosotros",
+        "Opciones" : {
+        "Historia": "Historia",
+        "MisionVision": "MisionVision",
+        "CalidadAgua": "CalidadAgua",
+        "DatosGenerales": "DatosGenerales"
+      }
       },
-      "Solicitudes": "/Solicitudes",
-      "Consulta": "/Consulta",
+  
+      "Solicitudes": { "texto": "Solicitudes", "ruta": "/Solicitudes" },
+      "Consulta": { "texto": "Consulta de Pagos", "ruta": "/Consulta" },
       "Contacto": {
+        "texto": "Contacto",
+        "SubOpciones": {
         "Quejas": "Contacto/Quejas",
         "Sugerencias": "Contacto/Sugerencias",
         "Reportes": "Contacto/Reportes",
         "PreguntasFrecuentes": "Contacto/PreguntasFrecuentes"
       }
+    }
     },
-    "IncioSesion": "/login"
+    "IncioSesion": {
+      "Texto": "Iniciar Sesión",
+      "Ruta": "/Login"
+    }
   },
   "footer": {
     "contacto": {
@@ -64,5 +74,6 @@
     },
     "horarioAtencion": "Lunes a Viernes, 7:00 AM - 5:00 PM",
     "redesSociales": {
-      "WhatsApp": "https://chat.whatsapp.com/IOTuJj4XCAU9S0FLzQFgTp?mode=ac_t"}}
-    }
+      "WhatsApp": "https://chat.whatsapp.com/IOTuJj4XCAU9S0FLzQFgTp?mode=ac_t"}},
+      "AcercaDeNosotros":"En la ASADA de Juan Diaz trabajamos para brindar un servicio  de agua potable eficiente,sostenible y de alta calidad.Nuestro Compromiso es con la comunidad y el ambiente,garantizando una gestion responsable de este recurso. "
+}

@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthLoginRouteImport } from './routes/(Auth)/Login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/(Auth)/ForgotPassword'
+import { Route as AboutUsMisionVisionRouteImport } from './routes/(AboutUs)/MisionVision'
+import { Route as AboutUsHistoriaRouteImport } from './routes/(AboutUs)/Historia'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,33 +30,57 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   path: '/ForgotPassword',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutUsMisionVisionRoute = AboutUsMisionVisionRouteImport.update({
+  id: '/(AboutUs)/MisionVision',
+  path: '/MisionVision',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutUsHistoriaRoute = AboutUsHistoriaRouteImport.update({
+  id: '/(AboutUs)/Historia',
+  path: '/Historia',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/Historia': typeof AboutUsHistoriaRoute
+  '/MisionVision': typeof AboutUsMisionVisionRoute
   '/ForgotPassword': typeof AuthForgotPasswordRoute
   '/Login': typeof AuthLoginRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/Historia': typeof AboutUsHistoriaRoute
+  '/MisionVision': typeof AboutUsMisionVisionRoute
   '/ForgotPassword': typeof AuthForgotPasswordRoute
   '/Login': typeof AuthLoginRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/(AboutUs)/Historia': typeof AboutUsHistoriaRoute
+  '/(AboutUs)/MisionVision': typeof AboutUsMisionVisionRoute
   '/(Auth)/ForgotPassword': typeof AuthForgotPasswordRoute
   '/(Auth)/Login': typeof AuthLoginRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/ForgotPassword' | '/Login'
+  fullPaths: '/' | '/Historia' | '/MisionVision' | '/ForgotPassword' | '/Login'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/ForgotPassword' | '/Login'
-  id: '__root__' | '/' | '/(Auth)/ForgotPassword' | '/(Auth)/Login'
+  to: '/' | '/Historia' | '/MisionVision' | '/ForgotPassword' | '/Login'
+  id:
+    | '__root__'
+    | '/'
+    | '/(AboutUs)/Historia'
+    | '/(AboutUs)/MisionVision'
+    | '/(Auth)/ForgotPassword'
+    | '/(Auth)/Login'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutUsHistoriaRoute: typeof AboutUsHistoriaRoute
+  AboutUsMisionVisionRoute: typeof AboutUsMisionVisionRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
 }
@@ -82,11 +108,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(AboutUs)/MisionVision': {
+      id: '/(AboutUs)/MisionVision'
+      path: '/MisionVision'
+      fullPath: '/MisionVision'
+      preLoaderRoute: typeof AboutUsMisionVisionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(AboutUs)/Historia': {
+      id: '/(AboutUs)/Historia'
+      path: '/Historia'
+      fullPath: '/Historia'
+      preLoaderRoute: typeof AboutUsHistoriaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutUsHistoriaRoute: AboutUsHistoriaRoute,
+  AboutUsMisionVisionRoute: AboutUsMisionVisionRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
 }
