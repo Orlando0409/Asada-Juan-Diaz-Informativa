@@ -37,7 +37,7 @@
   "header": {
     "logo": {
         "src": "/Logo_ASADA_Juan_Díaz.png",
-            "ruta": "/"
+        "ruta": "/"
     },
     "navbar": {
       "SobreNosotros": {
