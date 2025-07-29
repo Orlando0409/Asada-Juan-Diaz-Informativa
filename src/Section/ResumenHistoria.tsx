@@ -1,8 +1,10 @@
 import React from 'react'
 import Data from'../data/Data.json'
+
 const ResumenHistoria = () => {
     const resumen= Data.header.hero.ResumenHistoria
     const Boton= Data.header.Leermas.texto
+ 
   return (
         <div className='bg-gray-200 text-black p-20 flex flex-col gap-6 justify-between items-start'>
       <div className='flex flex-col gap-4'>
@@ -16,6 +18,7 @@ const ResumenHistoria = () => {
         >
           {Boton}
         </a>
+      
       </div>
     </div>
   );
