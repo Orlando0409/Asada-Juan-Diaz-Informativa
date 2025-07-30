@@ -1,4 +1,4 @@
-import React from 'react'
+import { Link } from '@tanstack/react-router'
 import Data from'../data/Data.json'
 
 const ResumenHistoria = () => {
@@ -12,12 +12,11 @@ const ResumenHistoria = () => {
         <blockquote className='border-l-4 border-[#6FCAF1] pl-4'>
           <p className='p-4 sm:text-md md:text-lg lg:text-xl italic'>{resumen}</p>
         </blockquote>
-        <a
-          href="/Historia"
-          className="text-white bg-[#6FCAF1] hover:bg-[#57b0dd] px-4 py-2 rounded-md text-sm sm:text-base transition duration-200"
-        >
+      <div className='flex justify-end'> 
+        <Link to="/Historia"
+          className="w-[150px] flex justify-center text-white bg-[#6FCAF1] hover:bg-[#57b0dd] px-4 py-2 rounded-md text-sm sm:text-base transition duration-200">
           {Boton}
-        </a>
+        </Link></div>
       
       </div>
     </div>

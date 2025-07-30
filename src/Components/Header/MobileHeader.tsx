@@ -1,14 +1,13 @@
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
-import { FaBars, FaTimes, FaUserCircle, FaChevronDown } from 'react-icons/fa'
-import type { InicioSesion, MenuItem } from '../../types/header/MenuItem'
+import { FaBars, FaTimes, FaChevronDown } from 'react-icons/fa'
+import type { MenuItem } from '../../types/header/MenuItem'
 
 interface MobileHeaderProps {
   menuItems: MenuItem[]
-  inicioSesion: InicioSesion
 }
 
-const MobileHeader = ({ menuItems, inicioSesion }: MobileHeaderProps) => {
+const MobileHeader = ({ menuItems }: MobileHeaderProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [expandedItem, setExpandedItem] = useState<string | null>(null)
 
@@ -73,17 +72,6 @@ const MobileHeader = ({ menuItems, inicioSesion }: MobileHeaderProps) => {
               </div>
             ))}
             
-            {/* Botón de login en móvil */}
-            <div className='pt-4 border-t border-gray-200'>
-              <Link
-                to={inicioSesion.ruta}
-                className='flex items-center gap-2 w-full bg-[#6FCAF1] text-white px-4 py-3 rounded-md hover:bg-[#5BB8E3] transition-colors duration-200 justify-center'
-                onClick={() => setIsOpen(false)}
-              >
-                <FaUserCircle size={18} />
-                {inicioSesion.texto}
-              </Link>
-            </div>
           </div>
         </div>
       )}
