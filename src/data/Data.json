@@ -6,8 +6,13 @@
   ],
   "mision": "Ser una ASADA líder en Guanacaste por la excelencia en distribución del servicio de agua potable, infraestructura sostenible y calidad garantizada del recurso.",
   "vision": "Maximizar el valor de la ASADA por medio de capacitaciones, proyectos, control de calidad y personal comprometido con el ambiente y la comunidad.",
+  "DatosGenerales": "En la ASADA de Juan Diaz trabajamos para brindar un servicio  de agua potable eficiente,sostenible y de alta calidad.Nuestro Compromiso es con la comunidad y el ambiente,garantizando una gestion responsable de este recurso.", 
   "historia": "La ASADA de Juan Díaz fue fundada en el año 2005. En un inicio, la idea principal era construir un acueducto para uso agrícola, pensando en beneficiar a los agricultores de la zona. Sin embargo, un vecino de la zona donó un terreno para un pozo. Las personas de la comunidad pensaron en la necesidad de acceso al agua potable en los hogares, y llegaron a la conclusión de que el agua para consumo humano era prioridad más que para el uso agrícola. Ante esta situación, se decidió cambiar el destino del proyecto y enfocarlo en llevar agua a las casas. Con este nuevo propósito se logró concretar un convenio con la delegación, lo que permitió la formalización de la creación de la ASADA. De esta manera, un proyecto que estaba destinado a la agricultura se transformó en una solución para la comunidad de Juan Díaz y sus alrededores.",
-   
+    "imageHistoria":{
+      "src": "HISTORIA_ASADA.png",
+    
+    "ruta": "/Historia"
+     },
   "requisitosSolicitudes": {
     "abonado": [
       "Ser mayor de edad",

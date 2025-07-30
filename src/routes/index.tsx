@@ -9,8 +9,10 @@ export const Route = createFileRoute('/')({
  function LandingPage() {
   return (
     <div>
+    
       <Hero/>
     <ResumenHistoria/>
+    
     
     </div>
   )
