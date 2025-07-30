@@ -1,9 +1,7 @@
 import React from 'react'
-
+import Data from '../data/Data.json'
 const Hero = () => {
-  return (
-    <div>Hero</div>
-  )
+ 
 }
 
 export default Hero
