@@ -31,9 +31,7 @@ const DesktopHeader = ({ menuItems, inicioSesion }: DesktopHeaderProps) => {
             </li>
           )
         ))}
-      </ul>
-
-      {/* Botón de Iniciar Sesión */}
+              {/* Botón de Iniciar Sesión */}
       <div className='flex items-center gap-3'>
         <Link 
           to={inicioSesion.ruta} 
@@ -43,6 +41,9 @@ const DesktopHeader = ({ menuItems, inicioSesion }: DesktopHeaderProps) => {
           <span className='hidden sm:inline'>{inicioSesion.texto}</span>
         </Link>
       </div>
+      </ul>
+
+
     </>
   )
 }

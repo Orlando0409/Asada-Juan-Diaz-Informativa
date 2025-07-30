@@ -16,7 +16,7 @@ const Dropdown = ({ texto, subopciones }: DropdownProps) => {
         {texto}
         <MdExpandMore size={18} className='transition-transform duration-200 group-hover:rotate-180' />
       </button>
-      <div className='absolute left-0 hidden group-hover:block bg-white shadow-lg rounded-md mt-2 z-50 w-48 border border-gray-100'>
+      <div className='absolute left-0 hidden group-hover:block bg-white shadow-lg rounded-md mt-2 z-10 w-48 border border-gray-100'>
         <ul className='py-2 text-sm text-gray-700'>
           {subopciones.map((opcion, index) => (
             <li key={index}>
