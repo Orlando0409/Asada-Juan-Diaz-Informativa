@@ -4,11 +4,15 @@
   "servicios": [
     "Agua potable para las comunidades de Juan Díaz y Oriente"
   ],
-  "mision":
-    "Ser una ASADA líder en Guanacaste por la excelencia en distribución del servicio de agua potable, infraestructura sostenible y calidad garantizada del recurso.",
-  "vision":
-    "Maximizar el valor de la ASADA por medio de capacitaciones, proyectos, control de calidad y personal comprometido con el ambiente y la comunidad.",
+  "mision": "Ser una ASADA líder en Guanacaste por la excelencia en distribución del servicio de agua potable, infraestructura sostenible y calidad garantizada del recurso.",
+  "vision": "Maximizar el valor de la ASADA por medio de capacitaciones, proyectos, control de calidad y personal comprometido con el ambiente y la comunidad.",
+  "DatosGenerales": "En la ASADA de Juan Diaz trabajamos para brindar un servicio  de agua potable eficiente,sostenible y de alta calidad.Nuestro Compromiso es con la comunidad y el ambiente,garantizando una gestion responsable de este recurso.", 
   "historia": "La ASADA de Juan Díaz fue fundada en el año 2005. En un inicio, la idea principal era construir un acueducto para uso agrícola, pensando en beneficiar a los agricultores de la zona. Sin embargo, un vecino de la zona donó un terreno para un pozo. Las personas de la comunidad pensaron en la necesidad de acceso al agua potable en los hogares, y llegaron a la conclusión de que el agua para consumo humano era prioridad más que para el uso agrícola. Ante esta situación, se decidió cambiar el destino del proyecto y enfocarlo en llevar agua a las casas. Con este nuevo propósito se logró concretar un convenio con la delegación, lo que permitió la formalización de la creación de la ASADA. De esta manera, un proyecto que estaba destinado a la agricultura se transformó en una solución para la comunidad de Juan Díaz y sus alrededores.",
+    "imageHistoria":{
+      "src": "HISTORIA_ASADA.png",
+    
+    "ruta": "/Historia"
+     },
   "requisitosSolicitudes": {
     "abonado": [
       "Ser mayor de edad",
@@ -36,26 +40,61 @@
   },
   "header": {
     "logo": {
-        "src": "/Logo_ASADA_Juan_Díaz.png",
-        "ruta": "/"
+      
+      "src": "/Logo_ASADA_Juan_Díaz.png",
+      "ruta": "/"
+    
     },
+    
+   "hero":{
+    "ResumenHistoria":"La ASADA de Juan Díaz fue fundada en el año 2005. En un inicio, la idea principal era construir un acueducto para uso agrícola..."
+   },
+   "Leermas":{
+     "texto":"Leer más..."
+   },
+
     "navbar": {
-      "SobreNosotros": {
-        "Historia": "SobreNosotros/Historia",
-        "MisionVision": "SobreNosotros/MisionVision",
-        "CalidadAgua": "SobreNosotros/CalidadAgua",
-        "DatosGenerales": "SobreNosotros/DatosGenerales"
-      },
-      "Solicitudes": "/Solicitudes",
-      "Consulta": "/Consulta",
-      "Contacto": {
-        "Quejas": "Contacto/Quejas",
-        "Sugerencias": "Contacto/Sugerencias",
-        "Reportes": "Contacto/Reportes",
-        "PreguntasFrecuentes": "Contacto/PreguntasFrecuentes"
-      }
+      "menuItems": [
+        {
+          "id": "sobreNosotros",
+          "texto": "Sobre Nosotros",
+          "tipo": "dropdown",
+          "subopciones": [
+            { "texto": "Datos Generales", "ruta": "/DatosGenerales" },
+            { "texto": "Historia", "ruta": "/Historia" },
+            { "texto": "Misión y Visión", "ruta": "/MisionVision" },
+            { "texto": "Calidad del Agua", "ruta": "/CalidadAgua" }
+          ]
+        },
+        {
+          "id": "solicitudes",
+          "texto": "Solicitudes",
+          "tipo": "link",
+          "ruta": "/solicitudes"
+        },
+        {
+          "id": "consulta",
+          "texto": "Consulta de Pagos",
+          "tipo": "link",
+          "ruta": "/consulta"
+        },
+        {
+          "id": "contacto",
+          "texto": "Contacto",
+          "tipo": "dropdown",
+          "subopciones": [
+            { "texto": "Quejas", "ruta": "/Quejas" },
+            { "texto": "Sugerencias", "ruta": "/Sugerencias" },
+            { "texto": "Reportes", "ruta": "/Reportes" },
+            { "texto": "Preguntas Frecuentes", "ruta": "/PreguntasFrecuentes" }
+          ]
+        }
+      ]
     },
-    "IncioSesion": "/login"
+    "inicioSesion": {
+      "texto": "Iniciar Sesión",
+      "ruta": "/login"
+    }
   },
   "footer": {
     "contacto": {
@@ -64,5 +103,8 @@
     },
     "horarioAtencion": "Lunes a Viernes, 7:00 AM - 5:00 PM",
     "redesSociales": {
-      "WhatsApp": "https://chat.whatsapp.com/IOTuJj4XCAU9S0FLzQFgTp?mode=ac_t"}}
-    }
+      "WhatsApp": "https://chat.whatsapp.com/IOTuJj4XCAU9S0FLzQFgTp?mode=ac_t"
+    },
+    "acercaDeNosotros": "En la ASADA de Juan Diaz trabajamos para brindar un servicio de agua potable eficiente,sostenible y de alta calidad.Nuestro Compromiso es con la comunidad y el ambiente,garantizando una gestion responsable de este recurso."
+  }
+}

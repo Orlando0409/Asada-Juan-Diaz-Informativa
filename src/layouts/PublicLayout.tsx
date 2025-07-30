@@ -10,7 +10,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
   return (
     <div>
       <Header />
-      <main>
+      <main className="flex flex-col pt-[70px]">
         {children}
       </main>
         <Footer />
