@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import Data from'../data/Data.json'
+import Data from'../../data/Data.json'
 
 const ResumenHistoria = () => {
     const resumen= Data.header.hero.ResumenHistoria

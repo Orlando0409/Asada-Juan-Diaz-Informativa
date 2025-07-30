@@ -18,10 +18,10 @@ const Dropdown = ({ texto, subopciones }: DropdownProps) => {
       </button>
       <div className='absolute left-0 hidden group-hover:block bg-white shadow-lg rounded-md mt-2 z-10 w-48 border border-gray-100'>
         <ul className='py-2 text-sm text-gray-700'>
-          {subopciones.map((opcion, index) => (
-            <li key={index}>
-              <Link 
-                to={opcion.ruta} 
+          {subopciones.map((opcion) => (
+            <li key={opcion.texto}>
+              <Link
+                to={opcion.ruta}
                 className='block px-4 py-2 hover:bg-[#6FCAF1]/10 hover:text-[#6FCAF1] transition-all duration-200 hover:scale-105 hover:px-5 hover:font-medium'
               >
                 {opcion.texto}
