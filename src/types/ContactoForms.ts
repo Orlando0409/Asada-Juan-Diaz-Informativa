@@ -2,7 +2,8 @@ export type ContactoTipo = 'Reportes' | 'Quejas' | 'Sugerencias'
 
 export interface Requisito {
   Nombre: string
-  Apellido: string
+  PrimerApellido: string
+  SegundoApellido?: string
   texto: string
 }
 

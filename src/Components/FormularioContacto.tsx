@@ -1,5 +1,4 @@
 import { useForm } from '@tanstack/react-form'
-import { BiSolidMessageAltEdit } from 'react-icons/bi'
 import data from '../data/Data.json'
 import {
   type ContactoTipo,
@@ -7,16 +6,21 @@ import {
   type RequisitosContacto,
 } from '../types/ContactoForms'
 import { ContactoSchema } from '../Schemas/ContactoData'
+import { useState } from 'react'
 
 type Props = {
   tipo: ContactoTipo
 }
 
 const FormularioContacto = ({ tipo }: Props) => {
+
+    const [archivoSeleccionado, setArchivoSeleccionado] = useState<File | null>(null)
+
   const form = useForm({
     defaultValues: {
       nombre: '',
-      Apellido: '',
+      primerApellido: '',
+      segundoApellido: '',
       mensaje: '',
       adjunto: undefined as File | undefined,
     },
@@ -31,11 +35,11 @@ const FormularioContacto = ({ tipo }: Props) => {
     },
   })
 
-  const requisitos: RequisitosContacto =
-    data.RequisitosContacto as unknown as RequisitosContacto
+  const requisitos: RequisitosContacto = data.RequisitosContacto as unknown as RequisitosContacto
 
   const clave = getRequisitosKey(tipo)
   const campos = requisitos[clave]
+  const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300'
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 text-gray-800">
@@ -47,88 +51,104 @@ const FormularioContacto = ({ tipo }: Props) => {
           Escribe tu {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
         </h2>
 
-        <form.Field name="nombre">
-          {(field) => (
-            <div className="mb-4">
-              <label className="block mb-1 font-medium">{campos.Nombre}</label>
-              <input
-                id={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                placeholder={campos.Nombre}
-                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
-              />
-              {field.state.meta.errors?.[0] && (
-                <span className="text-red-500 text-sm">
-                  {field.state.meta.errors[0]}
-                </span>
-              )}
-            </div>
-          )}
-        </form.Field>
+       {Object.entries(campos).map(([fieldName, fieldProps]) => (
+        <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
+       {(field) => {
 
-        <form.Field name="Apellido">
-          {(field) => (
-            <div className="mb-4">
-              <label className="block mb-1 font-medium">{campos.Apellido}</label>
-              <input
-                id={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                placeholder={campos.Apellido}
-                className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
-              />
-              {field.state.meta.errors?.[0] && (
-                <span className="text-red-500 text-sm">
-                  {field.state.meta.errors[0]}
-                </span>
-              )}
-            </div>
-          )}
-        </form.Field>
+      if (fieldProps.type === 'textarea') {
+        return (
+          <div className="mb-4">
+            <label className="block mb-1 font-medium">{fieldProps.label}</label>
+            <textarea
+              id={field.name}
+              value={field.state.value as string}
+              onBlur={field.handleBlur}
+              onChange={(e) => field.handleChange(e.target.value)}
+              placeholder={`${fieldProps.label}${fieldProps.required ? ' (obligatorio)' : ' (opcional)'}`}
+              className={`${commonClasses} h-28 resize-none`}
+            />
+            {field.state.meta.errors?.[0] && (
+              <span className="text-red-500 text-sm">
+                {field.state.meta.errors[0]}
+              </span>
+            )}
+          </div>
+        )
+      }
 
-        <form.Field name="mensaje">
-          {(field) => (
-            <div className="mb-4 relative">
-              <label className="block mb-1 font-medium">{campos.texto}</label>
-              <textarea
-                id={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => field.handleChange(e.target.value)}
-                placeholder={campos.texto}
-                className="w-full border border-gray-300 rounded px-3 py-2 pr-10 h-32 resize-none focus:outline-none focus:ring focus:ring-blue-300"
-              />
-              <BiSolidMessageAltEdit className="absolute bottom-3 left-3 text-gray-400 text-xl" />
-              {field.state.meta.errors?.[0] && (
-                <span className="text-red-500 text-sm block mt-1">
-                  {field.state.meta.errors[0]}
-                </span>
-              )}
-            </div>
-          )}
-        </form.Field>
+      if (fieldProps.type === 'file') {
+        return (
+          <div className="w-full mb-6" key={field.name}>
+            <label htmlFor="adjunto" className="block mb-1 font-medium">
+              {fieldProps.label}
+            </label>
+            <input
+              id="adjunto"
+              type="file"
+              accept=".png,.jpg,.jpeg,.heic"
+              disabled={!!archivoSeleccionado}
+              onChange={(e) => {
+                const file = e.target.files?.[0] ?? undefined
+                field.handleChange(file)
+                setArchivoSeleccionado(file ?? null)
+              }}
+              className="hidden"
+            />
+            <label
+              htmlFor="adjunto"
+              className={`
+                inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm
+                ${archivoSeleccionado ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}
+                mb-2
+              `}
+            >
+              {archivoSeleccionado ? 'Archivo cargado' : 'Subir archivo'}
+            </label>
+            {archivoSeleccionado && (
+              <div className="border rounded-md p-3 bg-gray-50 pb-3 mb-4">
+                <div className="flex justify-between items-center text-sm">
+                  <span>{archivoSeleccionado.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      form.setFieldValue('adjunto', undefined)
+                      setArchivoSeleccionado(null)
+                    }}
+                    className="text-red-500 hover:underline text-xs"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )
+      }
 
-        <form.Field name="adjunto">
-          {(field) => (
-            <div className="w-full mb-6">
-              <label htmlFor="adjunto" className="block mb-1 font-medium">
-                Adjuntar imágen o archivo (opcional)
-              </label>
-                <input
-                id={field.name}
-                type="file"
-                onChange={(e) =>
-                    field.handleChange(e.target.files?.[0] ?? undefined)
-                }
-                className="block w-30 text-xs text-gray-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-blue-600 file:text-white hover:file:bg-[#6FCAF1]"
-                />
-
-            </div>
+      // Input tipo texto por defecto
+      return (
+        <div className="mb-4">
+          <label className="block mb-1 font-medium">{fieldProps.label}</label>
+          <input
+            id={field.name}
+            type="text"
+            value={field.state.value as string}
+            onBlur={field.handleBlur}
+            onChange={(e) => field.handleChange(e.target.value)}
+            placeholder={`${fieldProps.label}${fieldProps.required ? ' (obligatorio)' : ' (opcional)'}`}
+            className={commonClasses}
+          />
+          {field.state.meta.errors?.[0] && (
+            <span className="text-red-500 text-sm">
+              {field.state.meta.errors[0]}
+            </span>
           )}
-        </form.Field>
+        </div>
+      )
+    }}
+  </form.Field>
+))}
+
 
         <button
           type="submit"

@@ -45,22 +45,28 @@
       "Número de abonado": "string",  
       "Cédula del titular": "string"
     },
-    "RequisitosContacto": {
+    "RequisitosContacto": 
+    {
       "requisitosReportes": {
-      "Nombre": "Nombre del usuario",
-      "Apellido": "Apellido del usuario",
-      "texto": "Descripción detallada del reporte"
+        "nombre": { "label": "Nombre completo", "type": "text", "required": true },
+        "primerApellido": { "label": "Primer apellido", "type": "text", "required": true },
+        "segundoApellido": { "label": "Segundo apellido", "type": "text", "required": false },
+        "mensaje": { "label": "Mensaje", "type": "textarea", "required": true },
+        "adjunto": { "label": "Adjuntar imagen", "type": "file", "required": false }
     },
     "requisitosQuejas": {
-      "Nombre": "Nombre del usuario",
-      "Apellido": "Apellido del usuario",
-      "texto": "Descripción detallada de la queja"
+      "nombre": { "label": "Nombre completo", "type": "text", "required": true },
+      "primerApellido": { "label": "Primer apellido", "type": "text", "required": true },
+      "segundoApellido": { "label": "Segundo apellido", "type": "text", "required": false },
+      "mensaje": { "label": "Descripción", "type": "textarea", "required": true },
+      "adjunto": { "label": "Adjuntar imagen", "type": "file", "required": false }
     },
     "requisitosSugerencias": {
-
-      "Nombre" : "Nombre del usuario",
-      "Apellido": "Apellido del usuario",
-      "texto": "Descripción detallada de la sugerencia"
+      "nombre": { "label": "Nombre completo", "type": "text", "required": true },
+      "primerApellido": { "label": "Primer apellido", "type": "text", "required": true },
+      "segundoApellido": { "label": "Segundo apellido", "type": "text", "required": false },
+      "mensaje": { "label": "Mensaje", "type": "textarea", "required": true },
+      "adjunto": { "label": "Adjuntar imagen", "type": "file", "required": false }
     }
   },
   "header": {
@@ -139,4 +145,6 @@
       "WhatsApp": "https://chat.whatsapp.com/IOTuJj4XCAU9S0FLzQFgTp?mode=ac_t"
     }
   }
+  
 }
+
