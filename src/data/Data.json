@@ -2,7 +2,7 @@
   "mision": "Ser una ASADA líder en Guanacaste por la excelencia en distribución del servicio de agua potable, infraestructura sostenible y calidad garantizada del recurso.",
   "vision": "Maximizar el valor de la ASADA por medio de capacitaciones, proyectos, control de calidad y personal comprometido con el ambiente y la comunidad.",
   "DatosGenerales": {
-    "nombre": "ASADA Juan Díaz",
+    "nombre": "Asociación Administradora de Acueducto y Alcantarillado Juan Díaz",
     "ubicacion": "Juan Diaz de Nicoya, Guanacaste, Costa Rica",
     "añoFundacion": 2005,
     "servicios": {
@@ -41,6 +41,28 @@
       "Escritura del terreno"
     ]
   },
+    "requisitosConsultaPagos": {
+      "Número de abonado": "string",  
+      "Cédula del titular": "string"
+    },
+    "RequisitosContacto": {
+      "requisitosReportes": {
+      "Nombre": "Nombre del usuario",
+      "Apellido": "Apellido del usuario",
+      "texto": "Descripción detallada del reporte"
+    },
+    "requisitosQuejas": {
+      "Nombre": "Nombre del usuario",
+      "Apellido": "Apellido del usuario",
+      "texto": "Descripción detallada de la queja"
+    },
+    "requisitosSugerencias": {
+
+      "Nombre" : "Nombre del usuario",
+      "Apellido": "Apellido del usuario",
+      "texto": "Descripción detallada de la sugerencia"
+    }
+  },
   "header": {
     "logo": {
       
@@ -59,38 +81,45 @@
     "navbar": {
       "menuItems": [
         {
-          "id": "sobreNosotros",
+          "id": 1,
           "texto": "Sobre Nosotros",
           "tipo": "dropdown",
           "subopciones": [
-            {  "texto": "Datos Generales", "ruta": "/DatosGenerales" },
-            {  "texto": "Historia", "ruta": "/Historia" },
-            {  "texto": "Misión y Visión", "ruta": "/MisionVision" },
-            {  "texto": "Calidad del Agua", "ruta": "/CalidadAgua" }
+            { "id": 10, "texto": "Datos Generales", "ruta": "/DatosGenerales" },
+            { "id": 11, "texto": "Historia", "ruta": "/Historia" },
+            { "id": 12, "texto": "Misión y Visión", "ruta": "/MisionVision" },
+            { "id": 13, "texto": "Calidad del Agua", "ruta": "/CalidadAgua" }
           ]
         },
         {
-          "id": "solicitudes",
+          "id": 2,
           "texto": "Solicitudes",
           "tipo": "link",
           "ruta": "/solicitudes"
         },
         {
-          "id": "consulta",
+          "id": 3,
           "texto": "Consulta de Pagos",
           "tipo": "link",
           "ruta": "/consulta"
         },
         {
-          "id": "contacto",
+          "id": 4,
           "texto": "Contacto",
           "tipo": "dropdown",
           "subopciones": [
-            { "texto": "Quejas", "ruta": "/Quejas" },
-            { "texto": "Sugerencias", "ruta": "/Sugerencias" },
-            { "texto": "Reportes", "ruta": "/Reportes" },
-            { "texto": "Preguntas Frecuentes", "ruta": "/PreguntasFrecuentes" }
+            { "id": 20, "texto": "Quejas", "ruta": "/Quejas" },
+            { "id": 21, "texto": "Sugerencias", "ruta": "/Sugerencias" },
+            { "id": 22, "texto": "Reportes", "ruta": "/Reportes" }
           ]
+        }
+        ,
+        { 
+          "id": 5,
+          "tipo":"PreguntasFrecuentes",
+          "texto": "Preguntas Frecuentes",
+          "ruta": "/PreguntasFrecuentes" ,
+          "icono": "FaQuestionCircle"
         }
       ]
     }

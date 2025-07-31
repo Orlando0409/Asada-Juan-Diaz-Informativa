@@ -10,6 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ContactoSugerenciasRouteImport } from './routes/(Contacto)/Sugerencias'
+import { Route as ContactoReportesRouteImport } from './routes/(Contacto)/Reportes'
+import { Route as ContactoQuejasRouteImport } from './routes/(Contacto)/Quejas'
 import { Route as AboutUsMisionVisionRouteImport } from './routes/(AboutUs)/MisionVision'
 import { Route as AboutUsHistoriaRouteImport } from './routes/(AboutUs)/Historia'
 import { Route as AboutUsDatosGeneralesRouteImport } from './routes/(AboutUs)/DatosGenerales'
@@ -17,6 +20,21 @@ import { Route as AboutUsDatosGeneralesRouteImport } from './routes/(AboutUs)/Da
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactoSugerenciasRoute = ContactoSugerenciasRouteImport.update({
+  id: '/(Contacto)/Sugerencias',
+  path: '/Sugerencias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactoReportesRoute = ContactoReportesRouteImport.update({
+  id: '/(Contacto)/Reportes',
+  path: '/Reportes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactoQuejasRoute = ContactoQuejasRouteImport.update({
+  id: '/(Contacto)/Quejas',
+  path: '/Quejas',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutUsMisionVisionRoute = AboutUsMisionVisionRouteImport.update({
@@ -40,12 +58,18 @@ export interface FileRoutesByFullPath {
   '/DatosGenerales': typeof AboutUsDatosGeneralesRoute
   '/Historia': typeof AboutUsHistoriaRoute
   '/MisionVision': typeof AboutUsMisionVisionRoute
+  '/Quejas': typeof ContactoQuejasRoute
+  '/Reportes': typeof ContactoReportesRoute
+  '/Sugerencias': typeof ContactoSugerenciasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/DatosGenerales': typeof AboutUsDatosGeneralesRoute
   '/Historia': typeof AboutUsHistoriaRoute
   '/MisionVision': typeof AboutUsMisionVisionRoute
+  '/Quejas': typeof ContactoQuejasRoute
+  '/Reportes': typeof ContactoReportesRoute
+  '/Sugerencias': typeof ContactoSugerenciasRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -53,18 +77,38 @@ export interface FileRoutesById {
   '/(AboutUs)/DatosGenerales': typeof AboutUsDatosGeneralesRoute
   '/(AboutUs)/Historia': typeof AboutUsHistoriaRoute
   '/(AboutUs)/MisionVision': typeof AboutUsMisionVisionRoute
+  '/(Contacto)/Quejas': typeof ContactoQuejasRoute
+  '/(Contacto)/Reportes': typeof ContactoReportesRoute
+  '/(Contacto)/Sugerencias': typeof ContactoSugerenciasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/DatosGenerales' | '/Historia' | '/MisionVision'
+  fullPaths:
+    | '/'
+    | '/DatosGenerales'
+    | '/Historia'
+    | '/MisionVision'
+    | '/Quejas'
+    | '/Reportes'
+    | '/Sugerencias'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/DatosGenerales' | '/Historia' | '/MisionVision'
+  to:
+    | '/'
+    | '/DatosGenerales'
+    | '/Historia'
+    | '/MisionVision'
+    | '/Quejas'
+    | '/Reportes'
+    | '/Sugerencias'
   id:
     | '__root__'
     | '/'
     | '/(AboutUs)/DatosGenerales'
     | '/(AboutUs)/Historia'
     | '/(AboutUs)/MisionVision'
+    | '/(Contacto)/Quejas'
+    | '/(Contacto)/Reportes'
+    | '/(Contacto)/Sugerencias'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -72,6 +116,9 @@ export interface RootRouteChildren {
   AboutUsDatosGeneralesRoute: typeof AboutUsDatosGeneralesRoute
   AboutUsHistoriaRoute: typeof AboutUsHistoriaRoute
   AboutUsMisionVisionRoute: typeof AboutUsMisionVisionRoute
+  ContactoQuejasRoute: typeof ContactoQuejasRoute
+  ContactoReportesRoute: typeof ContactoReportesRoute
+  ContactoSugerenciasRoute: typeof ContactoSugerenciasRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -81,6 +128,27 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(Contacto)/Sugerencias': {
+      id: '/(Contacto)/Sugerencias'
+      path: '/Sugerencias'
+      fullPath: '/Sugerencias'
+      preLoaderRoute: typeof ContactoSugerenciasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(Contacto)/Reportes': {
+      id: '/(Contacto)/Reportes'
+      path: '/Reportes'
+      fullPath: '/Reportes'
+      preLoaderRoute: typeof ContactoReportesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(Contacto)/Quejas': {
+      id: '/(Contacto)/Quejas'
+      path: '/Quejas'
+      fullPath: '/Quejas'
+      preLoaderRoute: typeof ContactoQuejasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(AboutUs)/MisionVision': {
@@ -112,6 +180,9 @@ const rootRouteChildren: RootRouteChildren = {
   AboutUsDatosGeneralesRoute: AboutUsDatosGeneralesRoute,
   AboutUsHistoriaRoute: AboutUsHistoriaRoute,
   AboutUsMisionVisionRoute: AboutUsMisionVisionRoute,
+  ContactoQuejasRoute: ContactoQuejasRoute,
+  ContactoReportesRoute: ContactoReportesRoute,
+  ContactoSugerenciasRoute: ContactoSugerenciasRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
