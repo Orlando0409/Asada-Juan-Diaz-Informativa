@@ -1,4 +1,4 @@
-import Data from '../data/Data.json'
+import Data from '../../data/Data.json'
 const MisionVision = () => {
  
     const Mision= Data.mision

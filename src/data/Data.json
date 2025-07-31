@@ -1,12 +1,15 @@
 {
-  "nombre": "ASADA Juan Díaz",
-  "ubicacion": "Juan Diaz de Nicoya,Guanacaste, Costa Rica",
-  "servicios": [
-    "Agua potable para las comunidades de Juan Díaz y Oriente"
-  ],
   "mision": "Ser una ASADA líder en Guanacaste por la excelencia en distribución del servicio de agua potable, infraestructura sostenible y calidad garantizada del recurso.",
   "vision": "Maximizar el valor de la ASADA por medio de capacitaciones, proyectos, control de calidad y personal comprometido con el ambiente y la comunidad.",
-  "DatosGenerales": "En la ASADA de Juan Diaz trabajamos para brindar un servicio  de agua potable eficiente,sostenible y de alta calidad.Nuestro Compromiso es con la comunidad y el ambiente,garantizando una gestion responsable de este recurso.", 
+  "DatosGenerales": {
+    "nombre": "Asociación Administradora de Acueducto y Alcantarillado Juan Díaz",
+    "ubicacion": "Juan Diaz de Nicoya, Guanacaste, Costa Rica",
+    "añoFundacion": 2005,
+    "servicios": {
+      "descripcion": "Brindar agua potable para las comunidades de Juan Díaz y Oriente"
+    },
+    "descripcion": "En la ASADA de Juan Diaz trabajamos para brindar un servicio  de agua potable eficiente,sostenible y de alta calidad.Nuestro Compromiso es con la comunidad y el ambiente,garantizando una gestion responsable de este recurso."
+  },
   "historia": "La ASADA de Juan Díaz fue fundada en el año 2005. En un inicio, la idea principal era construir un acueducto para uso agrícola, pensando en beneficiar a los agricultores de la zona. Sin embargo, un vecino de la zona donó un terreno para un pozo. Las personas de la comunidad pensaron en la necesidad de acceso al agua potable en los hogares, y llegaron a la conclusión de que el agua para consumo humano era prioridad más que para el uso agrícola. Ante esta situación, se decidió cambiar el destino del proyecto y enfocarlo en llevar agua a las casas. Con este nuevo propósito se logró concretar un convenio con la delegación, lo que permitió la formalización de la creación de la ASADA. De esta manera, un proyecto que estaba destinado a la agricultura se transformó en una solución para la comunidad de Juan Díaz y sus alrededores.",
     "imageHistoria":{
       "src": "HISTORIA_ASADA.png",
@@ -38,6 +41,28 @@
       "Escritura del terreno"
     ]
   },
+    "requisitosConsultaPagos": {
+      "Número de abonado": "string",  
+      "Cédula del titular": "string"
+    },
+    "RequisitosContacto": {
+      "requisitosReportes": {
+      "Nombre": "Nombre del usuario",
+      "Apellido": "Apellido del usuario",
+      "texto": "Descripción detallada del reporte"
+    },
+    "requisitosQuejas": {
+      "Nombre": "Nombre del usuario",
+      "Apellido": "Apellido del usuario",
+      "texto": "Descripción detallada de la queja"
+    },
+    "requisitosSugerencias": {
+
+      "Nombre" : "Nombre del usuario",
+      "Apellido": "Apellido del usuario",
+      "texto": "Descripción detallada de la sugerencia"
+    }
+  },
   "header": {
     "logo": {
       
@@ -47,7 +72,12 @@
     },
     
    "hero":{
-    "ResumenHistoria":"La ASADA de Juan Díaz fue fundada en el año 2005. En un inicio, la idea principal era construir un acueducto para uso agrícola..."
+    "imagen":"/ASADA_JUAN_D.png",
+    "titulo1":"ASADA",
+    "titulo2":"Juan Diaz",
+    "subtitulo":"Trabajamos juntos para que el agua llegue segura a cada hogar",
+    "ResumenHistoria":"La ASADA de Juan Díaz fue fundada en el año 2005. En un inicio, la idea principal era construir un acueducto para uso agrícola, pensando en beneficiar a los agricultores de la zona. Sin embargo..."
+    
    },
    "Leermas":{
      "texto":"Leer más..."
@@ -56,44 +86,47 @@
     "navbar": {
       "menuItems": [
         {
-          "id": "sobreNosotros",
+          "id": 1,
           "texto": "Sobre Nosotros",
           "tipo": "dropdown",
           "subopciones": [
-            { "texto": "Datos Generales", "ruta": "/DatosGenerales" },
-            { "texto": "Historia", "ruta": "/Historia" },
-            { "texto": "Misión y Visión", "ruta": "/MisionVision" },
-            { "texto": "Calidad del Agua", "ruta": "/CalidadAgua" }
+            { "id": 10, "texto": "Datos Generales", "ruta": "/DatosGenerales" },
+            { "id": 11, "texto": "Historia", "ruta": "/Historia" },
+            { "id": 12, "texto": "Misión y Visión", "ruta": "/MisionVision" },
+            { "id": 13, "texto": "Calidad del Agua", "ruta": "/CalidadAgua" }
           ]
         },
         {
-          "id": "solicitudes",
+          "id": 2,
           "texto": "Solicitudes",
           "tipo": "link",
           "ruta": "/solicitudes"
         },
         {
-          "id": "consulta",
+          "id": 3,
           "texto": "Consulta de Pagos",
           "tipo": "link",
           "ruta": "/consulta"
         },
         {
-          "id": "contacto",
+          "id": 4,
           "texto": "Contacto",
           "tipo": "dropdown",
           "subopciones": [
-            { "texto": "Quejas", "ruta": "/Quejas" },
-            { "texto": "Sugerencias", "ruta": "/Sugerencias" },
-            { "texto": "Reportes", "ruta": "/Reportes" },
-            { "texto": "Preguntas Frecuentes", "ruta": "/PreguntasFrecuentes" }
+            { "id": 20, "texto": "Quejas", "ruta": "/Quejas" },
+            { "id": 21, "texto": "Sugerencias", "ruta": "/Sugerencias" },
+            { "id": 22, "texto": "Reportes", "ruta": "/Reportes" }
           ]
         }
+        ,
+        { 
+          "id": 5,
+          "tipo":"PreguntasFrecuentes",
+          "texto": "Preguntas Frecuentes",
+          "ruta": "/PreguntasFrecuentes" ,
+          "icono": "FaQuestionCircle"
+        }
       ]
-    },
-    "inicioSesion": {
-      "texto": "Iniciar Sesión",
-      "ruta": "/login"
     }
   },
   "footer": {
@@ -104,7 +137,6 @@
     "horarioAtencion": "Lunes a Viernes, 7:00 AM - 5:00 PM",
     "redesSociales": {
       "WhatsApp": "https://chat.whatsapp.com/IOTuJj4XCAU9S0FLzQFgTp?mode=ac_t"
-    },
-    "acercaDeNosotros": "En la ASADA de Juan Diaz trabajamos para brindar un servicio de agua potable eficiente,sostenible y de alta calidad.Nuestro Compromiso es con la comunidad y el ambiente,garantizando una gestion responsable de este recurso."
+    }
   }
 }

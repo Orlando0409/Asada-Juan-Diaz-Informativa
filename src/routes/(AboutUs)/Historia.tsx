@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import Historia from '../../Section/Historia'
+import Historia from '../../Section/DatosGenerales/Historia'
 
 export const Route = createFileRoute('/(AboutUs)/Historia')({
   component: RouteComponent,
