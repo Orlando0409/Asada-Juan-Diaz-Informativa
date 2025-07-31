@@ -1,4 +1,3 @@
-import React from 'react'
 import Data from '../data/Data.json'
 const Hero = () => {
 const { imagen,titulo1, titulo2, subtitulo}= Data.header.hero;
@@ -9,11 +8,11 @@ const { imagen,titulo1, titulo2, subtitulo}= Data.header.hero;
           className='w-full h-full object-cover'
         />
 
-<div className="absolute inset-0  flex  flex-col items-center justify-center text-center px-7">
-  <h1 className="text-white text-5xl font-extrabold">{titulo1}</h1>
-  <h1 className="text-white text-5xl font-extrabold">{titulo2}</h1>
+<div className="absolute inset-0  flex  flex-col items-start justify-center text-center px-7">
+  <h1 className="text-white text-9xl font-extrabold">{titulo1}</h1>
+  <h1 className="text-white text-9xl font-extrabold">{titulo2}</h1>
 
-  <p className="text-white text-lg pt-8">{subtitulo} </p>
+  <p className="text-white text-2xl pt-8">{subtitulo} </p>
 </div>
 
       </div>
