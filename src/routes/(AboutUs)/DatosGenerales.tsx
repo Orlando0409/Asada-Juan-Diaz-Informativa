@@ -6,5 +6,5 @@ export const Route = createFileRoute('/(AboutUs)/DatosGenerales')({
 })
 
 function RouteComponent() {
-  return  <DatosGenerales/>
+  return <DatosGenerales/>
 }
