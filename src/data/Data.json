@@ -72,7 +72,15 @@
     },
     
    "hero":{
-    "ResumenHistoria":"La ASADA de Juan Díaz fue fundada en el año 2005. En un inicio, la idea principal era construir un acueducto para uso agrícola..."
+    "imagen":"/ASADA_JUAN_D.png",
+    "titulo1":"ASADA",
+    "titulo2":"Juan Diaz",
+    "subtitulo":"Trabajamos juntos para que el agua llegue segura a cada hogar",
+
+    "ResumenHistoria":"La ASADA de Juan Díaz fue fundada en el año 2005. En un inicio, la idea principal era construir un acueducto para uso agrícola...",
+    "ResumenMision":"Ser una ASADA líder en Guanacaste...",
+    "Resumenvision":"Maximizar el valor de la ASADA por medio de capacitaciones..."
+    
    },
    "Leermas":{
      "texto":"Leer más..."
