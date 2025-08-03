@@ -119,9 +119,9 @@
           "texto": "Contacto",
           "tipo": "dropdown",
           "subopciones": [
-            { "id": 20, "texto": "Queja", "ruta": "/Queja" },
-            { "id": 21, "texto": "Sugerencia", "ruta": "/Sugerencia" },
-            { "id": 22, "texto": "Reporte", "ruta": "/Reporte" }
+            { "id": 20, "texto": "Queja", "ruta": "/Quejas" },
+            { "id": 21, "texto": "Sugerencia", "ruta": "/Sugerencias" },
+            { "id": 22, "texto": "Reporte", "ruta": "/Reportes" }
           ]
         }
         ,
