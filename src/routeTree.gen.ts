@@ -9,14 +9,19 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ContactoSugerenciasRouteImport } from './routes/(Contacto)/Sugerencias'
 import { Route as ContactoReportesRouteImport } from './routes/(Contacto)/Reportes'
 import { Route as ContactoQuejasRouteImport } from './routes/(Contacto)/Quejas'
-import { Route as AboutUsMisionVisionRouteImport } from './routes/(AboutUs)/MisionVision'
 import { Route as AboutUsHistoriaRouteImport } from './routes/(AboutUs)/Historia'
 import { Route as AboutUsDatosGeneralesRouteImport } from './routes/(AboutUs)/DatosGenerales'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -37,11 +42,6 @@ const ContactoQuejasRoute = ContactoQuejasRouteImport.update({
   path: '/Quejas',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AboutUsMisionVisionRoute = AboutUsMisionVisionRouteImport.update({
-  id: '/(AboutUs)/MisionVision',
-  path: '/MisionVision',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AboutUsHistoriaRoute = AboutUsHistoriaRouteImport.update({
   id: '/(AboutUs)/Historia',
   path: '/Historia',
@@ -55,18 +55,18 @@ const AboutUsDatosGeneralesRoute = AboutUsDatosGeneralesRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/DatosGenerales': typeof AboutUsDatosGeneralesRoute
   '/Historia': typeof AboutUsHistoriaRoute
-  '/MisionVision': typeof AboutUsMisionVisionRoute
   '/Quejas': typeof ContactoQuejasRoute
   '/Reportes': typeof ContactoReportesRoute
   '/Sugerencias': typeof ContactoSugerenciasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/DatosGenerales': typeof AboutUsDatosGeneralesRoute
   '/Historia': typeof AboutUsHistoriaRoute
-  '/MisionVision': typeof AboutUsMisionVisionRoute
   '/Quejas': typeof ContactoQuejasRoute
   '/Reportes': typeof ContactoReportesRoute
   '/Sugerencias': typeof ContactoSugerenciasRoute
@@ -74,9 +74,9 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/(AboutUs)/DatosGenerales': typeof AboutUsDatosGeneralesRoute
   '/(AboutUs)/Historia': typeof AboutUsHistoriaRoute
-  '/(AboutUs)/MisionVision': typeof AboutUsMisionVisionRoute
   '/(Contacto)/Quejas': typeof ContactoQuejasRoute
   '/(Contacto)/Reportes': typeof ContactoReportesRoute
   '/(Contacto)/Sugerencias': typeof ContactoSugerenciasRoute
@@ -85,27 +85,27 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/DatosGenerales'
     | '/Historia'
-    | '/MisionVision'
     | '/Quejas'
     | '/Reportes'
     | '/Sugerencias'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/DatosGenerales'
     | '/Historia'
-    | '/MisionVision'
     | '/Quejas'
     | '/Reportes'
     | '/Sugerencias'
   id:
     | '__root__'
     | '/'
+    | '/auth'
     | '/(AboutUs)/DatosGenerales'
     | '/(AboutUs)/Historia'
-    | '/(AboutUs)/MisionVision'
     | '/(Contacto)/Quejas'
     | '/(Contacto)/Reportes'
     | '/(Contacto)/Sugerencias'
@@ -113,9 +113,9 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRoute
   AboutUsDatosGeneralesRoute: typeof AboutUsDatosGeneralesRoute
   AboutUsHistoriaRoute: typeof AboutUsHistoriaRoute
-  AboutUsMisionVisionRoute: typeof AboutUsMisionVisionRoute
   ContactoQuejasRoute: typeof ContactoQuejasRoute
   ContactoReportesRoute: typeof ContactoReportesRoute
   ContactoSugerenciasRoute: typeof ContactoSugerenciasRoute
@@ -123,6 +123,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -151,13 +158,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactoQuejasRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(AboutUs)/MisionVision': {
-      id: '/(AboutUs)/MisionVision'
-      path: '/MisionVision'
-      fullPath: '/MisionVision'
-      preLoaderRoute: typeof AboutUsMisionVisionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/(AboutUs)/Historia': {
       id: '/(AboutUs)/Historia'
       path: '/Historia'
@@ -177,9 +177,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRoute,
   AboutUsDatosGeneralesRoute: AboutUsDatosGeneralesRoute,
   AboutUsHistoriaRoute: AboutUsHistoriaRoute,
-  AboutUsMisionVisionRoute: AboutUsMisionVisionRoute,
   ContactoQuejasRoute: ContactoQuejasRoute,
   ContactoReportesRoute: ContactoReportesRoute,
   ContactoSugerenciasRoute: ContactoSugerenciasRoute,

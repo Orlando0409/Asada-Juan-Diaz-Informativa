@@ -14,7 +14,7 @@ type Props = {
 
 const FormularioContacto = ({ tipo }: Props) => {
 
-    const [archivoSeleccionado, setArchivoSeleccionado] = useState<File | null>(null)
+  const [archivoSeleccionado, setArchivoSeleccionado] = useState<File | null>(null)
 
   const form = useForm({
     defaultValues: {
@@ -42,13 +42,13 @@ const FormularioContacto = ({ tipo }: Props) => {
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300'
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 text-gray-800">
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 text-gray-800 p-10">
       <form
         onSubmit={(e) => form.handleSubmit(e)}
         className="bg-white shadow-lg p-8 rounded-lg w-[95%] max-w-md"
       >
         <h2 className="text-center text-xl font-semibold mb-6">
-          Escribe tu {tipo.charAt(0).toUpperCase() + tipo.slice(1)}
+          Escribe tu {tipo}
         </h2>
 
        {Object.entries(campos).map(([fieldName, fieldProps]) => (
@@ -58,13 +58,16 @@ const FormularioContacto = ({ tipo }: Props) => {
       if (fieldProps.type === 'textarea') {
         return (
           <div className="mb-4">
-            <label className="block mb-1 font-medium">{fieldProps.label}</label>
+            <div className='flex gap-2'>
+              <label className="block mb-1 font-medium">{fieldProps.label}</label>
+              {fieldProps.required && <p className="inline text-red-500">*</p>}
+            </div>
             <textarea
               id={field.name}
               value={field.state.value as string}
               onBlur={field.handleBlur}
               onChange={(e) => field.handleChange(e.target.value)}
-              placeholder={`${fieldProps.label}${fieldProps.required ? ' (obligatorio)' : ' (opcional)'}`}
+              placeholder={`${fieldProps.label}`}
               className={`${commonClasses} h-28 resize-none`}
             />
             {field.state.meta.errors?.[0] && (
@@ -127,24 +130,27 @@ const FormularioContacto = ({ tipo }: Props) => {
 
       // Input tipo texto por defecto
       return (
-        <div className="mb-4">
+      <div className="mb-4">
+        <div className='flex gap-2'>
           <label className="block mb-1 font-medium">{fieldProps.label}</label>
-          <input
-            id={field.name}
-            type="text"
-            value={field.state.value as string}
-            onBlur={field.handleBlur}
-            onChange={(e) => field.handleChange(e.target.value)}
-            placeholder={`${fieldProps.label}${fieldProps.required ? ' (obligatorio)' : ' (opcional)'}`}
-            className={commonClasses}
-          />
-          {field.state.meta.errors?.[0] && (
-            <span className="text-red-500 text-sm">
-              {field.state.meta.errors[0]}
-            </span>
-          )}
+          {fieldProps.required && <p className="inline text-red-500">*</p>}
         </div>
-      )
+        <input
+          id={field.name}
+          type="text"
+          value={field.state.value as string}
+          onBlur={field.handleBlur}
+          onChange={(e) => field.handleChange(e.target.value)}
+          placeholder={`${fieldProps.label}`}
+          className={commonClasses}
+        />
+        {field.state.meta.errors?.[0] && (
+          <span className="text-red-500 text-sm">
+            {field.state.meta.errors[0]}
+          </span>
+        )}
+      </div>
+    )
     }}
   </form.Field>
 ))}

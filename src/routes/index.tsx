@@ -1,7 +1,8 @@
 import { createFileRoute} from '@tanstack/react-router'
-import ResumenHistoria from '../Section/DatosGenerales/ResumenHistoria'
-import Hero from '../Section/Hero'
-import Proyectos from '../Section/Proyectos'
+import Hero from '../Section/Landing/Hero'
+import Proyectos from '../Section/Landing/Proyectos'
+import MisionVision from '../Section/Landing/MisionVision'
+import Servicio from '../Section/Landing/Servicio'
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
@@ -11,7 +12,8 @@ export const Route = createFileRoute('/')({
   return (
     <div>
       <Hero/>
-      <ResumenHistoria/>
+      <MisionVision/>
+      <Servicio/>
       <Proyectos/>
     </div>
   )
