@@ -42,10 +42,10 @@ const FormularioContacto = ({ tipo }: Props) => {
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300'
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 text-gray-800 p-10">
+    <div className="flex justify-center items-center max-h-screen bg-gray-100 text-gray-800 p-7">
       <form
         onSubmit={(e) => form.handleSubmit(e)}
-        className="bg-white shadow-lg p-8 rounded-lg w-[95%] max-w-md"
+        className="bg-white gap-2 shadow-lg pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-md max-h-auto overflow-y-auto"
       >
         <h2 className="text-center text-xl font-semibold mb-6">
           Escribe tu {tipo}
@@ -57,7 +57,7 @@ const FormularioContacto = ({ tipo }: Props) => {
 
       if (fieldProps.type === 'textarea') {
         return (
-          <div className="mb-4">
+          <div >
             <div className='flex gap-2'>
               <label className="block mb-1 font-medium">{fieldProps.label}</label>
               {fieldProps.required && <p className="inline text-red-500">*</p>}
@@ -81,9 +81,9 @@ const FormularioContacto = ({ tipo }: Props) => {
 
       if (fieldProps.type === 'file') {
         return (
-          <div className="w-full mb-6" key={field.name}>
+          <div className="w-full mb-2" key={field.name}>
             <label htmlFor="adjunto" className="block mb-1 font-medium">
-              {fieldProps.label}
+              {fieldProps.label} (Opcional)
             </label>
             <input
               id="adjunto"
@@ -108,7 +108,7 @@ const FormularioContacto = ({ tipo }: Props) => {
               {archivoSeleccionado ? 'Archivo cargado' : 'Subir archivo'}
             </label>
             {archivoSeleccionado && (
-              <div className="border rounded-md p-3 bg-gray-50 pb-3 mb-4">
+              <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2">
                 <div className="flex justify-between items-center text-sm">
                   <span>{archivoSeleccionado.name}</span>
                   <button
@@ -130,7 +130,7 @@ const FormularioContacto = ({ tipo }: Props) => {
 
       // Input tipo texto por defecto
       return (
-      <div className="mb-4">
+      <div >
         <div className='flex gap-2'>
           <label className="block mb-1 font-medium">{fieldProps.label}</label>
           {fieldProps.required && <p className="inline text-red-500">*</p>}
@@ -155,13 +155,16 @@ const FormularioContacto = ({ tipo }: Props) => {
   </form.Field>
 ))}
 
+      <div className="flex justify-end items-end">
+          <button
+            type="submit"
+            className="w-[120px] bg-blue-900 text-white py-2 rounded hover:bg-blue-800 transition"
+          >
+            Enviar
+          </button>
+      </div>
 
-        <button
-          type="submit"
-          className="w-full bg-blue-900 text-white py-2 rounded hover:bg-blue-800 transition"
-        >
-          Enviar
-        </button>
+
       </form>
     </div>
   )

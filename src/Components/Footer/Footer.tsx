@@ -1,11 +1,11 @@
-import Mapa from './mapa'
+import Mapa from './Mapa'
 import Redes from './Redes';
 
 const Footer = () => {
     const year = new Date().getFullYear();
   return (
 <footer className="w-full flex flex-col items-center gap-4 p-4 bg-gray-800 text-white">
-  <div className="w-[100vw] flex flex-wrap justify-between items-center gap-6 px-4 lg:px-12">
+  <div className="w-[100vw] flex flex-wrap justify-center items-center gap-6 px-4 lg:px-12">
     <Redes />
     <Mapa />
   

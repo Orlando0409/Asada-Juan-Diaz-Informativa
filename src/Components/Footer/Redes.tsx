@@ -6,21 +6,21 @@ const Redes = () => {
 
   return (
     <div
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 w-full text-center sm:text-left"
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 text-center sm:text-left"
     >
       {/* Contacto */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 justify-center items-center sm:items-start">
         <h4 className="font-semibold text-base sm:text-lg lg:text-xl">Contacto</h4>
-        <p className="flex justify-center sm:justify-start items-center gap-2 text-sm sm:text-base lg:text-lg">
+        <p className="flex justify-start sm:justify-center items-center gap-2 text-sm sm:text-base lg:text-lg">
           <FaPhone className="text-green-500" /> {contacto.telefono}
         </p>
-        <p className="flex justify-center sm:justify-start items-center gap-2 text-sm sm:text-base lg:text-lg">
+        <p className="flex justify-start sm:justify-center items-center gap-2 text-sm sm:text-base lg:text-lg">
           <FaEnvelope className="text-white-400" /> {contacto.correo}
         </p>
       </div>
 
       {/* Horario */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 justify-center items-center sm:items-start">
         <h4 className="font-semibold text-base sm:text-lg lg:text-xl">
           Horario de Atención
         </h4>
@@ -28,7 +28,7 @@ const Redes = () => {
       </div>
 
       {/* Redes Sociales */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 justify-center items-center sm:items-start">
         <h4 className="font-semibold text-base sm:text-lg lg:text-xl">
           Redes Sociales
         </h4>
@@ -36,10 +36,9 @@ const Redes = () => {
           href={redesSociales.WhatsApp}
           target="_blank"
           rel="noopener noreferrer"
-          className="
-            flex justify-center sm:justify-start items-center gap-2 text-green-500 hover:underline hover:text-green-400 transition-colors text-sm sm:text-base lg:text-lg"
+          className="flex justify-center max-w-[120px] sm:justify-center items-center gap-2 text-green-500 hover:underline hover:text-green-400 transition-colors text-sm sm:text-base lg:text-lg"
         >
-          <FaWhatsapp /> WhatsApp
+          <FaWhatsapp size={20} /> WhatsApp
         </a>
       </div>
     </div>
