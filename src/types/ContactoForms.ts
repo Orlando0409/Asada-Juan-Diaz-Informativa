@@ -1,8 +1,9 @@
-export type ContactoTipo = 'Reportes' | 'Quejas' | 'Sugerencias'
+export type ContactoTipo = 'Reporte' | 'Queja' | 'Sugerencia'
 
 export interface Requisito {
   Nombre: string
-  Apellido: string
+  PrimerApellido: string
+  SegundoApellido?: string
   texto: string
 }
 
@@ -18,9 +19,9 @@ export interface ContactoFormData extends Requisito {
 
 export const getRequisitosKey = (tipo: ContactoTipo): keyof RequisitosContacto => {
   const mapping: Record<ContactoTipo, keyof RequisitosContacto> = {
-    Reportes: 'requisitosReportes',
-    Quejas: 'requisitosQuejas',
-    Sugerencias: 'requisitosSugerencias'
+    Reporte: 'requisitosReportes',
+    Queja: 'requisitosQuejas',
+    Sugerencia: 'requisitosSugerencias'
   }
   return mapping[tipo]
 }

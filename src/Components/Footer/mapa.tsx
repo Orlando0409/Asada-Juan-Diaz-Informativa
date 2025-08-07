@@ -23,7 +23,7 @@ export default function Mapa() {
     <div 
     ref={mapRef}
     id="map"
-    className="w-full min-w-[300px] min-h-[300px] max-w-xs sm:max-w-sm md:max-w-md z-1">
+    className="w-full h-[250px]  z-1">
     </div>
   );
 }
