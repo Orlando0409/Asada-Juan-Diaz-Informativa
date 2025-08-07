@@ -4,8 +4,8 @@ import Redes from './Redes';
 const Footer = () => {
     const year = new Date().getFullYear();
   return (
-<footer className="w-full flex flex-col items-center gap-4 p-4 bg-gray-800 text-white">
-  <div className="w-[100vw] flex flex-wrap justify-center items-center gap-6 px-4 lg:px-12">
+<footer className="w-full h-full flex flex-col items-center gap-4 p-4 bg-gray-800 text-white">
+  <div className=" flex flex-wrap justify-center items-center gap-6 px-4 lg:px-12">
     <Redes />
     <Mapa />
   
