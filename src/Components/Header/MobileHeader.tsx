@@ -57,7 +57,7 @@ const MobileHeader = ({ menuItems }: MobileHeaderProps) => {
                         <div className='pl-4 space-y-1'>
                           {item.subopciones?.map((subitem) => (
                             <Link
-                              key={subitem.ruta}
+                              key={subitem.id}
                               to={subitem.ruta}
                               className='block py-2 px-3 text-sm text-gray-600 hover:bg-[#6FCAF1]/10 hover:text-[#6FCAF1] rounded-md transition-all duration-200 hover:pl-4'
                               onClick={() => setIsOpen(false)}

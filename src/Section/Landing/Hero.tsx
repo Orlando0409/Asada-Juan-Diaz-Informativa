@@ -4,7 +4,7 @@ const Hero = () => {
   const { imagen, titulo1, subtitulo } = Data.header.hero
 
   return (
-    <div className="relative w-full h-[70vh] sm:h-[80vh] lg:h-[90vh]">
+    <div className="relative w-full h-[70vh] sm:h-[80vh] lg:h-[75vh]">
       <img
         alt="Historia de la ASADA de Juan Díaz"
         src={imagen}
