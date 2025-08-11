@@ -13,7 +13,7 @@ const Dropdown = ({ texto, Subopcion }: DropdownProps) => {
       <div className='absolute left-0 hidden group-hover:block bg-white shadow-lg rounded-md mt-2 z-10 w-48 border border-gray-100'>
         <ul className='py-2 text-sm text-gray-700'>
           {Subopcion.map((opcion) => (
-            <li key={opcion.texto}>
+            <li key={opcion.id}>
               <Link
                 id={opcion.texto}
                 to={opcion.ruta}

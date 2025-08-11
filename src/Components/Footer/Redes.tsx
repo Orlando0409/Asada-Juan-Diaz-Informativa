@@ -6,10 +6,10 @@ const Redes = () => {
 
   return (
     <div
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 text-center sm:text-left"
+      className="max-h-[600px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 text-center sm:text-left p-4"
     >
       {/* Contacto */}
-      <div className="flex flex-col gap-2 justify-center items-center sm:items-start">
+      <div className="h-full flex flex-col gap-2 justify-center items-center sm:items-start">
         <h4 className="font-semibold text-base sm:text-lg lg:text-xl">Contacto</h4>
         <p className="flex justify-start sm:justify-center items-center gap-2 text-sm sm:text-base lg:text-lg">
           <FaPhone className="text-green-500" /> {contacto.telefono}
@@ -20,7 +20,7 @@ const Redes = () => {
       </div>
 
       {/* Horario */}
-      <div className="flex flex-col gap-2 justify-center items-center sm:items-start">
+      <div className="h-full flex flex-col gap-2 justify-start items-center sm:items-start">
         <h4 className="font-semibold text-base sm:text-lg lg:text-xl">
           Horario de Atención
         </h4>
@@ -28,7 +28,7 @@ const Redes = () => {
       </div>
 
       {/* Redes Sociales */}
-      <div className="flex flex-col gap-2 justify-center items-center sm:items-start">
+      <div className="h-full flex flex-col gap-2 justify-start items-center sm:items-start">
         <h4 className="font-semibold text-base sm:text-lg lg:text-xl">
           Redes Sociales
         </h4>
