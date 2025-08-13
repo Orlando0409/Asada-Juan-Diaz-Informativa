@@ -1,101 +1,106 @@
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination, Autoplay, Navigation } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/pagination";
-import "swiper/css/navigation";
-
-//import "swiper/swiper-bundle.css";
-//import "swiper/swiper-bundle.css";
+import { useState, useEffect } from "react";
 import { useProyectos } from "../../Hook/Proyecto/hookProyecto";
-import BotonLeerMas from "../../Components/Proyecto/BotonLeermas";
-import { useState } from "react";
+import ProyectosMobile from "../../Components/Proyecto/ProyectosMobile";
+import ProyectosDesktop from "../../Components/Proyecto/ProyectosDesktop";
+import Data from "../../data/Data.json";
 
-function Proyectos (){
-const{data: proyectos, isLoanding, isError}=useProyectos();
-   const [proyectoEx, setProyectoEx] = useState<number | null>(null);
 
-  //  Función que activa o desactiva la descripción
-  const toggleDescripcion = (id: number) => {
-    if (proyectoEx === id) {
-      setProyectoEx(null); // si ya está abierto, lo cerramos
+function Proyectos() {
+  const [slideActual, setSlideActual] = useState(0);
+  const [estaPausado, setEstaPausado] = useState(false);
+  const [proyectoExpandido, setProyectoExpandido] = useState<number | null>(null);
+  const {titulo, descripcion } = Data.ProyectoSeccion;
+  const { data: proyectos, isLoading } = useProyectos();
+
+  // Auto-cambio cada 2 segundos
+  useEffect(() => {
+    if (estaPausado || !proyectos) return;
+
+    const intervalo = setInterval(() => {
+      setSlideActual(prevSlide => 
+        prevSlide === proyectos.length - 1 ? 0 : prevSlide + 1
+      );
+    }, 2000);
+
+    return () => clearInterval(intervalo);
+  }, [estaPausado, proyectos]);
+
+  // Funciones de navegación
+  const irASiguiente = () => {
+    if (!proyectos) return;
+    setSlideActual(slideActual === proyectos.length - 1 ? 0 : slideActual + 1);
+    setProyectoExpandido(null);
+    setEstaPausado(false);
+  };
+
+  const irAAnterior = () => {
+    if (!proyectos) return;
+    setSlideActual(slideActual === 0 ? proyectos.length - 1 : slideActual - 1);
+    setProyectoExpandido(null);
+    setEstaPausado(false);
+  };
+
+  const irASlide = (index: number) => {
+    setSlideActual(index);
+    setProyectoExpandido(null);
+    setEstaPausado(false);
+  };
+
+  const toggleDescripcion = (idProyecto: number) => {
+    if (proyectoExpandido === idProyecto) {
+      setProyectoExpandido(null);
+      setEstaPausado(false);
     } else {
-      setProyectoEx(id); // si está cerrado, lo abrimos
+      setProyectoExpandido(idProyecto);
+      setEstaPausado(true);
     }
   };
 
+  // Loading
+  if (isLoading) {
+    return (
+      <section className="py-8 md:py-16 bg-gradient-to-br from-slate-50 to-blue-100 text-center">
+        <div className="container mx-auto px-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg">Cargando proyectos...</p>
+        </div>
+      </section>
+    );
+  }
 
-if(isLoanding)return <p>Cargando proyectos...</p>
-if (isError) return <p> No se lograron cargar los proyectos</p>
+  if (!proyectos) {
+     return (
+      <section className="py-8 md:py-16 bg-gradient-to-br from-slate-50 to-blue-100 text-center">
+        <div className="container mx-auto px-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg">No hay proyectos disponibles.</p>
+        </div>
+      </section>
+    );
+  }
 
- 
+  const porcentajeProgreso = ((slideActual + 1) / proyectos.length) * 100;
 
-return (
-<section className ="py-8 bg-gray-100
-">
-  
- <div className="flex items-start">   {/*contenedor*/}  
-  <div className=" w-2/4 flex justify-center"> {/*columna izquierda*/}
-  <div className="mt-20">
-    <div>
-  <h2 className="text-5xl font-bold text-blue-500 transform translate-y-6">
-  Proyectos
-</h2>
-  </div>
-  </div>
+  // Props compartidas para ambos componentes
+  const carruselProps = {
+    proyectos,
+    slideActual,
+    proyectoExpandido,
+    porcentajeProgreso,
+    irAAnterior,
+    irASiguiente,
+    irASlide,
+    toggleDescripcion,
+    titulo,
+    descripcion
+  };
 
-  </div>
- </div>
-
-      {/* Línea vertical */}
-   <div className="w-px bg-gray-500 h-74 -mt-30 ml-120"></div>
-
- <div className="w-4/9 max-w-md ml-150 -mt-73">
-  <Swiper
-        
-    modules={[Pagination, Autoplay, Navigation]}
-    spaceBetween={10}
-    slidesPerView={1}
-    pagination={{clickable:true}}
-    navigation={false} /*habilita botones*/
-    autoplay={{delay: 3000, disableOnInteraction:false}}
-
-    >
-  {proyectos?.map((proyecto) => (
-              <SwiperSlide key={proyecto.id_Proyecto}>
-                <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                  <img
-                   alt={proyecto.Titulo}
-                    src={proyecto.imagenUrl}
-                   
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="p-4">
-                    <h3 className="text-lg text-blue-500 font-semibold mb-1">
-                        {proyecto.Titulo}
-                      </h3>
-                     
-                      
-                     <BotonLeerMas
-                    descripcion={proyecto.descripcion}
-                    mostrarTodo={proyectoEx === proyecto.id_Proyecto}
-                    onToggle={() => toggleDescripcion(proyecto.id_Proyecto)}
-                  />
-                  
-                  </div>
-
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-
-      </div>
-
-
-</section>
-
-)
-
+  return (
+    <>
+      <ProyectosMobile {...carruselProps} />
+      <ProyectosDesktop {...carruselProps} />
+    </>
+  );
 }
-export default Proyectos
 
-
+export default Proyectos;

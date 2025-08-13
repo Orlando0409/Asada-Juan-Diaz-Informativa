@@ -141,6 +141,10 @@
     "redesSociales": {
       "WhatsApp": "https://chat.whatsapp.com/IOTuJj4XCAU9S0FLzQFgTp?mode=ac_t"
     }
+  },
+  "ProyectoSeccion": {
+    "titulo": "Proyectos",
+    "descripcion": "Descubre nuestros proyectos de desarrollo e infraestructura que transforman nuestra comunidad."
   }
   
 }
