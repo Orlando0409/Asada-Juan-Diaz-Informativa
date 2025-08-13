@@ -64,10 +64,7 @@
       "adjunto": { "label": "Adjuntar imagen", "type": "file", "required": false }
     },
     "requisitosSugerencias": {
-      "nombre": { "label": "Nombre completo", "type": "text", "required": true },
-      "primerApellido": { "label": "Primer apellido", "type": "text", "required": true },
-      "segundoApellido": { "label": "Segundo apellido", "type": "text", "required": false },
-      "mensaje": { "label": "Mensaje de tu sugerencia", "type": "textarea", "required": true },
+      "mensaje": { "label": "Descripción de tu sugerencia", "type": "textarea", "required": true },
       "adjunto": { "label": "Adjuntar imagen", "type": "file", "required": false }
     }
   },
@@ -87,7 +84,7 @@
     
    },
    "Leermas":{
-     "texto":"Leer más..."
+     "texto":"Ver más"
    },
 
     "navbar": {
