@@ -18,29 +18,29 @@
     "ruta": "/Historia"
      },
   "requisitosSolicitudes": {
-    "abonado": [
-      "Ser mayor de edad",
-      "Cédula",
-      "Nombre completo (Apellidos)",
-      "Dirección exacta de residencia",
-      "Número de teléfono",
-      "Correo electrónico",
-      "Planos del terreno",
-      "Escritura del terreno"
-    ],
-    "cambioMedidor": [
-      "Cédula",
-      "Nombre completo (Apellidos)",
-      "Dirección exacta",
-      "Correo electrónico",
-      "Número de teléfono",
-      "Motivo de solicitud"
-    ],
-    "desconexion": [
-      "Motivo de solicitud",
-      "Planos del terreno",
-      "Escritura del terreno"
-    ]
+    "abonado": {
+      "Edad":{ "label": "Ser mayor de edad", "type": "text", "required": true },
+      "Cédula": { "label": "Cédula", "type": "text", "required": true },
+      "NombreCompleto": { "label": "Nombre completo (Apellidos)", "type": "text", "required": true },
+      "DirecciónExacta": { "label": "Dirección exacta de residencia", "type": "text", "required": true },
+      "NúmeroTeléfono": { "label": "Número de teléfono", "type": "text", "required": true },
+      "CorreoElectrónico": { "label": "Correo electrónico", "type": "email", "required": true },
+      "PlanosDelTerreno": { "label": "Planos del terreno", "type": "file", "required": true },
+      "EscrituraDelTerreno": { "label": "Escritura del terreno", "type": "file", "required": true }
+    },
+    "cambioMedidor": {
+      "Cédula": { "label": "Cédula", "type": "text", "required": true },
+      "NombreCompleto": { "label": "Nombre completo (Apellidos)", "type": "text", "required": true },
+      "DirecciónExacta": { "label": "Dirección exacta", "type": "text", "required": true },
+      "CorreoElectrónico": { "label": "Correo electrónico", "type": "email", "required": true },
+      "NúmeroTeléfono": { "label": "Número de teléfono", "type": "text", "required": true },
+      "MotivoSolicitud": { "label": "Motivo de solicitud", "type": "text", "required": true }
+    },
+    "desconexion": {
+      "MotivoSolicitud": { "label": "Motivo de solicitud", "type": "text", "required": true },
+      "PlanosDelTerreno": { "label": "Planos del terreno", "type": "file", "required": true },
+      "EscrituraDelTerreno": { "label": "Escritura del terreno", "type": "file", "required": true }
+    }
   },
     "requisitosConsultaPagos": {
       "Número de abonado": "string",  
