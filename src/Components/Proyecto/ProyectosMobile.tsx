@@ -27,6 +27,20 @@ function ProyectosMobile({
   titulo,
   descripcion
 }: Readonly<ProyectosMobileProps>) {
+
+    const getBadgeClasses = (estadoNombre: string) => {
+    if (estadoNombre === 'Activo') {
+      return 'bg-green-100 text-green-800 border-green-200';
+    }
+    if (estadoNombre === 'En progreso') {
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    }
+    if (estadoNombre === 'Finalizado') {
+      return 'bg-blue-100 text-blue-800 border-blue-200';
+    }
+    return 'bg-gray-100 text-gray-800 border-gray-200';
+  };
+
   return (
     <section className="py-8 md:py-12 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 lg:hidden">
       <div className="container mx-auto px-4">
@@ -67,9 +81,9 @@ function ProyectosMobile({
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                       
                       {/* Badge estado móvil */}
-                      <span className="absolute top-3 right-3 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-                        {proyecto.estado?.Nombre_Estado || 'En progreso'}
-                      </span>
+                        <span className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium border ${getBadgeClasses(proyecto.estado.Nombre_Estado)}`}>
+                            {proyecto.estado.Nombre_Estado}
+                        </span>
                     </div>
 
                     {/* Contenido tarjeta móvil */}
@@ -87,6 +101,7 @@ function ProyectosMobile({
 
                       <BotonLeerMas
                         descripcion={proyecto.descripcion}
+
                         mostrarTodo={proyectoExpandido === proyecto.id_Proyecto}
                         onToggle={() => toggleDescripcion(proyecto.id_Proyecto)}
                       />

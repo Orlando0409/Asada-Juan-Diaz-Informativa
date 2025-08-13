@@ -27,6 +27,33 @@ function ProyectosDesktop({
   titulo,
   descripcion
 }: Readonly<ProyectosDesktopProps>) {
+  
+  const getBadgeClasses = (estadoNombre: string) => {
+    if (estadoNombre === 'Activo') {
+      return 'bg-green-100 text-green-800 border-green-200';
+    }
+    if (estadoNombre === 'En progreso') {
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    }
+    if (estadoNombre === 'Finalizado') {
+      return 'bg-blue-100 text-blue-800 border-blue-200';
+    }
+    return 'bg-gray-100 text-gray-800 border-gray-200';
+  };
+
+  const getDotColor = (estadoNombre: string) => {
+    if (estadoNombre === 'Activo') {
+      return 'bg-green-500';
+    }
+    if (estadoNombre === 'En progreso') {
+      return 'bg-yellow-500';
+    }
+    if (estadoNombre === 'Finalizado') {
+      return 'bg-blue-500';
+    }
+    return 'bg-gray-500';
+  };
+
   return (
     <section className="hidden lg:block py-16 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative">
       
@@ -63,23 +90,26 @@ function ProyectosDesktop({
               {proyectos.map((proyecto, index) => (
                 <div key={proyecto.id_Proyecto} className="w-full flex-shrink-0">
                   
-                  {/* Tarjeta desktop */}
-                  <div className={`bg-white rounded-xl shadow-xl overflow-hidden transition-all duration-500 border border-gray-100 hover:shadow-2xl ${
+                  {/* Card   */}
+                  <div className={`bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100 hover:shadow-2xl transition-all duration-500 ${
                     index === slideActual ? 'scale-100' : 'scale-95'
                   }`}>
                     
-                    {/* Imagen desktop */}
+                    {/* IMAGEN */}
                     <div className="relative overflow-hidden">
                       <img
                         alt={proyecto.Titulo}
                         src={proyecto.imagenUrl}
                         className="w-full h-56 object-cover transition-transform duration-700 hover:scale-105"
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://via.placeholder.com/400x300/E5E7EB/9CA3AF?text=Imagen+no+disponible';
+                        }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                       
                       {/* Badge estado desktop */}
-                      <span className="absolute top-4 right-4 bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium border border-blue-200">
-                        {proyecto.estado?.Nombre_Estado || 'En progreso'}
+                      <span className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium border ${getBadgeClasses(proyecto.estado.Nombre_Estado)}`}>
+                        {proyecto.estado.Nombre_Estado}
                       </span>
                     </div>
 
@@ -90,7 +120,7 @@ function ProyectosDesktop({
                       </h3>
                       
                       <div className="flex items-center space-x-2 text-sm text-gray-500 mb-4">
-                        <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                        <span className={`w-2 h-2 rounded-full ${getDotColor(proyecto.estado.Nombre_Estado)}`}></span>
                         <span>
                           Actualizado: {new Date(proyecto.fecha_Actualizacion).toLocaleDateString('es-ES')}
                         </span>
