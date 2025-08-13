@@ -42,7 +42,7 @@ const FormularioContacto = ({ tipo }: Props) => {
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300'
 
   return (
-    <div className="flex justify-center items-center max-h-screen bg-gray-100 text-gray-800 p-7">
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 text-gray-800 p-7">
       <form
         onSubmit={(e) => form.handleSubmit(e)}
         className="bg-white gap-2 shadow-lg pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-md max-h-auto overflow-y-auto"
@@ -109,7 +109,7 @@ const FormularioContacto = ({ tipo }: Props) => {
             </label>
             {archivoSeleccionado && (
               <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2">
-                <div className="flex justify-between items-center text-sm">
+                <div className="flex flex-wrap text-[.55rem] justify-between items-center sm:text-sm md:text-md lg:text-lg">
                   <span>{archivoSeleccionado.name}</span>
                   <button
                     type="button"
