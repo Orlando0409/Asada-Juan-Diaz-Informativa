@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 
-=======
-// src/types/Proyecto.ts
->>>>>>> Orlando-features
 export interface Proyecto {
   
   id_Proyecto: number;
@@ -18,9 +14,7 @@ export interface Proyecto {
   imagenUrl: string;
 }
 
-<<<<<<< HEAD
 
-=======
 export interface ProjectCardProps {
   proyecto: Proyecto;
   isActive: boolean;
@@ -39,4 +33,4 @@ export interface CarouselState {
   isPaused: boolean;
   expandedProject: number | null;
 }
->>>>>>> Orlando-features
+

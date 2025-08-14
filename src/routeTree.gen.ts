@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SolicitudesAfiliacionRouteImport } from './routes/(Solicitudes)/Afiliacion'
 import { Route as ContactoSugerenciasRouteImport } from './routes/(Contacto)/Sugerencias'
 import { Route as ContactoReportesRouteImport } from './routes/(Contacto)/Reportes'
 import { Route as ContactoQuejasRouteImport } from './routes/(Contacto)/Quejas'
@@ -25,6 +26,11 @@ const AuthRoute = AuthRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolicitudesAfiliacionRoute = SolicitudesAfiliacionRouteImport.update({
+  id: '/(Solicitudes)/Afiliacion',
+  path: '/Afiliacion',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactoSugerenciasRoute = ContactoSugerenciasRouteImport.update({
@@ -61,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/Quejas': typeof ContactoQuejasRoute
   '/Reportes': typeof ContactoReportesRoute
   '/Sugerencias': typeof ContactoSugerenciasRoute
+  '/Afiliacion': typeof SolicitudesAfiliacionRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/Quejas': typeof ContactoQuejasRoute
   '/Reportes': typeof ContactoReportesRoute
   '/Sugerencias': typeof ContactoSugerenciasRoute
+  '/Afiliacion': typeof SolicitudesAfiliacionRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +88,7 @@ export interface FileRoutesById {
   '/(Contacto)/Quejas': typeof ContactoQuejasRoute
   '/(Contacto)/Reportes': typeof ContactoReportesRoute
   '/(Contacto)/Sugerencias': typeof ContactoSugerenciasRoute
+  '/(Solicitudes)/Afiliacion': typeof SolicitudesAfiliacionRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/Quejas'
     | '/Reportes'
     | '/Sugerencias'
+    | '/Afiliacion'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/Quejas'
     | '/Reportes'
     | '/Sugerencias'
+    | '/Afiliacion'
   id:
     | '__root__'
     | '/'
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/(Contacto)/Quejas'
     | '/(Contacto)/Reportes'
     | '/(Contacto)/Sugerencias'
+    | '/(Solicitudes)/Afiliacion'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,6 +131,7 @@ export interface RootRouteChildren {
   ContactoQuejasRoute: typeof ContactoQuejasRoute
   ContactoReportesRoute: typeof ContactoReportesRoute
   ContactoSugerenciasRoute: typeof ContactoSugerenciasRoute
+  SolicitudesAfiliacionRoute: typeof SolicitudesAfiliacionRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -135,6 +148,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(Solicitudes)/Afiliacion': {
+      id: '/(Solicitudes)/Afiliacion'
+      path: '/Afiliacion'
+      fullPath: '/Afiliacion'
+      preLoaderRoute: typeof SolicitudesAfiliacionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(Contacto)/Sugerencias': {
@@ -183,6 +203,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactoQuejasRoute: ContactoQuejasRoute,
   ContactoReportesRoute: ContactoReportesRoute,
   ContactoSugerenciasRoute: ContactoSugerenciasRoute,
+  SolicitudesAfiliacionRoute: SolicitudesAfiliacionRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

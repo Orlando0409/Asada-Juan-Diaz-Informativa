@@ -100,10 +100,14 @@
           ]
         },
         {
-          "id": 2,
-          "texto": "Solicitudes",
-          "tipo": "link",
-          "ruta": "/solicitudes"
+         "id": 2,
+        "texto": "Solicitudes",
+        "tipo": "dropdown",
+        "subopciones": [
+          { "id": 1, "texto": "Afiliación", "ruta": "/afiliacion" },
+          { "id": 2, "texto": "Cambio de medidor", "ruta": "/cambio-medidor" },
+          { "id": 3, "texto": "Desconexión de medidor", "ruta": "/desconexion-medidor" }
+        ]
         },
         {
           "id": 3,
