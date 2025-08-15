@@ -1,6 +1,6 @@
 import React from 'react';
 
-// Button simple
+// Button de enviar
 export function Button({ className, ...props }: Readonly<React.ButtonHTMLAttributes<HTMLButtonElement>>) {
   return (
     <button
@@ -10,7 +10,7 @@ export function Button({ className, ...props }: Readonly<React.ButtonHTMLAttribu
   );
 }
 
-// Input simple
+// Input de texto
 export function Input({ className, ...props }: Readonly<React.InputHTMLAttributes<HTMLInputElement>>) {
   return (
     <input
