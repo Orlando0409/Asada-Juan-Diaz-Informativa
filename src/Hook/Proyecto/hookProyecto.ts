@@ -1,7 +1,8 @@
-// src/hooks/useProyectos.ts
-import { useQuery } from "@tanstack/react-query";
+
 import type { Proyecto } from "../../types/Proyecto/Proyecto";
 import { getAllProyectos } from "../../Services/Proyectos/ProyectoService";
+import { useQuery } from "@tanstack/react-query";
+
 
 export const useProyectos = () => {
   return useQuery<Proyecto[]>({

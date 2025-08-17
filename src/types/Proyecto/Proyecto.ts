@@ -1,4 +1,3 @@
-// src/types/Proyecto.ts
 export interface Proyecto {
   
   id_Proyecto: number;
@@ -13,6 +12,7 @@ export interface Proyecto {
   };
   imagenUrl: string;
 }
+
 
 export interface ProjectCardProps {
   proyecto: Proyecto;
@@ -32,3 +32,4 @@ export interface CarouselState {
   isPaused: boolean;
   expandedProject: number | null;
 }
+

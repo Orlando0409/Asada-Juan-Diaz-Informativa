@@ -11,6 +11,10 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SolicitudesDesconexionMedidorRouteImport } from './routes/(Solicitudes)/DesconexionMedidor'
+import { Route as SolicitudesCambiomedidorRouteImport } from './routes/(Solicitudes)/Cambiomedidor'
+import { Route as SolicitudesAsociadoRouteImport } from './routes/(Solicitudes)/Asociado'
+import { Route as SolicitudesAfiliacionRouteImport } from './routes/(Solicitudes)/Afiliacion'
 import { Route as ContactoSugerenciasRouteImport } from './routes/(Contacto)/Sugerencias'
 import { Route as ContactoReportesRouteImport } from './routes/(Contacto)/Reportes'
 import { Route as ContactoQuejasRouteImport } from './routes/(Contacto)/Quejas'
@@ -25,6 +29,28 @@ const AuthRoute = AuthRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolicitudesDesconexionMedidorRoute =
+  SolicitudesDesconexionMedidorRouteImport.update({
+    id: '/(Solicitudes)/DesconexionMedidor',
+    path: '/DesconexionMedidor',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const SolicitudesCambiomedidorRoute =
+  SolicitudesCambiomedidorRouteImport.update({
+    id: '/(Solicitudes)/Cambiomedidor',
+    path: '/Cambiomedidor',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const SolicitudesAsociadoRoute = SolicitudesAsociadoRouteImport.update({
+  id: '/(Solicitudes)/Asociado',
+  path: '/Asociado',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolicitudesAfiliacionRoute = SolicitudesAfiliacionRouteImport.update({
+  id: '/(Solicitudes)/Afiliacion',
+  path: '/Afiliacion',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactoSugerenciasRoute = ContactoSugerenciasRouteImport.update({
@@ -61,6 +87,10 @@ export interface FileRoutesByFullPath {
   '/Quejas': typeof ContactoQuejasRoute
   '/Reportes': typeof ContactoReportesRoute
   '/Sugerencias': typeof ContactoSugerenciasRoute
+  '/Afiliacion': typeof SolicitudesAfiliacionRoute
+  '/Asociado': typeof SolicitudesAsociadoRoute
+  '/Cambiomedidor': typeof SolicitudesCambiomedidorRoute
+  '/DesconexionMedidor': typeof SolicitudesDesconexionMedidorRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +100,10 @@ export interface FileRoutesByTo {
   '/Quejas': typeof ContactoQuejasRoute
   '/Reportes': typeof ContactoReportesRoute
   '/Sugerencias': typeof ContactoSugerenciasRoute
+  '/Afiliacion': typeof SolicitudesAfiliacionRoute
+  '/Asociado': typeof SolicitudesAsociadoRoute
+  '/Cambiomedidor': typeof SolicitudesCambiomedidorRoute
+  '/DesconexionMedidor': typeof SolicitudesDesconexionMedidorRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +114,10 @@ export interface FileRoutesById {
   '/(Contacto)/Quejas': typeof ContactoQuejasRoute
   '/(Contacto)/Reportes': typeof ContactoReportesRoute
   '/(Contacto)/Sugerencias': typeof ContactoSugerenciasRoute
+  '/(Solicitudes)/Afiliacion': typeof SolicitudesAfiliacionRoute
+  '/(Solicitudes)/Asociado': typeof SolicitudesAsociadoRoute
+  '/(Solicitudes)/Cambiomedidor': typeof SolicitudesCambiomedidorRoute
+  '/(Solicitudes)/DesconexionMedidor': typeof SolicitudesDesconexionMedidorRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +129,10 @@ export interface FileRouteTypes {
     | '/Quejas'
     | '/Reportes'
     | '/Sugerencias'
+    | '/Afiliacion'
+    | '/Asociado'
+    | '/Cambiomedidor'
+    | '/DesconexionMedidor'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +142,10 @@ export interface FileRouteTypes {
     | '/Quejas'
     | '/Reportes'
     | '/Sugerencias'
+    | '/Afiliacion'
+    | '/Asociado'
+    | '/Cambiomedidor'
+    | '/DesconexionMedidor'
   id:
     | '__root__'
     | '/'
@@ -109,6 +155,10 @@ export interface FileRouteTypes {
     | '/(Contacto)/Quejas'
     | '/(Contacto)/Reportes'
     | '/(Contacto)/Sugerencias'
+    | '/(Solicitudes)/Afiliacion'
+    | '/(Solicitudes)/Asociado'
+    | '/(Solicitudes)/Cambiomedidor'
+    | '/(Solicitudes)/DesconexionMedidor'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,6 +169,10 @@ export interface RootRouteChildren {
   ContactoQuejasRoute: typeof ContactoQuejasRoute
   ContactoReportesRoute: typeof ContactoReportesRoute
   ContactoSugerenciasRoute: typeof ContactoSugerenciasRoute
+  SolicitudesAfiliacionRoute: typeof SolicitudesAfiliacionRoute
+  SolicitudesAsociadoRoute: typeof SolicitudesAsociadoRoute
+  SolicitudesCambiomedidorRoute: typeof SolicitudesCambiomedidorRoute
+  SolicitudesDesconexionMedidorRoute: typeof SolicitudesDesconexionMedidorRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -135,6 +189,34 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(Solicitudes)/DesconexionMedidor': {
+      id: '/(Solicitudes)/DesconexionMedidor'
+      path: '/DesconexionMedidor'
+      fullPath: '/DesconexionMedidor'
+      preLoaderRoute: typeof SolicitudesDesconexionMedidorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(Solicitudes)/Cambiomedidor': {
+      id: '/(Solicitudes)/Cambiomedidor'
+      path: '/Cambiomedidor'
+      fullPath: '/Cambiomedidor'
+      preLoaderRoute: typeof SolicitudesCambiomedidorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(Solicitudes)/Asociado': {
+      id: '/(Solicitudes)/Asociado'
+      path: '/Asociado'
+      fullPath: '/Asociado'
+      preLoaderRoute: typeof SolicitudesAsociadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(Solicitudes)/Afiliacion': {
+      id: '/(Solicitudes)/Afiliacion'
+      path: '/Afiliacion'
+      fullPath: '/Afiliacion'
+      preLoaderRoute: typeof SolicitudesAfiliacionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(Contacto)/Sugerencias': {
@@ -183,6 +265,10 @@ const rootRouteChildren: RootRouteChildren = {
   ContactoQuejasRoute: ContactoQuejasRoute,
   ContactoReportesRoute: ContactoReportesRoute,
   ContactoSugerenciasRoute: ContactoSugerenciasRoute,
+  SolicitudesAfiliacionRoute: SolicitudesAfiliacionRoute,
+  SolicitudesAsociadoRoute: SolicitudesAsociadoRoute,
+  SolicitudesCambiomedidorRoute: SolicitudesCambiomedidorRoute,
+  SolicitudesDesconexionMedidorRoute: SolicitudesDesconexionMedidorRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
