@@ -12,7 +12,7 @@ type Props={
 
 const FormularioCambioMedidor=({tipo,onClose}:Props)=>{
   const [mostrarFormulario] = useState(true);
-
+   //
  const form = useForm({
    
    defaultValues:{

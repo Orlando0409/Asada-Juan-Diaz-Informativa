@@ -13,7 +13,7 @@ type Props = {
 const FormularioDesconexionMedidor = ({ tipo, onClose}: Props) => {
   //const [archivoSeleccionado, setArchivoSeleccionado] = useState<File | null>(null)
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
-
+ //
   const [mostrarFormulario] = useState(true);
   const form = useForm({
     defaultValues: {

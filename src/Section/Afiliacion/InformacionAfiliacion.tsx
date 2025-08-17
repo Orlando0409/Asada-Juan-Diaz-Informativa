@@ -52,24 +52,28 @@ const InformacionAfiliacion=()=>{
 
 
 
-       {/* fondo borroso */}
-      {mostrarFormulario && (
-        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50">
-          {/* Fondo borroso */}
-          <div
+
+            {/* fondo borroso */}
+
+           {mostrarFormulario && (
+
+            <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50">
+             {/* fondo borroso */}
+            <div
             className="absolute top-0 left-0 w-full h-full bg-black/10 backdrop-blur-[2px]"
             onClick={() => setMostrarFormulario(false)}
-          ></div>
+             ></div>
 
-          {/* Formulario centrado */}
-          <div className=" rounded shadow-lg relative w-[90%] max-w-sm max-h-[550px] overflow-y-scroll [scroll-whit:none] [-ms-overflow-style:none]"
-             style={{ scrollbarWidth: "none" }}>
-            <FormularioAfiliacion tipo="abonado" onClose={()=>setMostrarFormulario(false)}/>
+
+              {/* Formulario centrado */}
+               <div className=" rounded shadow-lg relative w-[90%] max-w-sm max-h-[550px] overflow-y-scroll [scroll-whit:none] [-ms-overflow-style:none]"
+                style={{ scrollbarWidth: "none" }}>
+               <FormularioAfiliacion tipo="abonado" onClose={()=>setMostrarFormulario(false)}/>
+            </div>
+            </div>
+           )}
           </div>
-        </div>
-      )}
-      </div>
-      </div>
+          </div>
          
         </section> 
         /*primer div*/

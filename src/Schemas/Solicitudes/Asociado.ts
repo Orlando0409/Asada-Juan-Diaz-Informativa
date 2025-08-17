@@ -6,5 +6,5 @@ export const AsociadoSchema = z.object({
   mensaje: z.string().min(1, 'El mensaje no puede estar vacío'),
   adjunto: z.instanceof(File).optional()
 })
-
+//
 export type Asociado = z.infer<typeof AsociadoSchema>

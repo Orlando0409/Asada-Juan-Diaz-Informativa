@@ -61,7 +61,7 @@ const DesconexionMedidor=()=>{
 
                       {mostrarFormulario && (
                      <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50">
-                      {/* Fondo borroso */}
+                      {/* fondo borroso */}
 
                      <div
 

@@ -13,7 +13,7 @@ type Props={
 const FormularioAsociado=({tipo, onClose }:Props)=>{
   //const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const [mostrarFormulario] = useState(true);
-
+  //
 
  const form = useForm({
    

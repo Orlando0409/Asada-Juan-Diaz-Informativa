@@ -6,5 +6,5 @@ export const DesconexionMedidorSchema = z.object({
   mensaje: z.string().min(1, 'El mensaje no puede estar vacío'),
   adjunto: z.instanceof(File).optional()
 })
-
+//
 export type DesconexionMedidor = z.infer<typeof DesconexionMedidorSchema>

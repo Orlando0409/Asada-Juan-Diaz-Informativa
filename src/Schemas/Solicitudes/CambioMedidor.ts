@@ -6,5 +6,5 @@ export const CambioMedidorSchema = z.object({
   mensaje: z.string().min(1, 'El mensaje no puede estar vacío'),
   adjunto: z.instanceof(File).optional()
 })
-
+//
 export type CambioMedidor = z.infer<typeof CambioMedidorSchema>
