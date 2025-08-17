@@ -19,9 +19,9 @@
      },
   "requisitosSolicitudes": {
     "abonado": {
-      "Edad":{ "label": "Ser mayor de edad", "type": "text", "required": true },
-      "Cédula": { "label": "Cédula", "type": "text", "required": true },
       "NombreCompleto": { "label": "Nombre completo (Apellidos)", "type": "text", "required": true },
+      "Cédula": { "label": "Cédula", "type": "text", "required": true },
+      "Edad":{ "label": "Edad", "type": "text", "required": true },
       "DirecciónExacta": { "label": "Dirección exacta de residencia", "type": "text", "required": true },
       "NúmeroTeléfono": { "label": "Número de teléfono", "type": "text", "required": true },
       "CorreoElectrónico": { "label": "Correo electrónico", "type": "email", "required": true },
@@ -37,10 +37,23 @@
       "MotivoSolicitud": { "label": "Motivo de solicitud", "type": "text", "required": true }
     },
     "desconexion": {
+      "NombreCompleto": { "label": "Nombre completo (Apellidos)", "type": "text", "required": true },
+      "Cédula": { "label": "Cédula", "type": "text", "required": true },
+      "DirecciónExacta": { "label": "Dirección exacta de residencia", "type": "text", "required": true },
+      "NúmeroTeléfono": { "label": "Número de teléfono", "type": "text", "required": true },
+      "CorreoElectrónico": { "label": "Correo electrónico", "type": "email", "required": true },
       "MotivoSolicitud": { "label": "Motivo de solicitud", "type": "text", "required": true },
       "PlanosDelTerreno": { "label": "Planos del terreno", "type": "file", "required": true },
       "EscrituraDelTerreno": { "label": "Escritura del terreno", "type": "file", "required": true }
+    },
+    "asociado":{
+      "NombreCompleto": { "label": "Nombre completo (Apellidos)", "type": "text", "required": true },
+      "Cédula": { "label": "Cédula", "type": "text", "required": true },
+      "NúmeroTeléfono": { "label": "Número de teléfono", "type": "text", "required": true },
+      "CorreoElectrónico": { "label": "Correo electrónico", "type": "email", "required": true },
+      "MotivoSolicitud": { "label": "Motivo de solicitud", "type": "text", "required": true }
     }
+
   },
     "requisitosConsultaPagos": {
       "Número de abonado": "string",  
@@ -104,16 +117,17 @@
         "texto": "Solicitudes",
         "tipo": "dropdown",
         "subopciones": [
-          { "id": 1, "texto": "Afiliación", "ruta": "/afiliacion" },
-          { "id": 2, "texto": "Cambio de medidor", "ruta": "/cambio-medidor" },
-          { "id": 3, "texto": "Desconexión de medidor", "ruta": "/desconexion-medidor" }
+          { "id": 1, "texto": "Afiliación", "ruta": "/Afiliacion" },
+          { "id": 2, "texto": "Cambio de medidor", "ruta": "CambioMedidor" },
+          { "id": 3, "texto": "Desconexión de medidor", "ruta": "/DesconexionMedidor" },
+          { "id": 4, "texto": "Asociado" , "ruta": "/Asociado" }
         ]
         },
         {
           "id": 3,
           "texto": "Consulta de Pagos",
           "tipo": "link",
-          "ruta": "/consulta"
+          "ruta": "/Consulta"
         },
         {
           "id": 4,
