@@ -1,0 +1,173 @@
+{
+  "organizacion": {
+    "nombre": "Asociación Administradora de Acueducto y Alcantarillado Juan Díaz",
+    "nombreCorto": "ASADA Juan Díaz",
+    "descripcion": "En la ASADA de Juan Díaz trabajamos para brindar un servicio de agua potable eficiente, sostenible y de alta calidad. Nuestro compromiso es con la comunidad y el ambiente, garantizando una gestión responsable de este recurso.",
+    "mision": "Ser una ASADA líder en Guanacaste por la excelencia en distribución del servicio de agua potable, infraestructura sostenible y calidad garantizada del recurso.",
+    "vision": "Maximizar el valor de la ASADA por medio de capacitaciones, proyectos, control de calidad y personal comprometido con el ambiente y la comunidad.",
+    "ubicacion": "Juan Díaz de Nicoya, Guanacaste, Costa Rica",
+    "añoFundacion": 2005,
+    "historia": "La ASADA de Juan Díaz fue fundada en el año 2005. Inicialmente pensada para uso agrícola, la comunidad decidió priorizar el agua potable para los hogares. Un vecino donó terreno para un pozo, y se logró formalizar la creación mediante convenio con la delegación, transformando el proyecto en una solución para la comunidad de Juan Díaz y sus alrededores."
+  },
+  "servicios": {
+    "principal": "Agua potable",
+    "descripcion": "Brindamos agua potable para las comunidades de Juan Díaz y Oriente",
+    "caracteristicas": [
+      "Servicio eficiente y sostenible",
+      "Alta calidad del agua",
+      "Gestión responsable del recurso",
+      "Control de calidad garantizado",
+      "Compromiso con el ambiente"
+    ],
+    "cobertura": ["Juan Díaz", "Oriente"]
+  },
+  "afiliacion": {
+    "descripcion": "Proceso simple y accesible para formar parte de nuestra organización",
+    "tipos": [
+      {
+        "tipo": "abonado",
+        "nombre": "Abonado",
+        "descripcion": "Para personas que desean acceder a nuestros servicios de agua potable",
+        "requisitos": [
+          "Ser mayor de edad",
+          "Cédula de identidad",
+          "Nombre completo",
+          "Dirección exacta de residencia",
+          "Número de teléfono",
+          "Correo electrónico",
+          "Planos del terreno",
+          "Escritura del terreno"
+        ]
+      },
+      {
+        "tipo": "asociado",
+        "nombre": "Asociado",
+        "descripcion": "Para personas que desean participar activamente en la gestión de la ASADA",
+        "requisitos": [
+          "Estar afiliado como abonado",
+          "Participar en al menos una reunión anual de la ASADA"
+        ]
+      }
+    ],
+    "proceso": [
+      "Completa el formulario de afiliación o para ser asociado en el apartado de solicitudes de nuestra página web/",
+      "Proporciona la información personal requerida",
+      "Selecciona el tipo de afiliación que necesitas",
+      "Adjunta los documentos requeridos",
+      "Envía la solicitud para revisión"
+    ],
+    "ubicacion": "Apartado de solicitudes en la página web"
+  },
+  "solicitudes": {
+    "tipos": [
+      {
+        "nombre": "Afiliación como Abonado",
+        "descripcion": "Solicitud para nuevo servicio de agua potable",
+        "requisitos": ["Cédula", "Nombre completo", "Dirección exacta", "Teléfono", "Correo", "Planos del terreno", "Escritura del terreno"]
+      },
+      {
+        "nombre": "Cambio de Medidor",
+        "descripcion": "Solicitud para cambiar medidor existente",
+        "requisitos": ["Cédula", "Nombre completo", "Dirección exacta", "Correo", "Teléfono", "Motivo de solicitud"]
+      },
+      {
+        "nombre": "Desconexión",
+        "descripcion": "Solicitud para desconectar el servicio",
+        "requisitos": ["Motivo de solicitud", "Planos del terreno", "Escritura del terreno"]
+      }
+    ]
+  },
+  "consultaPagos": {
+    "descripcion": "Consulta el estado de tus pagos y facturas",
+    "requisitos": ["Número de abonado", "Cédula del titular"],
+    "ubicacion": "Sección de consulta de pagos en la página web"
+  },
+  "contacto": {
+    "formas": [
+      {
+        "tipo": "Queja",
+        "descripcion": "Para reportar problemas con el servicio",
+        "requisitos": ["Nombre completo", "Primer apellido", "Segundo apellido (opcional)", "Descripción de la queja", "Adjuntar imagen (opcional)"]
+      },
+      {
+        "tipo": "Reporte",
+        "descripcion": "Para reportar daños o problemas en la infraestructura",
+        "requisitos": ["Nombre completo", "Primer apellido", "Segundo apellido (opcional)", "Ubicación del lugar afectado", "Descripción del reporte", "Adjuntar imagen (opcional)"]
+      },
+      {
+        "tipo": "Sugerencia",
+        "descripcion": "Para enviar sugerencias de mejora",
+        "requisitos": ["Descripción de la sugerencia", "Adjuntar imagen (opcional)"]
+      }
+    ],
+    "informacion": {
+      "telefono": "+506 1234-5678",
+      "correo": "asadajuandiaz@gmail.com",
+      "horario": "Lunes a Viernes, 7:00 AM - 5:00 PM",
+      "whatsapp": "https://chat.whatsapp.com/IOTuJj4XCAU9S0FLzQFgTp"
+    }
+  },
+  "navegacion": {
+    "secciones": [
+      {
+        "nombre": "Sobre Nosotros",
+        "subsecciones": ["Datos Generales", "Historia", "Calidad del Agua"]
+      },
+      {
+        "nombre": "Solicitudes",
+        "descripcion": "Formularios para afiliación, cambio de medidor y desconexión"
+      },
+      {
+        "nombre": "Consulta de Pagos",
+        "descripcion": "Verificar estado de pagos y facturas"
+      },
+      {
+        "nombre": "Contacto",
+        "subsecciones": ["Quejas", "Sugerencias", "Reportes"]
+      },
+      {
+        "nombre": "Preguntas Frecuentes",
+        "descripcion": "Respuestas a consultas comunes"
+      }
+    ]
+  },
+  "keywords": {
+    "saludo": ["hola", "buenas", "saludos", "hey", "buenos días", "buenas tardes"],
+    "despedida": ["adiós", "bye", "hasta luego", "gracias", "chao", "nos vemos"],
+    "organizacion": ["que es", "quienes son", "asada", "organización", "juan díaz", "misión", "visión", "historia", "fundación", "saga"],
+    "servicios": ["servicios", "agua potable", "agua", "suministro", "calidad", "cobertura"],
+    "afiliacion": ["afiliar", "afiliación", "abonado", "asociado", "registro", "inscribir", "unirse", "nuevo servicio"],
+    "solicitudes": ["solicitud", "formulario", "tramite", "cambio medidor", "desconexión", "documentos", "requisitos"],
+    "pagos": ["pago", "factura", "consulta", "deuda", "estado cuenta", "número abonado"],
+    "contacto": ["contacto", "teléfono", "correo", "dirección", "ubicación", "horario", "whatsapp"],
+    "problemas": ["queja", "problema", "daño", "reporte", "falla", "avería"],
+    "sugerencias": ["sugerencia", "mejora", "propuesta", "idea"],
+    "navegacion": ["como usar", "página", "sitio web", "donde encuentro", "secciones", "formularios"],
+    "ubicacion": ["donde", "juan díaz", "nicoya", "guanacaste", "costa rica", "dirección"],
+    "horarios": ["horario", "atención", "cuando", "abierto", "cerrado"]
+  },
+  "preguntas_frecuentes": {
+    "afiliacion": [
+      {
+        "pregunta": "¿Qué necesito para afiliarme como abonado?",
+        "respuesta": "Necesitas ser mayor de edad, tener cédula, proporcionar tu información personal completa, planos del terreno y escritura del terreno."
+      },
+      {
+        "pregunta": "¿Cuánto tiempo toma el proceso de afiliación?",
+        "respuesta": "El tiempo depende de la revisión de documentos, pero generalmente toma algunos días hábiles."
+      }
+    ],
+    "servicios": [
+      {
+        "pregunta": "¿Qué comunidades cubren?",
+        "respuesta": "Brindamos servicio de agua potable a las comunidades de Juan Díaz y Oriente."
+      }
+    ],
+    "pagos": [
+      {
+        "pregunta": "¿Cómo consulto mis pagos?",
+        "respuesta": "Puedes consultar tus pagos en la sección de consulta de pagos con tu número de abonado y cédula del titular."
+      }
+    ]
+  }
+}
