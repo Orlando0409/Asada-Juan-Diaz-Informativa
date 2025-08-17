@@ -57,3 +57,21 @@ export interface OrganizacionContexto {
     cobertura: string[];
   };
 }
+
+
+export interface ChatContextType {
+  messages: Message[];
+  isLoading: boolean;
+  error: ChatError | null;
+  sendMessage: (content: string) => void;
+  clearMessages: () => void;
+  retryLastMessage: () => void;
+  lastMessage: Message | undefined;
+  lastMessageCategory: string | undefined;
+  messageCount: number;
+  userMessageCount: number;
+  assistantMessageCount: number;
+  isOnline: boolean;
+  hasMessages: boolean;
+  canRetry: boolean;
+}

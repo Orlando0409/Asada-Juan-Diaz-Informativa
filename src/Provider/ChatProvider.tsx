@@ -1,5 +1,5 @@
 import  type{ ReactNode } from 'react';
-import { ChatContext, useChatLogic } from '../Hook/Chatbot';
+import { ChatContext, useChatLogic } from '../Hook/ChatBotHooks/Chatbot';
 
 interface ChatProviderProps {
   children: ReactNode;

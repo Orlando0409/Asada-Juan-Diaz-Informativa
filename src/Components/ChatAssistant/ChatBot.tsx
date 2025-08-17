@@ -1,12 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button, Input, Card } from './Ui';
-import { useChat, usePredefinedMessages } from '../../Hook/Chatbot';
 import { BsChatDots } from 'react-icons/bs';
 import { IoClose, IoSend, IoRefresh } from 'react-icons/io5';
 import { MessageBubble } from './MessageBubble';
 import { TypingIndicator } from './TypingIndicator';
 import { StatusIndicator } from './StatusIndicator';
 import { PredefinedMessages } from './PredefinedMessages';
+import { usePredefinedMessages } from '../../Hook/ChatBotHooks/PredefinedMensages';
+import { useChat } from '../../Hook/ChatBotHooks/Chatbot';
 
 export function ChatBot() {
   const [isOpen, setIsOpen] = useState(false);

@@ -38,10 +38,19 @@
           "Planos del terreno",
           "Escritura del terreno"
         ]
+      },
+      {
+        "tipo": "asociado",
+        "nombre": "Asociado",
+        "descripcion": "Para personas que desean participar activamente en la gestión de la ASADA",
+        "requisitos": [
+          "Estar afiliado como abonado",
+          "Participar en al menos una reunión anual de la ASADA"
+        ]
       }
     ],
     "proceso": [
-      "Completa el formulario de afiliación en el apartado de solicitudes de nuestra página web/",
+      "Completa el formulario de afiliación o para ser asociado en el apartado de solicitudes de nuestra página web/",
       "Proporciona la información personal requerida",
       "Selecciona el tipo de afiliación que necesitas",
       "Adjunta los documentos requeridos",

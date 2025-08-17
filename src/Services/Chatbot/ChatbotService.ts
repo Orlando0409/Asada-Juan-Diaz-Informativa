@@ -15,34 +15,28 @@ export class ChatbotService {
   // Procesa un mensaje con análisis inteligente de necesidad de API
   async processMessage(prompt: string): Promise<ChatResponse> {
     try {
-      // 1. Detectar intención
+      //  Detectar intención
       const intention = IntentionDetector.detect(prompt);
       
-      // 2. ANÁLISIS INTELIGENTE: ¿Necesita API realmente?
+      //  Analiza si usar la api o no
       const analysis = RequestAnalyzer.shouldUseAPI(prompt);
       
-      console.log(`🧠 Análisis: ${analysis.reason} (confianza: ${analysis.confidence})`);
-      
       if (!analysis.useAPI) {
-        // Usar fallback directamente - AHORRA TOKENS
-        console.log('💰 Ahorrando tokens - usando respuesta local');
+        // Usar fallback directamente
         return this.generateOptimizedFallback(prompt, intention);
       }
       
-      // 3. Si decide usar API, optimizar contexto
+      //  Si decide usar API, optimizar contexto
       const optimizedContext = RequestAnalyzer.optimizeContext(intention, prompt);
       const estimatedTokens = RequestAnalyzer.estimateTokenUsage(prompt, optimizedContext);
       
-      console.log(`📊 Tokens estimados: ${estimatedTokens}`);
-      
-      // 4. Verificación final de tokens antes de llamar API
+      //  Verificación final de tokens antes de llamar API
       const usage = TokenMonitor.getTodayStats();
       if (usage.tokens + estimatedTokens > 900000) { // 90% del límite
-        console.log('🚫 Límite crítico - forzando fallback');
         return this.generateOptimizedFallback(prompt, intention);
       }
       
-      // 5. Llamar API con contexto optimizado
+      //  Llamar API con contexto optimizado
       const response = await this.geminiClient.sendMessage(prompt, optimizedContext);
       
       return {
@@ -52,8 +46,7 @@ export class ChatbotService {
       };
 
     } catch (error) {
-      console.error('❌ Error en ChatbotService:', error);
-      // Fallback en caso de error
+      console.error('Error procesando el mensaje:', error);
       return this.generateFallbackResponse(prompt);
     }
   }
