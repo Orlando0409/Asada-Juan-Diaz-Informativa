@@ -12,19 +12,18 @@ const CambioMedidor=()=>{
         <img
         alt="Historia de la ASADA de Juan Díaz"
         src={"/ASADA_JUAN_D.png"}
-        className="w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-cover object-center"
       />
-        <div className="absolute inset-0 max-h-[90vh] max-w-[70vw] ml-60 mt-50 bg-white p-20 flex justify-around shadow-lg rounded-lg">
-
-          <div className="max-w-sm flex flex-col gap-10">
-            <h1 className="text-xl font-bold text-gray-800">Solicitud Cambio de Medidor </h1>
+       <div className="bg-white absolute inset-0 max-h-[90vh] w-[90%] sm:w-[85%] lg:w-[70%] mx-auto mt-10 lg:mt-20 p-6 sm:p-10 lg:-20 flex flex-col lg:flex-row shadow-lg rounded-lg overflow-auto ">
+          <div className="max-w-md w-full flex flex-col">
+            <h1 className="text-xl font-bold text-gray-800 mt-4">Solicitud Cambio de Medidor </h1>
             <p className="text-gray-600"> Si necesita realizar un cambio de medido, ya sea por daño, mal funcionamiento, puede hacerlo completando el formulario
                 <br />
                 Este proceso nos permite atender su solicitud de manera mas rapida. 
              </p>
              </div>
-                  <div className="max-w-md flex flex-col gap-10">
-                  <h2 className = "text-lg font-bold text-gray-800">Requisistos para Cambio de Medidor</h2>
+                  <div className="max-w-md w-full flex flex-col ">
+                  <h2 className = "text-lg font-bold text-gray-800 mt-4">Requisistos para Cambio de Medidor</h2>
                   <ul className ="list-disc pl-6 text-gray-700 space-y-1">
                   
                     {Object.entries(requisitos).map(([key, value])=>(
