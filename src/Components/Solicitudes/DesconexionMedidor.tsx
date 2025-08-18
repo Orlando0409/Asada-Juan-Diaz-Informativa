@@ -44,7 +44,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose}: Props) => {
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300'
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 text-gray-800 p-7">
+    <div className="flex justify-center items-center min-h-screen  text-gray-800 p-7">
       
       
       <form

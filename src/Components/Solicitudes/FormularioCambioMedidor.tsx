@@ -42,7 +42,7 @@ const FormularioCambioMedidor=({tipo,onClose}:Props)=>{
   const commonClasses =
     "w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300";
  return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 text-gray-800 p-7">
+    <div className="flex justify-center items-center min-h-screen  text-gray-800 p-7">
       <form
         onSubmit={(e) => form.handleSubmit(e)}
         className="bg-white gap-2 shadow-lg pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-md overflow-y-auto"
