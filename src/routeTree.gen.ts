@@ -20,6 +20,7 @@ import { Route as ContactoReportesRouteImport } from './routes/(Contacto)/Report
 import { Route as ContactoQuejasRouteImport } from './routes/(Contacto)/Quejas'
 import { Route as AboutUsHistoriaRouteImport } from './routes/(AboutUs)/Historia'
 import { Route as AboutUsDatosGeneralesRouteImport } from './routes/(AboutUs)/DatosGenerales'
+import { Route as AboutUsCalidadAguaRouteImport } from './routes/(AboutUs)/CalidadAgua'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -78,10 +79,16 @@ const AboutUsDatosGeneralesRoute = AboutUsDatosGeneralesRouteImport.update({
   path: '/DatosGenerales',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutUsCalidadAguaRoute = AboutUsCalidadAguaRouteImport.update({
+  id: '/(AboutUs)/CalidadAgua',
+  path: '/CalidadAgua',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/CalidadAgua': typeof AboutUsCalidadAguaRoute
   '/DatosGenerales': typeof AboutUsDatosGeneralesRoute
   '/Historia': typeof AboutUsHistoriaRoute
   '/Quejas': typeof ContactoQuejasRoute
@@ -95,6 +102,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/CalidadAgua': typeof AboutUsCalidadAguaRoute
   '/DatosGenerales': typeof AboutUsDatosGeneralesRoute
   '/Historia': typeof AboutUsHistoriaRoute
   '/Quejas': typeof ContactoQuejasRoute
@@ -109,6 +117,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/(AboutUs)/CalidadAgua': typeof AboutUsCalidadAguaRoute
   '/(AboutUs)/DatosGenerales': typeof AboutUsDatosGeneralesRoute
   '/(AboutUs)/Historia': typeof AboutUsHistoriaRoute
   '/(Contacto)/Quejas': typeof ContactoQuejasRoute
@@ -124,6 +133,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/CalidadAgua'
     | '/DatosGenerales'
     | '/Historia'
     | '/Quejas'
@@ -137,6 +147,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/CalidadAgua'
     | '/DatosGenerales'
     | '/Historia'
     | '/Quejas'
@@ -150,6 +161,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/auth'
+    | '/(AboutUs)/CalidadAgua'
     | '/(AboutUs)/DatosGenerales'
     | '/(AboutUs)/Historia'
     | '/(Contacto)/Quejas'
@@ -164,6 +176,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  AboutUsCalidadAguaRoute: typeof AboutUsCalidadAguaRoute
   AboutUsDatosGeneralesRoute: typeof AboutUsDatosGeneralesRoute
   AboutUsHistoriaRoute: typeof AboutUsHistoriaRoute
   ContactoQuejasRoute: typeof ContactoQuejasRoute
@@ -254,12 +267,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutUsDatosGeneralesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(AboutUs)/CalidadAgua': {
+      id: '/(AboutUs)/CalidadAgua'
+      path: '/CalidadAgua'
+      fullPath: '/CalidadAgua'
+      preLoaderRoute: typeof AboutUsCalidadAguaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  AboutUsCalidadAguaRoute: AboutUsCalidadAguaRoute,
   AboutUsDatosGeneralesRoute: AboutUsDatosGeneralesRoute,
   AboutUsHistoriaRoute: AboutUsHistoriaRoute,
   ContactoQuejasRoute: ContactoQuejasRoute,

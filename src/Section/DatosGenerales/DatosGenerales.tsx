@@ -1,6 +1,6 @@
 import Data from'../../data/Data.json'
 const DatosGenerales = () => {
-    const  {ubicacion, nombre, descripcion, añoFundacion }= Data.DatosGenerales
+    const  {ubicacion, nombre, añoFundacion }= Data.DatosGenerales
   return (
    <div className='bg-gray-200 text-black p-20 flex flex-col gap-5 justify-between items-start space-y-6'>
       <div className='flex flex-col sm:gap-3 lg:gap-5'>
@@ -9,7 +9,6 @@ const DatosGenerales = () => {
             <p className='p-4 sm:text-md md:text-lg lg:text-xl flex gap-2'><span className='font-semibold'>Nombre:</span> {nombre}</p>
             <p className='p-4 sm:text-md md:text-lg lg:text-xl flex gap-2'><span className='font-semibold'>Ubicación:</span> {ubicacion}</p>
             <p className='p-4 sm:text-md md:text-lg lg:text-xl flex gap-2'><span className='font-semibold'>Año de Fundación:</span> {añoFundacion}</p>
-            <p className='p-4 sm:text-md md:text-lg lg:text-xl italic'>{descripcion}</p>
         </blockquote>
       </div>
  
