@@ -17,7 +17,9 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
   const [mostrarFormulario] = useState(true);
   const form = useForm({
     defaultValues: {
-      NombreCompleto: '',
+      Nombre: '',
+      PrimerApellido:'',
+      SegundoApellido:'',
       Cedula: '',
       Edad: '',
       DireccionExacta: '',
@@ -48,16 +50,15 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
   const commonClasses = 'w-full border border-gray-300 rounded  px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300'
 
   return (
-    <div className="flex justify-centmin-h-screen text-gray-800 p-7">
-      
-      
+  <div className="flex justify-center items-center min-h-screen text-gray-800  p-5 w-full">
       <form
         onSubmit={(e) => form.handleSubmit(e)}
-        
-        className="bg-white gap-2 shadow-lg pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-md max-h-auto overflow-y-auto"
+        className="bg-white gap-2 shadow-lg pl-8 pr-8 pt-4 pb-4 rounded-lg w-full max-w-9xl overflow-y-auto"
       >
         <h2 className="text-center text-xl font-semibold mb-6">Formulario de Afiliación</h2>
-        {Object.entries(campos).map(([fieldName, fieldProps])=>(
+        
+    
+                {Object.entries(campos).map(([fieldName, fieldProps])=>(
         <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
             {(field) => {
               if (fieldProps.type === 'file') {

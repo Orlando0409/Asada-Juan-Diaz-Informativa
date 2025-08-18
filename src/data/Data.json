@@ -19,7 +19,9 @@
      },
   "requisitosSolicitudes": {
     "abonado": {
-      "NombreCompleto": { "label": "Nombre completo (Apellidos)", "type": "text", "required": true },
+      "Nombre": { "label": "Nombre ", "type": "text", "required": true },
+      "PrimerApellido": { "label": "Primer Apellido", "type": "text", "required": true },
+      "SegundoApellido": { "label": "SegundoApellido", "type": "text", "required": true },
       "Cédula": { "label": "Cédula", "type": "text", "required": true },
       "Edad":{ "label": "Edad", "type": "text", "required": true },
       "DirecciónExacta": { "label": "Dirección exacta de residencia", "type": "text", "required": true },
@@ -30,14 +32,18 @@
     },
     "cambioMedidor": {
       "Cédula": { "label": "Cédula", "type": "text", "required": true },
-      "NombreCompleto": { "label": "Nombre completo (Apellidos)", "type": "text", "required": true },
+      "Nombre": { "label": "Nombre ", "type": "text", "required": true },
+      "PrimerApellido": { "label": "Primer Apellido", "type": "text", "required": true },
+      "SegundoApellido": { "label": "SegundoApellido", "type": "text", "required": true },
       "DirecciónExacta": { "label": "Dirección exacta", "type": "text", "required": true },
       "CorreoElectrónico": { "label": "Correo electrónico", "type": "email", "required": true },
       "NúmeroTeléfono": { "label": "Número de teléfono", "type": "text", "required": true },
       "MotivoSolicitud": { "label": "Motivo de solicitud", "type": "text", "required": true }
     },
     "desconexion": {
-      "NombreCompleto": { "label": "Nombre completo (Apellidos)", "type": "text", "required": true },
+      "Nombre": { "label": "Nombre ", "type": "text", "required": true },
+      "PrimerApellido": { "label": "Primer Apellido", "type": "text", "required": true },
+      "SegundoApellido": { "label": "SegundoApellido", "type": "text", "required": true },
       "Cédula": { "label": "Cédula", "type": "text", "required": true },
       "DirecciónExacta": { "label": "Dirección exacta de residencia", "type": "text", "required": true },
       "NúmeroTeléfono": { "label": "Número de teléfono", "type": "text", "required": true },
@@ -47,7 +53,11 @@
       "EscrituraDelTerreno": { "label": "Escritura del terreno", "type": "file", "required": true }
     },
     "asociado":{
-      "NombreCompleto": { "label": "Nombre completo (Apellidos)", "type": "text", "required": true },
+      "Nombre": { "label": "Nombre ", "type": "text", "required": true },
+      "PrimerApellido": { "label": "Primer Apellido", "type": "text", "required": true },
+      "SegundoApellido": { "label": "SegundoApellido", "type": "text", "required": true },
+      "Cédula": { "label": "Cédula", "type": "text", "required": true },
+      "Cédula": { "label": "Cédula", "type": "text", "required": true },
       "Cédula": { "label": "Cédula", "type": "text", "required": true },
       "NúmeroTeléfono": { "label": "Número de teléfono", "type": "text", "required": true },
       "CorreoElectrónico": { "label": "Correo electrónico", "type": "email", "required": true },
