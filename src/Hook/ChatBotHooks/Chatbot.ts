@@ -29,7 +29,6 @@ export function useChatLogic() {
       return chatbotService.processMessage(prompt);
     },
     onSuccess: (data) => {
-      console.log('✅ chatMutation onSuccess:', data);
       
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),

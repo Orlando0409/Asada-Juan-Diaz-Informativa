@@ -101,9 +101,7 @@ function ProyectosDesktop({
                         alt={proyecto.Titulo}
                         src={proyecto.imagenUrl}
                         className="w-full h-56 object-cover transition-transform duration-700 hover:scale-105"
-                        onError={(e) => {
-                          e.currentTarget.src = 'https://via.placeholder.com/400x300/E5E7EB/9CA3AF?text=Imagen+no+disponible';
-                        }}
+
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                       
