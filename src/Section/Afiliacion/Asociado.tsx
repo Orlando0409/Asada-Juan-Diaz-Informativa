@@ -27,7 +27,7 @@ const Asociado=()=>{
              </p>
              </div>
                   <div className="max-w-md flex-1 w-full flex flex-col">
-                  <h2 className = "text-lg font-bold text-gray-800 mt-4">Requisistos para Cambio de Medidor</h2>
+                  <h2 className = "text-lg font-bold text-gray-800 mt-4">Requisistos para ser Asociado</h2>
                   <ul className ="list-disc pl-6 text-gray-700 space-y-1">
                   
                     {Object.entries(requisitos).map(([key, value])=>(
@@ -59,7 +59,7 @@ const Asociado=()=>{
               ></div>
 
               {/* Formulario centrado */}
-              <div className=" rounded relative w-[90%] max-w-sm max-h-[550px] overflow-y-scroll [scroll-whit:none] [-ms-overflow-style:none]"
+              <div className=" rounded relative w-[90%] max-w-md max-h-[550px] overflow-y-scroll [scroll-whit:none] [-ms-overflow-style:none]"
                 style={{ scrollbarWidth: "none" }}>
                 <FormularioAsociado tipo="asociado" onClose={()=>setMostrarFormulario(false)}/>
               </div>

@@ -17,7 +17,9 @@ const FormularioDesconexionMedidor = ({ tipo, onClose}: Props) => {
   const [mostrarFormulario] = useState(true);
   const form = useForm({
     defaultValues: {
-      NombreCompleto: '',
+      Nombre: '',
+      PimerApellido:'',
+      SegundoApellido:'',
       Cedula: '',
       Edad: '',
       DireccionExacta: '',
@@ -49,7 +51,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose}: Props) => {
         onSubmit={(e) => form.handleSubmit(e)}
         className="bg-white gap-2 shadow-lg pl-8 pr-8 pt-4 pb-4 rounded-lg w-full max-w-9xl overflow-y-auto"
       >
-        <h2 className="text-center text-xl font-semibold mb-6">Formulario de Afiliación</h2>
+        <h2 className="text-center text-xl font-semibold mb-6">Formulario para desconexión de medidor</h2>
         {Object.entries(campos).map(([fieldName, fieldProps])=>(
         <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
             {(field) => {
@@ -143,6 +145,9 @@ const FormularioDesconexionMedidor = ({ tipo, onClose}: Props) => {
                     placeholder={fieldProps.label}
                     className={commonClasses}
                   />
+                    {field.state.meta.errors?.[0] && (
+                    <span className="text-red-500 text-sm">{field.state.meta.errors[0]}</span>
+                  )}
                 </div>
                );
         

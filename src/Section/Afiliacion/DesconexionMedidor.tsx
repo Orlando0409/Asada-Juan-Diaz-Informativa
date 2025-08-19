@@ -20,7 +20,7 @@ const DesconexionMedidor=()=>{
 
                 <div className="bg-white lg:gap-8 absolute inset-0 max-h-[75vh] w-[90%] sm:w-[85%] lg:w-[70%] mx-auto mt-10 lg:mt-20 p-6 sm:p-10 lg:-20 flex flex-col lg:flex-row shadow-lg rounded-lg overflow-auto ">
                 <div className="max-w-md flex-1 w-full flex flex-col">
-                     <h1 className="text-xl font-bold text-gray-800 mt-4">Solicitud de Desconexion de Medidor </h1>
+                     <h1 className="text-xl font-bold text-gray-800 mt-4">Solicitud de desconexión de medidor </h1>
 
 
                 <p className="text-gray-600"> La desconexión del medidor es un trámite que pueden realizar los abonados 
@@ -73,7 +73,7 @@ const DesconexionMedidor=()=>{
             
                       {/* Formulario centrado */}
 
-                      <div className=" rounded  relative w-[90%] max-w-sm max-h-[550px] overflow-y-scroll [scroll-whit:none] [-ms-overflow-style:none]"
+                      <div className=" rounded  relative w-[90%] max-w-md max-h-[550px] overflow-y-scroll [scroll-whit:none] [-ms-overflow-style:none]"
 
                       style={{ scrollbarWidth: "none" }}>
 

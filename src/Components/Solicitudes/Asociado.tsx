@@ -18,8 +18,11 @@ const FormularioAsociado=({tipo, onClose }:Props)=>{
  const form = useForm({
    
    defaultValues:{
+   
+    Nombre:"",
+    PrimerApellido:"",
+    SegundoApellido:"",
     Cedula:"",
-    NombreCompleto:"",
     CorreoElectronico:"",
     NumeroTelefono:"",
     MotivoSolicitud:"",
@@ -48,7 +51,7 @@ const FormularioAsociado=({tipo, onClose }:Props)=>{
         onSubmit={(e) => form.handleSubmit(e)}
         className="bg-white gap-2 shadow-lg pl-8 pr-8 pt-4 pb-4 rounded-lg w-full max-w-9xl overflow-y-auto"
       >
-        <h2 className="text-center text-xl font-semibold mb-6">Formulario de Cambio de Medidor</h2>
+        <h2 className="text-center text-xl font-semibold mb-6">Formulario para ser asociado</h2>
 
        {Object.entries(campos).map(([fieldName, fieldProps])=>
         <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
@@ -75,14 +78,14 @@ const FormularioAsociado=({tipo, onClose }:Props)=>{
                   onChange={(e)=>field.handleChange(e.target.value)}
                   placeholder={fieldProps.label}
                   className={commonClasses}
-                  
-                  
-                  
                   />
 
                 )
               
               }
+                {field.state.meta.errors?.[0] && (
+                    <span className="text-red-500 text-sm">{field.state.meta.errors[0]}</span>
+                  )}
                 
             </div>
            )

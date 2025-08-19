@@ -31,10 +31,11 @@
       "EscrituraDelTerreno": { "label": "Escritura del terreno", "type": "file", "required": true }
     },
     "cambioMedidor": {
-      "Cédula": { "label": "Cédula", "type": "text", "required": true },
+     
       "Nombre": { "label": "Nombre ", "type": "text", "required": true },
       "PrimerApellido": { "label": "Primer Apellido", "type": "text", "required": true },
       "SegundoApellido": { "label": "SegundoApellido", "type": "text", "required": true },
+       "Cédula": { "label": "Cédula", "type": "text", "required": true },
       "DirecciónExacta": { "label": "Dirección exacta", "type": "text", "required": true },
       "CorreoElectrónico": { "label": "Correo electrónico", "type": "email", "required": true },
       "NúmeroTeléfono": { "label": "Número de teléfono", "type": "text", "required": true },
