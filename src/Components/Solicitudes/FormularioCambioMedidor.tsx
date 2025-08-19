@@ -23,7 +23,7 @@ const FormularioCambioMedidor=({tipo,onClose}:Props)=>{
     NumeroTelefono:"",
     MotivoSolicitud:"",
    },
-     validators: {
+  validators: {
       onChange: ({ value }) => {
         const result = CambioMedidorSchema.safeParse(value);
         return result.success ? undefined : result.error.format();
