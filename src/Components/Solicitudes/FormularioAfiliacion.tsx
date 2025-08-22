@@ -56,7 +56,8 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
         setArchivoSeleccionado({});
       } catch (error) {
         console.error("Error al enviar formulario:", error);
-        setFormErrors({ general: "Hubo un error al enviar el formulario. Intenta nuevamente." 
+        setFormErrors({
+          general: "Hubo un error al enviar el formulario. Intenta nuevamente."
 
         })
 
