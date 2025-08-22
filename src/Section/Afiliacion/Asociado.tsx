@@ -46,9 +46,6 @@ const Asociado = () => {
 
 
           </button>
-
-
-
           {/* fondo borroso */}
           {mostrarFormulario && (
             <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50">
@@ -58,7 +55,7 @@ const Asociado = () => {
                 onClick={() => setMostrarFormulario(false)}
               ></div>
 
-              {/* Formulario centrado */}
+              {/* centrar formulario*/}
               <div className=" rounded relative w-[90%] max-w-md max-h-[550px] overflow-y-scroll [scroll-whit:none] [-ms-overflow-style:none]"
                 style={{ scrollbarWidth: "none" }}
 

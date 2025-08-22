@@ -66,7 +66,7 @@ const InformacionAfiliacion = () => {
               ></div>
 
 
-              {/* Formulario centrado */}
+              {/* centrar formulario */}
               <div className=" rounded relative w-[90%] max-w-md max-h-[550px] overflow-y-scroll [scroll-whit:none] [-ms-overflow-style:none]"
                 style={{ scrollbarWidth: "none" }}>
                 <FormularioAfiliacion tipo="abonado" onClose={() => setMostrarFormulario(false)} />
