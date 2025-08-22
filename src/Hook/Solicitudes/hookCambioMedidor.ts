@@ -1,6 +1,4 @@
-//import { CambioMedidor } from './../../Schemas/Solicitudes/CambioMedidor';
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-//import type { CambioMedidor } from "../../Schemas/Solicitudes/CambioMedidor";
 import { createCambioMedidor, deleteCambioMedidor, getAllCambioMedidor, updateCambioMedidor } from "../../Services/Solicitudes/CambioMedidorService";
 import type { CambioMedidor } from "../../models/Solicitudes/CambioMedidor";
 
@@ -41,8 +39,11 @@ import type { CambioMedidor } from "../../models/Solicitudes/CambioMedidor";
 
 
       return {
-        desconexiones: CambioMedidorQuery.data, // ✅ usamos la variable declarada arriba
+        desconexiones: CambioMedidorQuery.data, //  usamos la variable declarada arriba
         isLoading: CambioMedidorQuery.isLoading,
         isError: CambioMedidorQuery.isError,
+        createCambioMedidor: createMutation.mutateAsync,
+        updateCambioMedidor: upadateMutation.mutateAsync,
+        deleteCambioMedidor: deleteMutation.mutateAsync,
     }
 }

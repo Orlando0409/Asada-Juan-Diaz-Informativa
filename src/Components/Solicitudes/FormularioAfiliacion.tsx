@@ -2,6 +2,7 @@ import { useForm } from "@tanstack/react-form"
 import { useState } from "react"
 import data from "../../data/Data.json"
 import { AfiliacionSchema } from "../../Schemas/Solicitudes/Afiliacion"
+import { useAfiliaciones } from "../../Hook/Solicitudes/hookAfiliacion"
 
 type SolicitudTipo = 'abonado'
 
@@ -14,6 +15,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
   //const [archivoSeleccionado, setArchivoSeleccionado] = useState<File | null>(null)
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const mutation = useAfiliaciones();
 
   const [mostrarFormulario] = useState(true);
   const form = useForm({
@@ -22,7 +24,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
       PrimerApellido: '',
       SegundoApellido: '',
       Cedula: '',
-      Edad: '',
+      Edad: 0,
       DireccionExacta: '',
       NumeroTelefono: '',
       CorreoElectronico: '',
@@ -31,12 +33,6 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
     },
     onSubmit: async ({ value }) => {
       setFormErrors({}); // limpiar errores previos
-
-      // Validación de edad
-      if (parseInt(value.Edad) < 18) {
-        setFormErrors({ Edad: "Solo se permite personas mayores de edad" });
-        return;
-      }
 
       // Validar con Zod
       const validation = AfiliacionSchema.safeParse(value);
@@ -52,6 +48,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
 
       try {
         console.log("Datos válidos enviados:", value);
+        await mutation.createAfiliacion(value);
         form.reset();
         setArchivoSeleccionado({});
       } catch (error) {

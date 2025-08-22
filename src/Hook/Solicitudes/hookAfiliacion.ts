@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-//import { Afiliacion } from "../../models/Solicitudes/Afiliacion";
 import { createAfiliacion, getAllAfiliaciones } from "../../Services/Solicitudes/AfiliacionService";
-import type { Afiliacion } from "../../models/Solicitudes/Afiliacion";
+import type { Afiliacion, AfiliacionFormData } from "../../models/Solicitudes/Afiliacion";
 
  
  export const useAfiliaciones=()=>{
@@ -17,7 +16,7 @@ import type { Afiliacion } from "../../models/Solicitudes/Afiliacion";
     })
     
     const createMutation= useMutation({
-        mutationFn: (data: Afiliacion)=> createAfiliacion(data),
+        mutationFn: (data: AfiliacionFormData)=> createAfiliacion(data),
         onSuccess:()=>queryClient.invalidateQueries({queryKey:["afiliaciones"]}),
         onError: ()=>console.error("no se creo la afiliacion")
         
