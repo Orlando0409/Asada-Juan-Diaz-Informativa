@@ -2,6 +2,7 @@ import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import data from '../../data/Data.json'
 import { CambioMedidorSchema } from "../../Schemas/Solicitudes/CambioMedidor";
+import { useCambioMedidor } from "../../Hook/Solicitudes/hookCambioMedidor";
 
 type SolicitudTipo = "cambioMedidor";
 type Props = {
@@ -13,18 +14,18 @@ type Props = {
 const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
   const [mostrarFormulario] = useState(true);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-
+  const mutation = useCambioMedidor();
   const form = useForm({
 
     defaultValues: {
-      Nombre: "",
-      PrimerApellido: "",
-      SegundoApellido: "",
-      Cedula: "",
-      DireccionExacta: "",
-      CorreoElectronico: "",
-      NumeroTelefono: "",
-      MotivoSolicitud: "",
+      Nombre: '',
+      PrimerApellido: '',
+      SegundoApellido: '',
+      Cedula: '',
+      DireccionExacta: '',
+      CorreoElectronico: '',
+      NumeroTelefono: '',
+      MotivoSolicitud: '',
     },
 
     onSubmit: async ({ value }) => {
@@ -89,7 +90,7 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
                     onChange={(e) => field.handleChange(e.target.value)}
                     placeholder={fieldProps.label}
                     className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
-
+                    style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                   />
                 ) : (
                   <input

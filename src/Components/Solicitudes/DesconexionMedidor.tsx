@@ -2,6 +2,7 @@ import { useForm } from "@tanstack/react-form"
 import { useState } from "react"
 import data from "../../data/Data.json"
 import { DesconexionMedidorSchema } from "../../Schemas/Solicitudes/DesconexionMedidor"
+import { useDesconexion } from "../../Hook/Solicitudes/hookDesconexion"
 
 type SolicitudTipo = 'desconexion'
 //lo estoy haciendo ahorita es el ultimo 
@@ -14,7 +15,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
   //const [archivoSeleccionado, setArchivoSeleccionado] = useState<File | null>(null)
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({}) // Agrega un arreglo para manejo de errores
-
+  const mutation = useDesconexion();
   const [mostrarFormulario] = useState(true);
   const form = useForm({
     defaultValues: {
