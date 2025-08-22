@@ -25,3 +25,18 @@ export const AfiliacionInicialState= {
   PlanosDelTerreno: undefined,
   EscrituraDelTerreno: undefined,
 };
+
+export interface AfiliacionFormData {
+  Nombre: string;
+  PrimerApellido: string;
+  SegundoApellido: string;
+  Cedula: string;
+  Edad: number;
+  DireccionExacta: string;
+  NumeroTelefono: string;
+  CorreoElectronico: string;
+  PlanosDelTerreno?: File | string;
+  EscrituraDelTerreno?: File | string;
+}
+
+

@@ -39,8 +39,11 @@ const upadateMutation = useMutation({
 
 
       return {
-        desconexiones: desconexionQuery.data, // ✅ usamos la variable declarada arriba
+        desconexiones: desconexionQuery.data, //  usamos la variable declarada arriba
         isLoading: desconexionQuery.isLoading,
         isError: desconexionQuery.isError,
+        createDesconexion: createMutation.mutateAsync,
+        updateDesconexion: upadateMutation.mutateAsync,
+        deleteDesconexion: deleteMutation.mutateAsync,
     }
 }

@@ -1,5 +1,5 @@
 import apiAuth from "../../api/apiAuth";
-import type { Afiliacion } from "../../models/Solicitudes/Afiliacion";
+import type { Afiliacion, AfiliacionFormData } from "../../models/Solicitudes/Afiliacion";
 
 //traer las afiliaciones 
 export async function getAllAfiliaciones(){
@@ -7,7 +7,7 @@ export async function getAllAfiliaciones(){
   return response.data;
 }
 //nueva afiliacion 
-export async function createAfiliacion(data:Afiliacion){
+export async function createAfiliacion(data:AfiliacionFormData){
     const response = await apiAuth.post("/solicitud-afiliacion/create",data);
     return response.data; 
 }
