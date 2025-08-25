@@ -1,17 +1,33 @@
-import Navbar from './Navbar'
-import Data from '../../data/Data.json'
 import { Link } from '@tanstack/react-router'
+import Data from '../../data/Data.json'
+import DesktopHeader from './DesktopHeader'
+import MobileHeader from './MobileHeader'
+import { mapIconsToMenuItems } from '../../utils/MapIcons'
+import type { RawMenuItem } from '../../utils/MapIcons'
 
-const header = () => {
+const Header = () => {
+  const { logo, navbar } = Data.header
+
+  // Covierte el texto de los íconos del json a componentes para que se puedan renderizar en el menú
+  const parsedMenuItems = mapIconsToMenuItems(navbar.menuItems as RawMenuItem[]) 
+
   return (
-    <header className="flex justify-between items-center p-4 bg-blue-500 text-white z-50 md:hiden">
-      <Link to={Data.header.logo.ruta} className="flex items-center">
-        <img src="/Logo_ASADA_Juan_Díaz.png" alt="Logo ASADA Juan Díaz" className="h-12" />
+    <nav className='fixed top-0 w-screen z-50 bg-white border-b border-gray-200 px-4 md:px-8 py-3 flex items-center justify-between shadow-sm'>
+      {/* Logo */}
+      <Link to={logo.ruta} className='flex items-center gap-2 h-13 w-15'>
+        <img src={logo.src} alt='logo' className='h-full w-full' />
       </Link>
-      <Navbar />
-      <Link to={Data.header.IncioSesion.Ruta} className='bg-white text-gray-800 px-4 py-2 rounded-md hover:bg-gray-600 hover:text-white'>{Data.header.IncioSesion.Texto}</Link>
-    </header>
+      {/* Header Desktop */}
+      <DesktopHeader 
+        menuItems={parsedMenuItems}
+      />
+
+      {/* Header Móvil */}
+      <MobileHeader 
+        menuItems={parsedMenuItems}
+      />
+    </nav>
   )
 }
 
-export default header
+export default Header

@@ -9,4 +9,8 @@ export default defineConfig({
     tailwindcss(),
     tanstackRouter({ target: 'react'})
   ],
+  server: {
+    host: true,  // necesario para que funcione bien en DevTunnel
+    port: 5173,
+  },
 })

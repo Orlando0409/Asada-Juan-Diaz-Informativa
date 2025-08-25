@@ -9,58 +9,194 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthLoginRouteImport } from './routes/(Auth)/Login'
-import { Route as AuthForgotPasswordRouteImport } from './routes/(Auth)/ForgotPassword'
+import { Route as SolicitudesDesconexionMedidorRouteImport } from './routes/(Solicitudes)/DesconexionMedidor'
+import { Route as SolicitudesCambiomedidorRouteImport } from './routes/(Solicitudes)/Cambiomedidor'
+import { Route as SolicitudesAsociadoRouteImport } from './routes/(Solicitudes)/Asociado'
+import { Route as SolicitudesAfiliacionRouteImport } from './routes/(Solicitudes)/Afiliacion'
+import { Route as ContactoSugerenciasRouteImport } from './routes/(Contacto)/Sugerencias'
+import { Route as ContactoReportesRouteImport } from './routes/(Contacto)/Reportes'
+import { Route as ContactoQuejasRouteImport } from './routes/(Contacto)/Quejas'
+import { Route as AboutUsHistoriaRouteImport } from './routes/(AboutUs)/Historia'
+import { Route as AboutUsDatosGeneralesRouteImport } from './routes/(AboutUs)/DatosGenerales'
+import { Route as AboutUsCalidadAguaRouteImport } from './routes/(AboutUs)/CalidadAgua'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthLoginRoute = AuthLoginRouteImport.update({
-  id: '/(Auth)/Login',
-  path: '/Login',
+const SolicitudesDesconexionMedidorRoute =
+  SolicitudesDesconexionMedidorRouteImport.update({
+    id: '/(Solicitudes)/DesconexionMedidor',
+    path: '/DesconexionMedidor',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const SolicitudesCambiomedidorRoute =
+  SolicitudesCambiomedidorRouteImport.update({
+    id: '/(Solicitudes)/Cambiomedidor',
+    path: '/Cambiomedidor',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const SolicitudesAsociadoRoute = SolicitudesAsociadoRouteImport.update({
+  id: '/(Solicitudes)/Asociado',
+  path: '/Asociado',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
-  id: '/(Auth)/ForgotPassword',
-  path: '/ForgotPassword',
+const SolicitudesAfiliacionRoute = SolicitudesAfiliacionRouteImport.update({
+  id: '/(Solicitudes)/Afiliacion',
+  path: '/Afiliacion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactoSugerenciasRoute = ContactoSugerenciasRouteImport.update({
+  id: '/(Contacto)/Sugerencias',
+  path: '/Sugerencias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactoReportesRoute = ContactoReportesRouteImport.update({
+  id: '/(Contacto)/Reportes',
+  path: '/Reportes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactoQuejasRoute = ContactoQuejasRouteImport.update({
+  id: '/(Contacto)/Quejas',
+  path: '/Quejas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutUsHistoriaRoute = AboutUsHistoriaRouteImport.update({
+  id: '/(AboutUs)/Historia',
+  path: '/Historia',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutUsDatosGeneralesRoute = AboutUsDatosGeneralesRouteImport.update({
+  id: '/(AboutUs)/DatosGenerales',
+  path: '/DatosGenerales',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutUsCalidadAguaRoute = AboutUsCalidadAguaRouteImport.update({
+  id: '/(AboutUs)/CalidadAgua',
+  path: '/CalidadAgua',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/ForgotPassword': typeof AuthForgotPasswordRoute
-  '/Login': typeof AuthLoginRoute
+  '/auth': typeof AuthRoute
+  '/CalidadAgua': typeof AboutUsCalidadAguaRoute
+  '/DatosGenerales': typeof AboutUsDatosGeneralesRoute
+  '/Historia': typeof AboutUsHistoriaRoute
+  '/Quejas': typeof ContactoQuejasRoute
+  '/Reportes': typeof ContactoReportesRoute
+  '/Sugerencias': typeof ContactoSugerenciasRoute
+  '/Afiliacion': typeof SolicitudesAfiliacionRoute
+  '/Asociado': typeof SolicitudesAsociadoRoute
+  '/Cambiomedidor': typeof SolicitudesCambiomedidorRoute
+  '/DesconexionMedidor': typeof SolicitudesDesconexionMedidorRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/ForgotPassword': typeof AuthForgotPasswordRoute
-  '/Login': typeof AuthLoginRoute
+  '/auth': typeof AuthRoute
+  '/CalidadAgua': typeof AboutUsCalidadAguaRoute
+  '/DatosGenerales': typeof AboutUsDatosGeneralesRoute
+  '/Historia': typeof AboutUsHistoriaRoute
+  '/Quejas': typeof ContactoQuejasRoute
+  '/Reportes': typeof ContactoReportesRoute
+  '/Sugerencias': typeof ContactoSugerenciasRoute
+  '/Afiliacion': typeof SolicitudesAfiliacionRoute
+  '/Asociado': typeof SolicitudesAsociadoRoute
+  '/Cambiomedidor': typeof SolicitudesCambiomedidorRoute
+  '/DesconexionMedidor': typeof SolicitudesDesconexionMedidorRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/(Auth)/ForgotPassword': typeof AuthForgotPasswordRoute
-  '/(Auth)/Login': typeof AuthLoginRoute
+  '/auth': typeof AuthRoute
+  '/(AboutUs)/CalidadAgua': typeof AboutUsCalidadAguaRoute
+  '/(AboutUs)/DatosGenerales': typeof AboutUsDatosGeneralesRoute
+  '/(AboutUs)/Historia': typeof AboutUsHistoriaRoute
+  '/(Contacto)/Quejas': typeof ContactoQuejasRoute
+  '/(Contacto)/Reportes': typeof ContactoReportesRoute
+  '/(Contacto)/Sugerencias': typeof ContactoSugerenciasRoute
+  '/(Solicitudes)/Afiliacion': typeof SolicitudesAfiliacionRoute
+  '/(Solicitudes)/Asociado': typeof SolicitudesAsociadoRoute
+  '/(Solicitudes)/Cambiomedidor': typeof SolicitudesCambiomedidorRoute
+  '/(Solicitudes)/DesconexionMedidor': typeof SolicitudesDesconexionMedidorRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/ForgotPassword' | '/Login'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/CalidadAgua'
+    | '/DatosGenerales'
+    | '/Historia'
+    | '/Quejas'
+    | '/Reportes'
+    | '/Sugerencias'
+    | '/Afiliacion'
+    | '/Asociado'
+    | '/Cambiomedidor'
+    | '/DesconexionMedidor'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/ForgotPassword' | '/Login'
-  id: '__root__' | '/' | '/(Auth)/ForgotPassword' | '/(Auth)/Login'
+  to:
+    | '/'
+    | '/auth'
+    | '/CalidadAgua'
+    | '/DatosGenerales'
+    | '/Historia'
+    | '/Quejas'
+    | '/Reportes'
+    | '/Sugerencias'
+    | '/Afiliacion'
+    | '/Asociado'
+    | '/Cambiomedidor'
+    | '/DesconexionMedidor'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/(AboutUs)/CalidadAgua'
+    | '/(AboutUs)/DatosGenerales'
+    | '/(AboutUs)/Historia'
+    | '/(Contacto)/Quejas'
+    | '/(Contacto)/Reportes'
+    | '/(Contacto)/Sugerencias'
+    | '/(Solicitudes)/Afiliacion'
+    | '/(Solicitudes)/Asociado'
+    | '/(Solicitudes)/Cambiomedidor'
+    | '/(Solicitudes)/DesconexionMedidor'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
-  AuthLoginRoute: typeof AuthLoginRoute
+  AuthRoute: typeof AuthRoute
+  AboutUsCalidadAguaRoute: typeof AboutUsCalidadAguaRoute
+  AboutUsDatosGeneralesRoute: typeof AboutUsDatosGeneralesRoute
+  AboutUsHistoriaRoute: typeof AboutUsHistoriaRoute
+  ContactoQuejasRoute: typeof ContactoQuejasRoute
+  ContactoReportesRoute: typeof ContactoReportesRoute
+  ContactoSugerenciasRoute: typeof ContactoSugerenciasRoute
+  SolicitudesAfiliacionRoute: typeof SolicitudesAfiliacionRoute
+  SolicitudesAsociadoRoute: typeof SolicitudesAsociadoRoute
+  SolicitudesCambiomedidorRoute: typeof SolicitudesCambiomedidorRoute
+  SolicitudesDesconexionMedidorRoute: typeof SolicitudesDesconexionMedidorRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -68,18 +204,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(Auth)/Login': {
-      id: '/(Auth)/Login'
-      path: '/Login'
-      fullPath: '/Login'
-      preLoaderRoute: typeof AuthLoginRouteImport
+    '/(Solicitudes)/DesconexionMedidor': {
+      id: '/(Solicitudes)/DesconexionMedidor'
+      path: '/DesconexionMedidor'
+      fullPath: '/DesconexionMedidor'
+      preLoaderRoute: typeof SolicitudesDesconexionMedidorRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(Auth)/ForgotPassword': {
-      id: '/(Auth)/ForgotPassword'
-      path: '/ForgotPassword'
-      fullPath: '/ForgotPassword'
-      preLoaderRoute: typeof AuthForgotPasswordRouteImport
+    '/(Solicitudes)/Cambiomedidor': {
+      id: '/(Solicitudes)/Cambiomedidor'
+      path: '/Cambiomedidor'
+      fullPath: '/Cambiomedidor'
+      preLoaderRoute: typeof SolicitudesCambiomedidorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(Solicitudes)/Asociado': {
+      id: '/(Solicitudes)/Asociado'
+      path: '/Asociado'
+      fullPath: '/Asociado'
+      preLoaderRoute: typeof SolicitudesAsociadoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(Solicitudes)/Afiliacion': {
+      id: '/(Solicitudes)/Afiliacion'
+      path: '/Afiliacion'
+      fullPath: '/Afiliacion'
+      preLoaderRoute: typeof SolicitudesAfiliacionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(Contacto)/Sugerencias': {
+      id: '/(Contacto)/Sugerencias'
+      path: '/Sugerencias'
+      fullPath: '/Sugerencias'
+      preLoaderRoute: typeof ContactoSugerenciasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(Contacto)/Reportes': {
+      id: '/(Contacto)/Reportes'
+      path: '/Reportes'
+      fullPath: '/Reportes'
+      preLoaderRoute: typeof ContactoReportesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(Contacto)/Quejas': {
+      id: '/(Contacto)/Quejas'
+      path: '/Quejas'
+      fullPath: '/Quejas'
+      preLoaderRoute: typeof ContactoQuejasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(AboutUs)/Historia': {
+      id: '/(AboutUs)/Historia'
+      path: '/Historia'
+      fullPath: '/Historia'
+      preLoaderRoute: typeof AboutUsHistoriaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(AboutUs)/DatosGenerales': {
+      id: '/(AboutUs)/DatosGenerales'
+      path: '/DatosGenerales'
+      fullPath: '/DatosGenerales'
+      preLoaderRoute: typeof AboutUsDatosGeneralesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(AboutUs)/CalidadAgua': {
+      id: '/(AboutUs)/CalidadAgua'
+      path: '/CalidadAgua'
+      fullPath: '/CalidadAgua'
+      preLoaderRoute: typeof AboutUsCalidadAguaRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -87,8 +279,17 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
-  AuthLoginRoute: AuthLoginRoute,
+  AuthRoute: AuthRoute,
+  AboutUsCalidadAguaRoute: AboutUsCalidadAguaRoute,
+  AboutUsDatosGeneralesRoute: AboutUsDatosGeneralesRoute,
+  AboutUsHistoriaRoute: AboutUsHistoriaRoute,
+  ContactoQuejasRoute: ContactoQuejasRoute,
+  ContactoReportesRoute: ContactoReportesRoute,
+  ContactoSugerenciasRoute: ContactoSugerenciasRoute,
+  SolicitudesAfiliacionRoute: SolicitudesAfiliacionRoute,
+  SolicitudesAsociadoRoute: SolicitudesAsociadoRoute,
+  SolicitudesCambiomedidorRoute: SolicitudesCambiomedidorRoute,
+  SolicitudesDesconexionMedidorRoute: SolicitudesDesconexionMedidorRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
