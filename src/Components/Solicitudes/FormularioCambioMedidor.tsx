@@ -3,6 +3,7 @@ import { useState } from "react";
 import data from '../../data/Data.json'
 import { CambioMedidorSchema } from "../../Schemas/Solicitudes/CambioMedidor";
 import { useCambioMedidor } from "../../Hook/Solicitudes/hookCambioMedidor";
+import type { CambioMedidor } from "../../models/Solicitudes/CambioMedidor";
 
 type SolicitudTipo = "cambioMedidor";
 type Props = {
@@ -10,7 +11,7 @@ type Props = {
   onClose: () => void;
 
 }
-
+//original 
 const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
   const [mostrarFormulario] = useState(true);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -44,9 +45,17 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
         return;
       }
 
+      const dataToSend: CambioMedidor = {
+        ...value,
+        Id_Estado_Solicitud: 1 // pendiente
+      };
+
       // si pasa validación
       try {
         console.log("Datos válidos enviados:", value);
+
+        await mutation.createCambioMedidor(dataToSend); // ahora sí cumple con el tipo
+
         form.reset();
       } catch (error) {
         console.error("Error al enviar formulario:", error);

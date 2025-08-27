@@ -16,8 +16,8 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const mutation = useAfiliaciones();
-
   const [mostrarFormulario] = useState(true);
+
   const form = useForm({
     defaultValues: {
       Nombre: '',
@@ -28,6 +28,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
       DireccionExacta: '',
       NumeroTelefono: '',
       CorreoElectronico: '',
+      MotivoSolicitud: '',
       PlanosDelTerreno: undefined as File | undefined,
       EscrituraDelTerreno: undefined as File | undefined,
     },
@@ -46,18 +47,28 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
         return;
       }
 
+      ////original 
       try {
-        console.log("Datos válidos enviados:", value);
-        await mutation.createAfiliacion(value);
+        const formData = new FormData();
+        Object.entries(value).forEach(([key, val]) => {
+          if (val !== undefined && val !== null && val !== "") {
+            if (val instanceof File) formData.append(key, val);
+            else formData.append(key, val.toString());
+          }
+        });
+
+        // Mostrar solo los valores limpios (sin (2))
+        console.log("FormData final a enviar:", value);
+
+        await mutation.createAfiliacion(formData);
+
         form.reset();
         setArchivoSeleccionado({});
       } catch (error) {
         console.error("Error al enviar formulario:", error);
         setFormErrors({
           general: "Hubo un error al enviar el formulario. Intenta nuevamente."
-
-        })
-
+        });
       }
     },
   });
@@ -113,6 +124,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                           onClick={() => {
                             field.handleChange(undefined)
                             setArchivoSeleccionado(prev => ({ ...prev, [fieldName]: null }))
+
                           }}
                           className="text-red-500 hover:underline text-xs"
                         >
@@ -136,7 +148,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                   </label>
                   <input
                     type={fieldProps.type === "email" ? "email" : "text"}
-                    value={field.state.value as string}
+                    value={(field.state.value as string | number) ?? ""}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
                     placeholder={fieldProps.label}
