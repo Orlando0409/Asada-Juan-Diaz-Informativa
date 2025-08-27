@@ -8,6 +8,11 @@ export async function getAllAfiliaciones(): Promise<Afiliacion[]> {
 }
 //nueva afiliacion 
 // 
+
+export async function createAfiliacion(data: FormData) {
+  const response = await apiAuth.post("/solicitud-afiliacion/create", data);
+  return response.data;
+}
 /*
 export async function createAfiliacion(data: FormData) {
   const response = await apiAuth.post("/solicitud-afiliacion/create", data, {
@@ -16,10 +21,10 @@ export async function createAfiliacion(data: FormData) {
     }
   });
   return response.data;
-}*/
+}
 
  //probar con la app 
- 
+ /*
 export async function createAfiliacion(data: FormData) {
   const response = await apiAuth.post(
     "https://webhook.site/3dafeb3d-90ed-48be-86b2-8d2667ea75dc",
@@ -27,7 +32,7 @@ export async function createAfiliacion(data: FormData) {
     // No pongas headers manuales aquí
   );
   return response.data;
-}
+}*/
 
  
 //actualizar 

@@ -3,12 +3,13 @@ import type { CambioMedidor } from "../../models/Solicitudes/CambioMedidor";
 import type { Desconexion } from "../../models/Solicitudes/Desconexio";
 
 //traer las afiliaciones 
-/*
+
 export async function getAllCambioMedidor(): Promise<CambioMedidor[]> {
   const response = await apiAuth.get("/solicitud-cambio-medidor/all");
   return response.data as CambioMedidor[];
 }
-*/
+
+/*
 let mockDB: CambioMedidor[] = [];
 
 export async function createCambioMedidor(data: CambioMedidor) {
@@ -28,7 +29,7 @@ export async function getAllCambioMedidor(): Promise<CambioMedidor[]> {
     }, 300);
   });
 }
-
+*/
 
 
 export async function getAllCambioMedidorById(id:number){
