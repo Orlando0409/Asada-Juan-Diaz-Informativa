@@ -1,6 +1,6 @@
 import apiAuth from "../../api/apiAuth";
-import type { CambioMedidor } from "../../models/Solicitudes/CambioMedidor";
-import type { Desconexion } from "../../models/Solicitudes/Desconexio";
+import type { CambioMedidor } from "../../Schemas/Solicitudes/CambioMedidor";
+
 
 //traer las afiliaciones 
 

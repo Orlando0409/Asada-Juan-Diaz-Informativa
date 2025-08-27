@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createCambioMedidor, deleteCambioMedidor, getAllCambioMedidor, updateCambioMedidor } from "../../Services/Solicitudes/CambioMedidorService";
-import type { CambioMedidor } from "../../models/Solicitudes/CambioMedidor";
+import {  deleteCambioMedidor, getAllCambioMedidor, updateCambioMedidor } from "../../Services/Solicitudes/CambioMedidorService";
+import type { CambioMedidor } from "../../Schemas/Solicitudes/CambioMedidor";
+
 
  export const useCambioMedidor=()=>{
     const queryClient=useQueryClient();
@@ -14,12 +15,6 @@ import type { CambioMedidor } from "../../models/Solicitudes/CambioMedidor";
 
     })
     
-    const createMutation= useMutation({
-        mutationFn: (data: CambioMedidor)=> createCambioMedidor(data),
-        onSuccess:()=>queryClient.invalidateQueries({queryKey:["cambioMedidor"]}),
-        onError: ()=>console.error("no se creo la solicitud ")
-        
-    })
 
 
     //actualizar solicsitud 
@@ -42,7 +37,6 @@ import type { CambioMedidor } from "../../models/Solicitudes/CambioMedidor";
         desconexiones: CambioMedidorQuery.data, //  usamos la variable declarada arriba
         isLoading: CambioMedidorQuery.isLoading,
         isError: CambioMedidorQuery.isError,
-        createCambioMedidor: createMutation.mutateAsync,
         updateCambioMedidor: upadateMutation.mutateAsync,
         deleteCambioMedidor: deleteMutation.mutateAsync,
     }

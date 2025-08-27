@@ -28,8 +28,8 @@ function ProyectosMobile({
   descripcion
 }: Readonly<ProyectosMobileProps>) {
 
-    const getBadgeClasses = (estadoNombre: string) => {
-    if (estadoNombre === 'Activo') {
+  const getBadgeClasses = (estadoNombre: string) => {
+    if (estadoNombre === 'En planeamiento') {
       return 'bg-green-100 text-green-800 border-green-200';
     }
     if (estadoNombre === 'En progreso') {
@@ -39,6 +39,13 @@ function ProyectosMobile({
       return 'bg-blue-100 text-blue-800 border-blue-200';
     }
     return 'bg-gray-100 text-gray-800 border-gray-200';
+  };
+
+  const getDotColor = (estadoNombre: string) => {
+    if (estadoNombre === 'En planeamiento') return 'bg-green-500';
+    if (estadoNombre === 'En progreso') return 'bg-yellow-500';
+    if (estadoNombre === 'Finalizado') return 'bg-blue-500';
+    return 'bg-gray-500';
   };
 
   return (
@@ -65,50 +72,57 @@ function ProyectosMobile({
               className="flex transition-transform duration-700 ease-out"
               style={{ transform: `translateX(-${slideActual * 100}%)` }}
             >
-              {proyectos.map((proyecto) => (
-                <div key={proyecto.id_Proyecto} className="w-full flex-shrink-0">
-                  
-                  {/* Tarjeta móvil */}
-                  <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+              {proyectos.map((proyecto, index) => {
+                // Soporta tanto "estado" como "Estado"
+                const nombreEstado = (proyecto.estado?.Nombre_Estado ?? (proyecto as any).Estado?.Nombre_Estado) ?? '';
+                return (
+                  <div key={`${proyecto.Id_Proyecto}-${index}`} className="w-full flex-shrink-0">
                     
-                    {/* Imagen móvil */}
-                    <div className="relative overflow-hidden">
-                      <img
-                        alt={proyecto.Titulo}
-                        src={proyecto.imagenUrl}
-                        className="w-full h-48 md:h-52 object-cover"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                    {/* Tarjeta móvil */}
+                    <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
                       
-                      {/* Badge estado móvil */}
-                        <span className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium border ${getBadgeClasses(proyecto.estado.Nombre_Estado)}`}>
-                            {proyecto.estado.Nombre_Estado}
-                        </span>
-                    </div>
-
-                    {/* Contenido tarjeta móvil */}
-                    <div className="p-4 space-y-3">
-                      <h3 className="text-lg md:text-xl font-bold text-gray-900">
-                        {proyecto.Titulo}
-                      </h3>
-                      
-                      <div className="flex items-center space-x-2 text-sm text-gray-500">
-                        <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-                        <span className="text-xs">
-                          {new Date(proyecto.fecha_Actualizacion).toLocaleDateString('es-ES')}
-                        </span>
+                      {/* Imagen móvil */}
+                      <div className="relative overflow-hidden">
+                        <img
+                          alt={proyecto.Titulo}
+                          src={proyecto.Imagen_Url}
+                          className="w-full h-48 md:h-52 object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                        
+                        {/* Badge estado móvil */}
+                        {nombreEstado ? (
+                          <span className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium border ${getBadgeClasses(nombreEstado)}`}>
+                              {nombreEstado}
+                          </span>
+                        ) : (
+                          <span className="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-medium border bg-gray-100 text-gray-800 border-gray-200">Sin estado</span>
+                        )}
                       </div>
 
-                      <BotonLeerMas
-                        descripcion={proyecto.descripcion}
+                      {/* Contenido tarjeta móvil */}
+                      <div className="p-4 space-y-3">
+                        <h3 className="text-lg md:text-xl font-bold text-gray-900">
+                          {proyecto.Titulo}
+                        </h3>
+                        
+                        <div className="flex items-center space-x-2 text-sm text-gray-500">
+                          <span className={`w-2 h-2 rounded-full ${getDotColor(nombreEstado)}`}></span>
+                          <span className="text-xs">
+                            {new Date(proyecto.Fecha_Actualizacion).toLocaleDateString('es-ES')}
+                          </span>
+                        </div>
 
-                        mostrarTodo={proyectoExpandido === proyecto.id_Proyecto}
-                        onToggle={() => toggleDescripcion(proyecto.id_Proyecto)}
-                      />
+                        <BotonLeerMas
+                          descripcion={proyecto.Descripcion ?? ''}
+                          mostrarTodo={proyectoExpandido === proyecto.Id_Proyecto}
+                          onToggle={() => toggleDescripcion(proyecto.Id_Proyecto)}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 
@@ -131,7 +145,7 @@ function ProyectosMobile({
           <div className="flex justify-center mt-4 space-x-2">
             {proyectos.map((proyecto, index) => (
               <button
-                key={proyecto.id_Proyecto}
+                key={`${proyecto.Id_Proyecto}-dot-${index}`}
                 onClick={() => irASlide(index)}
                 className={`transition-all duration-300 rounded-full ${
                   index === slideActual 

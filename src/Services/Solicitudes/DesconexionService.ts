@@ -1,5 +1,6 @@
 import apiAuth from "../../api/apiAuth";
-import type { Desconexion } from "../../models/Solicitudes/Desconexio";
+import type { Desconexion } from "../../models/Forms/Solicitudes/Desconexio";
+
 
 //traer las afiliaciones 
 export async function getAllDesconexion(): Promise<Desconexion[]> {

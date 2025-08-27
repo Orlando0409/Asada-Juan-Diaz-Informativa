@@ -1,5 +1,5 @@
 import apiAuth from "../../api/apiAuth";
-import type { Afiliacion, AfiliacionFormData } from "../../models/Solicitudes/Afiliacion";
+import type { Afiliacion } from "../../Schemas/Solicitudes/Afiliacion";
 
 //traer las afiliaciones 
 export async function getAllAfiliaciones(): Promise<Afiliacion[]> {

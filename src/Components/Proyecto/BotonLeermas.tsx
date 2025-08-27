@@ -7,7 +7,9 @@ type Props = {
 };
 
 function BotonLeerMas({ descripcion, mostrarTodo, onToggle }: Readonly<Props>) {
-  const palabras = descripcion.trim().split(" ");
+  // proteger contra undefined/null
+  const safeDescripcion = (descripcion ?? '').toString();
+  const palabras = safeDescripcion.trim().split(/\s+/).filter(Boolean);
   const textoCorto = palabras.slice(0, 5).join(" ");
   const textoTruncado = textoCorto + (palabras.length > 5 ? "..." : "");
 
@@ -16,7 +18,7 @@ function BotonLeerMas({ descripcion, mostrarTodo, onToggle }: Readonly<Props>) {
       {/* Texto de la descripción */}
       <div className="relative">
         <p className="text-gray-700 leading-relaxed transition-all duration-300 text-sm">
-          {mostrarTodo ? descripcion : textoTruncado}
+          {mostrarTodo ? safeDescripcion : textoTruncado}
         </p>
         
         {/* Gradiente de fade para el texto truncado */}
