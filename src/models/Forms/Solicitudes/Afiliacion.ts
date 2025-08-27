@@ -1,6 +1,6 @@
 export interface Afiliacion {
   Nombre: string;
-  PrimeApellido: string;
+  PrimerApellido: string;
   SegundoApellido: string;
   Cedula: string;
   CorreoElectronico: string;
@@ -8,7 +8,7 @@ export interface Afiliacion {
   Edad: number;
   NumeroTelefono:string;
   PlanosDelTerreno?: File | string;
-  Escritura_Delerreno?: File | string;
+  EscrituraDelTerreno?: File | string;
 }
 
 export const AfiliacionInicialState= {
@@ -31,7 +31,7 @@ export interface AfiliacionFormData {
   SegundoApellido: string;
   Cedula: string;
   CorreoElectronico: string;
-  Direccion_Exacta: string;
+  DireccionExacta: string;
   Edad: number;
   NumeroTelefono: string;
   PlanosDelTerreno?: File | string;

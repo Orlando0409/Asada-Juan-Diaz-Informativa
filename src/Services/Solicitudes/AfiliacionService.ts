@@ -13,26 +13,6 @@ export async function createAfiliacion(data: FormData) {
   const response = await apiAuth.post("/solicitud-afiliacion/create", data);
   return response.data;
 }
-/*
-export async function createAfiliacion(data: FormData) {
-  const response = await apiAuth.post("/solicitud-afiliacion/create", data, {
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
-  });
-  return response.data;
-}
-
- //probar con la app 
- /*
-export async function createAfiliacion(data: FormData) {
-  const response = await apiAuth.post(
-    "https://webhook.site/3dafeb3d-90ed-48be-86b2-8d2667ea75dc",
-    data
-    // No pongas headers manuales aquí
-  );
-  return response.data;
-}*/
 
  
 //actualizar 

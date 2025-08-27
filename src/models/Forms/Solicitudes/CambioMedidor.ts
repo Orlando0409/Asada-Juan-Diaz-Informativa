@@ -6,6 +6,7 @@ export interface CambioMedidor {
   Cedula: string;
   CorreoElectronico: string;
   DireccionExacta: string;
+   NumeroTelefono: string;
   MotivoSolicitud: string;
   Id_Estado_Solicitud: number;
 
@@ -18,6 +19,7 @@ export const CambioMedidorInicialState= {
   Cedula: "",
   CorreoElectronico: "",
   DireccionExacta: "",
+   NumeroTelefono: "",
   MotivoSolicitud: "",
   Id_Estado_Solicitud: 0,
  
@@ -31,8 +33,6 @@ export interface CambioMedidorFormData {
   NumeroTelefono: string;
   MotivoSolicitud: string;
   CorreoElectronico: string;
-  PlanosDelTerreno?: File | string;
-  EscrituraDelTerreno?: File | string;
 }
 
 

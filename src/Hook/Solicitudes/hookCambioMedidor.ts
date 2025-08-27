@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {  deleteCambioMedidor, getAllCambioMedidor, updateCambioMedidor } from "../../Services/Solicitudes/CambioMedidorService";
+import {  createCambioMedidor, deleteCambioMedidor, getAllCambioMedidor, updateCambioMedidor } from "../../Services/Solicitudes/CambioMedidorService";
 import type { CambioMedidor } from "../../Schemas/Solicitudes/CambioMedidor";
 
 
@@ -14,7 +14,11 @@ import type { CambioMedidor } from "../../Schemas/Solicitudes/CambioMedidor";
         refetchOnWindowFocus: false 
 
     })
-    
+   const createMutation = useMutation({
+  mutationFn: (data: CambioMedidor) => createCambioMedidor(data), // cambiar FormData por CambioMedidor
+  onSuccess: () => queryClient.invalidateQueries({ queryKey: ["Desconexion"] }),
+  onError: () => console.error("No se pudo crear la solicitud"),
+});
 
 
     //actualizar solicsitud 
@@ -37,6 +41,7 @@ import type { CambioMedidor } from "../../Schemas/Solicitudes/CambioMedidor";
         desconexiones: CambioMedidorQuery.data, //  usamos la variable declarada arriba
         isLoading: CambioMedidorQuery.isLoading,
         isError: CambioMedidorQuery.isError,
+        createCambioMedidor: createMutation.mutateAsync,
         updateCambioMedidor: upadateMutation.mutateAsync,
         deleteCambioMedidor: deleteMutation.mutateAsync,
     }

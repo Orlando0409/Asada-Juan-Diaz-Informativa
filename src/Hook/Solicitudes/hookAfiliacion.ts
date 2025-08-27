@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { createAfiliacion, getAllAfiliaciones } from "../../Services/Solicitudes/AfiliacionService";
-import type { Afiliacion, AfiliacionFormData } from "../../models/Solicitudes/Afiliacion";
+import type { Afiliacion } from "../../Schemas/Solicitudes/Afiliacion";
 
  
  export const useAfiliaciones=()=>{
