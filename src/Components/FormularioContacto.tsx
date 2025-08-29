@@ -1,33 +1,47 @@
 import { useForm } from '@tanstack/react-form'
 import data from '../data/Data.json'
 import {type ContactoTipo,getRequisitosKey,type RequisitosContacto} from '../types/ContactoForms'
-import { ContactoSchema } from '../Schemas/ContactoData'
 import { useState } from 'react'
+import { useCreateContacto } from '../Hook/Contacto/ContactoForms'
+import { getDynamicContactoSchema } from '../Schemas/ContactoData';
+
 
 type Props = {
   tipo: ContactoTipo
 }
 
 const FormularioContacto = ({ tipo }: Props) => {
+  const [formkey, setFormKey] = useState<number>(0); // Estado para forzar el reinicio del formulario
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<File | null>(null)
   const [formErrors, setFormErrors] = useState<Record<string, string>>({}) // Agrega un arreglo para manejo de errores
+  const mutation = useCreateContacto()
+
+  const requisitos = data.RequisitosContacto as unknown as RequisitosContacto
+  const clave = getRequisitosKey(tipo)
+  const campos = requisitos[clave]
+  const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300'
+  const DynamicContactoSchema = getDynamicContactoSchema(campos);
+
+
+const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps]) => {
+  if (fieldProps.type === 'file') {
+    acc[fieldName] = undefined;
+  } else {
+    acc[fieldName] = '';
+  }
+  return acc;
+}, {} as Record<string, any>);
+
+
 
   const form = useForm({
-    defaultValues: {
-      nombre: '',
-      primerApellido: '',
-      segundoApellido: '',
-      mensaje: '',
-      ubicacion: '', // Para reportes
-      adjunto: undefined as File | undefined,
-    },
+    defaultValues,
   
     onSubmit: async ({ value }) => {
       setFormErrors({}) // Limpia errores previos
 
       // Valida con Zod al hacer submit
-      const validation = ContactoSchema.safeParse(value)
-      
+      const validation = DynamicContactoSchema.safeParse(value)
       if (!validation.success) {
         const fieldErrors: Record<string, string> = {}
         validation.error.errors.forEach((err) => {
@@ -40,13 +54,8 @@ const FormularioContacto = ({ tipo }: Props) => {
 
       // Si llegamos aquí, la validación pasó
       try {
-        console.log('Datos válidos enviados:', value)
-        
-
-        // await enviarFormularioContacto(value, tipo)
-        
-        // Limpiar formulario después del éxito
-        form.reset()
+         await mutation.mutateAsync({ data: value, tipo })
+         setFormKey((prev) => prev + 1) // Reinicia el formulario
         setArchivoSeleccionado(null)
       } catch (error) {
         console.error('Error al enviar formulario:', error)
@@ -57,14 +66,10 @@ const FormularioContacto = ({ tipo }: Props) => {
     },
   })
 
-  const requisitos = data.RequisitosContacto as unknown as RequisitosContacto
-  const clave = getRequisitosKey(tipo)
-  const campos = requisitos[clave]
-  const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300'
-
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 text-gray-800 p-7">
       <form
+        key={formkey}
         onSubmit={(e) => {
           e.preventDefault() 
           form.handleSubmit()
@@ -76,7 +81,7 @@ const FormularioContacto = ({ tipo }: Props) => {
         </h2>
 
         {Object.entries(campos).map(([fieldName, fieldProps]) => (
-          <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
+          <form.Field key={fieldName} name={fieldName}>
             {(field) => {
               if (fieldProps.type === 'textarea') {
                 return (

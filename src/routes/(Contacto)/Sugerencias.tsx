@@ -6,5 +6,5 @@ export const Route = createFileRoute('/(Contacto)/Sugerencias')({
 })
 
 function RouteComponent() {
-  return <FormularioContacto tipo={'Sugerencia'} />
+  return <FormularioContacto key={'Sugerencia'} tipo={'Sugerencia'} />
 }

@@ -11,6 +11,6 @@ export default defineConfig({
   ],
   server: {
     host: true,  // necesario para que funcione bien en DevTunnel
-    port: 5173,
+    port: 5174,
   },
 })

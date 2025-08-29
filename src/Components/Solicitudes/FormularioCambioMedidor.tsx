@@ -3,6 +3,7 @@ import { useState } from "react";
 import data from '../../data/Data.json'
 import { CambioMedidorSchema } from "../../Schemas/Solicitudes/CambioMedidor";
 import { useCambioMedidor } from "../../Hook/Solicitudes/hookCambioMedidor";
+import type { CambioMedidor } from "../../models/Forms/Solicitudes/CambioMedidor";
 
 type SolicitudTipo = "cambioMedidor";
 type Props = {
@@ -10,7 +11,7 @@ type Props = {
   onClose: () => void;
 
 }
-
+//original 
 const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
   const [mostrarFormulario] = useState(true);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -33,7 +34,6 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
 
       // validar con Zod
       const validation = CambioMedidorSchema.safeParse(value);
-
       if (!validation.success) {
         const fieldErrors: Record<string, string> = {};
         validation.error.errors.forEach((err) => {
@@ -44,9 +44,17 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
         return;
       }
 
-      // si pasa validación
-      try {
-        console.log("Datos válidos enviados:", value);
+        // Preparar datos a enviar
+  const dataToSend: CambioMedidor = {
+    ...value,
+    Id_Estado_Solicitud: 1 // pendiente
+  };
+
+  try {
+    console.log("Datos válidos enviados:", dataToSend);
+    await mutation.createCambioMedidor(dataToSend); // enviar JSON directamente
+    form.reset();// ahora sí cumple con el tipo
+
         form.reset();
       } catch (error) {
         console.error("Error al enviar formulario:", error);

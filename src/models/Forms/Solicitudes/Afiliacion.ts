@@ -5,9 +5,8 @@ export interface Afiliacion {
   Cedula: string;
   CorreoElectronico: string;
   DireccionExacta: string;
-  Motivo_Solicitud: string;
-  Id_Estado_Solicitud: number;
   Edad: number;
+  NumeroTelefono:string;
   PlanosDelTerreno?: File | string;
   EscrituraDelTerreno?: File | string;
 }
@@ -19,22 +18,22 @@ export const AfiliacionInicialState= {
   Cedula: "",
   CorreoElectronico: "",
   DireccionExacta: "",
-  Motivo_Solicitud: "",
   Edad: 0,
-  Id_Estado_Solicitud: 0,
+   NumeroTelefono: "",
   PlanosDelTerreno: undefined,
   EscrituraDelTerreno: undefined,
 };
 
 export interface AfiliacionFormData {
+ 
   Nombre: string;
   PrimerApellido: string;
   SegundoApellido: string;
   Cedula: string;
-  Edad: number;
-  DireccionExacta: string;
-  NumeroTelefono: string;
   CorreoElectronico: string;
+  DireccionExacta: string;
+  Edad: number;
+  NumeroTelefono: string;
   PlanosDelTerreno?: File | string;
   EscrituraDelTerreno?: File | string;
 }

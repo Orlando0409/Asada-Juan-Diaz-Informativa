@@ -1,18 +1,19 @@
 export interface Proyecto {
   
-  id_Proyecto: number;
+  Id_Proyecto: number;
   Titulo: string;
-  descripcion: string;
-  fecha_Creacion: string;
-  fecha_Actualizacion: string;
+  Descripcion: string;
+  Fecha_Creacion: string;
+  Fecha_Actualizacion: string;
   Id_Usuario: number;
-  estado: {
-    id_Estado_Proyecto: number;
-    Nombre_Estado: string;
-  };
-  imagenUrl: string;
+  estado: Estado;
+  Imagen_Url: string;
 }
 
+export interface Estado{
+  Id_Estado_Proyecto: number;
+  Nombre_Estado: string;
+}
 
 export interface ProjectCardProps {
   proyecto: Proyecto;

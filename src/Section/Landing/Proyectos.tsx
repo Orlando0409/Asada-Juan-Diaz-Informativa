@@ -20,7 +20,7 @@ function Proyectos() {
       setSlideActual(prevSlide => 
         prevSlide === proyectos.length - 1 ? 0 : prevSlide + 1
       );
-    }, 2000);
+    }, 3000);
 
     return () => clearInterval(intervalo);
   }, [estaPausado, proyectos]);

@@ -5,7 +5,7 @@ import { DesconexionMedidorSchema } from "../../Schemas/Solicitudes/DesconexionM
 import { useDesconexion } from "../../Hook/Solicitudes/hookDesconexion"
 
 type SolicitudTipo = 'desconexion'
-//lo estoy haciendo ahorita es el ultimo 
+//lo estoy haciendo ahorita es el ultimo //original
 type Props = {
   tipo: SolicitudTipo
   onClose: () => void
@@ -17,13 +17,14 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({}) // Agrega un arreglo para manejo de errores
   const mutation = useDesconexion();
   const [mostrarFormulario] = useState(true);
+
+
   const form = useForm({
     defaultValues: {
       Nombre: '',
-      PimerApellido: '',
+      PrimerApellido: '',
       SegundoApellido: '',
       Cedula: '',
-      Edad: '',
       DireccionExacta: '',
       NumeroTelefono: '',
       CorreoElectronico: '',
@@ -36,7 +37,6 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
 
       // validar con Zod
       const validation = DesconexionMedidorSchema.safeParse(value);
-
       if (!validation.success) {
         const fieldErrors: Record<string, string> = {};
         validation.error.errors.forEach((err) => {
@@ -47,10 +47,21 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
         return;
       }
 
-      // si pasa validación
       try {
-        console.log("Datos válidos enviados:", value);
+        const formData = new FormData();
+        Object.entries(value).forEach(([key, val]) => {
+          if (val !== undefined && val !== null && val !== "") {
+            if (val instanceof File) formData.append(key, val);
+            else formData.append(key, val.toString());
+          }
+        });
+
+        console.log("FormData final a enviar:", value);
+
+        await mutation.createDesconexion(formData);
+
         form.reset();
+        setArchivoSeleccionado({});
       } catch (error) {
         console.error("Error al enviar formulario:", error);
         setFormErrors({
@@ -167,7 +178,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                   </label>
                   <input
                     type={fieldProps.type === "email" ? "email" : "text"}
-                    value={field.state.value as string}
+                    value={(field.state.value as string | number) ?? ""}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
                     placeholder={fieldProps.label}
@@ -216,3 +227,4 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
 }
 
 export default FormularioDesconexionMedidor
+//original

@@ -10,10 +10,6 @@ export const DesconexionMedidorSchema = z.object({
     .max(10, 'La cédula debe tener máximo 10 dígitos')
     .regex(/^\d+$/, 'La cédula solo debe contener números'),
 
-   Edad: z.coerce.number()
-    .min(18, 'Solo se permite personas mayores de edad')
-    .max(120, 'Edad no válida'),
-
    DireccionExacta: z.string().min(10, 'La dirección debe tener al menos 10 caracteres'),
  
    NumeroTelefono: z.string()

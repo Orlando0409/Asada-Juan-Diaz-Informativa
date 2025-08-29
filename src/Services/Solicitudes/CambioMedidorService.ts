@@ -1,22 +1,28 @@
 import apiAuth from "../../api/apiAuth";
-import type { CambioMedidor } from "../../models/Solicitudes/CambioMedidor";
-import type { Desconexion } from "../../models/Solicitudes/Desconexio";
+import type { CambioMedidor } from "../../Schemas/Solicitudes/CambioMedidor";
 
 //traer las afiliaciones 
-export async function getAllCambioMedidor(){
-      const response = await apiAuth.get("/solicitud-cambio-medidor/all");
-  return response.data;
+
+export async function getAllCambioMedidor(): Promise<CambioMedidor[]> {
+  const response = await apiAuth.get("/solicitud-cambio-medidor/all");
+  return response.data as CambioMedidor[];
 }
+
+
 export async function getAllCambioMedidorById(id:number){
       const response = await apiAuth.get(`/solicitud-cambio-medidor/${id}`);
   return response.data;
 }
 
 //nueva afiliacion 
+
 export async function createCambioMedidor(data: CambioMedidor){
     const response = await apiAuth.post("/solicitud-cambio-medidor/create",data);
     return response.data; 
 }
+// Crear nueva solicitud de cambio de medidor (solo para pruebas con Webhook.site)
+
+
 
 //actualizar 
 export async function updateCambioMedidor(id:number,data:CambioMedidor) {

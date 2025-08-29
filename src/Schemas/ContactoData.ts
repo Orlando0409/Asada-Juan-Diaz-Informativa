@@ -1,12 +1,15 @@
-import {z} from 'zod'
+import { z } from 'zod';
 
-export const ContactoSchema = z.object({
-  nombre: z.string().min(1, 'El nombre es obligatorio'),
-  primerApellido: z.string().min(1, 'El primer apellido es obligatorio'),
-  segundoApellido: z.string().optional(),
-  ubicacion: z.string().min(1, 'La ubicación es obligatoria'),
-  mensaje: z.string().min(1, 'El mensaje no puede estar vacío'),
-  adjunto: z.instanceof(File).optional(),
-})
-
-export type ContactoData = z.infer<typeof ContactoSchema>
+export function getDynamicContactoSchema(campos: Record<string, any>) {
+  const dynamicSchemaShape: Record<string, any> = {};
+  Object.entries(campos).forEach(([fieldName, fieldProps]) => {
+    if (fieldProps.type === 'file') {
+      dynamicSchemaShape[fieldName] = z.instanceof(File).optional();
+    } else if (fieldProps.required) {
+      dynamicSchemaShape[fieldName] = z.string().min(1, `${fieldProps.label} es requerido`);
+    } else {
+      dynamicSchemaShape[fieldName] = z.string().optional();
+    }
+  });
+  return z.object(dynamicSchemaShape);
+}
