@@ -20,6 +20,13 @@ export const CambioMedidorSchema = z.object({
   CorreoElectronico: z.string()
   .min(1, 'El correo electrónico es obligatorio')
   .email('El correo electrónico no es válido'),
+    Ubicacion: z.string()
+    .min(10, 'La ubicación debe tener al menos 10 caracteres')
+    .regex(/^[A-Za-z0-9 .,\-#]+$/, 'La ubicación solo puede contener letras, números, espacios y los caracteres .,-#'),
+
+  Numero_Medidor_Anterior: z.number()
+    .positive('El número de medidor anterior debe ser positivo')
+    .gt(0, 'El número de medidor anterior debe ser mayor a 0'),
 
 })
 //

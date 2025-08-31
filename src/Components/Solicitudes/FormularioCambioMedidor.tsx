@@ -3,7 +3,7 @@ import { useState } from "react";
 import data from '../../data/Data.json'
 import { CambioMedidorSchema } from "../../Schemas/Solicitudes/CambioMedidor";
 import { useCambioMedidor } from "../../Hook/Solicitudes/hookCambioMedidor";
-import type { CambioMedidor } from "../../models/Forms/Solicitudes/CambioMedidor";
+import { mapFormToBackend, type CambioMedidor, type CambioMedidorFormData } from "../../models/Forms/Solicitudes/CambioMedidor";
 
 type SolicitudTipo = "cambioMedidor";
 type Props = {
@@ -27,7 +27,9 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
       CorreoElectronico: '',
       NumeroTelefono: '',
       MotivoSolicitud: '',
-    },
+      Ubicacion: '',
+      Numero_Medidor_Anterior: 0,
+    } as CambioMedidorFormData,
 
     onSubmit: async ({ value }) => {
       setFormErrors({}); // limpiar errores previos
@@ -43,17 +45,15 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
         setFormErrors(fieldErrors);
         return;
       }
+      const dataToSend = mapFormToBackend(value);
+      // Preparar datos a enviar
+      const backendData = mapFormToBackend(value); // mapea los nombres al backend
+      await mutation.createCambioMedidor(backendData); // envía al backend
 
-        // Preparar datos a enviar
-  const dataToSend: CambioMedidor = {
-    ...value,
-    Id_Estado_Solicitud: 1 // pendiente
-  };
-
-  try {
-    console.log("Datos válidos enviados:", dataToSend);
-    await mutation.createCambioMedidor(dataToSend); // enviar JSON directamente
-    form.reset();// ahora sí cumple con el tipo
+      try {
+        console.log("Datos válidos enviados:", dataToSend);
+        await mutation.createCambioMedidor(dataToSend); // enviar JSON directamente
+        form.reset();// ahora sí cumple con el tipo
 
         form.reset();
       } catch (error) {
@@ -91,14 +91,23 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
                   {fieldProps.label}
                   {fieldProps.required && <span className="text-red-500">*</span>}
                 </label>
-                {fieldName === "MotivoSolicitud" ? (
+                {fieldName === "Numero_Medidor_Anterior" ? (
+                  <input
+                    type="number" // input tipo número
+                    value={field.state.value as number}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(Number(e.target.value))} // convierte string a número
+                    placeholder={fieldProps.label}
+                    className={commonClasses}
+                    min={1} // opcional: que sea mayor a 0
+                  />
+                ) : fieldName === "MotivoSolicitud" ? (
                   <textarea
                     value={field.state.value as string}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
                     placeholder={fieldProps.label}
                     className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
-                    style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                   />
                 ) : (
                   <input
@@ -108,12 +117,9 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
                     onChange={(e) => field.handleChange(e.target.value)}
                     placeholder={fieldProps.label}
                     className={commonClasses}
-
                   />
+                )}
 
-
-                )
-                }
 
                 {/* Mostrar errores de validación */}
                 {formErrors[fieldName] && (

@@ -131,6 +131,16 @@
         "label": "Motivo de solicitud",
         "type": "text",
         "required": true
+      },
+      "Ubicacion": {
+        "label": "Ubicación",
+        "type": "text",
+        "required": true
+      },
+      "Numero_Medidor_Anterior": {
+        "label": "Número de Medidor ",
+        "type": "text",
+        "required": true
       }
     },
     "desconexion": {
