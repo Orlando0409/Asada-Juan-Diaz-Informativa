@@ -1,5 +1,5 @@
 
-export interface CambioMedidor {
+/*export interface CambioMedidor {
   Nombre: string;
   PrimerApellido: string;
   SegundoApellido: string;
@@ -26,6 +26,7 @@ export const CambioMedidorInicialState= {
    Numero_Medidor_Anterior:0,
     Ubicacion: "" // <-- agregado
 };
+*/
 export interface CambioMedidorFormData {
   Nombre: string;
   PrimerApellido: string;
@@ -51,7 +52,6 @@ export interface CambioMedidorBackend {
   Direccion_Exacta: string;
   Numero_Telefono: string;
   Motivo_Solicitud: string;
- 
   Ubicacion: string;
   Numero_Medidor_Anterior: number;
   

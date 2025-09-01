@@ -3,7 +3,8 @@ import { useState } from "react";
 import data from '../../data/Data.json'
 import { CambioMedidorSchema } from "../../Schemas/Solicitudes/CambioMedidor";
 import { useCambioMedidor } from "../../Hook/Solicitudes/hookCambioMedidor";
-import { mapFormToBackend, type CambioMedidor, type CambioMedidorFormData } from "../../models/Forms/Solicitudes/CambioMedidor";
+import { mapFormToBackend, type CambioMedidorFormData } from "../../models/Forms/Solicitudes/CambioMedidor";
+//import { mapFormToBackend, type CambioMedidor, type CambioMedidorFormData } from "../../models/Forms/Solicitudes/CambioMedidor";
 
 type SolicitudTipo = "cambioMedidor";
 type Props = {
@@ -93,7 +94,7 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
                 </label>
                 {fieldName === "Numero_Medidor_Anterior" ? (
                   <input
-                    type="number" // input tipo número
+                    type="text"
                     value={field.state.value as number}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(Number(e.target.value))} // convierte string a número

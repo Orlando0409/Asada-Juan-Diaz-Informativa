@@ -45,13 +45,13 @@
         "type": "text",
         "required": true
       },
-      "PrimerApellido": {
+      "Apellido1": {
         "label": "Primer Apellido",
         "type": "text",
         "required": true
       },
-      "SegundoApellido": {
-        "label": "SegundoApellido",
+      "Apellido2": {
+        "label": "Segundo Apellido",
         "type": "text",
         "required": false
       },
@@ -65,27 +65,27 @@
         "type": "text",
         "required": true
       },
-      "DireccionExacta": {
+      "Direccion_Exacta": {
         "label": "Dirección exacta de residencia",
         "type": "text",
         "required": true
       },
-      "NumeroTelefono": {
+      "Numero_Telefono": {
         "label": "Número de teléfono",
         "type": "text",
         "required": true
       },
-      "CorreoElectronico": {
+      "Correo": {
         "label": "Correo electrónico",
         "type": "email",
         "required": true
       },
-      "PlanosDelTerreno": {
+      "Planos_Terreno": {
         "label": "Planos del terreno",
         "type": "file",
         "required": true
       },
-      "EscrituraDelTerreno": {
+      "Escritura_Terreno": {
         "label": "Escritura del terreno",
         "type": "file",
         "required": true

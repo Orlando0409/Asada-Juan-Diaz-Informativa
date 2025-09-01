@@ -21,17 +21,19 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
   const form = useForm({
     defaultValues: {
       Nombre: '',
-      PrimerApellido: '',
-      SegundoApellido: '',
+      Apellido1: '',
+      Apellido2: '',
       Cedula: '',
+      Correo: '',
+      Direccion_Exacta: '',
+
+      Numero_Telefono: '',
       Edad: 0,
-      DireccionExacta: '',
-      NumeroTelefono: '',
-      CorreoElectronico: '',
-      MotivoSolicitud: '',
-      PlanosDelTerreno: undefined as File | undefined,
-      EscrituraDelTerreno: undefined as File | undefined,
+      Planos_Terreno: undefined as File | undefined,
+      Escritura_Terreno: undefined as File | undefined,
     },
+
+
     onSubmit: async ({ value }) => {
       setFormErrors({}); // limpiar errores previos
 
@@ -52,10 +54,15 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
         const formData = new FormData();
         Object.entries(value).forEach(([key, val]) => {
           if (val !== undefined && val !== null && val !== "") {
-            if (val instanceof File) formData.append(key, val);
-            else formData.append(key, val.toString());
+            // Solo subir archivos si son File y tienen nombre que coincida
+            if (val instanceof File) {
+              formData.append(key, val); // clave debe ser EXACTA: Planos_Terreno o Escritura_Terreno
+            } else {
+              formData.append(key, val.toString());
+            }
           }
         });
+
 
         // Mostrar solo los valores limpios (sin (2))
         console.log("FormData final a enviar:", value);
