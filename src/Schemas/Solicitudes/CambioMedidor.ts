@@ -2,28 +2,25 @@ import {z} from 'zod'
 
 export const CambioMedidorSchema = z.object({
   Nombre: z.string().min(1, 'El nombre es obligatorio'),
-  PrimerApellido: z.string().min(1, 'El primer apellido es obligatorio'),
-  SegundoApellido: z.string().optional(),
+  Apellido1: z.string().min(1, 'El primer apellido es obligatorio'),
+  Apellido2: z.string().optional(),
   Cedula:z.string()
   .min(9, 'La cédula es obligatoria')
   .max(10, 'La cédula debe tener 10 dígitos en caso de extranjeros y 9 en caso de nacionales')
   .regex(/^\d+$/, 'La cédula solo debe contener números'),
 
-  DireccionExacta: z.string().min(10, 'La dirección debe tener al menos 10 caracteres'),
+  Direccion_Exacta: z.string().min(10, 'La dirección debe tener al menos 10 caracteres'),
 
-  NumeroTelefono:z.string()
+  Numero_Telefono:z.string()
    .length(8, 'El número de teléfono debe tener exactamente 8 dígitos')
    .regex(/^\d+$/, 'El teléfono solo debe contener números'),
 
-  MotivoSolicitud: z.string().min(10,'El motivo debe de tener al menos 10 caracteres'),
+  Motivo_Solicitud: z.string().min(10,'El motivo debe de tener al menos 10 caracteres'),
 
-  CorreoElectronico: z.string()
+  Correo: z.string()
   .min(1, 'El correo electrónico es obligatorio')
   .email('El correo electrónico no es válido'),
-    Ubicacion: z.string()
-    .min(10, 'La ubicación debe tener al menos 10 caracteres')
-    .regex(/^[A-Za-z0-9 .,\-#]+$/, 'La ubicación solo puede contener letras, números, espacios y los caracteres .,-#'),
-
+ 
   Numero_Medidor_Anterior: z.number()
     .positive('El número de medidor anterior debe ser positivo')
     .gt(0, 'El número de medidor anterior debe ser mayor a 0'),

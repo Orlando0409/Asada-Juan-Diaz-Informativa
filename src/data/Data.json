@@ -97,12 +97,12 @@
         "type": "text",
         "required": true
       },
-      "PrimerApellido": {
+      "Apellido1": {
         "label": "Primer Apellido",
         "type": "text",
         "required": true
       },
-      "SegundoApellido": {
+      "Apellido2": {
         "label": "SegundoApellido",
         "type": "text",
         "required": true
@@ -112,33 +112,28 @@
         "type": "text",
         "required": true
       },
-      "DireccionExacta": {
+      "Direccion_Exacta": {
         "label": "Dirección exacta",
         "type": "text",
         "required": true
       },
-      "CorreoElectronico": {
+      "Correo_Electronico": {
         "label": "Correo electrónico",
         "type": "email",
         "required": true
       },
-      "NumeroTelefono": {
+      "Numero_Telefono": {
         "label": "Número de teléfono",
-        "type": "text",
-        "required": true
-      },
-      "MotivoSolicitud": {
-        "label": "Motivo de solicitud",
-        "type": "text",
-        "required": true
-      },
-      "Ubicacion": {
-        "label": "Ubicación",
         "type": "text",
         "required": true
       },
       "Numero_Medidor_Anterior": {
         "label": "Número de Medidor ",
+        "type": "text",
+        "required": true
+      },
+      "Motivo_Solicitud": {
+        "label": "Motivo de solicitud",
         "type": "text",
         "required": true
       }

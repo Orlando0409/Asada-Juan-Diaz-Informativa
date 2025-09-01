@@ -1,49 +1,46 @@
 
-/*export interface CambioMedidor {
+export interface CambioMedidor {
   Nombre: string;
-  PrimerApellido: string;
-  SegundoApellido: string;
+  Apellido1: string;
+  Apellido2: string;
   Cedula: string;
-  CorreoElectronico: string;
-  DireccionExacta: string;
-   NumeroTelefono: string;
-  MotivoSolicitud: string;
-
+  Correo: string;
+  Direccion_Exacta: string;
+  Numero_Telefono: string;
+  Motivo_Solicitud: string;
   Numero_Medidor_Anterior: number;
-   Ubicacion: string; // <-- agregado
 }
-
-export const CambioMedidorInicialState= {
+export const CambioMedidorInicialState: CambioMedidor = {
   Nombre: "",
-  PrimerApellido: "",
-  SegundoApellido: "",
+  Apellido1: "",
+  Apellido2: "",
   Cedula: "",
-  CorreoElectronico: "",
-  DireccionExacta: "",
-   NumeroTelefono: "",
-  MotivoSolicitud: "",
-
-   Numero_Medidor_Anterior:0,
-    Ubicacion: "" // <-- agregado
+  Correo: "",
+  Direccion_Exacta: "",
+  Numero_Telefono: "",
+  Motivo_Solicitud: "",
+  Numero_Medidor_Anterior: 0
 };
-*/
 export interface CambioMedidorFormData {
   Nombre: string;
-  PrimerApellido: string;
-  SegundoApellido: string;
+  Apellido1: string;
+  Apellido2: string;
   Cedula: string;
-  DireccionExacta: string;
-  NumeroTelefono: string;
-  MotivoSolicitud: string;
-  CorreoElectronico: string;
-   Numero_Medidor_Anterior: number;
-   Ubicacion: string; // <-- agregado
+  Correo: string;
+  Direccion_Exacta: string;
+  Numero_Telefono: string;
+  Motivo_Solicitud: string;
+  Numero_Medidor_Anterior: number;
 }
 
+
+
+
+/*
 
 
 // --- Interfaz backend ---
-export interface CambioMedidorBackend {
+export interface  CambioMedidor{
   Nombre: string;
   Apellido1: string;
   Apellido2: string;
@@ -58,7 +55,7 @@ export interface CambioMedidorBackend {
 }
 
 // --- Función de mapeo frontend -> backend ---
-export const mapFormToBackend = (form: CambioMedidorFormData): CambioMedidorBackend => ({
+export const mapFormToBackend = (form: CambioMedidorFormData):  CambioMedidor=> ({
   Nombre: form.Nombre,
   Apellido1: form.PrimerApellido,
   Apellido2: form.SegundoApellido,
@@ -70,4 +67,4 @@ export const mapFormToBackend = (form: CambioMedidorFormData): CambioMedidorBack
 
   Ubicacion: form.Ubicacion,
   Numero_Medidor_Anterior: form.Numero_Medidor_Anterior,
-});
+});*/

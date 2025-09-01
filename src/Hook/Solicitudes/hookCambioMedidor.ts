@@ -1,16 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
-//import type { CambioMedidor } from "../../Schemas/Solicitudes/CambioMedidor";
 import { createCambioMedidor } from "../../Services/Solicitudes/CambioMedidorService";
-import type { CambioMedidorBackend } from "../../models/Forms/Solicitudes/CambioMedidor";
-
+import type { CambioMedidor } from "../../models/Forms/Solicitudes/CambioMedidor";
 
  export const useCambioMedidor=()=>{
     const queryClient=useQueryClient();
 
    const createMutation = useMutation({
-  mutationFn: (data: CambioMedidorBackend) => createCambioMedidor(data), // cambiar FormData por CambioMedidor
-  onSuccess: () => queryClient.invalidateQueries({ queryKey: ["Desconexion"] }),
+  mutationFn: (data: FormData) => createCambioMedidor(data), // cambiar FormData por CambioMedidor
+  onSuccess: () =>{queryClient.invalidateQueries({ queryKey: ["CambioMedidor"] });
+   console.log("Solicitud de cambio de medidor creada con éxito");
+},
+
+
 onError: (error: any) => console.error("Error al crear la solicitud:", error.response?.data || error)
 
 });

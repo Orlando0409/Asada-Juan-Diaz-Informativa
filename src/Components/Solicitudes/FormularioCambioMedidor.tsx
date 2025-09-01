@@ -3,8 +3,6 @@ import { useState } from "react";
 import data from '../../data/Data.json'
 import { CambioMedidorSchema } from "../../Schemas/Solicitudes/CambioMedidor";
 import { useCambioMedidor } from "../../Hook/Solicitudes/hookCambioMedidor";
-import { mapFormToBackend, type CambioMedidorFormData } from "../../models/Forms/Solicitudes/CambioMedidor";
-//import { mapFormToBackend, type CambioMedidor, type CambioMedidorFormData } from "../../models/Forms/Solicitudes/CambioMedidor";
 
 type SolicitudTipo = "cambioMedidor";
 type Props = {
@@ -17,25 +15,25 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
   const [mostrarFormulario] = useState(true);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const mutation = useCambioMedidor();
-  const form = useForm({
 
+
+  const form = useForm({
     defaultValues: {
-      Nombre: '',
-      PrimerApellido: '',
-      SegundoApellido: '',
-      Cedula: '',
-      DireccionExacta: '',
-      CorreoElectronico: '',
-      NumeroTelefono: '',
-      MotivoSolicitud: '',
-      Ubicacion: '',
+      Nombre: "",
+      Apellido1: "",
+      Apellido2: "",
+      Cedula: "",
+      Correo: "",
+      Direccion_Exacta: "",
+      Numero_Telefono: "",
+      Motivo_Solicitud: "",
       Numero_Medidor_Anterior: 0,
-    } as CambioMedidorFormData,
+    },
 
     onSubmit: async ({ value }) => {
       setFormErrors({}); // limpiar errores previos
-
-      // validar con Zod
+      console.log("Enviando formulario:", value);
+      // Validar con Zod
       const validation = CambioMedidorSchema.safeParse(value);
       if (!validation.success) {
         const fieldErrors: Record<string, string> = {};
@@ -46,23 +44,22 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
         setFormErrors(fieldErrors);
         return;
       }
-      const dataToSend = mapFormToBackend(value);
-      // Preparar datos a enviar
-      const backendData = mapFormToBackend(value); // mapea los nombres al backend
-      await mutation.createCambioMedidor(backendData); // envía al backend
+
+      // Crear FormData con los valores del formulario
+      const formData = new FormData();
+      Object.entries(value).forEach(([key, val]) => {
+        formData.append(key, val.toString());
+      });
 
       try {
-        console.log("Datos válidos enviados:", dataToSend);
-        await mutation.createCambioMedidor(dataToSend); // enviar JSON directamente
-        form.reset();// ahora sí cumple con el tipo
-
-        form.reset();
-      } catch (error) {
+        await mutation.createCambioMedidor(formData); // envía directamente los datos
+        //console.log("Solicitud enviada y creada con exito:", formData);
+        form.reset(); // limpiar formulario después de enviar
+      } catch (error: any) {
         console.error("Error al enviar formulario:", error);
         setFormErrors({
-          general: "Hubo un error al enviar el formulario. \n Por favor intenta nuevamente.",
-        })
-
+          general: "Hubo un error al enviar el formulario. Por favor intenta nuevamente.",
+        });
       }
     },
   });
@@ -84,57 +81,76 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
       >
         <h2 className="text-center text-xl font-semibold mb-6">Formulario de cambio de Medidor</h2>
 
-        {Object.entries(campos).map(([fieldName, fieldProps]) =>
+        {Object.entries(campos).map(([fieldName, fieldProps]) => (
           <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
-            {(field) => (
-              <div className="mb-3">
-                <label className="block mb-1 font-medium">
-                  {fieldProps.label}
-                  {fieldProps.required && <span className="text-red-500">*</span>}
-                </label>
-                {fieldName === "Numero_Medidor_Anterior" ? (
-                  <input
-                    type="text"
-                    value={field.state.value as number}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(Number(e.target.value))} // convierte string a número
-                    placeholder={fieldProps.label}
-                    className={commonClasses}
-                    min={1} // opcional: que sea mayor a 0
-                  />
-                ) : fieldName === "MotivoSolicitud" ? (
-                  <textarea
-                    value={field.state.value as string}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder={fieldProps.label}
-                    className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
-                  />
-                ) : (
+            {(field) => {
+              if (fieldName === "Motivo_Solicitud") {
+                return (
+                  <div className="mb-3">
+                    <label className="block mb-1 font-medium">
+                      {fieldProps.label}
+                      {fieldProps.required && <span className="text-red-500">*</span>}
+                    </label>
+                    <textarea
+                      value={field.state.value ?? ""}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder={fieldProps.label}
+                      className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
+                      style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                    />
+                    {formErrors[fieldName] && (
+                      <span className="text-red-500 text-sm">{formErrors[fieldName]}</span>
+                    )}
+                  </div>
+                );
+              }
+
+              if (fieldName === "Numero_Medidor_Anterior") {
+                return (
+                  <div className="mb-3">
+                    <label className="block mb-1 font-medium">
+                      {fieldProps.label}
+                      {fieldProps.required && <span className="text-red-500">*</span>}
+                    </label>
+                    <input
+                      type="text"
+                      value={field.state.value ?? ""} //ca,bio
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(Number(e.target.value))}
+                      placeholder={fieldProps.label}
+                      className={commonClasses}
+                      min={1}
+                    />
+                    {formErrors[fieldName] && (
+                      <span className="text-red-500 text-sm">{formErrors[fieldName]}</span>
+                    )}
+                  </div>
+                );
+              }
+
+              return (
+                <div className="mb-3">
+                  <label className="block mb-1 font-medium">
+                    {fieldProps.label}
+                    {fieldProps.required && <span className="text-red-500">*</span>}
+                  </label>
                   <input
                     type={fieldProps.type === "email" ? "email" : "text"}
-                    value={field.state.value as string}
+                    value={field.state.value ?? ""}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
                     placeholder={fieldProps.label}
                     className={commonClasses}
                   />
-                )}
-
-
-                {/* Mostrar errores de validación */}
-                {formErrors[fieldName] && (
-                  <span className="text-red-500 text-sm">
-                    {formErrors[fieldName]}
-                  </span>
-                )}
-              </div>
-            )
-
-            }
+                  {formErrors[fieldName] && (
+                    <span className="text-red-500 text-sm">{formErrors[fieldName]}</span>
+                  )}
+                </div>
+              );
+            }}
           </form.Field>
-
-        )}
+        ))}
         <div className="flex justify-end items-end gap-4">
           <button
             type="button"
