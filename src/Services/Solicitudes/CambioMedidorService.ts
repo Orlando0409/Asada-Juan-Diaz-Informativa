@@ -5,8 +5,8 @@ import type { CambioMedidor } from "../../Schemas/Solicitudes/CambioMedidor";
 
 //nueva afiliacion 
 
-export async function createCambioMedidor(data: FormData){
-    const response = await apiAuth.post("/solicitud-cambio-mediador/create",data);
+export async function createCambioMedidor(data: CambioMedidor){
+    const response = await apiAuth.post("/solicitud-cambio-medidor/create",data);
     return response.data; 
 }
 

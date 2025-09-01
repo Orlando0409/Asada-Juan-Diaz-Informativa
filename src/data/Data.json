@@ -117,7 +117,7 @@
         "type": "text",
         "required": true
       },
-      "Correo_Electronico": {
+      "Correo": {
         "label": "Correo electrónico",
         "type": "email",
         "required": true

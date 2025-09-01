@@ -23,16 +23,18 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
       Apellido1: "",
       Apellido2: "",
       Cedula: "",
-      Correo: "",
+      Correo: "", 
       Direccion_Exacta: "",
       Numero_Telefono: "",
       Motivo_Solicitud: "",
       Numero_Medidor_Anterior: 0,
     },
 
+
     onSubmit: async ({ value }) => {
       setFormErrors({}); // limpiar errores previos
       console.log("Enviando formulario:", value);
+
       // Validar con Zod
       const validation = CambioMedidorSchema.safeParse(value);
       if (!validation.success) {
@@ -45,16 +47,10 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
         return;
       }
 
-      // Crear FormData con los valores del formulario
-      const formData = new FormData();
-      Object.entries(value).forEach(([key, val]) => {
-        formData.append(key, val.toString());
-      });
-
       try {
-        await mutation.createCambioMedidor(formData); // envía directamente los datos
-        //console.log("Solicitud enviada y creada con exito:", formData);
-        form.reset(); // limpiar formulario después de enviar
+        await mutation.createCambioMedidor(value);
+        console.log("Solicitud enviada y creada con éxito");
+        form.reset();
       } catch (error: any) {
         console.error("Error al enviar formulario:", error);
         setFormErrors({

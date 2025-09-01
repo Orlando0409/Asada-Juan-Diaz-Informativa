@@ -10,6 +10,8 @@ export interface CambioMedidor {
   Motivo_Solicitud: string;
   Numero_Medidor_Anterior: number;
 }
+
+
 export const CambioMedidorInicialState: CambioMedidor = {
   Nombre: "",
   Apellido1: "",
