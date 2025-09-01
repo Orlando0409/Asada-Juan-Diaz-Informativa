@@ -1,9 +1,9 @@
 import type { IntentionType } from '../../types/Chatbot';
-import contextoOrganizacion from '../../data/ChatContexto.json';
+import dataJson from '../../data/Data.json';
+import chatConfig from '../../data/ChatContexto.json';
 
 export class FallbackResponder {
   
-  // Genera respuestas mejoradas y más completas
   static generateResponse(intention: IntentionType): string {
     if (!intention) {
       return this.getGenericResponse();
@@ -20,190 +20,352 @@ export class FallbackResponder {
       solicitudes: () => this.getSolicitudesResponse(),
       ubicacion: () => this.getUbicacionResponse(),
       horarios: () => this.getHorariosResponse(),
+      problemas: () => this.getProblemasResponse(),
+      sugerencias: () => this.getSugerenciasResponse(),
+      navegacion: () => this.getNavegacionResponse(),
     };
 
-    const responseGenerator = responses[intention as keyof typeof responses];
+    const responseGenerator = responses[intention];
     return responseGenerator ? responseGenerator() : this.getGenericResponse();
   }
 
   private static getGenericResponse(): string {
-    const { organizacion } = contextoOrganizacion;
-    return `Hola, soy el asistente de ${organizacion.nombreCorto}. Puedo ayudarte con información sobre:
+    const { DatosGenerales } = dataJson;
+    return `¡Hola! 👋 Soy el asistente virtual de ${DatosGenerales.nombre}.
 
-    🏢 Nuestra organización y servicios
-    💧 Afiliación como abonado
-    📋 Solicitudes y trámites
-    💰 Consulta de pagos
-    📞 Información de contacto
+    ${DatosGenerales.descripcion}
 
-    ¿Qué te interesa saber?`;
-      }
+    🏠 ¿Qué puedo ayudarte a encontrar?
 
-      private static getSaludoResponse(): string {
-        const { organizacion } = contextoOrganizacion;
-        return `¡Hola! 👋 Bienvenido a la ${organizacion.nombreCorto}.
+    💧 Servicios y Afiliación
+    • Cómo afiliarte como abonado o asociado
+    • Información sobre nuestros servicios
+    • Requisitos y documentos necesarios
 
-    Somos la Asociación Administradora de Acueducto de Juan Díaz.
+    📋 Solicitudes y Trámites
+    • Afiliación de nuevos abonados
+    • Cambio de medidor
+    • Desconexión de servicio
+    • Solicitud de asociado
 
-    ¿En qué puedo ayudarte hoy? Puedes preguntarme sobre afiliación, servicios, pagos o cualquier información sobre nuestra ASADA.`;
+    💰 Consultas
+    • Estado de pagos y facturas
+    • Métodos de pago disponibles
+
+    📞 Contacto e Información
+    • Datos de contacto y ubicación
+    • Horarios de atención
+    • Reportes y sugerencias
+
+    ¿Sobre qué tema específico te gustaría conocer más?`;
+  }
+
+  private static getSaludoResponse(): string {
+    const { respuestas_rapidas } = chatConfig;
+    const respuestas = respuestas_rapidas.saludo_basico;
+    return respuestas[Math.floor(Math.random() * respuestas.length)];
+  }
+
+  private static getDespedidaResponse(): string {
+    const { DatosGenerales, footer } = dataJson;
+    return `¡Gracias por contactar a ${DatosGenerales.nombre}! 👋
+
+    Esperamos haber resuelto tus dudas. Si necesitas más información, nuestros canales están disponibles:
+
+    📞 Teléfono: ${footer.contacto.telefono}
+    📧 Email: ${footer.contacto.correo}
+    ⏰ Horario: ${footer.horarioAtencion}
+    💬 WhatsApp: ${footer.redesSociales.WhatsApp}
+
+    💧 "Juntos cuidamos el agua, juntos cuidamos nuestra comunidad"
+
+    ¡Que tengas un excelente día! 🌟`;
   }
 
   private static getOrganizacionResponse(): string {
-    const { organizacion } = contextoOrganizacion;
-    return `🏢 ${organizacion.nombre}
+    const { DatosGenerales, mision, vision, historia } = dataJson;
+    return `🏢 ${DatosGenerales.nombre}
 
-    ¿Qué somos?
-    ${organizacion.descripcion}
+    ¿Quiénes somos?
+    ${DatosGenerales.descripcion}
 
-    📍 Ubicación: ${organizacion.ubicacion}
-    📅 Fundada en: ${organizacion.añoFundacion}
+    🎯 Misión:
+    ${mision}
 
-    ¿Te interesa conocer más sobre nuestros servicios o cómo afiliarte?`;
+    🌟 Visión:
+    ${vision}
+
+    📍 Información General:
+    • Ubicación: ${DatosGenerales.ubicacion}
+    • Fundada en: ${DatosGenerales.añoFundacion}
+    • Servicio Principal: ${DatosGenerales.servicios.descripcion}
+
+    🌍 Nuestra Historia:
+    ${historia.substring(0, 200)}...
+
+    ¿Te interesa conocer más sobre nuestra historia completa, servicios específicos o el proceso de afiliación?`;
   }
 
   private static getServiciosResponse(): string {
-    const { servicios } = contextoOrganizacion;
+    const { DatosGenerales, CalidadAguaArchivos } = dataJson;
+    const { caracteristicas_servicio, cobertura_servicio } = chatConfig.respuestas_optimizadas;
+    
     return `💧 Nuestros Servicios
 
-    Servicio Principal: ${servicios.principal}
-
-    ¿Qué ofrecemos?
-    ${servicios.descripcion}
+    Servicio Principal: ${DatosGenerales.servicios.descripcion}
 
     ✨ Características de nuestro servicio:
-    ${servicios.caracteristicas.map(c => `• ${c}`).join('\n')}
+    ${caracteristicas_servicio.map(c => `• ${c}`).join('\n')}
 
-    🌍 Cobertura: Comunidades de ${servicios.cobertura.join(' y ')}
+    🌍 Cobertura: Comunidades de ${cobertura_servicio.join(' y ')}
 
-    ¿Te interesa información específica sobre la calidad del agua o el proceso de afiliación?`;
+    📊 Control de Calidad:
+    Contamos con ${CalidadAguaArchivos.length}+ reportes de calidad del agua actualizados.
+
+    🔧 Servicios Adicionales:
+    • Instalación de medidores
+    • Mantenimiento de infraestructura
+    • Control de calidad continuo
+    • Atención al cliente
+
+    ¿Te interesa información específica sobre la calidad del agua o el proceso de afiliación para acceder a nuestros servicios?`;
   }
 
   private static getAfiliacionResponse(): string {
-    const { organizacion, afiliacion } = contextoOrganizacion;
-    return `💧 Afiliación a ${organizacion.nombreCorto}
-
-    ${afiliacion.descripcion}
+    const { requisitosSolicitudes } = dataJson;
+    
+    return `💧 Afiliación a ASADA Juan Díaz
 
     📋 Proceso de afiliación:
-    ${afiliacion.proceso.map((paso, index) => `${index + 1}. ${paso}`).join('\n')}
-
-    🔗 Ubicación: ${afiliacion.ubicacion}
+    1. Completa el formulario de afiliación en el apartado de solicitudes de nuestra página web
+    2. Proporciona la información personal requerida
+    3. Selecciona el tipo de afiliación que necesitas
+    4. Adjunta los documentos requeridos
+    5. Envía la solicitud para revisión
 
     🎯 Tipos de afiliación disponibles:
-    ${afiliacion.tipos.map(tipo => `• ${tipo.nombre}: ${tipo.descripcion}`).join('\n')}
 
-    Requisitos principales para abonado:
-    • ${afiliacion.tipos[0].requisitos.slice(0, 4).join('\n• ')}
+    🏠 Abonado (Servicio de Agua):
+    • Para acceder a nuestros servicios de agua potable
 
-    ⏱️ Tiempo estimado: ${afiliacion.tipos[0].tiempoEstimado}
+    👥 Asociado (Participación Activa):
+    • Para participar en la gestión de la ASADA
 
-    ¿Te interesa algún tipo específico de afiliación?`;
+    📝 Requisitos para Abonado:
+    ${Object.entries(requisitosSolicitudes.abonado).map(([_key, field]) => 
+      `• ${field.label}${field.required ? ' (Obligatorio)' : ' (Opcional)'}`
+    ).join('\n')}
+
+    🌐 Ubicación: Apartado de solicitudes en la página web
+
+    ¿Te interesa información específica sobre algún tipo de afiliación o necesitas ayuda con los requisitos?`;
   }
 
   private static getSolicitudesResponse(): string {
-    const { solicitudes } = contextoOrganizacion;
+    const { requisitosSolicitudes } = dataJson;
+    
+    const tiposSolicitudes = {
+      abonado: 'Afiliación como Abonado',
+      cambioMedidor: 'Cambio de Medidor',
+      desconexion: 'Desconexión de Medidor',
+      asociado: 'Solicitud de Asociado'
+    };
+
     return `📋 Solicitudes Disponibles
 
-    Además de la afiliación, puedes realizar estas solicitudes:
+    Formularios disponibles en nuestra página web:
 
-    ${solicitudes.tipos.map(tipo => 
-      `🔸 ${tipo.nombre}
-   ${tipo.descripcion}
-   ⏱️ Tiempo: ${tipo.tiempoEstimado}
-   📝 Requisitos principales: ${tipo.requisitos.slice(0, 3).join(', ')}${tipo.requisitos.length > 3 ? '...' : ''}`
-    ).join('\n')}
+    ${Object.entries(tiposSolicitudes).map(([tipo, nombre]) => {
+      const campos = requisitosSolicitudes[tipo as keyof typeof requisitosSolicitudes];
+      const cantidadCampos = Object.keys(campos).length;
+      
+      return `🔸 ${nombre}
+      📝 Campos requeridos: ${cantidadCampos}
+      📁 Documentos: ${Object.values(campos).filter(campo => campo.type === 'file').length > 0 ? 'Sí requiere' : 'No requiere'}}`;
+    })}
 
-    Todas las solicitudes se realizan a través del apartado de solicitudes en nuestra página web.
+    🌐 Acceso: Todas las solicitudes se realizan a través del apartado de solicitudes en nuestra página web.
 
     ¿Te interesa información detallada sobre alguna solicitud específica?`;
   }
 
   private static getPagosResponse(): string {
-    const { consultaPagos } = contextoOrganizacion;
+    const { requisitosConsultaPagos, footer } = dataJson;
+    const { metodos_pago, tipos_pago } = chatConfig.respuestas_optimizadas;
+    
     return `💰 Consulta de Pagos
 
-    ${consultaPagos.descripcion}
+    Consulta el estado de tus pagos y facturas utilizando tu número de abonado y cédula
 
-    📋 ¿Qué necesitas para consultar?
-    • ${consultaPagos.requisitos.join('\n• ')}
+    📋 Requisitos para consultar:
+    ${Object.entries(requisitosConsultaPagos).map(([campo, _tipo]) => 
+      `• ${campo}`
+    )}
 
-    🌐 ¿Dónde consultar?
-    ${consultaPagos.ubicacion}
+    🌐 Ubicación: Sección de consulta de pagos en la página web
 
     💳 Métodos de pago disponibles:
-    • ${consultaPagos.metodosPago.join('\n• ')}
+    ${metodos_pago.map(metodo => `• ${metodo}`)}
 
     📊 Tipos de pago:
-    • Mensual: ${consultaPagos.tiposPago.mensual}
-    • Reconexión: ${consultaPagos.tiposPago.reconexion}
-    • Mora: ${consultaPagos.tiposPago.mora}
+    • Mensual: ${tipos_pago.mensual}
+    • Reconexión: ${tipos_pago.reconexion}
+    • Mora: ${tipos_pago.mora}
+
+    📞 Contacto para consultas:
+    • Teléfono: ${footer.contacto.telefono}
+    • Email: ${footer.contacto.correo}
+    • Horario: ${footer.horarioAtencion}
 
     ¿Necesitas ayuda específica con tu consulta de pagos?`;
   }
 
   private static getContactoResponse(): string {
-    const { contacto } = contextoOrganizacion;
+    const { footer } = dataJson;
+    
     return `📞 Información de Contacto
 
-    📱 Teléfono: ${contacto.informacion.telefono}
-    📧 Email: ${contacto.informacion.correo}
-    ⏰ Horario: ${contacto.informacion.horario}
-    💬 WhatsApp: ${contacto.informacion.whatsapp}
+    📱 Datos de Contacto:
+    • Teléfono: ${footer.contacto.telefono}
+    • Email: ${footer.contacto.correo}
+    • Horario: ${footer.horarioAtencion}
+    • WhatsApp: ${footer.redesSociales.WhatsApp}
 
     📝 Formas de contacto disponibles:
-    ${contacto.formas.map(forma => 
-          `• ${forma.tipo}: ${forma.descripcion}
-      ⏱️ Tiempo de respuesta: ${forma.tiempoRespuesta}`
-      ).join()}
 
-    ¿Necesitas ayuda con algún tipo específico de contacto?`;
+    🔸 Quejas
+      Para reportar problemas con el servicio, atención al cliente o facturación
+
+    🔸 Reportes
+      Para reportar daños en tuberías, fugas, problemas de presión o calidad del agua
+      
+    🔸 Sugerencias
+      Para proponer mejoras en el servicio o nuevas ideas
+
+    🌐 Acceso: Puedes acceder a los formularios desde la sección de Contacto en nuestra página web.
+
+    ¿Necesitas ayuda con algún tipo específico de contacto o formulario?`;
   }
 
   private static getUbicacionResponse(): string {
-    const { organizacion, servicios } = contextoOrganizacion;
-    return `📍 Ubicación de ${organizacion.nombreCorto}
+    const { DatosGenerales } = dataJson;
+    const { cobertura_servicio } = chatConfig.respuestas_optimizadas;
+    
+    return `📍 Ubicación de ASADA Juan Díaz
 
-    🏠 Dirección: ${organizacion.ubicacion}
+    🏠 Dirección: ${DatosGenerales.ubicacion}
 
     Estamos ubicados en Juan Díaz de Nicoya, en la hermosa provincia de Guanacaste, Costa Rica.
 
     🌍 Área de cobertura:
-    Brindamos servicio de agua potable a las comunidades de ${servicios.cobertura.join(' y ')}.
+    Brindamos servicio de agua potable a las comunidades de ${cobertura_servicio.join(' y ')}.
 
-    📅 Fundada en: ${organizacion.añoFundacion}
+    📅 Historia: Fundada en ${DatosGenerales.añoFundacion}
+
+    🎯 Nuestra misión en la comunidad:
+    ${DatosGenerales.descripcion}
 
     ¿Necesitas más información sobre nuestra área de cobertura o cómo llegar a nuestras oficinas?`;
   }
 
   private static getHorariosResponse(): string {
-    const { contacto } = contextoOrganizacion;
+    const { footer } = dataJson;
+    
     return `⏰ Horarios de Atención
 
-    🕐 Horario: ${contacto.informacion.horario}
+    🕐 Horario: ${footer.horarioAtencion}
 
-    Durante este horario puedes:
-    • Realizar consultas por teléfono
-    • Enviar correos electrónicos
-    • Visitar nuestras oficinas
+    📞 Contacto durante horario de atención:
+    • Teléfono: ${footer.contacto.telefono}
+    • Email: ${footer.contacto.correo}
+    • WhatsApp: ${footer.redesSociales.WhatsApp}
 
-    📞 Contacto:
-    • Teléfono: ${contacto.informacion.telefono}
-    • Email: ${contacto.informacion.correo}
-    • WhatsApp: ${contacto.informacion.whatsapp}
+    🌐 Servicios disponibles 24/7:
+    • Formularios web (solicitudes, consultas, contacto)
+    • Información en nuestra página web 
 
-    Para emergencias fuera de horario, puedes usar nuestros canales de contacto web.
+    ⚡ Para emergencias:
+    Puedes usar nuestros canales de contacto web o WhatsApp
 
-    ¿Hay algo específico que necesitas resolver?`;
+    ¿Hay algo específico que necesitas resolver durante nuestro horario de atención?`;
   }
 
-  private static getDespedidaResponse(): string {
-    const { organizacion } = contextoOrganizacion;
-    return `¡Gracias por contactar a ${organizacion.nombreCorto}! 👋
+  private static getProblemasResponse(): string {
+    const { RequisitosContacto } = dataJson;
+    
+    return `🚨 Reportes y Problemas
 
-    Esperamos haber resuelto tus dudas. Si necesitas más información, no dudes en contactarnos nuevamente.
+    Para reportar problemas puedes usar:
 
-    💧 Juntos cuidamos el agua, juntos cuidamos nuestra comunidad.
+    🔸 Reportes (Daños técnicos):
+    Para reportar daños en tuberías, fugas, problemas de presión o calidad del agua
 
-    ¡Que tengas un excelente día! 🌟`;
+    📝 Requisitos para reportes:
+    ${Object.entries(RequisitosContacto.requisitosReportes).map(([_key, field]) => 
+      `• ${field.label}${field.required ? ' (Obligatorio)' : ' (Opcional)'}`
+    )}
+
+    🔸 Quejas (Atención al cliente):
+    Para reportar problemas con el servicio, atención al cliente o facturación
+
+    🌐 Acceso: Sección de Contacto en nuestra página web
+
+    ¿Necesitas reportar algún problema específico o tienes alguna queja sobre nuestro servicio?`;
+  }
+
+  private static getSugerenciasResponse(): string {
+    const { RequisitosContacto } = dataJson;
+    
+    return `💡 Sugerencias y Mejoras
+
+    Para proponer mejoras en el servicio o nuevas ideas
+
+    📝 Requisitos para sugerencias:
+    ${Object.entries(RequisitosContacto.requisitosSugerencias).map(([_key, field]) => 
+      `• ${field.label}${field.required ? ' (Obligatorio)' : ' (Opcional)'}`
+    )}
+
+    🌐 Acceso: Formulario de sugerencias en la sección de Contacto de nuestra página web
+
+    🎯 Tipos de sugerencias que valoramos:
+    • Mejoras en el servicio de agua
+    • Optimización de procesos
+    • Nuevas iniciativas comunitarias
+    • Mejoras en infraestructura
+    • Sugerencias ambientales
+
+    ¿Tienes alguna idea específica que te gustaría compartir con nosotros?`;
+  }
+
+  private static getNavegacionResponse(): string {
+    const { header } = dataJson;
+    
+    return `🧭 Navegación en nuestra página web
+
+    📱 Secciones principales disponibles:
+
+    ${header.navbar.menuItems.map(item => {
+      if (item.subopciones) {
+        return '🔸 ' + item.texto  + item.subopciones.map(sub => '• ' + sub.texto);
+      } else {
+        return '🔸' + item.texto + '';
+      }
+    })}
+
+    🎯 Funcionalidades especiales:
+    • Formularios interactivos para solicitudes
+    • Consulta de pagos en línea
+    • Descarga de documentos de calidad del agua
+    • Chat en vivo para consultas
+
+    ¿Necesitas ayuda para encontrar alguna sección específica?`;
+  }
+
+  static getEmergencyResponse(): string {
+    const { contextos_especiales } = chatConfig;
+    const { footer } = dataJson;
+    
+    return contextos_especiales.emergencia.respuesta_rapida
+      .replace('teléfono de la ASADA', footer.contacto.telefono);
   }
 }

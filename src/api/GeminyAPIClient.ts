@@ -1,4 +1,4 @@
-import contextoOrganizacion from '../data/ChatContexto.json';
+import contextoOrganizacion from '../data/Data.json';
 
 // Cliente para la API de Google Gemini
 export class GeminiAPIClient {
@@ -47,7 +47,7 @@ export class GeminiAPIClient {
 
                 Instrucciones:
                 - Responde de manera amigable y profesional
-                - Mantente en el contexto de ${contextoOrganizacion.organizacion.nombre}
+                - Mantente en el contexto de ${contextoOrganizacion.DatosGenerales.nombre}
                 - Si la pregunta no está relacionada, redirige amablemente
                 - Sé conciso pero informativo
                 - Usa un tono conversacional`
