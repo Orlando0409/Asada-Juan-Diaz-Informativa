@@ -5,7 +5,7 @@ const Historia = () => {
   const imagen = Data.imageHistoria
 
   return (
-    <section className="w-screen h-screen bg-gray-200 text-black px-6 py-10 sm:px-10 lg:px-20 lg:py-10 flex flex-col lg:flex-row items-center lg:items-start gap-8">
+    <section className="w-screen bg-gray-200 text-black px-6 py-10 sm:px-10 lg:px-20 lg:py-10 flex flex-col lg:flex-row items-center lg:items-start gap-8">
         <div className="flex-1 flex flex-col gap-4">
           <h3 className="font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl">
             Historia de la ASADA de Juan Díaz
