@@ -22,15 +22,15 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
   const form = useForm({
     defaultValues: {
       Nombre: '',
-      PrimerApellido: '',
-      SegundoApellido: '',
+      Apellido1: '',
+      Apellido2: '',
       Cedula: '',
-      DireccionExacta: '',
-      NumeroTelefono: '',
-      CorreoElectronico: '',
-      MotivoSolicitud: '',
-      PlanosDelTerreno: undefined as File | undefined,
-      EscrituraDelTerreno: undefined as File | undefined,
+      Direccion_Exacta: '',
+      Numero_Telefono: '',
+      Correo: '',
+      Motivo_Solicitud: '',
+      Planos_Terreno: undefined as File | undefined,
+      Escritura_Terreno: undefined as File | undefined,
     },
     onSubmit: async ({ value }) => {
       setFormErrors({}); // limpiar errores previos
