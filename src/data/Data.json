@@ -169,7 +169,7 @@
         "type": "text",
         "required": true
       },
-      "correo": {
+      "Correo": {
         "label": "Correo electrónico",
         "type": "email",
         "required": true

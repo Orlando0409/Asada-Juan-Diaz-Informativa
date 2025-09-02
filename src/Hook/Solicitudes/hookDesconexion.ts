@@ -8,7 +8,7 @@ import { createDesconexion } from "../../Services/Solicitudes/DesconexionService
   const createMutation = useMutation({
     mutationFn: (data: FormData) => createDesconexion(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["Desconexion"] });
+      queryClient.invalidateQueries({ queryKey: ["desconexion"] });
     },
     onError:()=>console.error("no se creo la solicitud de desconexion"),
    

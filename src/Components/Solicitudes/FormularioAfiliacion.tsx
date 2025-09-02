@@ -26,7 +26,6 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
       Cedula: '',
       Correo: '',
       Direccion_Exacta: '',
-
       Numero_Telefono: '',
       Edad: 0,
       Planos_Terreno: undefined as File | undefined,
