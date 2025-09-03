@@ -1,38 +1,37 @@
 
 export interface Desconexion {
   Nombre: string;
-  PrimerApellido: string;
-  SegundoApellido: string;
+  Apellido1: string;
+  Apellido2: string;
   Cedula: string;
-  CorreoElectronico: string;
-  DireccionExacta: string;
-  MotivoSolicitud: string;
-  NumeroTelefono:number,
-  Id_Estado_Solicitud: number;
-  PlanosDelTerreno?: File | string;
-  EscrituraDelTerreno?: File | string;
+  Correo: string;
+  Direccion_Exacta: string;
+  Motivo_Solicitud: string;
+  Numero_Telefono:number,
+  Planos_Terreno?: File | string;
+  Escritura_Terreno?: File | string;
 }
 export const DesconexionInicialState= {
   Nombre: "",
-  PrimerApellido: "",
-  SegundoApellido: "",
+  Apellido1: "",
+  Apellido2: "",
   Cedula: "",
-  CorreoElectronico: "",
-  DireccionExacta: "",
-  MotivoSolicitud: "",
-  NumeroTelefono:0,
-  Id_Estado_Solicitud: 0,
-  PlanosDelTerreno: undefined,
-  EscrituraDelTerreno: undefined,
+  Correo: "",
+  Direccion_Exacta: "",
+  Motivo_Solicitud: "",
+  Numero_Telefono:0,
+  Planos_Terreno: undefined,
+  Escritura_Terreno: undefined,
 };
 export interface DesconexionFormData {
-  Nombre: string;
-  PrimerApellido: string;
-  SegundoApellido: string;
+   Nombre: string;
+  Apellido1: string;
+  Apellido2: string;
   Cedula: string;
-  DireccionExacta: string;
-  NumeroTelefono: string;
-  CorreoElectronico: string;
-  PlanosDelTerreno?: File | string;
-  EscrituraDelTerreno?: File | string;
+  Correo: string;
+  Direccion_Exacta: string;
+  Motivo_Solicitud: string;
+  Numero_Telefono:number,
+  Planos_Terreno?: File | string;
+  Escritura_Terreno?: File | string;
 }

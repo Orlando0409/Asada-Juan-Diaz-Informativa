@@ -15,8 +15,10 @@ const CambioMedidor = () => {
         className="absolute inset-0 w-full h-full object-cover object-center"
       />
       <div className="bg-white lg:gap-8 absolute inset-0 max-h-[75vh] w-[90%] sm:w-[85%] lg:w-[70%] mx-auto mt-10 lg:mt-20 p-6 sm:p-10 lg:-20 flex flex-col lg:flex-row shadow-lg rounded-lg overflow-auto ">
-        <div className="max-w-md flex-1w-full flex flex-col">
-          <h1 className="text-xl font-bold text-gray-800 mt-4">Solicitud cambio de medidor </h1>
+        <div className="max-w-md flex-1 w-full flex flex-col">
+          <h1 className="text-3xl font-bold text-blue-600 text-center border-b-2 border-blue-600 pb-2 mb-10 z-10 relative">
+            Solicitud cambio de medidor
+          </h1>
           <p className="text-gray-600"> Si necesita realizar un cambio de medido, ya sea por daño, mal funcionamiento, puede hacerlo completando el formulario
             <br />
             Este proceso nos permite atender su solicitud de manera mas rapida.

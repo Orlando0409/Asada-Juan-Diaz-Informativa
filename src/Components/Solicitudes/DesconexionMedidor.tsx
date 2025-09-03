@@ -1,41 +1,37 @@
-import { useForm } from "@tanstack/react-form"
-import { useState } from "react"
-import data from "../../data/Data.json"
-import { DesconexionMedidorSchema } from "../../Schemas/Solicitudes/DesconexionMedidor"
-import { useDesconexion } from "../../Hook/Solicitudes/hookDesconexion"
+import { useForm } from "@tanstack/react-form";
+import { useState } from "react";
+import data from "../../data/Data.json";
+import { DesconexionMedidorSchema } from "../../Schemas/Solicitudes/DesconexionMedidor";
+import { useDesconexion } from "../../Hook/Solicitudes/hookDesconexion";
 
-type SolicitudTipo = 'desconexion'
-//lo estoy haciendo ahorita es el ultimo //original
+type SolicitudTipo = 'desconexion';
+
 type Props = {
-  tipo: SolicitudTipo
-  onClose: () => void
-}
+  tipo: SolicitudTipo;
+  onClose: () => void;
+};
 
-const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
-  //const [archivoSeleccionado, setArchivoSeleccionado] = useState<File | null>(null)
+const FormularioDesconexion = ({ tipo, onClose }: Props) => {
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({}) // Agrega un arreglo para manejo de errores
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const mutation = useDesconexion();
   const [mostrarFormulario] = useState(true);
-
 
   const form = useForm({
     defaultValues: {
       Nombre: '',
-      PrimerApellido: '',
-      SegundoApellido: '',
+      Apellido1: '',
+      Apellido2: '',
       Cedula: '',
-      DireccionExacta: '',
-      NumeroTelefono: '',
-      CorreoElectronico: '',
-      MotivoSolicitud: '',
-      PlanosDelTerreno: undefined as File | undefined,
-      EscrituraDelTerreno: undefined as File | undefined,
+      Direccion_Exacta: '',
+      Numero_Telefono: '',
+      Correo: '',
+      Motivo_Solicitud: '',
+      Planos_Terreno: undefined as File | undefined,
+      Escritura_Terreno: undefined as File | undefined,
     },
     onSubmit: async ({ value }) => {
-      setFormErrors({}); // limpiar errores previos
-
-      // validar con Zod
+      setFormErrors({});
       const validation = DesconexionMedidorSchema.safeParse(value);
       if (!validation.success) {
         const fieldErrors: Record<string, string> = {};
@@ -57,39 +53,42 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
         });
 
         console.log("FormData final a enviar:", value);
-
         await mutation.createDesconexion(formData);
 
         form.reset();
         setArchivoSeleccionado({});
+        console.log("✅ Formulario enviado correctamente");
       } catch (error) {
         console.error("Error al enviar formulario:", error);
         setFormErrors({
-          general: "Hubo un error al enviar el formulario. \n Por favor intenta nuevamente.",
-        })
-
+          general: "Hubo un error al enviar el formulario. Intenta nuevamente.",
+        });
       }
     },
   });
-  if (!mostrarFormulario) return null
-  const campos = data.requisitosSolicitudes[tipo]
-  const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300'
+
+  if (!mostrarFormulario) return null;
+
+  const campos = data.requisitosSolicitudes[tipo];
+  const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
 
   return (
-    <div className="flex justify-center items-center min-h-screen text-gray-800  p-5 w-full">
+    <div className="flex justify-center items-center min-h-screen text-gray-800 p-5 w-full">
       <form
         onSubmit={(e) => {
-          e.preventDefault()
-          form.handleSubmit()
+          e.preventDefault();
+          form.handleSubmit();
         }}
         className="bg-white gap-2 shadow-lg pl-8 pr-8 pt-4 pb-4 rounded-lg w-full max-w-9xl overflow-y-auto"
       >
-        <h2 className="text-center text-xl font-semibold mb-6">Formulario para desconexión de medidor</h2>
+        <h2 className="text-center text-xl font-semibold mb-6">Formulario de desconexión de medidor</h2>
+
         {Object.entries(campos).map(([fieldName, fieldProps]) => (
           <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
             {(field) => {
+              // Archivos
               if (fieldProps.type === 'file') {
-                const archivoActual = archivoSeleccionado[fieldName] ?? null
+                const archivoActual = archivoSeleccionado[fieldName] ?? null;
                 return (
                   <div className="w-full mb-2">
                     <label className="block mb-1 font-medium">{fieldProps.label}</label>
@@ -98,17 +97,16 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                       accept=".png,.jpg,.jpeg,.heic"
                       disabled={!!archivoActual}
                       onChange={(e) => {
-                        const file = e.target.files?.[0] ?? null
-                        field.handleChange(file ?? undefined)
-                        setArchivoSeleccionado(prev => ({ ...prev, [fieldName]: file }))
+                        const file = e.target.files?.[0] ?? undefined;
+                        field.handleChange(file);
+                        setArchivoSeleccionado(prev => ({ ...prev, [fieldName]: file ?? null }));
                       }}
                       className="hidden"
                       id={fieldName}
                     />
                     <label
                       htmlFor={fieldName}
-                      className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'
-                        }`}
+                      className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
                     >
                       {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
                     </label>
@@ -118,8 +116,8 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                         <button
                           type="button"
                           onClick={() => {
-                            field.handleChange(undefined)
-                            setArchivoSeleccionado(prev => ({ ...prev, [fieldName]: null }))
+                            field.handleChange(undefined);
+                            setArchivoSeleccionado(prev => ({ ...prev, [fieldName]: null }));
                           }}
                           className="text-red-500 hover:underline text-xs"
                         >
@@ -131,7 +129,8 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                 );
               }
 
-              if (fieldName === "MotivoSolicitud") {
+              // Textarea Motivo_Solicitud
+              if (fieldName === "Motivo_Solicitud") {
                 return (
                   <div className="mb-3">
                     <label className="block mb-1 font-medium">
@@ -145,36 +144,20 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                       placeholder={fieldProps.label}
                       className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
                       style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-
                     />
-
-                    {/* Mostrar errores de validación */}
                     {formErrors[fieldName] && (
-                      <span className="text-red-500 text-sm">
-                        {formErrors[fieldName]}
-                      </span>
+                      <span className="text-red-500 text-sm">{formErrors[fieldName]}</span>
                     )}
-
-
                   </div>
+                );
+              }
 
-
-
-                )
-              } {/*cierra corchetes despues del if*/ }
-
-
-
-
+              // Inputs normales
               return (
                 <div className="mb-3">
                   <label className="block mb-1 font-medium">
-                    {fieldProps.label}{""}
-                    {fieldProps.required && (
-                      <span className="text-red-500">*
-
-                      </span>
-                    )}
+                    {fieldProps.label}
+                    {fieldProps.required && <span className="text-red-500">*</span>}
                   </label>
                   <input
                     type={fieldProps.type === "email" ? "email" : "text"}
@@ -184,15 +167,18 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                     placeholder={fieldProps.label}
                     className={commonClasses}
                   />
-                  {field.state.meta.errors?.[0] && (
-                    <span className="text-red-500 text-sm">{field.state.meta.errors[0]}</span>
+                  {formErrors[fieldName] && (
+                    <span className="text-red-500 text-sm">{formErrors[fieldName]}</span>
                   )}
                 </div>
               );
-
             }}
           </form.Field>
         ))}
+
+        {formErrors.general && (
+          <div className="text-red-500 mb-3">{formErrors.general}</div>
+        )}
 
         <div className="flex justify-end items-end gap-4">
           <button
@@ -206,25 +192,16 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
           <div className="flex justify-end items-end mt-6">
             <button
               type="submit"
-              disabled={form.state.isSubmitting} // Deshabilitar durante envío
-              className={`
-              w-[120px] py-2 rounded transition
-              ${form.state.isSubmitting
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-blue-900 hover:bg-blue-800'
-                } text-white
-            `}
+              disabled={form.state.isSubmitting}
+              className={`w-[120px] py-2 rounded transition ${form.state.isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
             >
               {form.state.isSubmitting ? 'Enviando...' : 'Enviar'}
             </button>
           </div>
         </div>
       </form>
-
-
     </div>
-  )
-}
+  );
+};
 
-export default FormularioDesconexionMedidor
-//original
+export default FormularioDesconexion;

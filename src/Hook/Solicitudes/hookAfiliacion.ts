@@ -1,48 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { createAfiliacion, getAllAfiliaciones } from "../../Services/Solicitudes/AfiliacionService";
-import type { Afiliacion } from "../../Schemas/Solicitudes/Afiliacion";
+import { createAfiliacion } from "../../Services/Solicitudes/AfiliacionService";
 
- 
  export const useAfiliaciones=()=>{
     const queryClient=useQueryClient();
     
-    //trae afiliaciones 
-    const afiliacionesQuery = useQuery<Afiliacion[]>({
-        queryKey:["afiliaciones"],
-        queryFn:getAllAfiliaciones,
-        staleTime:5*60*1000,
-        refetchOnWindowFocus: false 
-
-    })
-    
         const createMutation = useMutation({
-        mutationFn: (data: FormData) => createAfiliacion(data), // espera FormData
+        mutationFn: (data: FormData) => createAfiliacion(data), // espera un FormData
         onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["afiliaciones"] });
-        console.log("Afiliación creada con éxito");
+        console.log("Solicitud de afiliación creada con éxito");
        },
-        //onError: ()=>console.error("no se creo la afiliacion")
-
-
-        onError: (error) => {
-      console.error(" No se creó la afiliación");
-      if (error instanceof Error) console.error("Mensaje de error:", error.message);
-      if ((error as any)?.response) {
-        console.error("Status:", (error as any).response.status);
-        console.error("Data:", (error as any).response.data);
-      }
-    },
-
-
-    })
-
+        onError: ()=>console.error("no se creo la solicitud de afiliacion"),
+      });
+     
     return {
-        afiliaciones: afiliacionesQuery.data,
-        isloading : afiliacionesQuery.isLoading,
-        isError: afiliacionesQuery.isError,
         createAfiliacion: createMutation.mutateAsync,
     }
-
 
 
  }

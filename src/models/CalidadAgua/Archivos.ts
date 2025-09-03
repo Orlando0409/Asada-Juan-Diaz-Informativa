@@ -1,10 +1,14 @@
 export interface CalidadAguaArchivos {
     id: number;
-    nombre: string;
-    url: string;
+    Titulo: string;
+    Url_Archivo: string;
+    Fecha_Creacion: string;
+    Fecha_Actualizacion: string;
 }
 export const CalidadAguaArchivosinitializedState = {
     id : 0,
-    nombre : '',
-    url : ''
+    Titulo : '',
+    Url_Archivo : '',
+    Fecha_Creacion: '',
+    Fecha_Actualizacion: ''     
 }
