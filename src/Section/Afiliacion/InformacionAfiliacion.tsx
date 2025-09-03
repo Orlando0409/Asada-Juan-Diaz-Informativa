@@ -14,11 +14,13 @@ const InformacionAfiliacion = () => {
         src={"/ASADA_JUAN_D.png"}
         className="absolute inset-0 w-full h-full object-cover object-center"
       />
+
+
       <div className="bg-white  lg:gap-8 absolute inset-0 max-h-[75vh] w-[90%] sm:w-[85%] lg:w-[70%] mx-auto mt-10 lg:mt-20 p-6 sm:p-10 lg:-20 flex flex-col lg:flex-row shadow-lg rounded-lg overflow-auto ">
 
         <div className=" flex-1 max-w-md  w-full flex flex-col ">
-
-          <h1 className="text-xl font-bold text-gray-800 mt-4">Información de afiliación como abonado
+          <h1 className="text-3xl font-bold text-blue-600 text-center border-b-2 border-blue-600 pb-2 mb-10 z-10 relative">
+            Información de afiliación como abonado
           </h1>
           <p className="text-gray-600 ">Como abonado, tendras los siguientes beneficios</p>
           <ul className="list-disc pl-6 text-gray-700 space-y-1">
