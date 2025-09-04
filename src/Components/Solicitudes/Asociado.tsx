@@ -19,12 +19,12 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
     defaultValues: {
 
       Nombre: "",
-      PrimerApellido: "",
-      SegundoApellido: "",
+      Apellido1: "",
+      Apellido2: "",
       Cedula: "",
-      CorreoElectronico: "",
-      NumeroTelefono: "",
-      MotivoSolicitud: "",
+      Correo: "",
+      Numero_Telefono: "",
+      Motivo_Solicitud: "",
     },
 
     onSubmit: async ({ value }) => {
