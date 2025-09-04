@@ -1,20 +1,19 @@
+import chatConfig from '../../data/ChatContexto.json';
+
 export class TokenMonitor {
   private static readonly STORAGE_KEY = 'gemini_token_usage';
   
-  // Estima tokens de un texto (aproximado)
   static estimateTokens(text: string): number {
-    // Regla aproximada: ~4 caracteres = 1 token
     return Math.ceil(text.length / 4);
   }
 
-  // Registra uso de tokens
   static logTokenUsage(prompt: string, response: string) {
     const promptTokens = this.estimateTokens(prompt);
     const responseTokens = this.estimateTokens(response);
     const totalTokens = promptTokens + responseTokens;
     
+    const today = new Date().toISOString().split('T')[0];
     const usage = this.getStoredUsage();
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
     
     if (!usage[today]) {
       usage[today] = { requests: 0, tokens: 0 };
@@ -23,38 +22,44 @@ export class TokenMonitor {
     usage[today].requests += 1;
     usage[today].tokens += totalTokens;
     
+    // Limpiar datos antiguos (más de 7 días)
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    
+    Object.keys(usage).forEach(date => {
+      if (new Date(date) < sevenDaysAgo) {
+        delete usage[date];
+      }
+    });
+    
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(usage));
     
-    
-    return { promptTokens, responseTokens, totalTokens, dailyTotal: usage[today].tokens };
   }
   
-  // Obtiene uso almacenado
-  private static getStoredUsage(): Record<string, { requests: number; tokens: number }> {
-    const stored = localStorage.getItem(this.STORAGE_KEY);
-    return stored ? JSON.parse(stored) : {};
-  }
-  
-  // Obtiene estadísticas del día actual
-  static getTodayStats() {
-    const usage = this.getStoredUsage();
+  static getTodayStats(): { requests: number; tokens: number } {
     const today = new Date().toISOString().split('T')[0];
+    const usage = this.getStoredUsage();
     return usage[today] || { requests: 0, tokens: 0 };
   }
   
-  // Limpia datos antiguos
-   
-  static cleanup() {
-    const usage = this.getStoredUsage();
-    const now = new Date();
-    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    
-    const cleaned = Object.fromEntries(
-      Object.entries(usage).filter(([date]) => 
-        new Date(date) >= sevenDaysAgo
-      )
-    );
-    
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(cleaned));
+  static getRemainingTokens(): number {
+    const { limite_tokens_diario } = chatConfig.configuracion_chatbot;
+    const todayUsage = this.getTodayStats();
+    return Math.max(0, limite_tokens_diario - todayUsage.tokens);
+  }
+  
+  static isNearLimit(): boolean {
+    const { limite_tokens_diario } = chatConfig.configuracion_chatbot;
+    const todayUsage = this.getTodayStats();
+    return todayUsage.tokens > (limite_tokens_diario * 0.8);
+  }
+  
+  private static getStoredUsage(): Record<string, { requests: number; tokens: number }> {
+    try {
+      const stored = localStorage.getItem(this.STORAGE_KEY);
+      return stored ? JSON.parse(stored) : {};
+    } catch {
+      return {};
+    }
   }
 }
