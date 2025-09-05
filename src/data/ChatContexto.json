@@ -1,280 +1,103 @@
 {
-  "organizacion": {
-    "nombre": "Asociación Administradora de Acueducto y Alcantarillado Juan Díaz",
-    "nombreCorto": "ASADA Juan Díaz",
-    "descripcion": "En la ASADA de Juan Díaz trabajamos para brindar un servicio de agua potable eficiente, sostenible y de alta calidad. Nuestro compromiso es con la comunidad y el ambiente, garantizando una gestión responsable de este recurso.",
-    "mision": "Ser una ASADA líder en Guanacaste por la excelencia en distribución del servicio de agua potable, infraestructura sostenible y calidad garantizada del recurso.",
-    "vision": "Maximizar el valor de la ASADA por medio de capacitaciones, proyectos, control de calidad y personal comprometido con el ambiente y la comunidad.",
-    "ubicacion": "Juan Díaz de Nicoya, Guanacaste, Costa Rica",
-    "añoFundacion": 2005,
-    "historia": "La ASADA de Juan Díaz fue fundada en el año 2005. En un inicio, la idea principal era construir un acueducto para uso agrícola, pensando en beneficiar a los agricultores de la zona. Sin embargo, un vecino de la zona donó un terreno para un pozo. Las personas de la comunidad pensaron en la necesidad de acceso al agua potable en los hogares, y llegaron a la conclusión de que el agua para consumo humano era prioridad más que para el uso agrícola. Ante esta situación, se decidió cambiar el destino del proyecto y enfocarlo en llevar agua a las casas. Con este nuevo propósito se logró concretar un convenio con la delegación, lo que permitió la formalización de la creación de la ASADA. De esta manera, un proyecto que estaba destinado a la agricultura se transformó en una solución para la comunidad de Juan Díaz y sus alrededores."
-  },
-  
-  "servicios": {
-    "principal": "Agua potable",
-    "descripcion": "Brindamos agua potable para las comunidades de Juan Díaz y Oriente",
-    "caracteristicas": [
-      "Servicio eficiente y sostenible",
-      "Alta calidad del agua",
-      "Gestión responsable del recurso",
-      "Control de calidad garantizado",
-      "Compromiso con el ambiente"
-    ],
-    "cobertura": ["Juan Díaz", "Oriente"],
-    "imagen": "/ASADA_JUAN_D.png"
-  },
-
-  "afiliacion": {
-    "descripcion": "Proceso simple y accesible para formar parte de nuestra organización",
-    "tipos": [
-      {
-        "tipo": "abonado",
-        "nombre": "Afiliación como Abonado",
-        "descripcion": "Para personas que desean acceder a nuestros servicios de agua potable",
-        "proceso": "Presentar solicitud con requisitos, inspección técnica, instalación del medidor",
-        "tiempoEstimado": "15-30 días hábiles",
-        "costo": "Según tarifario vigente",
-        "requisitos": [
-          "Ser mayor de edad",
-          "Cédula de identidad",
-          "Nombre completo y apellidos",
-          "Edad",
-          "Dirección exacta de residencia",
-          "Número de teléfono",
-          "Correo electrónico",
-          "Planos del terreno",
-          "Escritura del terreno"
-        ],
-        "camposFormulario": {
-          "NombreCompleto": { "label": "Nombre completo (Apellidos)", "type": "text", "required": true },
-          "Cédula": { "label": "Cédula", "type": "text", "required": true },
-          "Edad": { "label": "Edad", "type": "text", "required": true },
-          "DirecciónExacta": { "label": "Dirección exacta de residencia", "type": "text", "required": true },
-          "NúmeroTeléfono": { "label": "Número de teléfono", "type": "text", "required": true },
-          "CorreoElectrónico": { "label": "Correo electrónico", "type": "email", "required": true },
-          "PlanosDelTerreno": { "label": "Planos del terreno", "type": "file", "required": true },
-          "EscrituraDelTerreno": { "label": "Escritura del terreno", "type": "file", "required": true }
-        }
-      },
-      {
-        "tipo": "asociado",
-        "nombre": "Solicitud de Asociado",
-        "descripcion": "Para personas que desean participar activamente en la gestión de la ASADA",
-        "proceso": "Presentar solicitud, evaluación de la junta, aprobación en asamblea",
-        "tiempoEstimado": "30-45 días hábiles",
-        "requisitos": [
-          "Estar afiliado como abonado",
-          "Nombre completo y apellidos",
-          "Cédula de identidad",
-          "Número de teléfono",
-          "Correo electrónico",
-          "Motivo de la solicitud",
-          "Participar en al menos una reunión anual de la ASADA"
-        ],
-        "camposFormulario": {
-          "NombreCompleto": { "label": "Nombre completo (Apellidos)", "type": "text", "required": true },
-          "Cédula": { "label": "Cédula", "type": "text", "required": true },
-          "NúmeroTeléfono": { "label": "Número de teléfono", "type": "text", "required": true },
-          "CorreoElectrónico": { "label": "Correo electrónico", "type": "email", "required": true },
-          "MotivoSolicitud": { "label": "Motivo de solicitud", "type": "text", "required": true }
-        }
-      }
-    ],
-    "proceso": [
-      "Completa el formulario de afiliación en el apartado de solicitudes de nuestra página web",
-      "Proporciona la información personal requerida",
-      "Selecciona el tipo de afiliación que necesitas",
-      "Adjunta los documentos requeridos",
-      "Envía la solicitud para revisión"
-    ],
-    "ubicacion": "Apartado de solicitudes en la página web"
-  },
-
-  "solicitudes": {
-    "tipos": [
-      {
-        "tipo": "cambioMedidor",
-        "nombre": "Cambio de Medidor",
-        "descripcion": "Solicitud para reemplazar un medidor existente por daño o mal funcionamiento",
-        "proceso": "Solicitud, evaluación técnica, programación de cambio",
-        "tiempoEstimado": "5-10 días hábiles",
-        "requisitos": [
-          "Cédula de identidad",
-          "Nombre completo y apellidos",
-          "Dirección exacta",
-          "Correo electrónico",
-          "Número de teléfono",
-          "Motivo de la solicitud"
-        ],
-        "camposFormulario": {
-          "Cédula": { "label": "Cédula", "type": "text", "required": true },
-          "NombreCompleto": { "label": "Nombre completo (Apellidos)", "type": "text", "required": true },
-          "DirecciónExacta": { "label": "Dirección exacta", "type": "text", "required": true },
-          "CorreoElectrónico": { "label": "Correo electrónico", "type": "email", "required": true },
-          "NúmeroTeléfono": { "label": "Número de teléfono", "type": "text", "required": true },
-          "MotivoSolicitud": { "label": "Motivo de solicitud", "type": "text", "required": true }
-        }
-      },
-      {
-        "tipo": "desconexion",
-        "nombre": "Desconexión de Medidor",
-        "descripcion": "Solicitud para suspender definitivamente el servicio de agua",
-        "proceso": "Solicitud, verificación de pagos al día, desconexión física",
-        "tiempoEstimado": "3-7 días hábiles",
-        "requisitos": [
-          "Nombre completo y apellidos",
-          "Cédula de identidad",
-          "Dirección exacta de residencia",
-          "Número de teléfono",
-          "Correo electrónico",
-          "Motivo de la solicitud",
-          "Planos del terreno",
-          "Escritura del terreno"
-        ],
-        "camposFormulario": {
-          "NombreCompleto": { "label": "Nombre completo (Apellidos)", "type": "text", "required": true },
-          "Cédula": { "label": "Cédula", "type": "text", "required": true },
-          "DirecciónExacta": { "label": "Dirección exacta de residencia", "type": "text", "required": true },
-          "NúmeroTeléfono": { "label": "Número de teléfono", "type": "text", "required": true },
-          "CorreoElectrónico": { "label": "Correo electrónico", "type": "email", "required": true },
-          "MotivoSolicitud": { "label": "Motivo de solicitud", "type": "text", "required": true },
-          "PlanosDelTerreno": { "label": "Planos del terreno", "type": "file", "required": true },
-          "EscrituraDelTerreno": { "label": "Escritura del terreno", "type": "file", "required": true }
-        }
-      }
-    ]
-  },
-
-  "consultaPagos": {
-    "descripcion": "Consulta el estado de tus pagos y facturas",
-    "requisitos": ["Número de abonado", "Cédula del titular"],
-    "ubicacion": "Sección de consulta de pagos en la página web",
-    "metodosPago": ["Efectivo en oficinas", "Transferencia bancaria", "SINPE Móvil"],
-    "tiposPago": {
-      "mensual": "Pago mensual del servicio de agua",
-      "reconexion": "Pago por reconexión del servicio",
-      "mora": "Pago de intereses por mora"
-    },
-    "camposFormulario": {
-      "numeroAbonado": { "label": "Número de abonado", "type": "text", "required": true },
-      "cedulaTitular": { "label": "Cédula del titular", "type": "text", "required": true }
-    }
-  },
-
-  "contacto": {
-    "formas": [
-      {
-        "tipo": "Queja",
-        "descripcion": "Para reportar problemas con el servicio, atención al cliente o facturación",
-        "proceso": "Presentar queja, investigación interna, respuesta en tiempo establecido",
-        "tiempoRespuesta": "5-10 días hábiles",
-        "requisitos": ["Nombre completo", "Primer apellido", "Segundo apellido (opcional)", "Descripción de la queja", "Adjuntar imagen (opcional)"],
-        "camposFormulario": {
-          "nombre": { "label": "Nombre completo", "type": "text", "required": true },
-          "primerApellido": { "label": "Primer apellido", "type": "text", "required": true },
-          "segundoApellido": { "label": "Segundo apellido", "type": "text", "required": false },
-          "mensaje": { "label": "Descripción de tu queja", "type": "textarea", "required": true },
-          "adjunto": { "label": "Adjuntar imagen", "type": "file", "required": false }
-        }
-      },
-      {
-        "tipo": "Reporte",
-        "descripcion": "Para reportar daños en tuberías, fugas, problemas de presión o calidad del agua",
-        "proceso": "Recepción del reporte, inspección técnica, reparación o solución",
-        "tiempoRespuesta": "24-48 horas para emergencias, 3-5 días para otros casos",
-        "requisitos": ["Nombre completo", "Primer apellido", "Segundo apellido (opcional)", "Ubicación del lugar afectado", "Descripción del reporte", "Adjuntar imagen (opcional)"],
-        "camposFormulario": {
-          "nombre": { "label": "Nombre completo", "type": "text", "required": true },
-          "primerApellido": { "label": "Primer apellido", "type": "text", "required": true },
-          "segundoApellido": { "label": "Segundo apellido", "type": "text", "required": false },
-          "ubicacion": { "label": "Ubicación del lugar afectado", "type": "text", "required": true },
-          "mensaje": { "label": "Descripción del problema", "type": "textarea", "required": true },
-          "adjunto": { "label": "Adjuntar imagen", "type": "file", "required": false }
-        }
-      },
-      {
-        "tipo": "Sugerencia",
-        "descripcion": "Para proponer mejoras en el servicio o nuevas ideas",
-        "proceso": "Recepción de sugerencia, evaluación por la junta, implementación si es viable",
-        "tiempoRespuesta": "10-15 días hábiles",
-        "requisitos": ["Descripción de la sugerencia", "Adjuntar imagen (opcional)"],
-        "camposFormulario": {
-          "mensaje": { "label": "Descripción de tu sugerencia", "type": "textarea", "required": true },
-          "adjunto": { "label": "Adjuntar imagen", "type": "file", "required": false }
-        }
-      }
-    ],
-    "informacion": {
-      "telefono": "+506 1234-5678",
-      "correo": "asadajuandiaz@gmail.com",
-      "horario": "Lunes a Viernes, 7:00 AM - 5:00 PM",
-      "whatsapp": "https://chat.whatsapp.com/IOTuJj4XCAU9S0FLzQFgTp"
-    }
-  },
-
-  "navegacion": {
-    "secciones": [
-      {
-        "nombre": "Sobre Nosotros",
-        "subsecciones": ["Datos Generales", "Historia", "Calidad del Agua"]
-      },
-      {
-        "nombre": "Solicitudes",
-        "descripcion": "Formularios para afiliación, cambio de medidor y desconexión"
-      },
-      {
-        "nombre": "Consulta de Pagos",
-        "descripcion": "Verificar estado de pagos y facturas"
-      },
-      {
-        "nombre": "Contacto",
-        "subsecciones": ["Quejas", "Sugerencias", "Reportes"]
-      },
-      {
-        "nombre": "Preguntas Frecuentes",
-        "descripcion": "Respuestas a consultas comunes"
-      }
-    ]
+  "configuracion_chatbot": {
+    "tiempo_respuesta_max": 5000,
+    "usar_gemini_por_defecto": true,
+    "fallback_en_error": true,
+    "limite_tokens_diario": 1000000,
+    "respuestas_sugeridas": true
   },
 
   "keywords": {
-    "saludo": ["hola", "buenas", "saludos", "hey", "buenos días", "buenas tardes"],
-    "despedida": ["adiós", "bye", "hasta luego", "gracias", "chao", "nos vemos"],
-    "organizacion": ["que es", "quienes son", "asada", "organización", "juan díaz", "misión", "visión", "historia", "fundación", "saga"],
-    "servicios": ["servicios", "agua potable", "agua", "suministro", "calidad", "cobertura"],
-    "afiliacion": ["afiliar", "afiliación", "abonado", "asociado", "registro", "inscribir", "unirse", "nuevo servicio"],
-    "solicitudes": ["solicitud", "formulario", "tramite", "cambio medidor", "desconexión", "documentos", "requisitos"],
-    "pagos": ["pago", "factura", "consulta", "deuda", "estado cuenta", "número abonado"],
-    "contacto": ["contacto", "teléfono", "correo", "dirección", "ubicación", "horario", "whatsapp"],
-    "problemas": ["queja", "problema", "daño", "reporte", "falla", "avería"],
-    "sugerencias": ["sugerencia", "mejora", "propuesta", "idea"],
-    "navegacion": ["como usar", "página", "sitio web", "donde encuentro", "secciones", "formularios"],
-    "ubicacion": ["donde", "juan díaz", "nicoya", "guanacaste", "costa rica", "dirección"],
-    "horarios": ["horario", "atención", "cuando", "abierto", "cerrado"]
+    "saludo": ["hola", "buenas", "saludos", "hey", "buenos días", "buenas tardes", "buenas noches"],
+    "despedida": ["adiós", "bye", "hasta luego", "gracias", "chao", "nos vemos", "que tengas buen día", "cuídate"],
+    "organizacion": ["que es", "quienes son", "asada", "organización", "juan díaz", "juan diaz", "misión", "visión", "historia", "fundación", "saga", "sobre nosotros", "información"],
+    "servicios": ["servicios", "agua potable", "agua", "suministro", "calidad", "cobertura", "distribución", "infraestructura"],
+    "afiliacion": ["afiliar", "afiliación", "abonado", "asociado", "registro", "inscribir", "unirse", "nuevo servicio", "como me afilio", "requisitos afiliación"],
+    "solicitudes": ["solicitud", "formulario", "trámite", "cambio medidor", "desconexión", "documentos", "requisitos", "como solicitar", "donde solicitar"],
+    "pagos": ["pago", "factura", "consulta", "deuda", "estado cuenta", "número abonado", "consultar pagos", "facturas pendientes", "mora"],
+    "contacto": ["contacto", "teléfono", "correo", "dirección", "ubicación", "horario", "whatsapp", "como contactar", "comunicarse"],
+    "problemas": ["queja", "problema", "daño", "reporte", "falla", "avería", "reportar", "denunciar"],
+    "sugerencias": ["sugerencia", "mejora", "propuesta", "idea", "recomendación", "feedback"],
+    "navegacion": ["como usar", "página", "sitio web", "donde encuentro", "secciones", "formularios", "como navegar", "usar página"],
+    "ubicacion": ["donde", "juan díaz", "juan diaz", "nicoya", "guanacaste", "costa rica", "dirección", "ubicación", "como llegar"],
+    "horarios": ["horario", "atención", "cuando", "abierto", "cerrado", "hora", "disponible", "funciona"]
   },
 
-  "preguntas_frecuentes": {
-    "afiliacion": [
-      {
-        "pregunta": "¿Qué necesito para afiliarme como abonado?",
-        "respuesta": "Necesitas ser mayor de edad, tener cédula, proporcionar tu información personal completa, planos del terreno y escritura del terreno."
-      },
-      {
-        "pregunta": "¿Cuánto tiempo toma el proceso de afiliación?",
-        "respuesta": "El proceso de afiliación toma entre 15 a 30 días hábiles, dependiendo de la revisión de documentos y la inspección técnica."
-      }
+  "respuestas_rapidas": {
+    "saludo_basico": [
+      "¡Hola! 👋 Soy el asistente de ASADA Juan Díaz. ¿En qué puedo ayudarte?",
+      "¡Buenas! 😊 ¿Qué información necesitas sobre ASADA Juan Díaz?",
+      "¡Hola! Estoy aquí para ayudarte con información sobre nuestros servicios. ¿Qué necesitas saber?"
     ],
-    "servicios": [
-      {
-        "pregunta": "¿Qué comunidades cubren?",
-        "respuesta": "Brindamos servicio de agua potable a las comunidades de Juan Díaz y Oriente."
-      }
+    "despedida_basica": [
+      "¡Hasta luego! 👋 Que tengas un excelente día.",
+      "¡Gracias por contactarnos! 😊 Estamos aquí cuando nos necesites.",
+      "¡Cuídate! Si tienes más preguntas, no dudes en escribirme."
     ],
-    "pagos": [
-      {
-        "pregunta": "¿Cómo consulto mis pagos?",
-        "respuesta": "Puedes consultar tus pagos en la sección de consulta de pagos con tu número de abonado y cédula del titular."
-      }
+    "no_entiendo": [
+      "No estoy seguro de entender tu pregunta. ¿Podrías ser más específico sobre qué información de ASADA Juan Díaz necesitas?",
+      "Disculpa, pero no entendí bien. ¿Puedes reformular tu pregunta sobre nuestros servicios?",
+      "Lo siento, no pude procesar tu consulta. ¿Podrías hacerme una pregunta más específica sobre ASADA Juan Díaz?"
+    ]
+  },
+
+  "patrones_intencion": {
+    "pregunta_directa": ["qué", "que", "cómo", "como", "cuál", "cual", "cuándo", "cuando", "dónde", "donde", "por qué", "porque"],
+    "solicitud_ayuda": ["ayuda", "ayúdame", "necesito", "quiero", "podrías", "puedes", "me gustaría"],
+    "confirmacion": ["sí", "si", "correcto", "exacto", "claro", "perfecto", "ok"],
+    "negacion": ["no", "incorrecto", "falso", "nada", "ninguno", "jamás", "nunca"]
+  },
+
+  "contextos_especiales": {
+    "emergencia": {
+      "keywords": ["emergencia", "urgente", "daño grave", "sin agua", "contaminación"],
+      "respuesta_rapida": "Para emergencias, contacta inmediatamente al teléfono de la ASADA o WhatsApp. También puedes usar el formulario de reportes para documentar el problema."
+    },
+    "fuera_tema": {
+      "respuesta": "Solo puedo ayudarte con información sobre ASADA Juan Díaz y nuestros servicios de agua potable. ¿Hay algo específico sobre la ASADA que te gustaría saber?"
+    }
+  },
+
+  "prompts_contexto": {
+    "base": "Eres el asistente virtual de ASADA Juan Díaz (agua potable). IMPORTANTE: Solo responde sobre ASADA Juan Díaz y sus servicios. Sé conciso y útil.",
+    
+    "especificos": {
+      "organizacion": "Información institucional: misión, visión, historia, datos generales.",
+      "servicios": "Servicios de agua potable, calidad, cobertura, infraestructura.",
+      "afiliacion": "Proceso de afiliación, requisitos, tipos (abonado/asociado), tiempos.",
+      "solicitudes": "Formularios web: afiliación, cambio medidor, desconexión, asociado.",
+      "pagos": "Consulta de pagos con número abonado y cédula, métodos de pago.",
+      "contacto": "Información de contacto: teléfono, correo, horarios, WhatsApp.",
+      "problemas": "Reportes y quejas: formularios web, tiempos de respuesta.",
+      "navegacion": "Ayuda para usar la página web y encontrar secciones.",
+      "ubicacion": "Ubicación, dirección, área de cobertura.",
+      "horarios": "Horarios de atención y disponibilidad de servicios."
+    }
+  },
+
+  "respuestas_optimizadas": {
+    
+    "metodos_pago": [
+      "Efectivo en oficinas",
+      "Transferencia bancaria", 
+      "SINPE Móvil"
+    ],
+    
+    "tipos_pago": {
+      "mensual": "Pago mensual del servicio de agua",
+      "reconexion": "Pago por reconexión del servicio", 
+      "mora": "Pago de intereses por mora",
+      "desconexion": "Pago por desconexión del servicio"
+    },
+
+    "cobertura_servicio": ["Juan Díaz", "Oriente"],
+    
+    "caracteristicas_servicio": [
+      "Servicio eficiente y sostenible",
+      "Alta calidad del agua",
+      "Gestión responsable del recurso", 
+      "Control de calidad garantizado",
+      "Compromiso con el ambiente"
     ]
   }
 }

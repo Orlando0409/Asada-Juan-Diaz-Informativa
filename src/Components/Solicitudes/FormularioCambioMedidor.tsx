@@ -10,7 +10,7 @@ type Props = {
   onClose: () => void;
 
 }
-//original 
+
 const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
   const [mostrarFormulario] = useState(true);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -23,13 +23,12 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
       Apellido1: "",
       Apellido2: "",
       Cedula: "",
-      Correo: "", 
+      Correo: "",
       Direccion_Exacta: "",
       Numero_Telefono: "",
       Motivo_Solicitud: "",
       Numero_Medidor_Anterior: 0,
     },
-
 
     onSubmit: async ({ value }) => {
       setFormErrors({}); // limpiar errores previos
@@ -49,12 +48,12 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
 
       try {
         await mutation.createCambioMedidor(value);
-        console.log("Solicitud enviada y creada con éxito");
         form.reset();
+        setFormErrors({ general: "¡Solicitud enviada con éxito!" });
       } catch (error: any) {
         console.error("Error al enviar formulario:", error);
         setFormErrors({
-          general: "Hubo un error al enviar el formulario. Por favor intenta nuevamente.",
+          general: "Hubo un error al enviar el formulario. Por favor intenta nuevamente.", error,
         });
       }
     },
@@ -147,6 +146,14 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
             }}
           </form.Field>
         ))}
+
+        {/* Mensaje general de éxito*/}
+        {formErrors.general && (
+          <div className={`text-center mt-4 ${formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
+            {formErrors.general}
+          </div>
+        )}
+
         <div className="flex justify-end items-end gap-4">
           <button
             type="button"
@@ -169,8 +176,13 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
             `}
             >
               {form.state.isSubmitting ? 'Enviando...' : 'Enviar'}
+
             </button>
+
+
           </div>
+
+
         </div>
       </form>
     </div>

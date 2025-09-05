@@ -2,6 +2,7 @@ import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import data from '../../data/Data.json'
 import { AsociadoSchema } from "../../Schemas/Solicitudes/Asociado";
+import { createAsociado } from "../../Services/Solicitudes/Asociado";
 
 type SolicitudTipo = "asociado";
 type Props = {
@@ -11,20 +12,20 @@ type Props = {
 }
 
 const FormularioAsociado = ({ tipo, onClose }: Props) => {
-  //const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
+
   const [mostrarFormulario] = useState(true);
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({}) // Agrega un arreglo para manejo de errores
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({}) // arreglo para manejo de errores
   const form = useForm({
 
     defaultValues: {
 
       Nombre: "",
-      PrimerApellido: "",
-      SegundoApellido: "",
+      Apellido1: "",
+      Apellido2: "",
       Cedula: "",
-      CorreoElectronico: "",
-      NumeroTelefono: "",
-      MotivoSolicitud: "",
+      Correo: "",
+      Numero_Telefono: "",
+      Motivo_Solicitud: "",
     },
 
     onSubmit: async ({ value }) => {
@@ -45,9 +46,9 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
       // Si pasa validación
       try {
         console.log("Datos válidos enviados:", value);
-
+        await createAsociado(value);
         form.reset();
-
+        setFormErrors({ general: "¡Solicitud enviada con éxito!" }); // Mensaje de éxito
       } catch (error) {
         console.error("Error al enviar formulario:", error);
         setFormErrors({
@@ -75,6 +76,7 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
       >
         <h2 className="text-center text-xl font-semibold mb-6">Formulario para ser asociado</h2>
 
+
         {Object.entries(campos).map(([fieldName, fieldProps]) =>
           <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
             {(field) => (
@@ -83,7 +85,7 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
                   {fieldProps.label}
                   {fieldProps.required && <span className="text-red-500">*</span>}
                 </label>
-                {fieldName === "MotivoSolicitud" ? (
+                {fieldName === "Motivo_Solicitud" ? (
                   <textarea
                     value={field.state.value as string}
                     onBlur={field.handleBlur}
@@ -119,10 +121,11 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
             }
           </form.Field>
         )}
-        {/*probar*/}
-
+        {/*Mensaje general de éxito */}
         {formErrors.general && (
-          <span className="text-red-500 text-sm mb-2 block">{formErrors.general}</span>
+          <div className={`text-center mt-4 ${formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
+            {formErrors.general}
+          </div>
         )}
 
 

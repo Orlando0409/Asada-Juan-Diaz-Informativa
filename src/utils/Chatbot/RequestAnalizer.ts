@@ -1,248 +1,139 @@
 import { IntentionDetector } from './IntentionDetector';
 import { TokenMonitor } from './TokenMonitor';
-import contextoOrganizacion from '../../data/ChatContexto.json';
+import chatConfig from '../../data/ChatContexto.json';
 
 export class RequestAnalyzer {
   
-  // Analiza si realmente necesita llamar a la API o puede usar fallback
   static shouldUseAPI(prompt: string): {
     useAPI: boolean;
     reason: string;
     confidence: number;
   } {
     
-    // 1. Verificar límites de tokens
+    // Verificar límites desde configuración
+    const { configuracion_chatbot } = chatConfig;
     const usage = TokenMonitor.getTodayStats();
-    if (usage.tokens > 800000) { // 80% del límite
+    
+    if (usage.tokens > configuracion_chatbot.limite_tokens_diario * 0.9) {
       return {
         useAPI: false,
-        reason: 'Límite diario de tokens alcanzado (80%)',
-        confidence: 0.8
-      };
-    }
-    
-    // 2. Detectar intención
-    const intention = IntentionDetector.detect(prompt);
-    
-    // 3. Preguntas que NO necesitan API (respuestas exactas disponibles)
-    const directAnswerIntentions = [
-      'saludo',
-      'despedida', 
-      'organizacion',
-      'contacto',
-      'ubicacion',
-      'horarios'
-    ];
-    
-    if (directAnswerIntentions.includes(intention as string)) {
-      return {
-        useAPI: false,
-        reason: `Respuesta directa disponible para: ${intention}`,
-        confidence: 0.9
-      };
-    }
-    
-    // 4. Preguntas simples que el JSON puede responder
-    const simpleQuestions = this.detectSimpleQuestions(prompt);
-    if (simpleQuestions.isSimple) {
-      return {
-        useAPI: false,
-        reason: `Pregunta simple: ${simpleQuestions.type}`,
-        confidence: 0.85
-      };
-    }
-    
-    // 5. Preguntas complejas que SÍ necesitan API
-    const complexQuestions = this.detectComplexQuestions(prompt);
-    if (complexQuestions.isComplex) {
-      return {
-        useAPI: true,
-        reason: `Pregunta compleja: ${complexQuestions.type}`,
+        reason: 'Límite diario crítico de tokens alcanzado',
         confidence: 0.95
       };
     }
     
-    // 6. Por defecto, para preguntas específicas usar API
-    if (intention && ['afiliacion', 'servicios', 'solicitudes', 'pagos'].includes(intention)) {
+    // Detectar intención
+    const intention = IntentionDetector.detect(prompt);
+    
+    // Verificar contextos especiales
+    const { contextos_especiales } = chatConfig;
+    
+    // Detectar emergencias
+    const isEmergency = contextos_especiales.emergencia.keywords.some(
+      keyword => prompt.toLowerCase().includes(keyword)
+    );
+    
+    if (isEmergency) {
+      return {
+        useAPI: false,
+        reason: 'Respuesta de emergencia rápida',
+        confidence: 0.9
+      };
+    }
+    
+    // Solo usar fallback para saludos/despedidas muy básicos
+    const basicIntentions = ['saludo', 'despedida'];
+    const isBasicGreeting = basicIntentions.includes(intention as string) && 
+                           prompt.trim().length < 10;
+    
+    if (isBasicGreeting) {
+      return {
+        useAPI: false,
+        reason: `Saludo/despedida básico: ${intention}`,
+        confidence: 0.85
+      };
+    }
+    
+    // Detectar spam obvio
+    if (this.isObviousSpam(prompt)) {
+      return {
+        useAPI: false,
+        reason: 'Spam detectado',
+        confidence: 0.9
+      };
+    }
+    
+    // Usar patrones de intención para análisis
+    const { patrones_intencion } = chatConfig;
+    const isPreguntaDirecta = patrones_intencion.pregunta_directa.some(
+      patron => prompt.toLowerCase().includes(patron)
+    );
+    
+    if (isPreguntaDirecta) {
       return {
         useAPI: true,
-        reason: `Pregunta específica sobre: ${intention}`,
+        reason: 'Pregunta directa detectada',
         confidence: 0.8
       };
     }
     
-    // 7. Preguntas fuera de contexto - usar fallback
+    // Para lo demás, usar configuración por defecto
+    const confidence = this.calculateAPIConfidence(prompt, intention);
+    
     return {
-      useAPI: false,
-      reason: 'Pregunta fuera de contexto de ASADA',
-      confidence: 0.7
+      useAPI: configuracion_chatbot.usar_gemini_por_defecto,
+      reason: intention ? 
+        `Pregunta sobre ${intention} - API recomendada` : 
+        'Pregunta compleja - API recomendada',
+      confidence
     };
   }
   
-  // Detecta preguntas simples que no necesitan API
-   
-  private static detectSimpleQuestions(prompt: string): { isSimple: boolean; type?: string } {
-    const lowerPrompt = prompt.toLowerCase();
+  private static calculateAPIConfidence(prompt: string, intention: string | null): number {
+    let confidence = 0.7; // Base confidence
     
-    const simplePatterns = [
-      { pattern: /^(hola|buenas|hey|saludos)/, type: 'saludo' },
-      { pattern: /^(adiós|adios|bye|gracias|chao)/, type: 'despedida' },
-      { pattern: /^(que es|qué es).+(asada|organización|organizacion)/, type: 'definición básica' },
-      { pattern: /^(dónde|donde).+(ubicación|ubicacion|dirección|direccion)/, type: 'ubicación' },
-      { pattern: /^(cuál|cual).+(teléfono|telefono|correo|contacto)/, type: 'contacto básico' },
-      { pattern: /^(cuándo|cuando).+(horario|atienden)/, type: 'horarios' },
-      { pattern: /^(misión|mision|visión|vision)/, type: 'información institucional' },
-      { pattern: /^(historia|fundación|fundacion|creación|creacion)/, type: 'historia' },
-    ];
-    
-    for (const { pattern, type } of simplePatterns) {
-      if (pattern.test(lowerPrompt)) {
-        return { isSimple: true, type };
-      }
+    if (intention) confidence += 0.1;
+    if (prompt.length > 20) confidence += 0.1;
+    if (/[¿?]/.test(prompt) || /^(cómo|como|qué|que|cuál|cual|dónde|donde|cuándo|cuando|por qué|porque)/.test(prompt.toLowerCase())) {
+      confidence += 0.1;
     }
     
-    return { isSimple: false };
+    return Math.min(0.95, confidence);
   }
   
-  // Detecta preguntas complejas que SÍ necesitan API
-   
-  private static detectComplexQuestions(prompt: string): { isComplex: boolean; type?: string } {
-    const lowerPrompt = prompt.toLowerCase();
-    
-    const complexPatterns = [
-      { pattern: /como.+(proceso|procedimiento|pasos).+(detallado|específico|especifico)/, type: 'proceso detallado' },
-      { pattern: /cuáles.+(requisitos|documentos|necesito).+(exactos|específicos|especificos)/, type: 'requisitos específicos' },
-      { pattern: /qué pasa si.+/, type: 'escenario hipotético' },
-      { pattern: /puedo.+(hacer|solicitar|tramitar).+si.+/, type: 'consulta condicional' },
-      { pattern: /diferencia entre.+/, type: 'comparación' },
-      { pattern: /me ayuda.+(explicar|entender).+porque.+/, type: 'explicación detallada' },
-      { pattern: /(problema|falla|daño|avería|averia).+(específico|especifico|complejo)/, type: 'problema complejo' },
-      { pattern: /varios.+(pasos|requisitos|documentos)/, type: 'múltiples elementos' },
-    ];
-    
-    for (const { pattern, type } of complexPatterns) {
-      if (pattern.test(lowerPrompt)) {
-        return { isComplex: true, type };
-      }
-    }
-    
-    // Detectar preguntas largas (probablemente complejas)
-    if (prompt.split(' ').length > 15) {
-      return { isComplex: true, type: 'pregunta extensa' };
-    }
-    
-    return { isComplex: false };
-  }
-  
-  // Optimiza el contexto para usar menos tokens
-
-  static optimizeContext(intention: string | null, _prompt: string): string {
-    const org = contextoOrganizacion.organizacion;
-    
-    // Contexto súper minimal para ahorrar tokens
-    const minimalBase = `Asistente de ${org.nombreCorto}. 
-    ${org.descripcion}
-        Solo responde sobre ASADA Juan Díaz.
-        Sé conciso pero informativo.`;
-    
-    if (!intention) return minimalBase;
-    
-    // Contextos optimizados por intención
-    const optimizedContexts: Record<string, string> = {
-      organizacion: `${minimalBase}
-        Misión: ${org.mision}
-        Historia: Fundada en ${org.añoFundacion} para agua potable comunitaria.`,
-            
-      servicios: `${minimalBase}
-        Servicio: Agua potable de calidad para Juan Díaz y Oriente.
-        Características: Eficiente, sostenible, control de calidad garantizado.`,
-            
-      afiliacion: `${minimalBase}
-        Afiliación: Formulario web con cédula, documentos del terreno.
-        Tipos: Abonado (servicios) y Asociado (participación activa).
-        Proceso: ${contextoOrganizacion.afiliacion?.proceso?.slice(0, 3).join('. ') || 'Completar formulario en web'}.`,
-            
-      contacto: `${minimalBase}
-        Contacto: ${contextoOrganizacion.contacto?.informacion?.telefono || 'Ver página web'}
-        Email: ${contextoOrganizacion.contacto?.informacion?.correo || 'Ver página web'}
-        Horario: ${contextoOrganizacion.contacto?.informacion?.horario || 'Lunes a Viernes'}`,
-            
-      pagos: `${minimalBase}
-        Consulta pagos: Ingresa número de abonado + cédula en sección web.
-        Ubicación: ${contextoOrganizacion.consultaPagos?.ubicacion || 'Página web'}.`,
-            
-      solicitudes: `${minimalBase}
-        Solicitudes web: Afiliación, cambio medidor, desconexión.
-        Requisitos varían según tipo. Documentos necesarios en formularios.`
-    };
-    
-    return optimizedContexts[intention] || minimalBase;
-  }
-  
-  //Estima tokens que se usarían
-  static estimateTokenUsage(prompt: string, context: string): number {
-    // Estimación: prompt + context + respuesta estimada
-    const promptTokens = Math.ceil(prompt.length / 4);
-    const contextTokens = Math.ceil(context.length / 4);
-    const responseTokens = 50; // Respuesta estimada de ~200 caracteres
-    
-    return promptTokens + contextTokens + responseTokens;
-  }
-  
-  //* Verifica patrones de spam o preguntas repetitivas
-  static isSpamOrRepetitive(prompt: string): boolean {
+  private static isObviousSpam(prompt: string): boolean {
     const lowerPrompt = prompt.toLowerCase().trim();
     
-    // Detectar patrones de spam
     const spamPatterns = [
-      /^(.)\1{10,}$/, // Caracteres repetidos
-      /^(test|testing|prueba|hola)\s*$/, // Palabras de prueba solas
+      /^(.)\1{15,}$/, // Muchos caracteres repetidos
       /^[^\w\s]*$/, // Solo símbolos
-      /(.{1,10})\1{5,}/ // Patrones repetitivos cortos
+      /(.{1,5})\1{8,}/, // Patrones muy repetitivos
+      /^(test|testing|prueba)\s*$/i, // Palabras de prueba solas
+      /^[aeiou123]\s*$/i, // Caracteres únicos
     ];
     
     return spamPatterns.some(pattern => pattern.test(lowerPrompt));
   }
   
-  //Analiza la calidad de la pregunta
-  static analyzeQuestionQuality(prompt: string): {
-    quality: 'high' | 'medium' | 'low';
-    score: number;
-    factors: string[];
-  } {
-    const factors: string[] = [];
-    let score = 0;
+  static optimizeContext(intention: string | null, _prompt: string): string {
+    const { prompts_contexto } = chatConfig;
     
-    // Longitud adecuada
-    if (prompt.length >= 10 && prompt.length <= 200) {
-      score += 20;
-      factors.push('Longitud adecuada');
+    // Contexto base desde configuración
+    let context = prompts_contexto.base;
+    
+    // Agregar contexto específico si existe
+    if (intention && prompts_contexto.especificos[intention as keyof typeof prompts_contexto.especificos]) {
+      context += `\n\nENFOQUE: ${prompts_contexto.especificos[intention as keyof typeof prompts_contexto.especificos]}`;
     }
     
-    // Tiene palabras clave relacionadas con ASADA
-    const relevantKeywords = ['asada', 'agua', 'afilia', 'pago', 'servicio', 'solicitud'];
-    if (relevantKeywords.some(keyword => prompt.toLowerCase().includes(keyword))) {
-      score += 30;
-      factors.push('Relevante a ASADA');
-    }
+    return context;
+  }
+  
+  static estimateTokenUsage(prompt: string, context: string): number {
+    const promptTokens = Math.ceil(prompt.length / 4);
+    const contextTokens = Math.ceil(context.length / 4);
+    const responseTokens = 75;
     
-    // Está bien formada (tiene signos de interrogación, etc.)
-    if (/[¿?]/.test(prompt) || /^(cómo|como|qué|que|cuál|cual|dónde|donde|cuándo|cuando)/.test(prompt.toLowerCase())) {
-      score += 25;
-      factors.push('Bien formada');
-    }
-    
-    // No es spam
-    if (!this.isSpamOrRepetitive(prompt)) {
-      score += 25;
-      factors.push('No spam');
-    }
-    
-    let quality: 'high' | 'medium' | 'low';
-    if (score >= 80) quality = 'high';
-    else if (score >= 50) quality = 'medium';
-    else quality = 'low';
-    
-    return { quality, score, factors };
+    return promptTokens + contextTokens + responseTokens;
   }
 }
