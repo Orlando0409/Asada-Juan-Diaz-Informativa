@@ -147,6 +147,13 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
           </form.Field>
         ))}
 
+        {/* Mensaje general de éxito*/}
+        {formErrors.general && (
+          <div className={`text-center mt-4 ${formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
+            {formErrors.general}
+          </div>
+        )}
+
         <div className="flex justify-end items-end gap-4">
           <button
             type="button"
@@ -169,8 +176,13 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
             `}
             >
               {form.state.isSubmitting ? 'Enviando...' : 'Enviar'}
+
             </button>
+
+
           </div>
+
+
         </div>
       </form>
     </div>

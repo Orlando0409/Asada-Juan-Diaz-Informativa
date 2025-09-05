@@ -23,8 +23,8 @@ export const CambioMedidorSchema = z.object({
  
   Numero_Medidor_Anterior: z.number()
     .positive('El número de medidor anterior debe ser positivo')
-    .gt(0, 'El número de medidor anterior debe ser mayor a 0'),
-
+    .gt(0, 'El número de medidor anterior debe ser mayor a 0 ')
+    .max(9999999, 'El número de medidor anterior no puede exceder 9999999'),
 })
 //
 export type CambioMedidor = z.infer<typeof CambioMedidorSchema>

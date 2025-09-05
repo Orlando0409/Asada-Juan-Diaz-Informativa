@@ -95,6 +95,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
         <h2 className="text-center text-xl font-semibold mb-6">Formulario de afiliación</h2>
 
 
+
         {Object.entries(campos).map(([fieldName, fieldProps]) => (
           <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
             {(field) => {
@@ -173,7 +174,12 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
             }}
           </form.Field>
         ))}
-
+        {/* <-- Mensaje general de éxito*/}
+        {formErrors.general && (
+          <div className={`text-center mt-4 ${formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
+            {formErrors.general}
+          </div>
+        )}
         <div className="flex justify-end items-end gap-4">
           <button
             type="button"

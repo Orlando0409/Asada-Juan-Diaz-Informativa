@@ -76,6 +76,7 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
       >
         <h2 className="text-center text-xl font-semibold mb-6">Formulario para ser asociado</h2>
 
+
         {Object.entries(campos).map(([fieldName, fieldProps]) =>
           <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
             {(field) => (
@@ -120,10 +121,11 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
             }
           </form.Field>
         )}
-        {/*probar*/}
-
+        {/* <-- Mensaje general de éxito o error abajo */}
         {formErrors.general && (
-          <span className="text-red-500 text-sm mb-2 block">{formErrors.general}</span>
+          <div className={`text-center mt-4 ${formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
+            {formErrors.general}
+          </div>
         )}
 
 

@@ -84,6 +84,7 @@ const FormularioDesconexion = ({ tipo, onClose }: Props) => {
       >
         <h2 className="text-center text-xl font-semibold mb-6">Formulario de desconexión de medidor</h2>
 
+
         {Object.entries(campos).map(([fieldName, fieldProps]) => (
           <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
             {(field) => {
@@ -130,7 +131,7 @@ const FormularioDesconexion = ({ tipo, onClose }: Props) => {
                 );
               }
 
-              // Textarea Motivo_Solicitud
+
               if (fieldName === "Motivo_Solicitud") {
                 return (
                   <div className="mb-3">
@@ -153,7 +154,7 @@ const FormularioDesconexion = ({ tipo, onClose }: Props) => {
                 );
               }
 
-            
+
               return (
                 <div className="mb-3">
                   <label className="block mb-1 font-medium">
@@ -176,9 +177,11 @@ const FormularioDesconexion = ({ tipo, onClose }: Props) => {
             }}
           </form.Field>
         ))}
-
+        {/* <-- Mensaje general de éxito o error abajo */}
         {formErrors.general && (
-          <div className="text-red-500 mb-3">{formErrors.general}</div>
+          <div className={`text-center mt-4 ${formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
+            {formErrors.general}
+          </div>
         )}
 
         <div className="flex justify-end items-end gap-4">
