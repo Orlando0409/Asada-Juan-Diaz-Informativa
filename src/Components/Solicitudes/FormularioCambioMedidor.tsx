@@ -23,7 +23,7 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
       Apellido1: "",
       Apellido2: "",
       Cedula: "",
-      Correo: "", 
+      Correo: "",
       Direccion_Exacta: "",
       Numero_Telefono: "",
       Motivo_Solicitud: "",
@@ -49,8 +49,10 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
 
       try {
         await mutation.createCambioMedidor(value);
-        console.log("Solicitud enviada y creada con éxito");
+
         form.reset();
+        setFormErrors({ general: "¡Solicitud enviada con éxito!" });
+        setFormErrors({ general: "¡Solicitud enviada con éxito!" });
       } catch (error: any) {
         console.error("Error al enviar formulario:", error);
         setFormErrors({
@@ -147,6 +149,7 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
             }}
           </form.Field>
         ))}
+
         <div className="flex justify-end items-end gap-4">
           <button
             type="button"

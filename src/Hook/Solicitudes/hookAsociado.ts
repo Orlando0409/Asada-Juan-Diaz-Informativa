@@ -7,13 +7,10 @@ import { createAsociado } from "../../Services/Solicitudes/Asociado";
 
    const createMutation = useMutation({
   mutationFn: (data: Asociado) => createAsociado(data), 
-  onSuccess: () =>{queryClient.invalidateQueries({ queryKey: ["Asociado"] });
+  onSuccess: () =>{queryClient.invalidateQueries({ queryKey: ["asociado"] });
    console.log("Solicitud de asociado creada con éxito");
 },
-
-
-onError: (error: any) => console.error("Error al crear la solicitud:", error.response?.data || error)
-
+  onError: () => console.error("no se creo la solicitud de asociado"),
 });
 
       return {

@@ -2,6 +2,7 @@ import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import data from '../../data/Data.json'
 import { AsociadoSchema } from "../../Schemas/Solicitudes/Asociado";
+import { createAsociado } from "../../Services/Solicitudes/Asociado";
 
 type SolicitudTipo = "asociado";
 type Props = {
@@ -45,9 +46,9 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
       // Si pasa validación
       try {
         console.log("Datos válidos enviados:", value);
-
+        await createAsociado(value);
         form.reset();
-
+        setFormErrors({ general: "¡Solicitud enviada con éxito!" }); // Mensaje de éxito
       } catch (error) {
         console.error("Error al enviar formulario:", error);
         setFormErrors({
@@ -83,7 +84,7 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
                   {fieldProps.label}
                   {fieldProps.required && <span className="text-red-500">*</span>}
                 </label>
-                {fieldName === "MotivoSolicitud" ? (
+                {fieldName === "Motivo_Solicitud" ? (
                   <textarea
                     value={field.state.value as string}
                     onBlur={field.handleBlur}

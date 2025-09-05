@@ -56,8 +56,9 @@ const FormularioDesconexion = ({ tipo, onClose }: Props) => {
         await mutation.createDesconexion(formData);
 
         form.reset();
+        setFormErrors({ general: "¡Solicitud enviada con éxito!" });
         setArchivoSeleccionado({});
-        console.log("✅ Formulario enviado correctamente");
+        console.log(" Formulario enviado correctamente");
       } catch (error) {
         console.error("Error al enviar formulario:", error);
         setFormErrors({
@@ -152,7 +153,7 @@ const FormularioDesconexion = ({ tipo, onClose }: Props) => {
                 );
               }
 
-              // Inputs normales
+            
               return (
                 <div className="mb-3">
                   <label className="block mb-1 font-medium">

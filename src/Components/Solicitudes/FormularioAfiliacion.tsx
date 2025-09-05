@@ -63,12 +63,12 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
         });
 
 
-        // Mostrar solo los valores limpios (sin (2))
         console.log("FormData final a enviar:", value);
 
         await mutation.createAfiliacion(formData);
 
         form.reset();
+        setFormErrors({ general: "¡Solicitud enviada con éxito!" });
         setArchivoSeleccionado({});
       } catch (error) {
         console.error("Error al enviar formulario:", error);
