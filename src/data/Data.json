@@ -103,7 +103,7 @@
         "required": true
       },
       "Apellido2": {
-        "label": "SegundoApellido",
+        "label": "Segundo Apellido",
         "type": "text",
         "required": true
       },
@@ -150,7 +150,7 @@
         "required": true
       },
       "Apellido2": {
-        "label": "SegundoApellido",
+        "label": "Segundo Apellido",
         "type": "text",
         "required": true
       },
