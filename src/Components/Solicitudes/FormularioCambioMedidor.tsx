@@ -30,7 +30,6 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
       Numero_Medidor_Anterior: 0,
     },
 
-
     onSubmit: async ({ value }) => {
       setFormErrors({}); // limpiar errores previos
       console.log("Enviando formulario:", value);
@@ -49,14 +48,12 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
 
       try {
         await mutation.createCambioMedidor(value);
-
         form.reset();
-        setFormErrors({ general: "¡Solicitud enviada con éxito!" });
         setFormErrors({ general: "¡Solicitud enviada con éxito!" });
       } catch (error: any) {
         console.error("Error al enviar formulario:", error);
         setFormErrors({
-          general: "Hubo un error al enviar el formulario. Por favor intenta nuevamente.",
+          general: "Hubo un error al enviar el formulario. Por favor intenta nuevamente.", error,
         });
       }
     },

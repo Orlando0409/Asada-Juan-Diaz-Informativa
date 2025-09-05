@@ -21,7 +21,7 @@ export const CambioMedidorInicialState: CambioMedidor = {
   Direccion_Exacta: "",
   Numero_Telefono: "",
   Motivo_Solicitud: "",
-  Numero_Medidor_Anterior: 1,
+  Numero_Medidor_Anterior: 0,
 };
 export interface CambioMedidorFormData {
   Nombre: string;
