@@ -1,7 +1,9 @@
 import Data from '../../data/Data.json';
+import { useCalidadAguaQuery } from '../../Hook/CalidadDeAgua/hookCalidadAgua';
 const CalidadDeAgua = () => {
-  const descripcion = Data.DatosGenerales.descripcion;
-  const archivos = Data.CalidadAguaArchivos || []
+
+  const { data: archivos = [], isLoading } = useCalidadAguaQuery();
+
   return (
 
     <section className='bg-white text-gray-800 p-6 sm:p-10 md:-16 flex flex-col gap-12'>
@@ -10,7 +12,7 @@ const CalidadDeAgua = () => {
         <h1 className='font-bold text-2xl sm:text-3xl md:text-4xl text-blue-900 mb-4'>Calidad de Agua</h1>
         <blockquote className='border-l-4 border-blue-400 pl-4 sm:pl-6'>
           <p className='text- base sm:text-lg md-text-xl leading-relaxed'>
-            {descripcion}<br />
+
             <span className='font-semibold text-blue-700'>
               Con el fin de dar transparencia y confianza a la comunidad, les brindamos estos documentos para que puedan ver la pureza del agua.
             </span>
@@ -25,9 +27,9 @@ const CalidadDeAgua = () => {
           Documentos disponibles
         </h2>
         <div className='grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
-          {archivos.map((archivo: any) => (
+          {archivos.map((archivo: any, idx: number) => (
             <div
-              key={archivo.id}
+              key={archivo.id ?? idx}
               className='bg-white rounded-3xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 p-5 flex flex-col items-center text-center'
             >
               {/*icono */}
@@ -40,11 +42,11 @@ const CalidadDeAgua = () => {
               </div>
               {/*titulos */}
               <h3 className='font-semibold text-base sm:text-lg md:text-xl text-gray-700 mb-4 line-clamp-2'>
-                {archivo.nombre}
+                {archivo.Titulo}
               </h3>
               {/*boton */}
               <a
-                href={archivo.url}
+                href={archivo.Url_Archivo}
                 target='_blank'
                 rel='noopener noreferrer'
                 className='mt-auto inline-block bg-blue-600 text-white px-4 py-2 sm:px-5 sm:py-2 rounded-2xl hover:bg-blue-700 shadow-sm hover:shadow-md transition text-sm sm:text-base'

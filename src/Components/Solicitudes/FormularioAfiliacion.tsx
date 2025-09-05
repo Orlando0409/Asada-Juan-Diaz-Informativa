@@ -12,7 +12,7 @@ type Props = {
 }
 
 const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
-  //const [archivoSeleccionado, setArchivoSeleccionado] = useState<File | null>(null)
+
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const mutation = useAfiliaciones();
@@ -26,7 +26,6 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
       Cedula: '',
       Correo: '',
       Direccion_Exacta: '',
-
       Numero_Telefono: '',
       Edad: 0,
       Planos_Terreno: undefined as File | undefined,
@@ -64,12 +63,12 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
         });
 
 
-        // Mostrar solo los valores limpios (sin (2))
         console.log("FormData final a enviar:", value);
 
         await mutation.createAfiliacion(formData);
 
         form.reset();
+        setFormErrors({ general: "¡Solicitud enviada con éxito!" });
         setArchivoSeleccionado({});
       } catch (error) {
         console.error("Error al enviar formulario:", error);
@@ -94,6 +93,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
         className="bg-white gap-2 shadow-lg pl-8 pr-8 pt-4 pb-4 rounded-lg w-full max-w-9xl overflow-y-auto"
       >
         <h2 className="text-center text-xl font-semibold mb-6">Formulario de afiliación</h2>
+
 
 
         {Object.entries(campos).map(([fieldName, fieldProps]) => (
@@ -174,7 +174,12 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
             }}
           </form.Field>
         ))}
-
+        {/* Mensaje general de éxito*/}
+        {formErrors.general && (
+          <div className={`text-center mt-4 ${formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
+            {formErrors.general}
+          </div>
+        )}
         <div className="flex justify-end items-end gap-4">
           <button
             type="button"

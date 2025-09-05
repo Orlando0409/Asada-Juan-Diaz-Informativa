@@ -5,53 +5,40 @@ import FormularioDesconexionMedidor from "../../Components/Solicitudes/Desconexi
 
 const DesconexionMedidor = () => {
      const [mostrarFormulario, setMostrarFormulario] = useState(false)
-
      const requisitos = data.requisitosSolicitudes.desconexion;
-
      return (
           <section className="min-h-screen flex items-center justify-center relative w-full">
-
                <img
-
                     alt="Historia de la ASADA de Juan Díaz"
                     src={"/ASADA_JUAN_D.png"}
                     className="absolute inset-0 w-full h-full object-cover object-center"
                />
-
                <div className="bg-white lg:gap-8 absolute inset-0 max-h-[75vh] w-[90%] sm:w-[85%] lg:w-[70%] mx-auto mt-10 lg:mt-20 p-6 sm:p-10 lg:-20 flex flex-col lg:flex-row shadow-lg rounded-lg overflow-auto ">
                     <div className="max-w-md flex-1 w-full flex flex-col">
-                         <h1 className="text-xl font-bold text-gray-800 mt-4">Solicitud de desconexión de medidor </h1>
-
-
+                         <h1 className="text-3xl font-bold text-blue-600 text-center border-b-2 border-blue-600 pb-2 mb-10 z-10 relative">
+                              Solicitud de desconexión de medidor
+                         </h1>
                          <p className="text-gray-600"> La desconexión del medidor es un trámite que pueden realizar los abonados
                               cuando ya no necesitan el servicio de agua en una.
                               <br />
                               A Continuación se muestran los requisitos que se deben cumplir para solicitar la desconexión del medidor
-
                          </p>
                     </div>
-
                     <div className="max-w-md flex-1 w-full flex flex-col">
                          <h2 className="text-lg font-semibold text-gray-800 mt-4">Requisistos Desconexión de Medidor </h2>
 
                          <ul className="list-disc pl-6 text-gray-700 space-y-1">
-
-
                               {Object.entries(requisitos).map(([key, value]) => (
                                    <li key={key}>
                                         {value.label}
                                    </li>
                               ))}
-
                          </ul>
-
-
                          <button
 
                               className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500 transition"
                               onClick={() => setMostrarFormulario(!mostrarFormulario)}
                          >
-
                               {mostrarFormulario ? 'Ocultar Formulario' : 'Llenar Formulario'}
 
 

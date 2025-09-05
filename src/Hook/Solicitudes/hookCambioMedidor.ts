@@ -2,11 +2,12 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createCambioMedidor } from "../../Services/Solicitudes/CambioMedidorService";
 import type { CambioMedidor } from "../../models/Forms/Solicitudes/CambioMedidor";
 
+
  export const useCambioMedidor=()=>{
     const queryClient=useQueryClient();
 
    const createMutation = useMutation({
-  mutationFn: (data: CambioMedidor) => createCambioMedidor(data), // cambiar FormData por CambioMedidor
+  mutationFn: (data: CambioMedidor) => createCambioMedidor(data), 
   onSuccess: () =>{queryClient.invalidateQueries({ queryKey: ["CambioMedidor"] });
    console.log("Solicitud de cambio de medidor creada con éxito");
 },

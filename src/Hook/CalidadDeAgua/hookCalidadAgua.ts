@@ -1,10 +1,21 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { CalidadAguaArchivos } from "../../models/CalidadAgua/Archivos";
-import { createCalidadAgua } from "../../Services/CalidadDeAgua/CalidadAgua";
+import { getCalidadAgua } from "../../Services/CalidadDeAgua/CalidadAgua";
 
+ export const useCalidadAguaQuery = () => {
+  return useQuery<CalidadAguaArchivos[]>({
+    queryKey: ["CalidadAgua"],
+    queryFn: getCalidadAgua,
+  });
+};
+
+
+
+/*
 export const useCalidadAguaMutation= ()=>{
     const QueryClient= useQueryClient();
 
+     /*
     const createMutation=useMutation({
         mutationFn:(data: Omit<CalidadAguaArchivos,"id">)=>createCalidadAgua(data),
         onSuccess:()=>{
@@ -15,4 +26,4 @@ export const useCalidadAguaMutation= ()=>{
     return {
        createCalidadAgua: createMutation.mutateAsync,
     }
-}
+}*/

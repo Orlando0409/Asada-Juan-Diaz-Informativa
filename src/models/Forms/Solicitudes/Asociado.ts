@@ -1,37 +1,33 @@
 export interface Asociado {
   Nombre: string;
-  PrimerApellido: string;
-  SegundoApellido: string;
+  Apellido1: string;
+  Apellido2: string;
   Cedula: string;
-  CorreoElectronico: string;
-  DireccionExacta: string;
-  MotivoSolicitud: string;
-  NumeroTelefono:number
-  Id_Estado_Solicitud: number;
+  Correo: string;
+  Motivo_Solicitud: string;
+  Numero_Telefono:number
+ 
  
 }
 
 export const AsociadoInicialState= {
   Nombre: "",
-  PrimerApellido: "",
-  SegundoApellido: "",
+  Apellido1: "",
+  Apellido2: "",
   Cedula: "",
-  CorreoElectronico: "",
-  DireccionExacta: "",
-  MotivoSolicitud: "",
-  NumeroTelefono:0,
-  Id_Estado_Solicitud: 0,
+  Correo: "",
+  Motivo_Solicitud: "",
+  Numero_Telefono:0,
   
 };
 
 export interface AfiliacionFormData {
   Nombre: string;
-  PrimerApellido: string;
-  SegundoApellido: string;
+  Apellido1: string;
+  Apellido2: string;
   Cedula: string;
-  DireccionExacta: string;
-  NumeroTelefono: string;
-  CorreoElectronico: string;
-  MotivoSolicitud:string;
+  Correo: string;
+  Motivo_Solicitud: string;
+  Numero_Telefono: number;
   
 }

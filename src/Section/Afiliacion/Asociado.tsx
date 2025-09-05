@@ -19,7 +19,10 @@ const Asociado = () => {
       />
       <div className="bg-white lg:gap-8 absolute inset-0 max-h-[75vh] w-[90%] sm:w-[85%] lg:w-[70%] mx-auto mt-10 lg:mt-20 p-6 sm:p-10 lg:-20 flex flex-col lg:flex-row shadow-lg rounded-lg overflow-auto ">
         <div className="max-w-md flex-1 w-full flex flex-col">
-          <h1 className="text-xl font-bold text-gray-800 mt-4">Solicitud Para Ser asociado  </h1>
+          <h1 className="text-3xl font-bold text-blue-600 text-center border-b-2 border-blue-600 pb-2 mb-10 z-10 relative">
+            Solicitud Para Ser asociado
+          </h1>
+
           <p className="text-gray-600"> Ser Asociado en la ASADA es formar parte de la organización comunal
             <br />
             Al ser Asociado no solo recive el servicio de agua potable, si no que tambien tien derecho a toma de decisiones.
