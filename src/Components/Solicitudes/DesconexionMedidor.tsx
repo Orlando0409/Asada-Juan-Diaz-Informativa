@@ -177,7 +177,7 @@ const FormularioDesconexion = ({ tipo, onClose }: Props) => {
             }}
           </form.Field>
         ))}
-        {/* <-- Mensaje general de éxito o error abajo */}
+        {/* Mensaje general de éxito */}
         {formErrors.general && (
           <div className={`text-center mt-4 ${formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
             {formErrors.general}

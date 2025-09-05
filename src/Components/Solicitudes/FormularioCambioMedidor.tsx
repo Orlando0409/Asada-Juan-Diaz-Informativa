@@ -10,7 +10,7 @@ type Props = {
   onClose: () => void;
 
 }
-//original 
+
 const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
   const [mostrarFormulario] = useState(true);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});

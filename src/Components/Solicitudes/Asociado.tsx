@@ -12,9 +12,9 @@ type Props = {
 }
 
 const FormularioAsociado = ({ tipo, onClose }: Props) => {
-  //const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
+
   const [mostrarFormulario] = useState(true);
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({}) // Agrega un arreglo para manejo de errores
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({}) // arreglo para manejo de errores
   const form = useForm({
 
     defaultValues: {
@@ -121,7 +121,7 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
             }
           </form.Field>
         )}
-        {/* <-- Mensaje general de éxito o error abajo */}
+        {/*Mensaje general de éxito */}
         {formErrors.general && (
           <div className={`text-center mt-4 ${formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
             {formErrors.general}

@@ -12,7 +12,7 @@ type Props = {
 }
 
 const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
-  //const [archivoSeleccionado, setArchivoSeleccionado] = useState<File | null>(null)
+
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const mutation = useAfiliaciones();
@@ -174,7 +174,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
             }}
           </form.Field>
         ))}
-        {/* <-- Mensaje general de éxito*/}
+        {/* Mensaje general de éxito*/}
         {formErrors.general && (
           <div className={`text-center mt-4 ${formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
             {formErrors.general}
