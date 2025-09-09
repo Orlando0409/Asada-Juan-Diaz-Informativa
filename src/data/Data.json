@@ -226,6 +226,156 @@
         "type": "text",
         "required": true
       }
+    },
+    "juridica": {
+      "afiliacion": {
+        "Razon_Social": {
+          "label": "Razón Social",
+          "type": "text",
+          "required": true
+        },
+        "Cedula_Juridica": {
+          "label": "Cédula Jurídica",
+          "type": "text",
+          "required": true
+        },
+        "Direccion_Exacta": {
+          "label": "Dirección exacta",
+          "type": "text",
+          "required": true
+        },
+        "Correo": {
+          "label": "Correo electrónico",
+          "type": "email",
+          "required": true
+        },
+        "Numero_Telefono": {
+          "label": "Número de teléfono",
+          "type": "text",
+          "required": true
+        },
+        "Planos_Terreno": {
+          "label": "Planos del terreno",
+          "type": "file",
+          "required": true
+        },
+        "Escritura_Terreno": {
+          "label": "Escritura del terreno",
+          "type": "file",
+          "required": true
+        }
+      },
+      "desconexion": {
+        "Razon_Social": {
+          "label": "Razón Social",
+          "type": "text",
+          "required": true
+        },
+        "Cedula_Juridica": {
+          "label": "Cédula Jurídica",
+          "type": "text",
+          "required": true
+        },
+        "Direccion_Exacta": {
+          "label": "Dirección exacta",
+          "type": "text",
+          "required": true
+        },
+        "Correo": {
+          "label": "Correo electrónico",
+          "type": "email",
+          "required": true
+        },
+        "Numero_Telefono": {
+          "label": "Número de teléfono",
+          "type": "text",
+          "required": true
+        },
+        "Motivo_Solicitud": {
+          "label": "Motivo de solicitud",
+          "type": "text",
+          "required": true
+        },
+        "Planos_Terreno": {
+          "label": "Planos del terreno",
+          "type": "file",
+          "required": true
+        },
+        "Escritura_Terreno": {
+          "label": "Escritura del terreno",
+          "type": "file",
+          "required": true
+        }
+      },
+      "cambioMedidor": {
+        "Razon_Social": {
+          "label": "Razón Social",
+          "type": "text",
+          "required": true
+        },
+        "Cedula_Juridica": {
+          "label": "Cédula Jurídica",
+          "type": "text",
+          "required": true
+        },
+        "Direccion_Exacta": {
+          "label": "Dirección exacta",
+          "type": "text",
+          "required": true
+        },
+        "Correo": {
+          "label": "Correo electrónico",
+          "type": "email",
+          "required": true
+        },
+        "Numero_Telefono": {
+          "label": "Número de teléfono",
+          "type": "text",
+          "required": true
+        },
+        "Numero_Medidor_Anterior": {
+          "label": "Número de Medidor",
+          "type": "text",
+          "required": true
+        },
+        "Motivo_Solicitud": {
+          "label": "Motivo de solicitud",
+          "type": "text",
+          "required": true
+        }
+      },
+      "asociado": {
+        "Razon_Social": {
+          "label": "Razón Social",
+          "type": "text",
+          "required": true
+        },
+        "Cedula_Juridica": {
+          "label": "Cédula Jurídica",
+          "type": "text",
+          "required": true
+        },
+        "Direccion_Exacta": {
+          "label": "Dirección exacta",
+          "type": "text",
+          "required": true
+        },
+        "Correo": {
+          "label": "Correo electrónico",
+          "type": "email",
+          "required": true
+        },
+        "Numero_Telefono": {
+          "label": "Número de teléfono",
+          "type": "text",
+          "required": true
+        },
+        "Motivo_Solicitud": {
+          "label": "Motivo de solicitud",
+          "type": "text",
+          "required": true
+        }
+      }
     }
   },
   "requisitosConsultaPagos": {
@@ -367,6 +517,26 @@
               "id": 4,
               "texto": "Asociado",
               "ruta": "/Asociado"
+            },
+            {
+              "id": 5,
+              "texto": "Afiliación Jurídica",
+              "ruta": "/AfiliacionJuridica"
+            },
+            {
+              "id": 6,
+              "texto": "Cambio de medidor Jurídica",
+              "ruta": "/CambioMedidorJuridica"
+            },
+            {
+              "id": 7,
+              "texto": "Desconexión de medidor Jurídica",
+              "ruta": "/DesconexionMedidorJuridica"
+            },
+            {
+              "id": 8,
+              "texto": "Asociado Jurídica",
+              "ruta": "/AsociadoJuridica"
             }
           ]
         },

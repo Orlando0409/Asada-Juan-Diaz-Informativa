@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Asociado } from "../../Schemas/Solicitudes/Asociado";
 import { createAsociado } from "../../Services/Solicitudes/Asociado";
 
- export const useCambioMedidor=()=>{
+ export const useAsociadoMedidor=()=>{
     const queryClient=useQueryClient();
 
    const createMutation = useMutation({
