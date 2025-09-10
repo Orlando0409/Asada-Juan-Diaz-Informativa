@@ -1,74 +1,135 @@
 
-import { useState } from "react"
-import data from '../../data/Data.json'
-import FormularioDesconexionMedidor from "../../Components/Solicitudes/DesconexionMedidor"
+import { useState } from "react";
+import data from '../../data/Data.json';
+import FormularioDesconexionMedidor from "../../Components/Solicitudes/DesconexionMedidor";
+import DesconexionMedidorJuridica from "../../Components/Solicitudes/Juridica/DesconexionMedidorJuridica";
 
 const DesconexionMedidor = () => {
-     const [mostrarFormulario, setMostrarFormulario] = useState(false)
-     const requisitos = data.requisitosSolicitudes.desconexion;
+     const [mostrarFormularioFisico, setMostrarFormularioFisico] = useState(false);
+     const [mostrarFormularioJuridico, setMostrarFormularioJuridico] = useState(false);
+
+     const requisitosFisico = data.requisitosSolicitudes.desconexion;
+     const requisitosJuridico = data.requisitosSolicitudes.juridica?.desconexion;
+
      return (
-          <section className="min-h-screen flex items-center justify-center relative w-full">
-               <img
-                    alt="Historia de la ASADA de Juan Díaz"
-                    src={"/ASADA_JUAN_D.png"}
-                    className="absolute inset-0 w-full h-full object-cover object-center"
-               />
-               <div className="bg-white lg:gap-8 absolute inset-0 max-h-[75vh] w-[90%] sm:w-[85%] lg:w-[70%] mx-auto mt-10 lg:mt-20 p-6 sm:p-10 lg:-20 flex flex-col lg:flex-row shadow-lg rounded-lg overflow-auto ">
-                    <div className="max-w-md flex-1 w-full flex flex-col">
-                         <h1 className="text-3xl font-bold text-blue-600 text-center border-b-2 border-blue-600 pb-2 mb-10 z-10 relative">
-                              Solicitud de desconexión de medidor
+          <section className="min-h-screen w-full bg-white flex flex-col items-center py-6 sm:py-8 md:py-10 px-2 sm:px-4 md:px-6 lg:px-8">
+
+               {/* Información general */}
+               <div className="w-full max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-3xl xl:max-w-4xl bg-white shadow-lg rounded-lg p-4 sm:p-6 md:p-8 mb-8 sm:mb-10 md:mb-12">
+                    <div className="text-center mb-4 sm:mb-6">
+                         <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-blue-600 mb-2 sm:mb-3 md:mb-4">
+                              Solicitud de Desconexión de Medidor
                          </h1>
-                         <p className="text-gray-600"> La desconexión del medidor es un trámite que pueden realizar los abonados
-                              cuando ya no necesitan el servicio de agua en una.
-                              <br />
-                              A Continuación se muestran los requisitos que se deben cumplir para solicitar la desconexión del medidor
+                         <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed">
+                              La desconexión del medidor es un trámite que pueden realizar los abonados cuando ya no necesitan el servicio de agua.
+                              <br className="hidden sm:block" />
+                              <span className="block sm:inline"> A continuación se muestran los requisitos que se deben cumplir para solicitar la desconexión.</span>
                          </p>
                     </div>
-                    <div className="max-w-md flex-1 w-full flex flex-col">
-                         <h2 className="text-lg font-semibold text-gray-800 mt-4">Requisistos Desconexión de Medidor </h2>
 
-                         <ul className="list-disc pl-6 text-gray-700 space-y-1">
-                              {Object.entries(requisitos).map(([key, value]) => (
-                                   <li key={key}>
-                                        {value.label}
-                                   </li>
+                    {/* Línea divisoria */}
+                    <hr className="border-gray-200 my-4 sm:my-5 md:my-6" />
+
+                    {/* Información adicional */}
+                    <div className="text-center">
+                         <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-800 mb-3 sm:mb-4">
+                              Información Importante
+                         </h2>
+                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4 text-gray-700">
+                              <div className="flex items-center justify-center p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                                   <span className="text-xs sm:text-sm md:text-base">• Proceso rápido y eficiente</span>
+                              </div>
+                              <div className="flex items-center justify-center p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                                   <span className="text-xs sm:text-sm md:text-base">• Trámite sin costo adicional</span>
+                              </div>
+                              <div className="flex items-center justify-center p-2 rounded-lg hover:bg-gray-50 transition-colors">
+                                   <span className="text-xs sm:text-sm md:text-base">• Atención personalizada</span>
+                              </div>
+                         </div>
+                    </div>
+               </div>
+
+               {/* Cards con requisitos */}
+               <div className="flex flex-col xl:flex-row gap-4 sm:gap-6 md:gap-8 w-full max-w-xs sm:max-w-sm md:max-w-4xl lg:max-w-5xl xl:max-w-6xl px-2 sm:px-0">
+
+                    {/* Card Jurídico */}
+                    <div className="flex-1 bg-gray-50 shadow-lg rounded-lg p-4 sm:p-5 md:p-6 flex flex-col min-h-[320px] sm:min-h-[350px] md:min-h-[400px]">
+                         <h2 className="text-lg sm:text-xl md:text-xl font-semibold text-gray-800 mb-3 sm:mb-4 text-center">
+                              Cliente Jurídico
+                         </h2>
+                         <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 text-center italic leading-relaxed">
+                              Para empresas, organizaciones o entidades legales
+                         </p>
+                         <ul className="list-disc pl-4 sm:pl-5 md:pl-6 space-y-1 sm:space-y-2 text-gray-700 flex-1 overflow-auto max-h-48 sm:max-h-56 md:max-h-64">
+                              {requisitosJuridico && Object.entries(requisitosJuridico).map(([key, value]) => (
+                                   <li key={key} className="text-xs sm:text-sm md:text-base leading-relaxed">{value.label}</li>
                               ))}
                          </ul>
                          <button
-
-                              className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500 transition"
-                              onClick={() => setMostrarFormulario(!mostrarFormulario)}
+                              className="mt-3 sm:mt-4 bg-blue-600 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded text-sm sm:text-base hover:bg-blue-500 transition-colors duration-200 w-full"
+                              onClick={() => setMostrarFormularioJuridico(true)}
                          >
-                              {mostrarFormulario ? 'Ocultar Formulario' : 'Llenar Formulario'}
-
-
+                              Llenar Formulario Jurídico
                          </button>
-
-                         {mostrarFormulario && (
-                              <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50">
-                                   {/* fondo borroso */}
-
-                                   <div
-
-                                        className="absolute top-0 left-0 w-full h-full bg-black/10 backdrop-blur-[2px]"
-                                        onClick={() => setMostrarFormulario(false)}
-                                   ></div>
-
-
-                                   {/* centrar formulario */}
-
-                                   <div className=" rounded  relative w-[90%] max-w-md max-h-[550px] overflow-y-scroll [scroll-whit:none] [-ms-overflow-style:none]"
-
-                                        style={{ scrollbarWidth: "none" }}>
-
-                                        <FormularioDesconexionMedidor tipo="desconexion" onClose={() => setMostrarFormulario(false)} />
-                                   </div>
-                              </div>
-                         )}
                     </div>
+
+                    {/* Card Físico */}
+                    <div className="flex-1 bg-gray-50 shadow-lg rounded-lg p-4 sm:p-5 md:p-6 flex flex-col min-h-[320px] sm:min-h-[350px] md:min-h-[400px]">
+                         <h2 className="text-lg sm:text-xl md:text-xl font-semibold text-gray-800 mb-3 sm:mb-4 text-center">
+                              Cliente Físico
+                         </h2>
+                         <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 text-center italic leading-relaxed">
+                              Para personas individuales
+                         </p>
+                         <ul className="list-disc pl-4 sm:pl-5 md:pl-6 space-y-1 sm:space-y-2 text-gray-700 flex-1 overflow-auto max-h-48 sm:max-h-56 md:max-h-64">
+                              {Object.entries(requisitosFisico).map(([key, value]) => (
+                                   <li key={key} className="text-xs sm:text-sm md:text-base leading-relaxed">{value.label}</li>
+                              ))}
+                         </ul>
+                         <button
+                              className="mt-3 sm:mt-4 bg-blue-600 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded text-sm sm:text-base hover:bg-blue-500 transition-colors duration-200 w-full"
+                              onClick={() => setMostrarFormularioFisico(true)}
+                         >
+                              Llenar Formulario Físico
+                         </button>
+                    </div>
+
                </div>
+
+               {/* Modal Formulario Jurídico */}
+               {mostrarFormularioJuridico && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
+                         {/* Fondo borroso */}
+                         <div
+                              className="absolute inset-0 bg-black/10 backdrop-blur-sm"
+                              onClick={() => setMostrarFormularioJuridico(false)}
+                         ></div>
+                         {/* Contenedor del formulario */}
+                         <div className="rounded relative w-[95%] sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] max-w-md max-h-[80vh] sm:max-h-[85vh] md:max-h-[550px] overflow-y-scroll scrollbar-hide"
+                              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+                              <DesconexionMedidorJuridica tipo="desconexion" onClose={() => setMostrarFormularioJuridico(false)} />
+                         </div>
+                    </div>
+               )}
+
+               {/* Modal Formulario Físico */}
+               {mostrarFormularioFisico && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
+                         {/* Fondo borroso */}
+                         <div
+                              className="absolute inset-0 bg-black/10 backdrop-blur-sm"
+                              onClick={() => setMostrarFormularioFisico(false)}
+                         ></div>
+                         {/* Contenedor del formulario */}
+                         <div className="rounded relative w-[95%] sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] max-w-md max-h-[80vh] sm:max-h-[85vh] md:max-h-[550px] overflow-y-scroll scrollbar-hide"
+                              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+                              <FormularioDesconexionMedidor tipo="desconexion" onClose={() => setMostrarFormularioFisico(false)} />
+                         </div>
+                    </div>
+               )}
+
           </section>
-          /*primer div*/
-     )
-}
-export default DesconexionMedidor
+     );
+};
+
+export default DesconexionMedidor;
