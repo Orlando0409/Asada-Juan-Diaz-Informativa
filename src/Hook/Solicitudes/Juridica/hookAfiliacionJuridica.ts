@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createAfiliacionJuridica } from "../../../Services/Solicitudes/Juridica/AfiliacionJuricaServices";
+import { createAfiliacionJuridica } from "../../../Services/Solicitudes/Juridica/AfiliacionJuridicaService";
 
 export const useAfiliacionJuridica = () => {
-  const queryClient = useQueryClient(); // <-- FALTABA ESTO
+  const queryClient = useQueryClient(); 
  const createMutation = useMutation({
     mutationFn: (data: FormData) => createAfiliacionJuridica(data), // espera un FormData
     onSuccess: () => {

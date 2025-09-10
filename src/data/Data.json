@@ -355,11 +355,6 @@
           "type": "text",
           "required": true
         },
-        "Direccion_Exacta": {
-          "label": "Dirección exacta",
-          "type": "text",
-          "required": true
-        },
         "Correo": {
           "label": "Correo electrónico",
           "type": "email",
@@ -517,26 +512,6 @@
               "id": 4,
               "texto": "Asociado",
               "ruta": "/Asociado"
-            },
-            {
-              "id": 5,
-              "texto": "Afiliación Jurídica",
-              "ruta": "/AfiliacionJuridica"
-            },
-            {
-              "id": 6,
-              "texto": "Cambio de medidor Jurídica",
-              "ruta": "/CambioMedidorJuridica"
-            },
-            {
-              "id": 7,
-              "texto": "Desconexión de medidor Jurídica",
-              "ruta": "/DesconexionMedidorJuridica"
-            },
-            {
-              "id": 8,
-              "texto": "Asociado Jurídica",
-              "ruta": "/AsociadoJuridica"
             }
           ]
         },
