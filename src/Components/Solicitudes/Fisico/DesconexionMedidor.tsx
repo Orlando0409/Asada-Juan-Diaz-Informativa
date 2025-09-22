@@ -1,9 +1,9 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
-import data from "../../data/Data.json";
-import { DesconexionMedidorSchema } from "../../Schemas/Solicitudes/DesconexionMedidor";
-import { useDesconexion } from "../../Hook/Solicitudes/hookDesconexion";
-
+import { DesconexionMedidorSchema } from "../../../Schemas/Solicitudes/DesconexionMedidor";
+//import { useDesconexion } from "../../../Hook/Solicitudes/Fisico/hookDesconexion";
+import data from '../../../data/Data.json';
+import { useDesconexion } from "../../../Hook/Solicitudes/Fisico/hookDesconexion";
 type SolicitudTipo = 'desconexion';
 
 type Props = {

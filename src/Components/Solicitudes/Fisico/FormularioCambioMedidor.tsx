@@ -1,9 +1,8 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
-import data from '../../data/Data.json'
-import { CambioMedidorSchema } from "../../Schemas/Solicitudes/CambioMedidor";
-import { useCambioMedidor } from "../../Hook/Solicitudes/hookCambioMedidor";
-
+import { CambioMedidorSchema } from "../../../Schemas/Solicitudes/CambioMedidor";
+import { useCambioMedidor } from "../../../Hook/Solicitudes/Fisico/hookCambioMedidor";
+import data from '../../../data/Data.json';
 type SolicitudTipo = "cambioMedidor";
 type Props = {
   tipo: SolicitudTipo;

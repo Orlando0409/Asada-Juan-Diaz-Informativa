@@ -1,7 +1,8 @@
 import { useState } from "react"
 import data from '../../data/Data.json'
-import FormularioCambioMedidor from "../../Components/Solicitudes/FormularioCambioMedidor"
+//import FormularioCambioMedidor from "../../Components/Solicitudes/FormularioCambioMedidor"
 import CambioMedidorJuridica from "../../Components/Solicitudes/Juridica/CambioMedidorJuridica"
+import FormularioCambioMedidor from "../../Components/Solicitudes/Fisico/FormularioCambioMedidor"
 
 const CambioMedidor = () => {
   const [mostrarFormularioFisico, setMostrarFormularioFisico] = useState(false)

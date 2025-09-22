@@ -1,5 +1,5 @@
-import apiAuth from "../../api/apiAuth";
-import type { CambioMedidor } from "../../Schemas/Solicitudes/CambioMedidor";
+import apiAuth from "../../../api/apiAuth";
+import type { CambioMedidor } from "../../../Schemas/Solicitudes/CambioMedidor";
 
 //nueva afiliacion
 export async function createCambioMedidor(data: CambioMedidor){

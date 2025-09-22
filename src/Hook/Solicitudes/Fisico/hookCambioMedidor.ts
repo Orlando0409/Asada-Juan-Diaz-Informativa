@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createCambioMedidor } from "../../Services/Solicitudes/CambioMedidorService";
-import type { CambioMedidor } from "../../models/Forms/Solicitudes/CambioMedidor";
+import { createCambioMedidor } from "../../../Services/Solicitudes/Fisico/CambioMedidorService";
+import type { CambioMedidor } from "../../../models/Forms/Solicitudes/Fisico/CambioMedidor";
 
 
  export const useCambioMedidor=()=>{
