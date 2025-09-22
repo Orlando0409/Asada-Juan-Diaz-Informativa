@@ -1,4 +1,4 @@
-import apiAuth from "../../api/apiAuth";
+import apiAuth from "../../../api/apiAuth";
 
 
 export async function createAfiliacion(data: FormData) {

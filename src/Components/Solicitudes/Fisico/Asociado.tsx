@@ -1,9 +1,8 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
-import data from '../../data/Data.json'
-import { AsociadoSchema } from "../../Schemas/Solicitudes/Asociado";
-import { createAsociado } from "../../Services/Solicitudes/Asociado";
-
+import { AsociadoSchema } from "../../../Schemas/Solicitudes/Asociado";
+import { createAsociado } from "../../../Services/Solicitudes/Fisico/Asociado";
+import data from '../../../data/Data.json';
 type SolicitudTipo = "asociado";
 type Props = {
   tipo: SolicitudTipo;
