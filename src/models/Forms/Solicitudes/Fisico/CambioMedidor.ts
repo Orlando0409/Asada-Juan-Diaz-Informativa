@@ -3,7 +3,8 @@ export interface CambioMedidor {
   Nombre: string;
   Apellido1: string;
   Apellido2: string;
-  Cedula: string;
+ Identificacion: string;
+ Tipo_Identificacion: 'Cedula Nacional' | 'DIMEX' | 'Pasaporte';
   Correo: string;
   Direccion_Exacta: string;
   Numero_Telefono: string;
@@ -16,7 +17,8 @@ export const CambioMedidorInicialState: CambioMedidor = {
   Nombre: "",
   Apellido1: "",
   Apellido2: "",
-  Cedula: "",
+  Identificacion: "",
+  Tipo_Identificacion: 'Cedula Nacional',
   Correo: "",
   Direccion_Exacta: "",
   Numero_Telefono: "",
@@ -27,7 +29,8 @@ export interface CambioMedidorFormData {
   Nombre: string;
   Apellido1: string;
   Apellido2: string;
-  Cedula: string;
+  Identificacion: string;
+  Tipo_Identificacion: 'Cedula Nacional' | 'DIMEX' | 'Pasaporte';
   Correo: string;
   Direccion_Exacta: string;
   Numero_Telefono: string;

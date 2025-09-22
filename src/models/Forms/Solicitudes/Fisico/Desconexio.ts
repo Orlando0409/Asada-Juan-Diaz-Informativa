@@ -3,7 +3,8 @@ export interface Desconexion {
   Nombre: string;
   Apellido1: string;
   Apellido2: string;
-  Cedula: string;
+ Identificacion: string;
+  Tipo_Identificacion: 'Cedula Nacional' | 'DIMEX' | 'Pasaporte';
   Correo: string;
   Direccion_Exacta: string;
   Motivo_Solicitud: string;
@@ -15,7 +16,8 @@ export const DesconexionInicialState= {
   Nombre: "",
   Apellido1: "",
   Apellido2: "",
-  Cedula: "",
+  Identificacion: "",
+  Tipo_Identificacion: "Cedula Nacional",
   Correo: "",
   Direccion_Exacta: "",
   Motivo_Solicitud: "",
@@ -27,7 +29,8 @@ export interface DesconexionFormData {
    Nombre: string;
   Apellido1: string;
   Apellido2: string;
-  Cedula: string;
+  Identificacion: string;
+  Tipo_Identificacion: 'Cedula Nacional' | 'DIMEX' | 'Pasaporte';
   Correo: string;
   Direccion_Exacta: string;
   Motivo_Solicitud: string;

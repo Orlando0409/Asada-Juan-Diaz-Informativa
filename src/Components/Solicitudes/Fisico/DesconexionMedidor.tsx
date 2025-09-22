@@ -1,45 +1,128 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
-import { DesconexionMedidorSchema } from "../../../Schemas/Solicitudes/DesconexionMedidor";
-//import { useDesconexion } from "../../../Hook/Solicitudes/Fisico/hookDesconexion";
-import data from '../../../data/Data.json';
+import data from "../../../data/Data.json";
+import { DesconexionMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/DesconexionMedidor";
 import { useDesconexion } from "../../../Hook/Solicitudes/Fisico/hookDesconexion";
-type SolicitudTipo = 'desconexion';
 
+type AxiosError = {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+  message: string;
+};
+
+type SolicitudTipo = 'desconexion';
 type Props = {
   tipo: SolicitudTipo;
   onClose: () => void;
 };
 
-const FormularioDesconexion = ({ tipo, onClose }: Props) => {
+const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const mutation = useDesconexion();
   const [mostrarFormulario] = useState(true);
 
+  // Validación en tiempo real usando el schema
+  const validateField = (fieldName: string, value: any, allValues?: any) => {
+    try {
+      const dummy: any = {
+        Nombre: "Test",
+        Apellido1: "Test",
+        Apellido2: "",
+        Tipo_Identificacion: "Cedula Nacional",
+        Identificacion: "123456789",
+        Direccion_Exacta: "Dirección válida",
+        Numero_Telefono: "12345678",
+        Correo: "test@test.com",
+        Motivo_Solicitud: "Motivo válido",
+        Planos_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
+        Escritura_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
+      };
+
+      if (fieldName === "Identificacion" && allValues?.Tipo_Identificacion) {
+        dummy.Tipo_Identificacion = allValues.Tipo_Identificacion;
+        dummy.Identificacion = value;
+      } else if (fieldName === "Tipo_Identificacion" && allValues?.Identificacion) {
+        dummy.Tipo_Identificacion = value;
+        dummy.Identificacion = allValues.Identificacion;
+      } else {
+        dummy[fieldName] = value;
+      }
+
+      DesconexionMedidorSchema.parse(dummy);
+
+      setFieldErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[fieldName];
+        return newErrors;
+      });
+    } catch (error: any) {
+      let errorMessage = '';
+      if (error.errors && Array.isArray(error.errors)) {
+        const fieldError = error.errors.find((err: any) => err.path.includes(fieldName));
+        errorMessage = fieldError?.message || error.errors[0]?.message || 'Error de validación';
+      } else if (error.message) {
+        errorMessage = error.message;
+      } else {
+        errorMessage = 'Error de validación';
+      }
+      setFieldErrors(prev => ({
+        ...prev,
+        [fieldName]: errorMessage,
+      }));
+    }
+  };
+
+  const getPlaceholder = (fieldName: string, tipoIdentificacion?: TipoIdentificacion) => {
+    const placeholders: Record<string, string> = {
+      Nombre: 'Juan Carlos',
+      Apellido1: 'Pérez',
+      Apellido2: 'González (opcional)',
+      Correo: 'ejemplo@gmail.com',
+      Numero_Telefono: '88887777',
+      Direccion_Exacta: 'San José, del Banco Nacional 200m sur',
+      Motivo_Solicitud: 'Escribe el motivo de tu solicitud',
+    };
+    if (fieldName === 'Identificacion') {
+      switch (tipoIdentificacion) {
+        case "Cedula Nacional": return '123456789';
+        case "Dimex": return '123456789012';
+        case "Pasaporte": return 'A1234567';
+        default: return 'Seleccione tipo de identificación primero';
+      }
+    }
+    return placeholders[fieldName] || '';
+  };
+
   const form = useForm({
     defaultValues: {
-      Nombre: '',
-      Apellido1: '',
-      Apellido2: '',
-      Cedula: '',
-      Direccion_Exacta: '',
-      Numero_Telefono: '',
-      Correo: '',
-      Motivo_Solicitud: '',
+      Nombre: "",
+      Apellido1: "",
+      Apellido2: "",
+      Tipo_Identificacion: "Cedula Nacional",
+      Identificacion: "",
+      Direccion_Exacta: "",
+      Numero_Telefono: "",
+      Correo: "",
+      Motivo_Solicitud: "",
       Planos_Terreno: undefined as File | undefined,
       Escritura_Terreno: undefined as File | undefined,
     },
+
     onSubmit: async ({ value }) => {
       setFormErrors({});
       const validation = DesconexionMedidorSchema.safeParse(value);
       if (!validation.success) {
-        const fieldErrors: Record<string, string> = {};
+        const validationErrors: Record<string, string> = {};
         validation.error.errors.forEach((err) => {
           const field = err.path[0] as string;
-          fieldErrors[field] = err.message;
+          validationErrors[field] = err.message;
         });
-        setFormErrors(fieldErrors);
+        setFormErrors(validationErrors);
         return;
       }
 
@@ -47,22 +130,38 @@ const FormularioDesconexion = ({ tipo, onClose }: Props) => {
         const formData = new FormData();
         Object.entries(value).forEach(([key, val]) => {
           if (val !== undefined && val !== null && val !== "") {
-            if (val instanceof File) formData.append(key, val);
-            else formData.append(key, val.toString());
+            if (val instanceof File) {
+              formData.append(key, val);
+            } else {
+              formData.append(key, val.toString());
+            }
           }
         });
 
-        console.log("FormData final a enviar:", value);
         await mutation.createDesconexion(formData);
 
         form.reset();
         setFormErrors({ general: "¡Solicitud enviada con éxito!" });
+        setFieldErrors({});
         setArchivoSeleccionado({});
-        console.log(" Formulario enviado correctamente");
-      } catch (error) {
-        console.error("Error al enviar formulario:", error);
+      } catch (error: unknown) {
+        let errorMsg = '';
+        if (
+          typeof error === "object" &&
+          error !== null &&
+          "response" in error &&
+          "message" in error
+        ) {
+          errorMsg =
+            (error as AxiosError).response?.data?.message ||
+            (error as AxiosError).message;
+        } else if (error instanceof Error) {
+          errorMsg = error.message;
+        } else {
+          errorMsg = String(error);
+        }
         setFormErrors({
-          general: "Hubo un error al enviar el formulario. Intenta nuevamente.",
+          general: errorMsg,
         });
       }
     },
@@ -84,24 +183,145 @@ const FormularioDesconexion = ({ tipo, onClose }: Props) => {
       >
         <h2 className="text-center text-xl font-semibold mb-6">Formulario de desconexión de medidor</h2>
 
+        {/* Campos dinámicos */}
+        {Object.entries(campos).map(([fieldName, fieldProps]) => {
+          if (fieldName === "Tipo_Identificacion" || fieldName === "Identificacion") return null;
+          if (fieldProps.type === 'file') return null;
+          return (
+            <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
+              {(field) => (
+                <div className="mb-3">
+                  <label className="block mb-1 font-medium">
+                    {fieldProps.label}
+                    {fieldProps.required && <span className="text-red-500">*</span>}
+                  </label>
+                  {fieldName === "Motivo_Solicitud" ? (
+                    <textarea
+                      value={field.state.value as string}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder={getPlaceholder(fieldName)}
+                      className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
+                    />
+                  ) : (
+                    <input
+                      type={fieldProps.type === "email" ? "email" : "text"}
+                      value={typeof field.state.value === "string" || typeof field.state.value === "number" ? field.state.value : ""}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      placeholder={getPlaceholder(fieldName)}
+                      className={commonClasses}
+                    />
+                  )}
+                  {fieldErrors[fieldName] && (
+                    <span className="text-red-500 text-sm block mt-1">{fieldErrors[fieldName]}</span>
+                  )}
+                  {formErrors[fieldName] && !fieldErrors[fieldName] && (
+                    <span className="text-red-500 text-sm block mt-1">{formErrors[fieldName]}</span>
+                  )}
+                </div>
+              )}
+            </form.Field>
+          );
+        })}
 
-        {Object.entries(campos).map(([fieldName, fieldProps]) => (
-          <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
-            {(field) => {
-              // Archivos
-              if (fieldProps.type === 'file') {
+        {/* Tipo de Identificación */}
+        <div className="mb-3">
+          <form.Field name="Tipo_Identificacion">
+            {(field) => (
+              <div>
+                <label className="block mb-1 font-medium">
+                  Tipo de Identificación <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={field.state.value}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                    validateField('Tipo_Identificacion', e.target.value, form.state.values);
+                    form.setFieldValue('Identificacion', '');
+                    setFieldErrors(prev => {
+                      const newErrors = { ...prev };
+                      delete newErrors['Identificacion'];
+                      return newErrors;
+                    });
+                  }}
+                  className={`${commonClasses} ${fieldErrors['Tipo_Identificacion'] ? 'border-red-500 focus:ring-red-300' : ''}`}
+                >
+                  <option value="">Seleccione tipo de identificación</option>
+                  {TipoIdentificacionValues.map((tipo) => (
+                    <option key={tipo} value={tipo}>{tipo}</option>
+                  ))}
+                </select>
+                {fieldErrors['Tipo_Identificacion'] && (
+                  <span className="text-red-500 text-sm block mt-1">
+                    {fieldErrors['Tipo_Identificacion']}
+                  </span>
+                )}
+                {formErrors['Tipo_Identificacion'] && !fieldErrors['Tipo_Identificacion'] && (
+                  <span className="text-red-500 text-sm block mt-1">
+                    {formErrors['Tipo_Identificacion']}
+                  </span>
+                )}
+              </div>
+            )}
+          </form.Field>
+        </div>
+
+        {/* Número de Identificación */}
+        <div className="mb-3">
+          <form.Field name="Identificacion">
+            {(field) => (
+              <div>
+                <label className="block mb-1 font-medium">
+                  Número de Identificación <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={field.state.value}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                    validateField('Identificacion', e.target.value, form.state.values);
+                  }}
+                  placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion as TipoIdentificacion)}
+                  disabled={!form.state.values.Tipo_Identificacion}
+                  className={`${commonClasses} ${fieldErrors['Identificacion'] ? 'border-red-500 focus:ring-red-300' : ''} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                />
+                {fieldErrors['Identificacion'] && (
+                  <span className="text-red-500 text-sm block mt-1">
+                    {fieldErrors['Identificacion']}
+                  </span>
+                )}
+                {formErrors['Identificacion'] && !fieldErrors['Identificacion'] && (
+                  <span className="text-red-500 text-sm block mt-1">
+                    {formErrors['Identificacion']}
+                  </span>
+                )}
+              </div>
+            )}
+          </form.Field>
+        </div>
+
+        {/* Archivos */}
+        {Object.entries(campos).map(([fieldName, fieldProps]) => {
+          if (fieldProps.type !== 'file') return null;
+          return (
+            <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
+              {(field) => {
                 const archivoActual = archivoSeleccionado[fieldName] ?? null;
                 return (
                   <div className="w-full mb-2">
-                    <label className="block mb-1 font-medium">{fieldProps.label}</label>
+                    <label className="block mb-1 font-medium">{fieldProps.label}
+                      {fieldProps.required && <span className="text-red-500">*</span>}
+                    </label>
                     <input
                       type="file"
                       accept=".png,.jpg,.jpeg,.heic"
                       disabled={!!archivoActual}
                       onChange={(e) => {
-                        const file = e.target.files?.[0] ?? undefined;
-                        field.handleChange(file);
-                        setArchivoSeleccionado(prev => ({ ...prev, [fieldName]: file ?? null }));
+                        const file = e.target.files?.[0] ?? null;
+                        field.handleChange(file ?? undefined);
+                        setArchivoSeleccionado(prev => ({ ...prev, [fieldName]: file }));
+                        validateField(fieldName, file);
                       }}
                       className="hidden"
                       id={fieldName}
@@ -120,6 +340,10 @@ const FormularioDesconexion = ({ tipo, onClose }: Props) => {
                           onClick={() => {
                             field.handleChange(undefined);
                             setArchivoSeleccionado(prev => ({ ...prev, [fieldName]: null }));
+                            setFieldErrors(prev => ({
+                              ...prev,
+                              [fieldName]: `Debe subir ${fieldName === 'Planos_Terreno' ? 'el plano del terreno' : 'la escritura del terreno'}`,
+                            }));
                           }}
                           className="text-red-500 hover:underline text-xs"
                         >
@@ -127,57 +351,24 @@ const FormularioDesconexion = ({ tipo, onClose }: Props) => {
                         </button>
                       </div>
                     )}
-                  </div>
-                );
-              }
-
-
-              if (fieldName === "Motivo_Solicitud") {
-                return (
-                  <div className="mb-3">
-                    <label className="block mb-1 font-medium">
-                      {fieldProps.label}
-                      {fieldProps.required && <span className="text-red-500">*</span>}
-                    </label>
-                    <textarea
-                      value={field.state.value as string}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      placeholder={fieldProps.label}
-                      className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
-                      style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-                    />
-                    {formErrors[fieldName] && (
-                      <span className="text-red-500 text-sm">{formErrors[fieldName]}</span>
+                    {fieldErrors[fieldName] && (
+                      <span className="text-red-500 text-sm block mt-1">
+                        {fieldErrors[fieldName]}
+                      </span>
+                    )}
+                    {formErrors[fieldName] && !fieldErrors[fieldName] && (
+                      <span className="text-red-500 text-sm block mt-1">
+                        {formErrors[fieldName]}
+                      </span>
                     )}
                   </div>
                 );
-              }
+              }}
+            </form.Field>
+          );
+        })}
 
-
-              return (
-                <div className="mb-3">
-                  <label className="block mb-1 font-medium">
-                    {fieldProps.label}
-                    {fieldProps.required && <span className="text-red-500">*</span>}
-                  </label>
-                  <input
-                    type={fieldProps.type === "email" ? "email" : "text"}
-                    value={(field.state.value as string | number) ?? ""}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    placeholder={fieldProps.label}
-                    className={commonClasses}
-                  />
-                  {formErrors[fieldName] && (
-                    <span className="text-red-500 text-sm">{formErrors[fieldName]}</span>
-                  )}
-                </div>
-              );
-            }}
-          </form.Field>
-        ))}
-        {/* Mensaje general de éxito */}
+        {/* Mensaje general */}
         {formErrors.general && (
           <div className={`text-center mt-4 ${formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
             {formErrors.general}
@@ -192,12 +383,17 @@ const FormularioDesconexion = ({ tipo, onClose }: Props) => {
           >
             Cerrar
           </button>
-
           <div className="flex justify-end items-end mt-6">
             <button
               type="submit"
               disabled={form.state.isSubmitting}
-              className={`w-[120px] py-2 rounded transition ${form.state.isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
+              className={`
+              w-[120px] py-2 rounded transition
+              ${form.state.isSubmitting
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-blue-900 hover:bg-blue-800'
+                } text-white
+            `}
             >
               {form.state.isSubmitting ? 'Enviando...' : 'Enviar'}
             </button>
@@ -208,4 +404,4 @@ const FormularioDesconexion = ({ tipo, onClose }: Props) => {
   );
 };
 
-export default FormularioDesconexion;
+export default FormularioDesconexionMedidor;

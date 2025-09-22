@@ -1,9 +1,18 @@
 import { useForm } from "@tanstack/react-form";
 import { useState, useEffect } from "react";
 import data from "../../../data/Data.json";
-import { AfiliacionSchema, TipoIdentificacionValues, } from "../../../Schemas/Solicitudes/Afiliacion";
+import { AfiliacionSchema, TipoIdentificacionValues, type TipoIdentificacion, } from "../../../Schemas/Solicitudes/Fisica/Afiliacion";
 import { useAfiliaciones } from "../../../Hook/Solicitudes/Fisico/hookAfiliacion";
-import { AxiosError } from "axios";
+
+// Sustituye el import por esto:
+type AxiosError = {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+  message: string;
+};
 
 type SolicitudTipo = 'abonado';
 
@@ -138,18 +147,26 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
         setFieldErrors({});
         setArchivoSeleccionado({});
       } catch (error: unknown) {
-        let errorMsg = '';
-        if (error instanceof AxiosError) {
-          errorMsg = error.response?.data?.message || error.message;
-        } else if (error instanceof Error) {
-          errorMsg = error.message;
-        } else {
-          errorMsg = String(error);
-        }
-        setFormErrors({
-          general: errorMsg,
-        });
-      }
+  let errorMsg = '';
+  // Verifica si el error tiene la estructura de AxiosError
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "response" in error &&
+    "message" in error
+  ) {
+    errorMsg =
+      (error as AxiosError).response?.data?.message ||
+      (error as AxiosError).message;
+  } else if (error instanceof Error) {
+    errorMsg = error.message;
+  } else {
+    errorMsg = String(error);
+  }
+  setFormErrors({
+    general: errorMsg,
+  });
+}
     },
   });
 
@@ -265,7 +282,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                     field.handleChange(e.target.value);
                     validateField('Identificacion', e.target.value, form.state.values);
                   }}
-                  placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion)}
+                  placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion as TipoIdentificacion)}
                   disabled={!form.state.values.Tipo_Identificacion}
                   className={`${commonClasses} ${fieldErrors['Identificacion'] ? 'border-red-500 focus:ring-red-300' : ''} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 />
