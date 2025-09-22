@@ -1,10 +1,9 @@
 import { useForm } from "@tanstack/react-form";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import data from "../../../data/Data.json";
-import { AfiliacionSchema, TipoIdentificacionValues, type TipoIdentificacion, } from "../../../Schemas/Solicitudes/Fisica/Afiliacion";
+import { AfiliacionSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/Afiliacion";
 import { useAfiliaciones } from "../../../Hook/Solicitudes/Fisico/hookAfiliacion";
 
-// Sustituye el import por esto:
 type AxiosError = {
   response?: {
     data?: {
@@ -147,26 +146,25 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
         setFieldErrors({});
         setArchivoSeleccionado({});
       } catch (error: unknown) {
-  let errorMsg = '';
-  // Verifica si el error tiene la estructura de AxiosError
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "response" in error &&
-    "message" in error
-  ) {
-    errorMsg =
-      (error as AxiosError).response?.data?.message ||
-      (error as AxiosError).message;
-  } else if (error instanceof Error) {
-    errorMsg = error.message;
-  } else {
-    errorMsg = String(error);
-  }
-  setFormErrors({
-    general: errorMsg,
-  });
-}
+        let errorMsg = '';
+        if (
+          typeof error === "object" &&
+          error !== null &&
+          "response" in error &&
+          "message" in error
+        ) {
+          errorMsg =
+            (error as AxiosError).response?.data?.message ||
+            (error as AxiosError).message;
+        } else if (error instanceof Error) {
+          errorMsg = error.message;
+        } else {
+          errorMsg = String(error);
+        }
+        setFormErrors({
+          general: errorMsg,
+        });
+      }
     },
   });
 
@@ -188,7 +186,8 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
 
         {/* Campos dinámicos */}
         {Object.entries(campos).map(([fieldName, fieldProps]) => {
-          if (fieldName === 'Cedula' || fieldProps.type === 'file') return null;
+          // OMITIR "Cedula" y los archivos
+          if (fieldName === 'Cedula' || fieldName === "Tipo_Identificacion" || fieldName === "Identificacion" || fieldProps.type === 'file') return null;
           return (
             <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
               {(field) => (
@@ -248,9 +247,9 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                   className={`${commonClasses} ${fieldErrors['Tipo_Identificacion'] ? 'border-red-500 focus:ring-red-300' : ''}`}
                 >
                   <option value="">Seleccione tipo de identificación</option>
-                  <option value="Cedula Nacional">Cédula Nacional</option>
-                  <option value="Dimex">DIMEX</option>
-                  <option value="Pasaporte">Pasaporte</option>
+                  {TipoIdentificacionValues.map((tipo) => (
+                    <option key={tipo} value={tipo}>{tipo}</option>
+                  ))}
                 </select>
                 {fieldErrors['Tipo_Identificacion'] && (
                   <span className="text-red-500 text-sm block mt-1">

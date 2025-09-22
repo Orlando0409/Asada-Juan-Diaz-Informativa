@@ -114,12 +114,14 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
 
     onSubmit: async ({ value }) => {
       setFormErrors({});
+      const validationErrors: Record<string, string> = {};
       const validation = CambioMedidorSchema.safeParse(value);
       if (!validation.success) {
-        const validationErrors: Record<string, string> = {};
         validation.error.errors.forEach((err) => {
           const field = err.path[0] as string;
-          validationErrors[field] = err.message;
+          if (!validationErrors[field]) {
+            validationErrors[field] = err.message; // Solo el primer error por campo
+          }
         });
         setFormErrors(validationErrors);
         return;
@@ -180,8 +182,8 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
 
         {/* Campos dinámicos */}
         {Object.entries(campos).map(([fieldName, fieldProps]) => {
-          if (fieldName === "Tipo_Identificacion" || fieldName === "Identificacion") return null;
-          if (fieldProps.type === 'file') return null;
+          // OMITIR "Tipo_Identificacion", "Identificacion" y archivos
+          if (fieldName === "Tipo_Identificacion" || fieldName === "Identificacion" || fieldProps.type === 'file') return null;
           return (
             <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
               {(field) => (
@@ -194,35 +196,37 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
                     <textarea
                       value={field.state.value as string}
                       onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
+                      onChange={(e) => {
+                        field.handleChange(e.target.value);
+                        validateField(fieldName, e.target.value, form.state.values);
+                      }}
                       placeholder={getPlaceholder(fieldName)}
                       className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
                     />
-                  ) : fieldName === "Numero_Medidor_Anterior" ? (
-                    <input
-                      type="number"
-                      value={field.state.value ?? ""}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(Number(e.target.value))}
-                      placeholder={getPlaceholder(fieldName)}
-                      className={commonClasses}
-                      min={1}
-                    />
                   ) : (
                     <input
-                      type={fieldProps.type === "email" ? "email" : "text"}
-                      value={typeof field.state.value === "string" || typeof field.state.value === "number" ? field.state.value : ""}
+                      type={fieldProps.type === "email" ? "email" : fieldProps.type === "number" ? "number" : "text"}
+                      value={(field.state.value as string | number) ?? ""}
                       onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
+                      onChange={(e) => {
+                        const value = fieldProps.type === "number" ? Number(e.target.value) : e.target.value;
+                        field.handleChange(value);
+                        validateField(fieldName, value, form.state.values);
+                      }}
                       placeholder={getPlaceholder(fieldName)}
-                      className={commonClasses}
+                      className={`${commonClasses} ${fieldErrors[fieldName] ? 'border-red-500 focus:ring-red-300' : ''}`}
                     />
                   )}
+                  {/* Solo muestra el primer error por campo */}
                   {fieldErrors[fieldName] && (
-                    <span className="text-red-500 text-sm block mt-1">{fieldErrors[fieldName]}</span>
+                    <span className="text-red-500 text-sm block mt-1">
+                      {fieldErrors[fieldName]}
+                    </span>
                   )}
                   {formErrors[fieldName] && !fieldErrors[fieldName] && (
-                    <span className="text-red-500 text-sm block mt-1">{formErrors[fieldName]}</span>
+                    <span className="text-red-500 text-sm block mt-1">
+                      {formErrors[fieldName]}
+                    </span>
                   )}
                 </div>
               )}
