@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { Asociado } from "../../../Schemas/Solicitudes/Asociado";
+import type { Asociado } from "../../../Schemas/Solicitudes/Fisica/Asociado";
 import { createAsociado } from "../../../Services/Solicitudes/Fisico/Asociado";
 
  export const useAsociadoMedidor=()=>{
