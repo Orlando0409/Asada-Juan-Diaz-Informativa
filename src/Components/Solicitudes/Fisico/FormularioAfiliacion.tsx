@@ -38,7 +38,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
         Identificacion: "123456789",
         Edad: 18,
         Direccion_Exacta: "1234567890",
-        Numero_Telefono: "12345678",
+        Numero_Telefono: "+50688887777", // Ejemplo en formato E.164
         Correo: "test@test.com",
         Planos_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
         Escritura_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
@@ -84,7 +84,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
       Apellido1: 'Pérez',
       Apellido2: 'González (opcional)',
       Correo: 'ejemplo@gmail.com',
-      Numero_Telefono: '88887777',
+      Numero_Telefono: '+50688887777', // Ejemplo en formato E.164
       Direccion_Exacta: 'San José, del Banco Nacional 200m sur',
       Edad: '25',
     };
@@ -108,7 +108,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
       Identificacion: '',
       Correo: '',
       Direccion_Exacta: '',
-      Numero_Telefono: '',
+      Numero_Telefono: '', // Campo inicializado vacío
       Edad: 0,
       Planos_Terreno: undefined as File | undefined,
       Escritura_Terreno: undefined as File | undefined,
@@ -186,8 +186,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
 
         {/* Campos dinámicos */}
         {Object.entries(campos).map(([fieldName, fieldProps]) => {
-          // OMITIR "Cedula" y los archivos
-          if (fieldName === 'Cedula' || fieldName === "Tipo_Identificacion" || fieldName === "Identificacion" || fieldProps.type === 'file') return null;
+          if (fieldName === "Tipo_Identificacion" || fieldName === "Identificacion" || fieldProps.type === 'file') return null;
           return (
             <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
               {(field) => (

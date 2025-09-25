@@ -14,13 +14,14 @@ type AxiosError = {
 };
 
 type SolicitudTipo = "cambioMedidor";
+
 type Props = {
   tipo: SolicitudTipo;
   onClose: () => void;
 };
 
 const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
-  const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
+  //const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const mutation = useCambioMedidor();
@@ -140,7 +141,7 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
         form.reset();
         setFormErrors({ general: "¡Solicitud enviada con éxito!" });
         setFieldErrors({});
-        setArchivoSeleccionado({});
+        //setArchivoSeleccionado({});
       } catch (error: unknown) {
         let errorMsg = '';
         if (
