@@ -3,6 +3,7 @@ import { useState } from "react";
 import data from "../../../data/Data.json";
 import { CambioMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/CambioMedidor";
 import { useCambioMedidor } from "../../../Hook/Solicitudes/Fisico/hookCambioMedidor";
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 type AxiosError = {
   response?: {
@@ -20,8 +21,25 @@ type Props = {
   onClose: () => void;
 };
 
+const validatePhoneNumber = (phone: string): string | null => {
+  const phoneNumber = parsePhoneNumberFromString(phone);
+
+  if (!phoneNumber || !phoneNumber.isValid()) {
+    return `Número de teléfono inválido. Asegúrate de que esté en formato E.164.`;
+  }
+
+  return null; // Número válido
+};
+
+// Función para normalizar números de teléfono internacionales
+const normalizePhoneNumber = (phone: string): string => {
+  if (!phone.startsWith('+')) {
+    throw new Error('El número debe incluir el código de país y comenzar con "+". Ejemplo: +5215512345678');
+  }
+  return phone; // Mantiene el símbolo "+" y el formato E.164
+};
+
 const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
-  //const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const mutation = useCambioMedidor();
@@ -36,10 +54,10 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
         Apellido2: "",
         Tipo_Identificacion: "Cedula Nacional",
         Identificacion: "123456789",
-        Direccion_Exacta: "Dirección válida",
-        Numero_Telefono: "12345678",
+        Direccion_Exacta: "1234567890",
+        Numero_Telefono: "+50688887777", // Ejemplo en formato E.164
         Correo: "test@test.com",
-        Motivo_Solicitud: "Motivo válido",
+        Motivo_Solicitud: "Cambio por daño",
         Numero_Medidor_Anterior: 1234567,
       };
 
@@ -83,9 +101,9 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
       Apellido1: 'Pérez',
       Apellido2: 'González (opcional)',
       Correo: 'ejemplo@gmail.com',
-      Numero_Telefono: '88887777',
+      Numero_Telefono: '+50688887777', // Ejemplo en formato E.164
       Direccion_Exacta: 'San José, del Banco Nacional 200m sur',
-      Motivo_Solicitud: 'Escribe el motivo de tu solicitud',
+      Motivo_Solicitud: 'Cambio por daño',
       Numero_Medidor_Anterior: '1234567',
     };
     if (fieldName === 'Identificacion') {
@@ -115,20 +133,21 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
 
     onSubmit: async ({ value }) => {
       setFormErrors({});
-      const validationErrors: Record<string, string> = {};
-      const validation = CambioMedidorSchema.safeParse(value);
-      if (!validation.success) {
-        validation.error.errors.forEach((err) => {
-          const field = err.path[0] as string;
-          if (!validationErrors[field]) {
-            validationErrors[field] = err.message; // Solo el primer error por campo
-          }
-        });
-        setFormErrors(validationErrors);
-        return;
-      }
-
       try {
+        const normalizedPhone = normalizePhoneNumber(value.Numero_Telefono);
+        value.Numero_Telefono = normalizedPhone;
+
+        const validation = CambioMedidorSchema.safeParse(value);
+        if (!validation.success) {
+          const validationErrors: Record<string, string> = {};
+          validation.error.errors.forEach((err) => {
+            const field = err.path[0] as string;
+            validationErrors[field] = err.message;
+          });
+          setFormErrors(validationErrors);
+          return;
+        }
+
         const formData = new FormData();
         Object.entries(value).forEach(([key, val]) => {
           if (val !== undefined && val !== null && val !== "") {
@@ -141,25 +160,9 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
         form.reset();
         setFormErrors({ general: "¡Solicitud enviada con éxito!" });
         setFieldErrors({});
-        //setArchivoSeleccionado({});
-      } catch (error: unknown) {
-        let errorMsg = '';
-        if (
-          typeof error === "object" &&
-          error !== null &&
-          "response" in error &&
-          "message" in error
-        ) {
-          errorMsg =
-            (error as AxiosError).response?.data?.message ||
-            (error as AxiosError).message;
-        } else if (error instanceof Error) {
-          errorMsg = error.message;
-        } else {
-          errorMsg = String(error);
-        }
+      } catch (error: any) {
         setFormErrors({
-          general: errorMsg,
+          general: error.message,
         });
       }
     },
@@ -183,8 +186,7 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
 
         {/* Campos dinámicos */}
         {Object.entries(campos).map(([fieldName, fieldProps]) => {
-          // OMITIR "Tipo_Identificacion", "Identificacion" y archivos
-          if (fieldName === "Tipo_Identificacion" || fieldName === "Identificacion" || fieldProps.type === 'file') return null;
+          if (fieldName === "Tipo_Identificacion" || fieldName === "Identificacion") return null;
           return (
             <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
               {(field) => (
@@ -193,32 +195,18 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
                     {fieldProps.label}
                     {fieldProps.required && <span className="text-red-500">*</span>}
                   </label>
-                  {fieldName === "Motivo_Solicitud" ? (
-                    <textarea
-                      value={field.state.value as string}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => {
-                        field.handleChange(e.target.value);
-                        validateField(fieldName, e.target.value, form.state.values);
-                      }}
-                      placeholder={getPlaceholder(fieldName)}
-                      className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
-                    />
-                  ) : (
-                    <input
-                      type={fieldProps.type === "email" ? "email" : fieldProps.type === "number" ? "number" : "text"}
-                      value={(field.state.value as string | number) ?? ""}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => {
-                        const value = fieldProps.type === "number" ? Number(e.target.value) : e.target.value;
-                        field.handleChange(value);
-                        validateField(fieldName, value, form.state.values);
-                      }}
-                      placeholder={getPlaceholder(fieldName)}
-                      className={`${commonClasses} ${fieldErrors[fieldName] ? 'border-red-500 focus:ring-red-300' : ''}`}
-                    />
-                  )}
-                  {/* Solo muestra el primer error por campo */}
+                  <input
+                    type={fieldProps.type === "email" ? "email" : fieldProps.type === "number" ? "number" : "text"}
+                    value={(field.state.value as string | number) ?? ""}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => {
+                      const value = fieldProps.type === "number" ? Number(e.target.value) : e.target.value;
+                      field.handleChange(value);
+                      validateField(fieldName, value, form.state.values);
+                    }}
+                    placeholder={getPlaceholder(fieldName)}
+                    className={`${commonClasses} ${fieldErrors[fieldName] ? 'border-red-500 focus:ring-red-300' : ''}`}
+                  />
                   {fieldErrors[fieldName] && (
                     <span className="text-red-500 text-sm block mt-1">
                       {fieldErrors[fieldName]}
@@ -348,3 +336,5 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
 };
 
 export default FormularioCambioMedidor;
+//mas o menos 
+

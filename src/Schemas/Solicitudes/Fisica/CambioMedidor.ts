@@ -12,13 +12,16 @@ const IDENTITY_PATTERNS: Record<TipoIdentificacion, RegExp> = {
   'Cedula Nacional': /^\d{9}$/,
   'Dimex': /^\d{11,12}$/,
   'Pasaporte': /^[A-Za-z0-9]{6,9}$/,
-};
+} as const;
 
 const IDENTITY_ERROR_MESSAGES: Record<TipoIdentificacion, string> = {
   'Cedula Nacional': 'La cédula debe tener exactamente 9 dígitos',
   'Dimex': 'El DIMEX debe tener 11 o 12 dígitos',
   'Pasaporte': 'El pasaporte debe tener 6-9 caracteres alfanuméricos',
-};
+} as const;
+
+// Regex para validar el formato E.164
+const E164_REGEX = /^\+?[1-9]\d{1,14}$/;
 
 export const CambioMedidorSchema = z.object({
   Nombre: z.string()
@@ -40,26 +43,28 @@ export const CambioMedidorSchema = z.object({
 
   Direccion_Exacta: z.string()
     .min(10, 'La dirección debe tener al menos 10 caracteres')
-    .max(50, 'La dirección no puede tener más de 50 caracteres'),
+    .max(255, 'La dirección no puede tener más de 255 caracteres'),
 
   Numero_Telefono: z.string()
     .min(1, 'El número de teléfono es obligatorio')
-    .regex(/^\d{8}$/, 'El teléfono debe tener exactamente 8 dígitos'),
-
-  Motivo_Solicitud: z.string()
-    .min(10, 'El motivo debe de tener al menos 10 caracteres'),
+    .regex(E164_REGEX, 'El número de teléfono debe estar en formato E.164 (ejemplo: +50688887777)'),
 
   Correo: z.string()
     .min(1, 'El correo electrónico es obligatorio')
-    .max(50, 'El correo no puede tener más de 50 caracteres')
+    .max(100, 'El correo no puede tener más de 100 caracteres')
     .email('El correo electrónico no es válido'),
 
+  Motivo_Solicitud: z.string()
+    .min(10, 'El motivo debe tener al menos 10 caracteres')
+    .max(500, 'El motivo no puede tener más de 500 caracteres'),
+
   Numero_Medidor_Anterior: z.coerce.number()
-    .min(1, 'El número de medidor anterior es obligatorio')
-    .max(9999999, 'El número de medidor anterior no puede exceder 9999999'),
-})
-.refine(
+    .int('El número de medidor anterior debe ser un número entero')
+    .positive('El número de medidor anterior debe ser positivo')
+    .max(9999999, 'El número de medidor anterior no puede exceder 9,999,999'),
+}).refine(
   (data) => {
+    // Validación de identidad usando patrones
     const { Tipo_Identificacion, Identificacion } = data;
     const pattern = IDENTITY_PATTERNS[Tipo_Identificacion];
     return pattern ? pattern.test(Identificacion) : false;
