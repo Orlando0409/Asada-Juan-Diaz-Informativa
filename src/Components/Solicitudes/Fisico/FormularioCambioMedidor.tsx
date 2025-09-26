@@ -3,40 +3,23 @@ import { useState } from "react";
 import data from "../../../data/Data.json";
 import { CambioMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/CambioMedidor";
 import { useCambioMedidor } from "../../../Hook/Solicitudes/Fisico/hookCambioMedidor";
-import { parsePhoneNumberFromString } from 'libphonenumber-js';
+import { parsePhoneNumberFromString, type CountryCode } from 'libphonenumber-js';
 
-type AxiosError = {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-  message: string;
-};
-
-type SolicitudTipo = "cambioMedidor";
+type SolicitudTipo = 'cambioMedidor';
 
 type Props = {
   tipo: SolicitudTipo;
   onClose: () => void;
 };
 
-const validatePhoneNumber = (phone: string): string | null => {
+const normalizePhoneNumber = (phone: string): string => {
   const phoneNumber = parsePhoneNumberFromString(phone);
 
   if (!phoneNumber || !phoneNumber.isValid()) {
-    return `Número de teléfono inválido. Asegúrate de que esté en formato E.164.`;
+    throw new Error('Número de teléfono inválido. Asegúrate de incluir el código de país, ej. +5215512345678');
   }
 
-  return null; // Número válido
-};
-
-// Función para normalizar números de teléfono internacionales
-const normalizePhoneNumber = (phone: string): string => {
-  if (!phone.startsWith('+')) {
-    throw new Error('El número debe incluir el código de país y comenzar con "+". Ejemplo: +5215512345678');
-  }
-  return phone; // Mantiene el símbolo "+" y el formato E.164
+  return phoneNumber.format('E.164'); // Devuelve el número en formato internacional
 };
 
 const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
@@ -45,27 +28,26 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
   const mutation = useCambioMedidor();
   const [mostrarFormulario] = useState(true);
 
-  // Validación en tiempo real usando el schema
   const validateField = (fieldName: string, value: any, allValues?: any) => {
     try {
       const dummy: any = {
         Nombre: "Test",
         Apellido1: "Test",
         Apellido2: "",
-        Tipo_Identificacion: "Cedula Nacional",
+        Tipo_Identificacion: "Cedula Nacional" as TipoIdentificacion,
         Identificacion: "123456789",
         Direccion_Exacta: "1234567890",
-        Numero_Telefono: "+50688887777", // Ejemplo en formato E.164
+        Numero_Telefono: "+50688887777",
         Correo: "test@test.com",
         Motivo_Solicitud: "Cambio por daño",
         Numero_Medidor_Anterior: 1234567,
       };
 
       if (fieldName === "Identificacion" && allValues?.Tipo_Identificacion) {
-        dummy.Tipo_Identificacion = allValues.Tipo_Identificacion;
+        dummy.Tipo_Identificacion = allValues.Tipo_Identificacion as TipoIdentificacion;
         dummy.Identificacion = value;
       } else if (fieldName === "Tipo_Identificacion" && allValues?.Identificacion) {
-        dummy.Tipo_Identificacion = value;
+        dummy.Tipo_Identificacion = value as TipoIdentificacion;
         dummy.Identificacion = allValues.Identificacion;
       } else {
         dummy[fieldName] = value;
@@ -88,10 +70,7 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
       } else {
         errorMessage = 'Error de validación';
       }
-      setFieldErrors(prev => ({
-        ...prev,
-        [fieldName]: errorMessage,
-      }));
+      setFieldErrors(prev => ({ ...prev, [fieldName]: errorMessage }));
     }
   };
 
@@ -101,7 +80,7 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
       Apellido1: 'Pérez',
       Apellido2: 'González (opcional)',
       Correo: 'ejemplo@gmail.com',
-      Numero_Telefono: '+50688887777', // Ejemplo en formato E.164
+      Numero_Telefono: '+50688887777',
       Direccion_Exacta: 'San José, del Banco Nacional 200m sur',
       Motivo_Solicitud: 'Cambio por daño',
       Numero_Medidor_Anterior: '1234567',
@@ -109,7 +88,7 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
     if (fieldName === 'Identificacion') {
       switch (tipoIdentificacion) {
         case "Cedula Nacional": return '123456789';
-        case "Dimex": return '123456789012';
+        case "DIMEX": return '123456789012';
         case "Pasaporte": return 'A1234567';
         default: return 'Seleccione tipo de identificación primero';
       }
@@ -119,23 +98,22 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
 
   const form = useForm({
     defaultValues: {
-      Nombre: "",
-      Apellido1: "",
-      Apellido2: "",
-      Tipo_Identificacion: "Cedula Nacional",
-      Identificacion: "",
-      Direccion_Exacta: "",
-      Numero_Telefono: "",
-      Correo: "",
-      Motivo_Solicitud: "",
+      Nombre: '',
+      Apellido1: '',
+      Apellido2: '',
+      Tipo_Identificacion: 'Cedula Nacional' as TipoIdentificacion,
+      Identificacion: '',
+      Direccion_Exacta: '',
+      Numero_Telefono: '',
+      Correo: '',
+      Motivo_Solicitud: '',
       Numero_Medidor_Anterior: 0,
     },
 
     onSubmit: async ({ value }) => {
       setFormErrors({});
       try {
-        const normalizedPhone = normalizePhoneNumber(value.Numero_Telefono);
-        value.Numero_Telefono = normalizedPhone;
+        value.Numero_Telefono = normalizePhoneNumber(value.Numero_Telefono);
 
         const validation = CambioMedidorSchema.safeParse(value);
         if (!validation.success) {
@@ -148,22 +126,13 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
           return;
         }
 
-        const formData = new FormData();
-        Object.entries(value).forEach(([key, val]) => {
-          if (val !== undefined && val !== null && val !== "") {
-            formData.append(key, val.toString());
-          }
-        });
-
-        await mutation.createCambioMedidor(formData);
+        await mutation.createCambioMedidor(value);
 
         form.reset();
         setFormErrors({ general: "¡Solicitud enviada con éxito!" });
         setFieldErrors({});
       } catch (error: any) {
-        setFormErrors({
-          general: error.message,
-        });
+        setFormErrors({ general: error.message });
       }
     },
   });
@@ -176,15 +145,11 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
   return (
     <div className="flex justify-center items-center min-h-screen text-gray-800 p-5 w-full">
       <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          form.handleSubmit();
-        }}
+        onSubmit={(e) => { e.preventDefault(); form.handleSubmit(); }}
         className="bg-white gap-2 shadow-lg pl-8 pr-8 pt-4 pb-4 rounded-lg w-full max-w-9xl overflow-y-auto"
       >
         <h2 className="text-center text-xl font-semibold mb-6">Formulario de cambio de medidor</h2>
 
-        {/* Campos dinámicos */}
         {Object.entries(campos).map(([fieldName, fieldProps]) => {
           if (fieldName === "Tipo_Identificacion" || fieldName === "Identificacion") return null;
           return (
@@ -200,23 +165,15 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
                     value={(field.state.value as string | number) ?? ""}
                     onBlur={field.handleBlur}
                     onChange={(e) => {
-                      const value = fieldProps.type === "number" ? Number(e.target.value) : e.target.value;
-                      field.handleChange(value);
-                      validateField(fieldName, value, form.state.values);
+                      const val = fieldProps.type === "number" ? Number(e.target.value) : e.target.value;
+                      field.handleChange(val);
+                      validateField(fieldName, val, form.state.values);
                     }}
                     placeholder={getPlaceholder(fieldName)}
                     className={`${commonClasses} ${fieldErrors[fieldName] ? 'border-red-500 focus:ring-red-300' : ''}`}
                   />
-                  {fieldErrors[fieldName] && (
-                    <span className="text-red-500 text-sm block mt-1">
-                      {fieldErrors[fieldName]}
-                    </span>
-                  )}
-                  {formErrors[fieldName] && !fieldErrors[fieldName] && (
-                    <span className="text-red-500 text-sm block mt-1">
-                      {formErrors[fieldName]}
-                    </span>
-                  )}
+                  {fieldErrors[fieldName] && <span className="text-red-500 text-sm block mt-1">{fieldErrors[fieldName]}</span>}
+                  {formErrors[fieldName] && !fieldErrors[fieldName] && <span className="text-red-500 text-sm block mt-1">{formErrors[fieldName]}</span>}
                 </div>
               )}
             </form.Field>
@@ -228,20 +185,14 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
           <form.Field name="Tipo_Identificacion">
             {(field) => (
               <div>
-                <label className="block mb-1 font-medium">
-                  Tipo de Identificación <span className="text-red-500">*</span>
-                </label>
+                <label className="block mb-1 font-medium">Tipo de Identificación <span className="text-red-500">*</span></label>
                 <select
                   value={field.state.value}
                   onChange={(e) => {
-                    field.handleChange(e.target.value);
+                    field.handleChange(e.target.value as TipoIdentificacion);
                     validateField('Tipo_Identificacion', e.target.value, form.state.values);
                     form.setFieldValue('Identificacion', '');
-                    setFieldErrors(prev => {
-                      const newErrors = { ...prev };
-                      delete newErrors['Identificacion'];
-                      return newErrors;
-                    });
+                    setFieldErrors(prev => { const newErrors = { ...prev }; delete newErrors['Identificacion']; return newErrors; });
                   }}
                   className={`${commonClasses} ${fieldErrors['Tipo_Identificacion'] ? 'border-red-500 focus:ring-red-300' : ''}`}
                 >
@@ -250,16 +201,8 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
                     <option key={tipo} value={tipo}>{tipo}</option>
                   ))}
                 </select>
-                {fieldErrors['Tipo_Identificacion'] && (
-                  <span className="text-red-500 text-sm block mt-1">
-                    {fieldErrors['Tipo_Identificacion']}
-                  </span>
-                )}
-                {formErrors['Tipo_Identificacion'] && !fieldErrors['Tipo_Identificacion'] && (
-                  <span className="text-red-500 text-sm block mt-1">
-                    {formErrors['Tipo_Identificacion']}
-                  </span>
-                )}
+                {fieldErrors['Tipo_Identificacion'] && <span className="text-red-500 text-sm block mt-1">{fieldErrors['Tipo_Identificacion']}</span>}
+                {formErrors['Tipo_Identificacion'] && !fieldErrors['Tipo_Identificacion'] && <span className="text-red-500 text-sm block mt-1">{formErrors['Tipo_Identificacion']}</span>}
               </div>
             )}
           </form.Field>
@@ -270,30 +213,17 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
           <form.Field name="Identificacion">
             {(field) => (
               <div>
-                <label className="block mb-1 font-medium">
-                  Número de Identificación <span className="text-red-500">*</span>
-                </label>
+                <label className="block mb-1 font-medium">Número de Identificación <span className="text-red-500">*</span></label>
                 <input
                   type="text"
                   value={field.state.value}
-                  onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    validateField('Identificacion', e.target.value, form.state.values);
-                  }}
+                  onChange={(e) => { field.handleChange(e.target.value); validateField('Identificacion', e.target.value, form.state.values); }}
                   placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion as TipoIdentificacion)}
                   disabled={!form.state.values.Tipo_Identificacion}
                   className={`${commonClasses} ${fieldErrors['Identificacion'] ? 'border-red-500 focus:ring-red-300' : ''} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 />
-                {fieldErrors['Identificacion'] && (
-                  <span className="text-red-500 text-sm block mt-1">
-                    {fieldErrors['Identificacion']}
-                  </span>
-                )}
-                {formErrors['Identificacion'] && !fieldErrors['Identificacion'] && (
-                  <span className="text-red-500 text-sm block mt-1">
-                    {formErrors['Identificacion']}
-                  </span>
-                )}
+                {fieldErrors['Identificacion'] && <span className="text-red-500 text-sm block mt-1">{fieldErrors['Identificacion']}</span>}
+                {formErrors['Identificacion'] && !fieldErrors['Identificacion'] && <span className="text-red-500 text-sm block mt-1">{formErrors['Identificacion']}</span>}
               </div>
             )}
           </form.Field>
@@ -307,24 +237,12 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
         )}
 
         <div className="flex justify-end items-end gap-4">
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-[120px] bg-blue-900 text-white py-2 rounded hover:bg-blue-800 transition"
-          >
-            Cerrar
-          </button>
+          <button type="button" onClick={onClose} className="w-[120px] bg-blue-900 text-white py-2 rounded hover:bg-blue-800 transition">Cerrar</button>
           <div className="flex justify-end items-end mt-6">
             <button
               type="submit"
               disabled={form.state.isSubmitting}
-              className={`
-              w-[120px] py-2 rounded transition
-              ${form.state.isSubmitting
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-blue-900 hover:bg-blue-800'
-                } text-white
-            `}
+              className={`w-[120px] py-2 rounded transition ${form.state.isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
             >
               {form.state.isSubmitting ? 'Enviando...' : 'Enviar'}
             </button>
@@ -336,5 +254,3 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
 };
 
 export default FormularioCambioMedidor;
-//mas o menos 
-
