@@ -29,7 +29,7 @@ export const CambioMedidorSchema = z.object({
   Correo: z.string()
     .email({ message: "Debe ser un correo electrónico válido" }),
   Numero_Telefono: z.string()
-    .refine(validarTelefono, { message: "Debe ser un número de teléfono válido con código de país, ej. +5215512345678" }),
+    .refine(validarTelefono, { message: "Debe ser un número de teléfono válido con código de país, ej. +50688088690" }),
 
   //Numero_Telefono: z.string()
     //.regex(/^\+506\d{8}$/, { message: "Debe ser un número válido con formato +506XXXXXXXX" }),
