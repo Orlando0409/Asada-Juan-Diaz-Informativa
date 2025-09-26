@@ -1,73 +1,53 @@
-import { z } from 'zod';
+import parsePhoneNumberFromString from "libphonenumber-js";
+import { z } from "zod";
 
-// Enum para tipo de identificación
-export const TipoIdentificacionValues = [
-  'Cedula Nacional',
-  'Dimex',
-  'Pasaporte',
-] as const;
+// Valores permitidos para el tipo de identificación
+export const TipoIdentificacionValues = ["Cedula Nacional", "DIMEX", "Pasaporte"] as const;
 export type TipoIdentificacion = typeof TipoIdentificacionValues[number];
-
-const IDENTITY_PATTERNS: Record<TipoIdentificacion, RegExp> = {
-  'Cedula Nacional': /^\d{9}$/,
-  'Dimex': /^\d{11,12}$/,
-  'Pasaporte': /^[A-Za-z0-9]{6,9}$/,
+const validarTelefono = (phone: string) => {
+  const phoneNumber = parsePhoneNumberFromString(phone);
+  if (!phoneNumber || !phoneNumber.isValid()) {
+    return false;
+  }
+  return true;
 };
-
-const IDENTITY_ERROR_MESSAGES: Record<TipoIdentificacion, string> = {
-  'Cedula Nacional': 'La cédula debe tener exactamente 9 dígitos',
-  'Dimex': 'El DIMEX debe tener 11 o 12 dígitos',
-  'Pasaporte': 'El pasaporte debe tener 6-9 caracteres alfanuméricos',
-};
-
+// Schema de validación para el formulario de cambio de medidor
 export const CambioMedidorSchema = z.object({
   Nombre: z.string()
-    .min(1, 'El nombre es obligatorio')
-    .refine(val => val.trim().length > 0, 'El nombre no puede estar vacío'),
+    .min(2, { message: "El nombre debe tener al menos 2 caracteres" }),
 
   Apellido1: z.string()
-    .min(1, 'El primer apellido es obligatorio')
-    .refine(val => val.trim().length > 0, 'El primer apellido no puede estar vacío'),
+    .min(2, { message: "El primer apellido debe tener al menos 2 caracteres" }),
 
-  Apellido2: z.string().optional(),
+  Apellido2: z.string()
+    .optional()
+    .or(z.string().min(2, { message: "El segundo apellido debe tener al menos 2 caracteres" })),
 
-  Tipo_Identificacion: z.enum(TipoIdentificacionValues, {
-    errorMap: () => ({ message: 'Debe seleccionar un tipo de identificación válido' }),
+  Direccion_Exacta: z.string()
+    .min(5, { message: "La dirección debe tener al menos 5 caracteres" }),
+
+  Correo: z.string()
+    .email({ message: "Debe ser un correo electrónico válido" }),
+  Numero_Telefono: z.string()
+    .refine(validarTelefono, { message: "Debe ser un número de teléfono válido con código de país, ej. +50688088690" }),
+
+  //Numero_Telefono: z.string()
+    //.regex(/^\+506\d{8}$/, { message: "Debe ser un número válido con formato +506XXXXXXXX" }),
+
+  Tipo_Identificacion: z.enum(TipoIdentificacionValues, { 
+    required_error: "Debe seleccionar un tipo de identificación" 
   }),
 
   Identificacion: z.string()
-    .min(1, 'El número de identificación es obligatorio'),
-
-  Direccion_Exacta: z.string()
-    .min(10, 'La dirección debe tener al menos 10 caracteres')
-    .max(50, 'La dirección no puede tener más de 50 caracteres'),
-
-  Numero_Telefono: z.string()
-    .min(1, 'El número de teléfono es obligatorio')
-    .regex(/^\d{8}$/, 'El teléfono debe tener exactamente 8 dígitos'),
+    .min(9, { message: "El número de identificación debe tener al menos 9 caracteres" }),
 
   Motivo_Solicitud: z.string()
-    .min(10, 'El motivo debe de tener al menos 10 caracteres'),
+    .min(3, { message: "Debe ingresar un motivo válido" }),
 
-  Correo: z.string()
-    .min(1, 'El correo electrónico es obligatorio')
-    .max(50, 'El correo no puede tener más de 50 caracteres')
-    .email('El correo electrónico no es válido'),
+    Numero_Medidor_Anterior: z.coerce.number({
+    invalid_type_error: "El número de medidor debe ser un número válido",
+  })
+    .min(1, { message: "Debe ingresar un número de medidor válido" })
+    .max(9999999, { message: "El número de medidor no puede ser mayor a 9,999,999" }),
+});
 
-  Numero_Medidor_Anterior: z.coerce.number()
-    .min(1, 'El número de medidor anterior es obligatorio')
-    .max(9999999, 'El número de medidor anterior no puede exceder 9999999'),
-})
-.refine(
-  (data) => {
-    const { Tipo_Identificacion, Identificacion } = data;
-    const pattern = IDENTITY_PATTERNS[Tipo_Identificacion];
-    return pattern ? pattern.test(Identificacion) : false;
-  },
-  {
-    message: 'El número de identificación no es válido para el tipo seleccionado',
-    path: ["Identificacion"],
-  }
-);
-
-export type CambioMedidor = z.infer<typeof CambioMedidorSchema>;

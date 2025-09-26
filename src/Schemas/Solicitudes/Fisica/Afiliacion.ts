@@ -14,13 +14,14 @@ const IDENTITY_PATTERNS: Record<TipoIdentificacion, RegExp> = {
   'Pasaporte': /^[A-Za-z0-9]{6,9}$/,
 } as const;
 
-
 const IDENTITY_ERROR_MESSAGES: Record<TipoIdentificacion, string> = {
   'Cedula Nacional': 'La cédula debe tener exactamente 9 dígitos',
   'Dimex': 'El DIMEX debe tener 11 o 12 dígitos',
   'Pasaporte': 'El pasaporte debe tener 6-9 caracteres alfanuméricos',
 } as const;
 
+// Regex para validar el formato E.164
+const E164_REGEX = /^\+?[1-9]\d{1,14}$/;
 
 export const AfiliacionSchema = z.object({
   Nombre: z.string()
@@ -32,10 +33,10 @@ export const AfiliacionSchema = z.object({
     .refine(val => val.trim().length > 0, 'El primer apellido no puede estar vacío'),
 
   Apellido2: z.string().optional(),
+
   Tipo_Identificacion: z.enum(TipoIdentificacionValues, {
     errorMap: () => ({ message: 'Debe seleccionar un tipo de identificación válido' }),
   }),
-  
 
   Identificacion: z.string()
     .min(1, 'El número de identificación es obligatorio'),
@@ -43,14 +44,15 @@ export const AfiliacionSchema = z.object({
   Edad: z.coerce.number()
     .min(18, 'Solo se permite personas mayores de edad (mínimo 18 años)')
     .max(120, 'La edad no puede ser mayor a 120 años'),
-  
+
   Direccion_Exacta: z.string()
     .min(10, 'La dirección debe tener al menos 10 caracteres')
     .max(50, 'La dirección no puede tener más de 50 caracteres'),
-           
-  Numero_Telefono: z.string()
-    .min(1, 'El número de teléfono es obligatorio')
-    .regex(/^\d{8}$/, 'El teléfono debe tener exactamente 8 dígitos'),
+
+
+Numero_Telefono: z.string()
+  .min(1, 'El número de teléfono es obligatorio')
+  .regex(E164_REGEX, 'El número de teléfono debe estar en formato E.164 (ejemplo: +50688887777)'),
   
   Correo: z.string()
     .min(1, 'El correo electrónico es obligatorio')

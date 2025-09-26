@@ -3,6 +3,7 @@ import { useState } from "react";
 import data from "../../../data/Data.json";
 import { AfiliacionSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/Afiliacion";
 import { useAfiliaciones } from "../../../Hook/Solicitudes/Fisico/hookAfiliacion";
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 type AxiosError = {
   response?: {
@@ -18,6 +19,24 @@ type SolicitudTipo = 'abonado';
 type Props = {
   tipo: SolicitudTipo;
   onClose: () => void;
+};
+import type { CountryCode } from 'libphonenumber-js';
+
+const validatePhoneNumber = (phone: string, countryCode: CountryCode): string | null => {
+  const phoneNumber = parsePhoneNumberFromString(phone, countryCode);
+
+  if (!phoneNumber || !phoneNumber.isValid()) {
+    return `Número de teléfono inválido para el país ${countryCode}. Asegúrate de que esté en formato E.164.`;
+  }
+
+  return null; // Número válido
+};
+// Función para normalizar números de teléfono internacionales
+const normalizePhoneNumber = (phone: string): string => {
+  if (!phone.startsWith('+')) {
+    throw new Error('El número debe incluir el código de país y comenzar con "+". Ejemplo: +5215512345678');
+  }
+  return phone; // Mantiene el símbolo "+" y el formato E.164
 };
 
 const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
@@ -38,7 +57,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
         Identificacion: "123456789",
         Edad: 18,
         Direccion_Exacta: "1234567890",
-        Numero_Telefono: "12345678",
+        Numero_Telefono: "+50688887777", // Ejemplo en formato E.164
         Correo: "test@test.com",
         Planos_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
         Escritura_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
@@ -84,7 +103,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
       Apellido1: 'Pérez',
       Apellido2: 'González (opcional)',
       Correo: 'ejemplo@gmail.com',
-      Numero_Telefono: '88887777',
+      Numero_Telefono: '+50688887777', // Ejemplo en formato E.164
       Direccion_Exacta: 'San José, del Banco Nacional 200m sur',
       Edad: '25',
     };
@@ -108,7 +127,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
       Identificacion: '',
       Correo: '',
       Direccion_Exacta: '',
-      Numero_Telefono: '',
+      Numero_Telefono: '', // Campo inicializado vacío
       Edad: 0,
       Planos_Terreno: undefined as File | undefined,
       Escritura_Terreno: undefined as File | undefined,
@@ -116,18 +135,24 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
 
     onSubmit: async ({ value }) => {
       setFormErrors({});
-      const validation = AfiliacionSchema.safeParse(value);
-      if (!validation.success) {
-        const validationErrors: Record<string, string> = {};
-        validation.error.errors.forEach((err) => {
-          const field = err.path[0] as string;
-          validationErrors[field] = err.message;
-        });
-        setFormErrors(validationErrors);
-        return;
-      }
-
       try {
+        // Normaliza el número de teléfono antes de enviarlo
+        const normalizedPhone = normalizePhoneNumber(value.Numero_Telefono);
+        value.Numero_Telefono = normalizedPhone;
+
+        console.log("Número enviado al backend:", value.Numero_Telefono); // Verifica el número enviado
+
+        const validation = AfiliacionSchema.safeParse(value);
+        if (!validation.success) {
+          const validationErrors: Record<string, string> = {};
+          validation.error.errors.forEach((err) => {
+            const field = err.path[0] as string;
+            validationErrors[field] = err.message;
+          });
+          setFormErrors(validationErrors);
+          return;
+        }
+
         const formData = new FormData();
         Object.entries(value).forEach(([key, val]) => {
           if (val !== undefined && val !== null && val !== "") {
@@ -145,24 +170,9 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
         setFormErrors({ general: "¡Solicitud enviada con éxito!" });
         setFieldErrors({});
         setArchivoSeleccionado({});
-      } catch (error: unknown) {
-        let errorMsg = '';
-        if (
-          typeof error === "object" &&
-          error !== null &&
-          "response" in error &&
-          "message" in error
-        ) {
-          errorMsg =
-            (error as AxiosError).response?.data?.message ||
-            (error as AxiosError).message;
-        } else if (error instanceof Error) {
-          errorMsg = error.message;
-        } else {
-          errorMsg = String(error);
-        }
+      } catch (error: any) {
         setFormErrors({
-          general: errorMsg,
+          Numero_Telefono: error.message,
         });
       }
     },
@@ -186,8 +196,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
 
         {/* Campos dinámicos */}
         {Object.entries(campos).map(([fieldName, fieldProps]) => {
-          // OMITIR "Cedula" y los archivos
-          if (fieldName === 'Cedula' || fieldName === "Tipo_Identificacion" || fieldName === "Identificacion" || fieldProps.type === 'file') return null;
+          if (fieldName === "Tipo_Identificacion" || fieldName === "Identificacion" || fieldProps.type === 'file') return null;
           return (
             <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
               {(field) => (
@@ -404,3 +413,4 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
 };
 
 export default FormularioAfiliacion;
+//funciona bien
