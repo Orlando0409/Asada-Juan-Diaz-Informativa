@@ -1,9 +1,10 @@
 import { z } from 'zod';
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 // Tipo para TipoIdentificacion
 export const TipoIdentificacionValues = [
   'Cedula Nacional',
-  'Dimex',
+  'DIMEX',
   'Pasaporte',
 ] as const;
 export type TipoIdentificacion = typeof TipoIdentificacionValues[number];
@@ -11,14 +12,14 @@ export type TipoIdentificacion = typeof TipoIdentificacionValues[number];
 // Patrones de validación para tipos de identificación
 const IDENTITY_PATTERNS: Record<TipoIdentificacion, RegExp> = {
   'Cedula Nacional': /^\d{9}$/,
-  'Dimex': /^\d{11,12}$/,
+  'DIMEX': /^\d{11,12}$/,
   'Pasaporte': /^[A-Za-z0-9]{6,9}$/,
 } as const;
 
 // Mensajes de error específicos por tipo de identificación
 const IDENTITY_ERROR_MESSAGES: Record<TipoIdentificacion, string> = {
   'Cedula Nacional': 'La cédula debe tener exactamente 9 dígitos',
-  'Dimex': 'El DIMEX debe tener 11 o 12 dígitos',
+  'DIMEX': 'El DIMEX debe tener 11 o 12 dígitos',
   'Pasaporte': 'El pasaporte debe tener 6-9 caracteres alfanuméricos',
 } as const;
 
@@ -41,8 +42,13 @@ export const AsociadoSchema = z.object({
     .min(1, 'El número de identificación es obligatorio'),
 
   Numero_Telefono: z.string()
-    .length(8, 'El número de teléfono debe tener exactamente 8 dígitos')
-    .regex(/^\d+$/, 'El teléfono solo debe contener números'),
+    .min(1, 'El número de teléfono es obligatorio')
+    .refine((phone) => {
+      const phoneNumber = parsePhoneNumberFromString(phone || "");
+      return !!phoneNumber && phoneNumber.isValid();
+    }, {
+      message: 'Debe ingresar un número de teléfono válido con código de país, ej. +50688887777'
+    }),
 
   Motivo_Solicitud: z.string()
     .min(10, 'El motivo debe de tener al menos 10 caracteres'),
