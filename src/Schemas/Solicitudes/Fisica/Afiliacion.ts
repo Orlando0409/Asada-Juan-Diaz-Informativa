@@ -25,11 +25,11 @@ const E164_REGEX = /^\+?[1-9]\d{1,14}$/;
 
 export const AfiliacionSchema = z.object({
   Nombre: z.string()
-    .min(1, 'El nombre es obligatorio')
+    .min(2, 'El nombre es obligatorio, debe tener al menos 2 caracteres')
     .refine(val => val.trim().length > 0, 'El nombre no puede estar vacío'),
 
   Apellido1: z.string()
-    .min(1, 'El primer apellido es obligatorio')
+    .min(2, 'El primer apellido es obligatorio debe tener al menos 2 caracteres')
     .refine(val => val.trim().length > 0, 'El primer apellido no puede estar vacío'),
 
   Apellido2: z.string().optional(),
