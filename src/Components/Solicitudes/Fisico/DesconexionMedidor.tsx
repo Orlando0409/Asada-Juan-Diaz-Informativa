@@ -315,7 +315,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                     </label>
                     <input
                       type="file"
-                      accept=".png,.jpg,.jpeg,.heic"
+                      accept=".pdf,.docx,.jpg,.jpeg,.png"
                       disabled={!!archivoActual}
                       onChange={(e) => {
                         const file = e.target.files?.[0] ?? null;
