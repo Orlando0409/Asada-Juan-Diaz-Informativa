@@ -9,6 +9,7 @@ const validarTelefono = (phone: string) => {
   if (!phoneNumber || !phoneNumber.isValid()) {
     return false;
   }
+  
   return true;
 };
 // Schema de validación para el formulario de cambio de medidor
@@ -28,9 +29,15 @@ export const CambioMedidorSchema = z.object({
 
   Correo: z.string()
     .email({ message: "Debe ser un correo electrónico válido" }),
-  Numero_Telefono: z.string()
-    .refine(validarTelefono, { message: "Debe ser un número de teléfono válido con código de país, ej. +50688088690" }),
-
+Numero_Telefono: z.string().refine(
+  (phone) => {
+    const phoneNumber = parsePhoneNumberFromString(phone);
+    return !!phoneNumber && phoneNumber.isValid();
+  },
+  {
+    message: "Debe ingresar un número de teléfono válido con código de país, ej. +50688088690"
+  }
+),
   //Numero_Telefono: z.string()
     //.regex(/^\+506\d{8}$/, { message: "Debe ser un número válido con formato +506XXXXXXXX" }),
 
@@ -42,7 +49,7 @@ export const CambioMedidorSchema = z.object({
     .min(9, { message: "El número de identificación debe tener al menos 9 caracteres" }),
 
   Motivo_Solicitud: z.string()
-    .min(3, { message: "Debe ingresar un motivo válido" }),
+    .min(10, { message: "Debe tener al menos 10 caracteres" }),
 
     Numero_Medidor_Anterior: z.coerce.number({
     invalid_type_error: "El número de medidor debe ser un número válido",
