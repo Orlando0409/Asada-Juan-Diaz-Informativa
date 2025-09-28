@@ -8,7 +8,8 @@ const Asociado = () => {
   const [mostrarFormularioJuridico, setMostrarFormularioJuridico] = useState(false);
 
   const requisitosFisico = data.requisitosSolicitudes.asociado ?? {};
-  const requisitosJuridico = data.requisitosSolicitudes.juridica?.asociado ?? {};
+  // CORREGIDO: Acceso correcto a los requisitos jurídicos
+  const requisitosJuridico = data.juridica?.asociado ?? {};
 
   return (
     <section className="min-h-screen w-full bg-white flex flex-col items-center py-10 px-4 sm:px-6 lg:px-8">
@@ -81,7 +82,7 @@ const Asociado = () => {
             onClick={() => setMostrarFormularioJuridico(false)}
           ></div>
           {/* Contenedor del formulario */}
-          <div className="rounded relative w-[90%] max-w-md max-h-[550px] overflow-y-scroll [scroll-whit:none] [-ms-overflow-style:none]"
+          <div className="rounded relative w-[90%] max-w-5xl max-h-[550px] overflow-y-scroll [scroll-whit:none] [-ms-overflow-style:none]"
             style={{ scrollbarWidth: "none" }}>
             <FormularioAsociadoJuridico tipo="juridico" onClose={() => setMostrarFormularioJuridico(false)} />
           </div>
