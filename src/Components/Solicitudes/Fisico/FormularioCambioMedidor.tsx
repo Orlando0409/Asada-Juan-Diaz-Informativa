@@ -1,9 +1,21 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
+import { z } from "zod";
 import data from "../../../data/Data.json";
 import { CambioMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/CambioMedidor";
 import { useCambioMedidor } from "../../../Hook/Solicitudes/Fisico/hookCambioMedidor";
-import { parsePhoneNumberFromString, type CountryCode } from 'libphonenumber-js';
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
+
+type AxiosError = {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+  message: string;
+};
 
 type SolicitudTipo = 'cambioMedidor';
 
@@ -14,13 +26,14 @@ type Props = {
 
 const normalizePhoneNumber = (phone: string): string => {
   const phoneNumber = parsePhoneNumberFromString(phone);
-
   if (!phoneNumber || !phoneNumber.isValid()) {
     throw new Error('Número de teléfono inválido. Asegúrate de incluir el código de país, ej. +5215512345678');
   }
-
-  return phoneNumber.format('E.164'); // Devuelve el número en formato internacional
+  return phoneNumber.format('E.164');
 };
+
+// Extrae los esquemas individuales de Zod
+const fieldSchemas: Record<string, z.ZodTypeAny> = CambioMedidorSchema.shape;
 
 const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -28,49 +41,27 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
   const mutation = useCambioMedidor();
   const [mostrarFormulario] = useState(true);
 
-  const validateField = (fieldName: string, value: any, allValues?: any) => {
-    try {
-      const dummy: any = {
-        Nombre: "Test",
-        Apellido1: "Test",
-        Apellido2: "",
-        Tipo_Identificacion: "Cedula Nacional" as TipoIdentificacion,
-        Identificacion: "123456789",
-        Direccion_Exacta: "1234567890",
-        Numero_Telefono: "+50688887777",
-        Correo: "test@test.com",
-        Motivo_Solicitud: "Cambio por daño",
-        Numero_Medidor_Anterior: 1234567,
-      };
-
-      if (fieldName === "Identificacion" && allValues?.Tipo_Identificacion) {
-        dummy.Tipo_Identificacion = allValues.Tipo_Identificacion as TipoIdentificacion;
-        dummy.Identificacion = value;
-      } else if (fieldName === "Tipo_Identificacion" && allValues?.Identificacion) {
-        dummy.Tipo_Identificacion = value as TipoIdentificacion;
-        dummy.Identificacion = allValues.Identificacion;
-      } else {
-        dummy[fieldName] = value;
+  // Validación en tiempo real SOLO del campo editado
+  const handleFieldChange = (fieldName: string, value: any) => {
+    if (fieldSchemas[fieldName]) {
+      try {
+        fieldSchemas[fieldName].parse(value);
+        setFieldErrors(prev => {
+          const newErrors = { ...prev };
+          delete newErrors[fieldName];
+          return newErrors;
+        });
+      } catch (error: any) {
+        let errorMessage = '';
+        if (error.errors && Array.isArray(error.errors)) {
+          errorMessage = error.errors[0]?.message || 'Error de validación';
+        } else if (error.message) {
+          errorMessage = error.message;
+        } else {
+          errorMessage = 'Error de validación';
+        }
+        setFieldErrors(prev => ({ ...prev, [fieldName]: errorMessage }));
       }
-
-      CambioMedidorSchema.parse(dummy);
-
-      setFieldErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[fieldName];
-        return newErrors;
-      });
-    } catch (error: any) {
-      let errorMessage = '';
-      if (error.errors && Array.isArray(error.errors)) {
-        const fieldError = error.errors.find((err: any) => err.path.includes(fieldName));
-        errorMessage = fieldError?.message || error.errors[0]?.message || 'Error de validación';
-      } else if (error.message) {
-        errorMessage = error.message;
-      } else {
-        errorMessage = 'Error de validación';
-      }
-      setFieldErrors(prev => ({ ...prev, [fieldName]: errorMessage }));
     }
   };
 
@@ -109,12 +100,10 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
       Motivo_Solicitud: '',
       Numero_Medidor_Anterior: 0,
     },
-
     onSubmit: async ({ value }) => {
       setFormErrors({});
       try {
         value.Numero_Telefono = normalizePhoneNumber(value.Numero_Telefono);
-
         const validation = CambioMedidorSchema.safeParse(value);
         if (!validation.success) {
           const validationErrors: Record<string, string> = {};
@@ -125,14 +114,19 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
           setFormErrors(validationErrors);
           return;
         }
-
         await mutation.createCambioMedidor(value);
-
         form.reset();
         setFormErrors({ general: "¡Solicitud enviada con éxito!" });
         setFieldErrors({});
       } catch (error: any) {
-        setFormErrors({ general: error.message });
+        // Axios error handling
+        if (error?.response?.data?.message) {
+          setFormErrors({ general: error.response.data.message });
+        } else if (error?.message) {
+          setFormErrors({ general: error.message });
+        } else {
+          setFormErrors({ general: "Error al enviar la solicitud" });
+        }
       }
     },
   });
@@ -146,87 +140,228 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
     <div className="flex justify-center items-center min-h-screen text-gray-800 p-5 w-full">
       <form
         onSubmit={(e) => { e.preventDefault(); form.handleSubmit(); }}
-        className="bg-white gap-2 shadow-lg pl-8 pr-8 pt-4 pb-4 rounded-lg w-full max-w-9xl overflow-y-auto"
+        className="bg-white shadow-lg pl-24 pr-24 pt-8 pb-8 rounded-lg w-full max-w-7xl mx-auto"
       >
-        <h2 className="text-center text-xl font-semibold mb-6">Formulario de cambio de medidor</h2>
+        <h2 className="text-center text-2xl font-semibold mb-10">Formulario de cambio de medidor</h2>
 
-        {Object.entries(campos).map(([fieldName, fieldProps]) => {
-          if (fieldName === "Tipo_Identificacion" || fieldName === "Identificacion") return null;
-          return (
-            <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
-              {(field) => (
-                <div className="mb-3">
-                  <label className="block mb-1 font-medium">
-                    {fieldProps.label}
-                    {fieldProps.required && <span className="text-red-500">*</span>}
-                  </label>
-                  <input
-                    type={fieldProps.type === "email" ? "email" : fieldProps.type === "number" ? "number" : "text"}
-                    value={(field.state.value as string | number) ?? ""}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => {
-                      const val = fieldProps.type === "number" ? Number(e.target.value) : e.target.value;
-                      field.handleChange(val);
-                      validateField(fieldName, val, form.state.values);
-                    }}
-                    placeholder={getPlaceholder(fieldName)}
-                    className={`${commonClasses} ${fieldErrors[fieldName] ? 'border-red-500 focus:ring-red-300' : ''}`}
-                  />
-                  {fieldErrors[fieldName] && <span className="text-red-500 text-sm block mt-1">{fieldErrors[fieldName]}</span>}
-                  {formErrors[fieldName] && !fieldErrors[fieldName] && <span className="text-red-500 text-sm block mt-1">{formErrors[fieldName]}</span>}
-                </div>
-              )}
-            </form.Field>
-          );
-        })}
-
-        {/* Tipo de Identificación */}
-        <div className="mb-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+           {/* Tipo de Identificación y Número de Identificación */}
           <form.Field name="Tipo_Identificacion">
             {(field) => (
-              <div>
+              <div className="mb-3 w-full">
                 <label className="block mb-1 font-medium">Tipo de Identificación <span className="text-red-500">*</span></label>
                 <select
                   value={field.state.value}
                   onChange={(e) => {
                     field.handleChange(e.target.value as TipoIdentificacion);
-                    validateField('Tipo_Identificacion', e.target.value, form.state.values);
+                    handleFieldChange('Tipo_Identificacion', e.target.value as TipoIdentificacion);
                     form.setFieldValue('Identificacion', '');
                     setFieldErrors(prev => { const newErrors = { ...prev }; delete newErrors['Identificacion']; return newErrors; });
                   }}
-                  className={`${commonClasses} ${fieldErrors['Tipo_Identificacion'] ? 'border-red-500 focus:ring-red-300' : ''}`}
+                  className={commonClasses}
                 >
                   <option value="">Seleccione tipo de identificación</option>
                   {TipoIdentificacionValues.map((tipo) => (
                     <option key={tipo} value={tipo}>{tipo}</option>
                   ))}
                 </select>
-                {fieldErrors['Tipo_Identificacion'] && <span className="text-red-500 text-sm block mt-1">{fieldErrors['Tipo_Identificacion']}</span>}
-                {formErrors['Tipo_Identificacion'] && !fieldErrors['Tipo_Identificacion'] && <span className="text-red-500 text-sm block mt-1">{formErrors['Tipo_Identificacion']}</span>}
+                {fieldErrors["Tipo_Identificacion"] && (
+                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Tipo_Identificacion"]}</span>
+                )}
               </div>
             )}
           </form.Field>
-        </div>
-
-        {/* Número de Identificación */}
-        <div className="mb-3">
           <form.Field name="Identificacion">
             {(field) => (
-              <div>
+              <div className="mb-3 w-full">
                 <label className="block mb-1 font-medium">Número de Identificación <span className="text-red-500">*</span></label>
                 <input
                   type="text"
                   value={field.state.value}
-                  onChange={(e) => { field.handleChange(e.target.value); validateField('Identificacion', e.target.value, form.state.values); }}
-                  placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion as TipoIdentificacion)}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                    handleFieldChange("Identificacion", e.target.value);
+                  }}
+                  placeholder={getPlaceholder("Identificacion", form.state.values.Tipo_Identificacion as TipoIdentificacion)}
                   disabled={!form.state.values.Tipo_Identificacion}
-                  className={`${commonClasses} ${fieldErrors['Identificacion'] ? 'border-red-500 focus:ring-red-300' : ''} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                  className={`${commonClasses} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 />
-                {fieldErrors['Identificacion'] && <span className="text-red-500 text-sm block mt-1">{fieldErrors['Identificacion']}</span>}
-                {formErrors['Identificacion'] && !fieldErrors['Identificacion'] && <span className="text-red-500 text-sm block mt-1">{formErrors['Identificacion']}</span>}
+                {fieldErrors["Identificacion"] && (
+                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Identificacion"]}</span>
+                )}
               </div>
             )}
           </form.Field>
+          {/* Nombre y Primer Apellido */}
+          <form.Field name="Nombre">
+            {(field) => (
+              <div className="mb-3 w-full">
+                <label className="block mb-1 font-medium">Nombre <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  value={field.state.value}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                    handleFieldChange("Nombre", e.target.value);
+                  }}
+                  placeholder={getPlaceholder("Nombre")}
+                  className={commonClasses}
+                />
+                {fieldErrors["Nombre"] && (
+                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Nombre"]}</span>
+                )}
+              </div>
+            )}
+          </form.Field>
+          <form.Field name="Apellido1">
+            {(field) => (
+              <div className="mb-3 w-full">
+                <label className="block mb-1 font-medium">Primer Apellido <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  value={field.state.value}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                    handleFieldChange("Apellido1", e.target.value);
+                  }}
+                  placeholder={getPlaceholder("Apellido1")}
+                  className={commonClasses}
+                />
+                {fieldErrors["Apellido1"] && (
+                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido1"]}</span>
+                )}
+              </div>
+            )}
+          </form.Field>
+
+          {/* Segundo Apellido y Dirección Exacta */}
+          <form.Field name="Apellido2">
+            {(field) => (
+              <div className="mb-3 w-full">
+                <label className="block mb-1 font-medium">Segundo Apellido</label>
+                <input
+                  type="text"
+                  value={field.state.value}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                    handleFieldChange("Apellido2", e.target.value);
+                  }}
+                  placeholder={getPlaceholder("Apellido2")}
+                  className={commonClasses}
+                />
+                {fieldErrors["Apellido2"] && (
+                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido2"]}</span>
+                )}
+              </div>
+            )}
+          </form.Field>
+          <form.Field name="Direccion_Exacta">
+            {(field) => (
+              <div className="mb-3 w-full">
+                <label className="block mb-1 font-medium">Dirección exacta <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  value={field.state.value}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                    handleFieldChange("Direccion_Exacta", e.target.value);
+                  }}
+                  placeholder={getPlaceholder("Direccion_Exacta")}
+                  className={commonClasses}
+                />
+                {fieldErrors["Direccion_Exacta"] && (
+                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Direccion_Exacta"]}</span>
+                )}
+              </div>
+            )}
+          </form.Field>
+
+          {/* Correo y Teléfono */}
+          <form.Field name="Correo">
+            {(field) => (
+              <div className="mb-3 w-full">
+                <label className="block mb-1 font-medium">Correo electrónico <span className="text-red-500">*</span></label>
+                <input
+                  type="email"
+                  value={field.state.value}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                    handleFieldChange("Correo", e.target.value);
+                  }}
+                  placeholder={getPlaceholder("Correo")}
+                  className={commonClasses}
+                />
+                {fieldErrors["Correo"] && (
+                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Correo"]}</span>
+                )}
+              </div>
+            )}
+          </form.Field>
+          <form.Field name="Numero_Telefono">
+            {(field) => (
+              <div className="mb-3 w-full">
+                <label className="block mb-1 font-medium">Número de teléfono <span className="text-red-500">*</span></label>
+                <PhoneInput
+                  international
+                  defaultCountry="CR"
+                  value={field.state.value}
+                  onChange={(value) => {
+                    field.handleChange(value || "");
+                    handleFieldChange("Numero_Telefono", value || "");
+                  }}
+                  className={`${commonClasses} border-green-500 focus:ring-green-300 ${fieldErrors["Numero_Telefono"] ? 'border-red-500 focus:ring-red-300' : ''}`}
+                />
+                {fieldErrors["Numero_Telefono"] && (
+                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
+                )}
+              </div>
+            )}
+          </form.Field>
+
+          {/* Número de Medidor y Motivo */}
+          <form.Field name="Numero_Medidor_Anterior">
+            {(field) => (
+              <div className="mb-3 w-full">
+                <label className="block mb-1 font-medium">Número de Medidor <span className="text-red-500">*</span></label>
+                <input
+                  type="number"
+                  value={field.state.value}
+                  onChange={(e) => {
+                    field.handleChange(Number(e.target.value));
+                    handleFieldChange("Numero_Medidor_Anterior", Number(e.target.value));
+                  }}
+                  placeholder={getPlaceholder("Numero_Medidor_Anterior")}
+                  className={commonClasses}
+                />
+                {fieldErrors["Numero_Medidor_Anterior"] && (
+                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Medidor_Anterior"]}</span>
+                )}
+              </div>
+            )}
+          </form.Field>
+          <form.Field name="Motivo_Solicitud">
+            {(field) => (
+              <div className="mb-3 w-full">
+                <label className="block mb-1 font-medium">Motivo de solicitud <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  value={field.state.value}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                    handleFieldChange("Motivo_Solicitud", e.target.value);
+                  }}
+                  placeholder={getPlaceholder("Motivo_Solicitud")}
+                  className={commonClasses}
+                />
+                {fieldErrors["Motivo_Solicitud"] && (
+                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Solicitud"]}</span>
+                )}
+              </div>
+            )}
+          </form.Field>
+
+         
+
         </div>
 
         {/* Mensaje general */}
@@ -236,9 +371,9 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
           </div>
         )}
 
-        <div className="flex justify-end items-end gap-4">
+        <div className="flex justify-end items-end gap-4 mt-8">
           <button type="button" onClick={onClose} className="w-[120px] bg-blue-900 text-white py-2 rounded hover:bg-blue-800 transition">Cerrar</button>
-          <div className="flex justify-end items-end mt-6">
+          <div className="flex justify-end items-end">
             <button
               type="submit"
               disabled={form.state.isSubmitting}
