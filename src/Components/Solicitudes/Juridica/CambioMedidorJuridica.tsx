@@ -14,17 +14,8 @@ type Props = {
     onClose: () => void;
 };
 
-const normalizePhoneNumber = (phone: string): string => {
-    const phoneNumber = parsePhoneNumberFromString(phone);
-    if (!phoneNumber || !phoneNumber.isValid()) {
-        throw new Error('Número de teléfono inválido. Asegúrate de incluir el código de país, ej. +5215512345678');
-    }
-    return phoneNumber.format('E.164');
-};
 function formatCedulaJuridica(value: string) {
-    // Elimina todo lo que no sea número
     const digits = value.replace(/\D/g, "");
-    // Aplica el formato: 3-XXX-XXXXXX
     let formatted = "";
     if (digits.length > 0) formatted += digits[0];
     if (digits.length > 1) formatted += "-" + digits.slice(1, 4);
@@ -91,7 +82,15 @@ const CambioMedidorJuridica = ({ tipo, onClose }: Props) => {
         onSubmit: async ({ value }) => {
             setFormErrors({});
             try {
-                value.Numero_Telefono = normalizePhoneNumber(value.Numero_Telefono);
+                // Validar y normalizar el teléfono internacional
+                const phoneNumber = parsePhoneNumberFromString(value.Numero_Telefono || "");
+                if (!phoneNumber || !phoneNumber.isValid()) {
+                    setFormErrors({ Numero_Telefono: "Número de teléfono inválido" });
+                    return;
+                }
+                // Guarda el número en formato E.164 (+50688887777)
+                value.Numero_Telefono = phoneNumber.format("E.164");
+
                 const validation = CambioMedidorJuridicaSchema.safeParse(value);
                 if (!validation.success) {
                     const validationErrors: Record<string, string> = {};
@@ -125,6 +124,41 @@ const CambioMedidorJuridica = ({ tipo, onClose }: Props) => {
 
     const campos = data.juridica[tipo];
     const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
+
+    function validateField(
+        fieldName: string,
+        value: string,
+        values: {
+            Razon_Social: string;
+            Cedula_Juridica: string;
+            Correo: string;
+            Numero_Telefono: string;
+            Direccion_Exacta: string;
+            Motivo_Solicitud: string;
+            Numero_Medidor_Anterior: number;
+        }
+    ) {
+        if (fieldSchemas[fieldName]) {
+            try {
+                fieldSchemas[fieldName].parse(value);
+                setFieldErrors(prev => {
+                    const newErrors = { ...prev };
+                    delete newErrors[fieldName];
+                    return newErrors;
+                });
+            } catch (error: any) {
+                let errorMessage = '';
+                if (error.errors && Array.isArray(error.errors)) {
+                    errorMessage = error.errors[0]?.message || 'Error de validación';
+                } else if (error.message) {
+                    errorMessage = error.message;
+                } else {
+                    errorMessage = 'Error de validación';
+                }
+                setFieldErrors(prev => ({ ...prev, [fieldName]: errorMessage }));
+            }
+        }
+    }
 
     return (
         <div className="flex justify-center items-center min-h-screen text-gray-800 p-5 w-full">
@@ -261,15 +295,14 @@ const CambioMedidorJuridica = ({ tipo, onClose }: Props) => {
                         {(field) => (
                             <div className="mb-3 w-full">
                                 <label className="block mb-1 font-medium">Motivo de solicitud <span className="text-red-500">*</span></label>
-                                <input
-                                    type="text"
+                                <textarea
                                     value={field.state.value}
                                     onChange={(e) => {
                                         field.handleChange(e.target.value);
-                                        handleFieldChange("Motivo_Solicitud", e.target.value);
+                                        validateField("Motivo_Solicitud", e.target.value, form.state.values);
                                     }}
-                                    placeholder={getPlaceholder("Motivo_Solicitud")}
-                                    className={commonClasses}
+                                    placeholder="Escribe el motivo de tu solicitud"
+                                    className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
                                 />
                                 {fieldErrors["Motivo_Solicitud"] && (
                                     <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Solicitud"]}</span>
