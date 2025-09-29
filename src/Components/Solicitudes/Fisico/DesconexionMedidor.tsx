@@ -1,10 +1,12 @@
 import { useForm } from "@tanstack/react-form";
 import { useRef, useState } from "react";
 import data from "../../../data/Data.json";
-import { DesconexionMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/DesconexionMedidor";
-import { useDesconexion } from "../../../Hook/Solicitudes/Fisico/hookDesconexion";
+
+
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
+import { useDesconexion } from "../../../Hook/Solicitudes/Fisico/hookDesconexion";
+import { DesconexionMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/DesconexionMedidor";
 
 type AxiosError = {
   response?: {
@@ -34,11 +36,10 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const mutation = useDesconexion();
-   const planosInputRef = useRef<HTMLInputElement>(null);
-    const escrituraInputRef = useRef<HTMLInputElement>(null);
-  
- const [mostrarFormulario, setMostrarFormulario] = useState(true);
+  const planosInputRef = useRef<HTMLInputElement>(null);
+  const escrituraInputRef = useRef<HTMLInputElement>(null);
 
+  const [mostrarFormulario, setMostrarFormulario] = useState(true);
 
   // Validación en tiempo real usando el schema
   const validateField = (fieldName: string, value: any, allValues?: any) => {
@@ -164,6 +165,18 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
         setMostrarFormulario(false);
         if (onClose) onClose();
       } catch (error: any) {
+        // --- CAMBIO: Mostrar mensaje si no existe afiliado físico ---
+        const backendMessage = error?.response?.data?.message;
+        if (
+          backendMessage &&
+          backendMessage.includes("No existe un afiliado físico")
+        ) {
+          setFormErrors({
+            general: "No existe un afiliado físico con esa cédula. Debe ser afiliado antes de realizar esta solicitud.",
+          });
+          return;
+        }
+        // --- FIN CAMBIO ---
         setFormErrors({
           Numero_Telefono: error.message,
         });
@@ -215,7 +228,6 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                       <option key={tipo} value={tipo}>{tipo}</option>
                     ))}
                   </select>
-                 
                 </div>
               )}
             </form.Field>
@@ -453,7 +465,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                     className="hidden"
                     id="Planos_Terreno"
                     ref={planosInputRef}
-                    key={archivoActual ? archivoActual.name : 'planos'} // Forzar reinicio del input cuando se elimina el archivo
+                    key={archivoActual ? archivoActual.name : 'planos'}
                   />
                   <label
                     htmlFor="Planos_Terreno"
@@ -474,7 +486,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                             ["Planos_Terreno"]: `Debe subir el plano del terreno`,
                           }));
                           if (planosInputRef.current) {
-                              planosInputRef.current.value = '';
+                            planosInputRef.current.value = '';
                           }
                         }}
                         className="text-red-500 hover:underline text-xs"
@@ -517,7 +529,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                     className="hidden"
                     id="Escritura_Terreno"
                     ref={escrituraInputRef}
-                    key={archivoActual ? archivoActual.name : 'escritura'} // Forzar reinicio del input cuando se elimina el archivo
+                    key={archivoActual ? archivoActual.name : 'escritura'}
                   />
                   <label
                     htmlFor="Escritura_Terreno"
@@ -538,7 +550,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                             ["Escritura_Terreno"]: `Debe subir la escritura del terreno`,
                           }));
                           if (escrituraInputRef.current) {
-                              escrituraInputRef.current.value = '';
+                            escrituraInputRef.current.value = '';
                           }
                         }}
                         className="text-red-500 hover:underline text-xs"
@@ -564,15 +576,14 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
           </form.Field>
         </div>
 
-        {/* Mensaje general */}
+        {/* Mensaje de afiliado físico no encontrado */}
         {formErrors.general && (
-          <div className={`text-center mt-4 ${formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
+          <div className="text-center mt-4 text-red-500">
             {formErrors.general}
           </div>
         )}
 
         <div className="flex justify-end items-end gap-4 mt-8">
-         
           <div className="flex justify-end items-end">
             <button
               type="submit"
