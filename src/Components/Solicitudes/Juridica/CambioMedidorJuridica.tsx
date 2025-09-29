@@ -28,7 +28,7 @@ const CambioMedidorJuridica = ({ tipo, onClose }: Props) => {
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const mutation = useCambioMedidorJuridica();
-    const [mostrarFormulario] = useState(true);
+    const [mostrarFormulario, setMostrarFormulario] = useState(true);
 
     // Validación en tiempo real SOLO del campo editado
     const handleFieldChange = (fieldName: string, value: any) => {
@@ -96,6 +96,9 @@ const CambioMedidorJuridica = ({ tipo, onClose }: Props) => {
                 form.reset();
                 setFormErrors({ general: "¡Solicitud enviada con éxito!" });
                 setFieldErrors({});
+                alert("¡Solicitud enviada exitosamente!");
+        setMostrarFormulario(false);
+        if (onClose) onClose();
             } catch (error: any) {
                 if (error?.response?.data?.message) {
                     setFormErrors({ general: error.response.data.message });

@@ -28,7 +28,7 @@ const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
       const planosInputRef = useRef<HTMLInputElement>(null);
       const escrituraInputRef = useRef<HTMLInputElement>(null);
     
-    const [mostrarFormulario] = useState(true);
+     const [mostrarFormulario, setMostrarFormulario] = useState(true);
 
     // Validación en tiempo real usando el schema
     const validateField = (fieldName: string, value: any, allValues?: any) => {
@@ -113,6 +113,10 @@ const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
                 setFormErrors({ general: "¡Solicitud enviada con éxito!" });
                 setArchivoSeleccionado({});
                 setFieldErrors({});
+                  setArchivoSeleccionado({});
+        alert("¡Solicitud enviada exitosamente!");
+        setMostrarFormulario(false);
+        if (onClose) onClose();
             } catch (error) {
                 setFormErrors({
                     general: "Hubo un error al enviar el formulario. Intenta nuevamente."
@@ -391,13 +395,7 @@ const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
                 )}
 
                 <div className="flex justify-end items-end gap-4 mt-8">
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="w-[120px] bg-gray-600 text-white py-2 rounded hover:bg-gray-700 transition-colors"
-                    >
-                        Cerrar
-                    </button>
+                    
                     <button
                         type="submit"
                         disabled={form.state.isSubmitting}

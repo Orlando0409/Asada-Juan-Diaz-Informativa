@@ -39,7 +39,7 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const mutation = useCambioMedidor();
-  const [mostrarFormulario] = useState(true);
+  const [mostrarFormulario, setMostrarFormulario] = useState(true);
 
   // Validación en tiempo real SOLO del campo editado
   const handleFieldChange = (fieldName: string, value: any) => {
@@ -118,6 +118,10 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
         form.reset();
         setFormErrors({ general: "¡Solicitud enviada con éxito!" });
         setFieldErrors({});
+        
+        alert("¡Solicitud enviada exitosamente!");
+        setMostrarFormulario(false);
+        if (onClose) onClose();
       } catch (error: any) {
         // Axios error handling
         if (error?.response?.data?.message) {

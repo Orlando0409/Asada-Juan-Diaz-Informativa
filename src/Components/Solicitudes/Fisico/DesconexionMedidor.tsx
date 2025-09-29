@@ -37,7 +37,8 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
    const planosInputRef = useRef<HTMLInputElement>(null);
     const escrituraInputRef = useRef<HTMLInputElement>(null);
   
-  const [mostrarFormulario] = useState(true);
+ const [mostrarFormulario, setMostrarFormulario] = useState(true);
+
 
   // Validación en tiempo real usando el schema
   const validateField = (fieldName: string, value: any, allValues?: any) => {
@@ -159,6 +160,9 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
         setFormErrors({ general: "¡Solicitud enviada con éxito!" });
         setFieldErrors({});
         setArchivoSeleccionado({});
+        alert("¡Solicitud enviada exitosamente!");
+        setMostrarFormulario(false);
+        if (onClose) onClose();
       } catch (error: any) {
         setFormErrors({
           Numero_Telefono: error.message,
@@ -568,13 +572,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
         )}
 
         <div className="flex justify-end items-end gap-4 mt-8">
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-[120px] bg-blue-900 text-white py-2 rounded hover:bg-blue-800 transition"
-          >
-            Cerrar
-          </button>
+         
           <div className="flex justify-end items-end">
             <button
               type="submit"
