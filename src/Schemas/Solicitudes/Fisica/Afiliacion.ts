@@ -16,7 +16,7 @@ const IDENTITY_PATTERNS: Record<TipoIdentificacion, RegExp> = {
 
 const IDENTITY_ERROR_MESSAGES: Record<TipoIdentificacion, string> = {
   'Cedula Nacional': 'La cédula debe tener exactamente 9 dígitos',
-  'Dimex': 'El DIMEX debe tener 11 o 12 dígitos',
+  'Dimex': 'El Dimex debe tener 11 o 12 dígitos',
   'Pasaporte': 'El pasaporte debe tener 6-9 caracteres alfanuméricos',
 } as const;
 
@@ -37,10 +37,9 @@ export const AfiliacionSchema = z.object({
   Tipo_Identificacion: z.enum(TipoIdentificacionValues, {
     errorMap: () => ({ message: 'Debe seleccionar un tipo de identificación válido' }),
   }),
-
-  Identificacion: z.string()
-    .min(1, 'El número de identificación es obligatorio'),
-
+Identificacion: z.string()
+  .min(1, 'El número de identificación es obligatorio')
+  .transform(val => val.trim()),
   Edad: z.coerce.number()
     .min(18, 'Solo se permite personas mayores de edad (mínimo 18 años)')
     .max(120, 'La edad no puede ser mayor a 120 años'),

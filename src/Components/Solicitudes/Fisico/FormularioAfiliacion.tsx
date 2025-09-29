@@ -217,23 +217,14 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                         return newErrors;
                       });
                     }}
-                    className={`${commonClasses} ${fieldErrors['Tipo_Identificacion'] ? 'border-red-500 focus:ring-red-300' : ''}`}
+                    className={`${commonClasses} ${fieldErrors['Tipo_Identificacion'] ? 'border-blue-500 focus:ring-blue-300' : ''}`}
                   >
                     <option value="">Seleccione tipo de identificación</option>
                     {TipoIdentificacionValues.map((tipo) => (
                       <option key={tipo} value={tipo}>{tipo}</option>
                     ))}
                   </select>
-                  {fieldErrors['Tipo_Identificacion'] && (
-                    <span className="text-red-500 text-sm block mt-1">
-                      {fieldErrors['Tipo_Identificacion']}
-                    </span>
-                  )}
-                  {formErrors['Tipo_Identificacion'] && !fieldErrors['Tipo_Identificacion'] && (
-                    <span className="text-red-500 text-sm block mt-1">
-                      {formErrors['Tipo_Identificacion']}
-                    </span>
-                  )}
+                 
                 </div>
               )}
             </form.Field>
@@ -587,3 +578,4 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
 };
 
 export default FormularioAfiliacion;
+//funciona 

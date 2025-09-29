@@ -39,7 +39,6 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
   // Validación en tiempo real usando el schema
   const validateField = (fieldName: string, value: any, allValues?: any) => {
     try {
-      // Dummy para validar solo el campo editado
       const dummy: any = {
         Nombre: "Test",
         Apellido1: "Test",
@@ -47,7 +46,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
         Tipo_Identificacion: "Cedula Nacional",
         Identificacion: "123456789",
         Direccion_Exacta: "Dirección válida",
-        Numero_Telefono: "88887777",
+        Numero_Telefono: "+50688887777",
         Correo: "test@test.com",
         Motivo_Solicitud: "Motivo válido",
         Planos_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
@@ -202,23 +201,14 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                         return newErrors;
                       });
                     }}
-                    className={`${commonClasses} ${fieldErrors['Tipo_Identificacion'] ? 'border-red-500 focus:ring-red-300' : ''}`}
+                    className={`${commonClasses} ${fieldErrors['Tipo_Identificacion'] ? 'border-blue-500 focus:ring-blue-300' : ''}`}
                   >
                     <option value="">Seleccione tipo de identificación</option>
                     {TipoIdentificacionValues.map((tipo) => (
                       <option key={tipo} value={tipo}>{tipo}</option>
                     ))}
                   </select>
-                  {fieldErrors['Tipo_Identificacion'] && (
-                    <span className="text-red-500 text-sm block mt-1">
-                      {fieldErrors['Tipo_Identificacion']}
-                    </span>
-                  )}
-                  {formErrors['Tipo_Identificacion'] && !fieldErrors['Tipo_Identificacion'] && (
-                    <span className="text-red-500 text-sm block mt-1">
-                      {formErrors['Tipo_Identificacion']}
-                    </span>
-                  )}
+                 
                 </div>
               )}
             </form.Field>
@@ -243,6 +233,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                     disabled={!form.state.values.Tipo_Identificacion}
                     className={`${commonClasses} ${fieldErrors['Identificacion'] ? 'border-red-500 focus:ring-red-300' : ''} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                   />
+                  {/* Solo muestra errores de identificación aquí */}
                   {fieldErrors['Identificacion'] && (
                     <span className="text-red-500 text-sm block mt-1">
                       {fieldErrors['Identificacion']}
@@ -273,6 +264,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                   placeholder={getPlaceholder("Nombre")}
                   className={commonClasses}
                 />
+                {/* Solo muestra errores de nombre aquí */}
                 {fieldErrors["Nombre"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Nombre"]}</span>
                 )}
@@ -297,6 +289,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                   placeholder={getPlaceholder("Apellido1")}
                   className={commonClasses}
                 />
+                {/* Solo muestra errores de primer apellido aquí */}
                 {fieldErrors["Apellido1"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido1"]}</span>
                 )}
@@ -321,6 +314,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                   placeholder={getPlaceholder("Apellido2")}
                   className={commonClasses}
                 />
+                {/* Solo muestra errores de segundo apellido aquí */}
                 {fieldErrors["Apellido2"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido2"]}</span>
                 )}
@@ -345,6 +339,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                   placeholder={getPlaceholder("Direccion_Exacta")}
                   className={commonClasses}
                 />
+                {/* Solo muestra errores de dirección aquí */}
                 {fieldErrors["Direccion_Exacta"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Direccion_Exacta"]}</span>
                 )}
@@ -369,6 +364,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                   placeholder={getPlaceholder("Correo")}
                   className={commonClasses}
                 />
+                {/* Solo muestra errores de correo aquí */}
                 {fieldErrors["Correo"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Correo"]}</span>
                 )}
@@ -393,6 +389,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                   }}
                   className={`${commonClasses} ${fieldErrors["Numero_Telefono"] ? 'border-red-500 focus:ring-red-300' : ''}`}
                 />
+                {/* Solo muestra errores de teléfono aquí */}
                 {fieldErrors["Numero_Telefono"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
                 )}
@@ -416,6 +413,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                   placeholder={getPlaceholder("Motivo_Solicitud")}
                   className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
                 />
+                {/* Solo muestra errores de motivo aquí */}
                 {fieldErrors["Motivo_Solicitud"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Solicitud"]}</span>
                 )}
@@ -473,6 +471,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                       </button>
                     </div>
                   )}
+                  {/* Solo muestra errores de planos aquí */}
                   {fieldErrors["Planos_Terreno"] && (
                     <span className="text-red-500 text-sm block mt-1">
                       {fieldErrors["Planos_Terreno"]}
@@ -531,6 +530,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                       </button>
                     </div>
                   )}
+                  {/* Solo muestra errores de escritura aquí */}
                   {fieldErrors["Escritura_Terreno"] && (
                     <span className="text-red-500 text-sm block mt-1">
                       {fieldErrors["Escritura_Terreno"]}
