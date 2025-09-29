@@ -1,11 +1,9 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { AsociadoSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/Asociado";
-
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import data from "../../../data/Data.json";
-
 import { useAsociadoMedidor } from "../../../Hook/Solicitudes/Fisico/hookAsociado";
 
 type AxiosError = {
@@ -34,54 +32,25 @@ const normalizePhoneNumber = (phone: string): string => {
 const FormularioAsociado = ({ tipo, onClose }: Props) => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const mutation = useAsociadoMedidor();
-  const [mostrarFormulario] = useState(true);
+  const [mostrarFormulario, setMostrarFormulario] = useState(true);
 
-  // Validación en tiempo real usando el schema
-  const validateField = (fieldName: string, value: any, allValues?: any) => {
+  // Validación en tiempo real de todo el formulario
+  const validateAllFields = (values: any) => {
     try {
-      const dummy: any = {
-        Nombre: "Test",
-        Apellido1: "Test",
-        Apellido2: "",
-        Tipo_Identificacion: "Cedula Nacional",
-        Identificacion: "123456789",
-        Correo: "test@test.com",
-        Numero_Telefono: "+50688887777",
-        Motivo_Solicitud: "Motivo válido",
-      };
-
-      if (fieldName === "Identificacion" && allValues?.Tipo_Identificacion) {
-        dummy.Tipo_Identificacion = allValues.Tipo_Identificacion;
-        dummy.Identificacion = value;
-      } else if (fieldName === "Tipo_Identificacion" && allValues?.Identificacion) {
-        dummy.Tipo_Identificacion = value;
-        dummy.Identificacion = allValues.Identificacion;
-      } else {
-        dummy[fieldName] = value;
-      }
-
-      AsociadoSchema.parse(dummy);
-
-      setFieldErrors((prev) => {
-        const newErrors = { ...prev };
-        delete newErrors[fieldName];
-        return newErrors;
-      });
+      AsociadoSchema.parse(values);
+      setFieldErrors({});
     } catch (error: any) {
-      let errorMessage = "";
+      const errors: Record<string, string> = {};
       if (error.errors && Array.isArray(error.errors)) {
-        const fieldError = error.errors.find((err: any) => err.path.includes(fieldName));
-        errorMessage = fieldError?.message || error.errors[0]?.message || "Error de validación";
-      } else if (error.message) {
-        errorMessage = error.message;
-      } else {
-        errorMessage = "Error de validación";
+        error.errors.forEach((err: any) => {
+          const field = err.path[0] as string;
+          errors[field] = err.message;
+        });
       }
-      setFieldErrors((prev) => ({
-        ...prev,
-        [fieldName]: errorMessage,
-      }));
+      setFieldErrors(errors);
     }
   };
 
@@ -123,6 +92,7 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
 
     onSubmit: async ({ value }) => {
       setFormErrors({});
+      setFieldErrors({});
       try {
         value.Numero_Telefono = normalizePhoneNumber(value.Numero_Telefono);
 
@@ -134,6 +104,15 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
             validationErrors[field] = err.message;
           });
           setFormErrors(validationErrors);
+          setFieldErrors(validationErrors);
+          setTouched(prev => {
+            // Marca todos los campos como tocados al enviar
+            const allTouched: Record<string, boolean> = { ...prev };
+            Object.keys(validationErrors).forEach(key => {
+              allTouched[key] = true;
+            });
+            return allTouched;
+          });
           return;
         }
 
@@ -143,8 +122,11 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
         });
 
         form.reset();
-        setFormErrors({ general: "¡Solicitud enviada con éxito!" });
-        setFieldErrors({});
+        setMostrarFormulario(false);
+        setShowSuccessAlert(true);
+        setTimeout(() => setShowSuccessAlert(false), 3000);
+        if (onClose) onClose();
+        alert("¡Formulario enviado con éxito!");
       } catch (error: unknown) {
         let errorMsg = '';
         if (
@@ -168,7 +150,35 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
     },
   });
 
-  if (!mostrarFormulario) return null;
+  // Validar todos los campos al intentar enviar
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    validateAllFields(form.state.values);
+    form.handleSubmit();
+  };
+
+  // Validar en tiempo real cada vez que cambia un campo y marcar como tocado
+  const handleFieldChange = (
+    fieldName: "Nombre" | "Apellido1" | "Apellido2" | "Identificacion" | "Correo" | "Numero_Telefono" | "Motivo_Solicitud" | "Tipo_Identificacion",
+    value: any
+  ) => {
+    setTouched(prev => ({ ...prev, [fieldName]: true }));
+    const newValues = { ...form.state.values, [fieldName]: value };
+    validateAllFields(newValues);
+    form.setFieldValue(fieldName, value);
+  };
+
+  if (!mostrarFormulario) {
+    return showSuccessAlert ? (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+        <div className="bg-white rounded-lg shadow-lg px-8 py-6 text-center">
+          <h3 className="text-green-600 text-xl font-semibold mb-2">¡Formulario enviado con éxito!</h3>
+          <p className="text-gray-700">Gracias por enviar tu solicitud.</p>
+        </div>
+      </div>
+    ) : null;
+  }
+
   const campos = data.requisitosSolicitudes[tipo];
   const commonClasses =
     "w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300";
@@ -176,10 +186,7 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
   return (
     <div className="flex justify-center items-center min-h-screen text-gray-800 p-5 w-full">
       <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          form.handleSubmit();
-        }}
+        onSubmit={handleSubmit}
         className="bg-white shadow-lg pl-24 pr-24 pt-8 pb-8 rounded-lg w-full max-w-7xl mx-auto"
       >
         <h2 className="text-center text-2xl font-semibold mb-10">Formulario para ser asociado</h2>
@@ -195,15 +202,10 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
                 <select
                   value={field.state.value}
                   onChange={(e) => {
-                    field.handleChange(e.target.value as TipoIdentificacion);
-                    validateField('Tipo_Identificacion', e.target.value as TipoIdentificacion, form.state.values);
+                    handleFieldChange('Tipo_Identificacion', e.target.value as TipoIdentificacion);
                     form.setFieldValue('Identificacion', '');
-                    setFieldErrors(prev => {
-                      const newErrors = { ...prev };
-                      delete newErrors['Identificacion'];
-                      return newErrors;
-                    });
                   }}
+                  onBlur={() => setTouched(prev => ({ ...prev, Tipo_Identificacion: true }))}
                   className={commonClasses}
                 >
                   <option value="">Seleccione tipo de identificación</option>
@@ -211,7 +213,7 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
                     <option key={tipo} value={tipo}>{tipo}</option>
                   ))}
                 </select>
-                {fieldErrors["Tipo_Identificacion"] && (
+                {touched["Tipo_Identificacion"] && fieldErrors["Tipo_Identificacion"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Tipo_Identificacion"]}</span>
                 )}
                 {formErrors["Tipo_Identificacion"] && !fieldErrors["Tipo_Identificacion"] && (
@@ -231,14 +233,14 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
                   type="text"
                   value={field.state.value}
                   onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    validateField('Identificacion', e.target.value, form.state.values);
+                    handleFieldChange('Identificacion', e.target.value);
                   }}
+                  onBlur={() => setTouched(prev => ({ ...prev, Identificacion: true }))}
                   placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion as TipoIdentificacion)}
                   disabled={!form.state.values.Tipo_Identificacion}
                   className={`${commonClasses} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 />
-                {fieldErrors["Identificacion"] && (
+                {touched["Identificacion"] && fieldErrors["Identificacion"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Identificacion"]}</span>
                 )}
                 {formErrors["Identificacion"] && !fieldErrors["Identificacion"] && (
@@ -256,13 +258,13 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
                   type="text"
                   value={field.state.value}
                   onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    validateField("Nombre", e.target.value, form.state.values);
+                    handleFieldChange("Nombre", e.target.value);
                   }}
+                  onBlur={() => setTouched(prev => ({ ...prev, Nombre: true }))}
                   placeholder={getPlaceholder("Nombre")}
                   className={commonClasses}
                 />
-                {fieldErrors["Nombre"] && (
+                {touched["Nombre"] && fieldErrors["Nombre"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Nombre"]}</span>
                 )}
                 {formErrors["Nombre"] && !fieldErrors["Nombre"] && (
@@ -280,13 +282,13 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
                   type="text"
                   value={field.state.value}
                   onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    validateField("Apellido1", e.target.value, form.state.values);
+                    handleFieldChange("Apellido1", e.target.value);
                   }}
+                  onBlur={() => setTouched(prev => ({ ...prev, Apellido1: true }))}
                   placeholder={getPlaceholder("Apellido1")}
                   className={commonClasses}
                 />
-                {fieldErrors["Apellido1"] && (
+                {touched["Apellido1"] && fieldErrors["Apellido1"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido1"]}</span>
                 )}
                 {formErrors["Apellido1"] && !fieldErrors["Apellido1"] && (
@@ -304,13 +306,13 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
                   type="text"
                   value={field.state.value}
                   onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    validateField("Apellido2", e.target.value, form.state.values);
+                    handleFieldChange("Apellido2", e.target.value);
                   }}
+                  onBlur={() => setTouched(prev => ({ ...prev, Apellido2: true }))}
                   placeholder={getPlaceholder("Apellido2")}
                   className={commonClasses}
                 />
-                {fieldErrors["Apellido2"] && (
+                {touched["Apellido2"] && fieldErrors["Apellido2"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido2"]}</span>
                 )}
                 {formErrors["Apellido2"] && !fieldErrors["Apellido2"] && (
@@ -328,13 +330,13 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
                   type="email"
                   value={field.state.value}
                   onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    validateField("Correo", e.target.value, form.state.values);
+                    handleFieldChange("Correo", e.target.value);
                   }}
+                  onBlur={() => setTouched(prev => ({ ...prev, Correo: true }))}
                   placeholder={getPlaceholder("Correo")}
                   className={commonClasses}
                 />
-                {fieldErrors["Correo"] && (
+                {touched["Correo"] && fieldErrors["Correo"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Correo"]}</span>
                 )}
                 {formErrors["Correo"] && !fieldErrors["Correo"] && (
@@ -353,12 +355,12 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
                   defaultCountry="CR"
                   value={field.state.value}
                   onChange={(value) => {
-                    field.handleChange(value || "");
-                    validateField("Numero_Telefono", value || "", form.state.values);
+                    handleFieldChange("Numero_Telefono", value || "");
                   }}
+                  onBlur={() => setTouched(prev => ({ ...prev, Numero_Telefono: true }))}
                   className={`${commonClasses} ${fieldErrors["Numero_Telefono"] ? 'border-red-500 focus:ring-red-300' : ''}`}
                 />
-                {fieldErrors["Numero_Telefono"] && (
+                {touched["Numero_Telefono"] && fieldErrors["Numero_Telefono"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
                 )}
                 {formErrors["Numero_Telefono"] && !fieldErrors["Numero_Telefono"] && (
@@ -375,13 +377,13 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
                 <textarea
                   value={field.state.value}
                   onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    validateField("Motivo_Solicitud", e.target.value, form.state.values);
+                    handleFieldChange("Motivo_Solicitud", e.target.value);
                   }}
+                  onBlur={() => setTouched(prev => ({ ...prev, Motivo_Solicitud: true }))}
                   placeholder={getPlaceholder("Motivo_Solicitud")}
                   className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
                 />
-                {fieldErrors["Motivo_Solicitud"] && (
+                {touched["Motivo_Solicitud"] && fieldErrors["Motivo_Solicitud"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Solicitud"]}</span>
                 )}
                 {formErrors["Motivo_Solicitud"] && !fieldErrors["Motivo_Solicitud"] && (
@@ -390,7 +392,6 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
               </div>
             )}
           </form.Field>
-
         </div>
 
         {/* Mensaje general */}
