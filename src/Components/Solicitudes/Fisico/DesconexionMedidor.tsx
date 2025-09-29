@@ -1,5 +1,5 @@
 import { useForm } from "@tanstack/react-form";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import data from "../../../data/Data.json";
 import { DesconexionMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/DesconexionMedidor";
 import { useDesconexion } from "../../../Hook/Solicitudes/Fisico/hookDesconexion";
@@ -34,6 +34,9 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const mutation = useDesconexion();
+   const planosInputRef = useRef<HTMLInputElement>(null);
+    const escrituraInputRef = useRef<HTMLInputElement>(null);
+  
   const [mostrarFormulario] = useState(true);
 
   // Validación en tiempo real usando el schema
@@ -445,6 +448,8 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                     }}
                     className="hidden"
                     id="Planos_Terreno"
+                    ref={planosInputRef}
+                    key={archivoActual ? archivoActual.name : 'planos'} // Forzar reinicio del input cuando se elimina el archivo
                   />
                   <label
                     htmlFor="Planos_Terreno"
@@ -464,6 +469,9 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                             ...prev,
                             ["Planos_Terreno"]: `Debe subir el plano del terreno`,
                           }));
+                          if (planosInputRef.current) {
+                              planosInputRef.current.value = '';
+                          }
                         }}
                         className="text-red-500 hover:underline text-xs"
                       >
@@ -504,6 +512,8 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                     }}
                     className="hidden"
                     id="Escritura_Terreno"
+                    ref={escrituraInputRef}
+                    key={archivoActual ? archivoActual.name : 'escritura'} // Forzar reinicio del input cuando se elimina el archivo
                   />
                   <label
                     htmlFor="Escritura_Terreno"
@@ -523,6 +533,9 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                             ...prev,
                             ["Escritura_Terreno"]: `Debe subir la escritura del terreno`,
                           }));
+                          if (escrituraInputRef.current) {
+                              escrituraInputRef.current.value = '';
+                          }
                         }}
                         className="text-red-500 hover:underline text-xs"
                       >

@@ -1,5 +1,5 @@
 import { useForm } from "@tanstack/react-form";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import data from "../../../data/Data.json";
 
 import { useAfiliaciones } from "../../../Hook/Solicitudes/Fisico/hookAfiliacion";
@@ -34,6 +34,9 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const planosInputRef = useRef<HTMLInputElement>(null);
+  const escrituraInputRef = useRef<HTMLInputElement>(null);
+
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [mostrarFormulario, setMostrarFormulario] = useState(true);
   const mutation = useAfiliaciones();
@@ -123,6 +126,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
       Edad: 0,
       Planos_Terreno: undefined as File | undefined,
       Escritura_Terreno: undefined as File | undefined,
+      Motivo_Solicitud: '', // <-- Add this line
     },
 
     onSubmit: async ({ value }) => {
@@ -224,7 +228,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                       <option key={tipo} value={tipo}>{tipo}</option>
                     ))}
                   </select>
-                 
+
                 </div>
               )}
             </form.Field>
@@ -432,7 +436,37 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
               </div>
             )}
           </form.Field>
+
+
+
+
+          {/* Motivo de Solicitud */}
+          <form.Field name="Motivo_Solicitud">
+            {(field) => (
+              <div className="mb-3 w-full">
+                <label className="block mb-1 font-medium">Motivo de solicitud <span className="text-red-500">*</span></label>
+                <textarea
+                  value={field.state.value}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                    validateField("Motivo_Solicitud", e.target.value, form.state.values);
+                  }}
+                  placeholder="Escribe el motivo de tu solicitud"
+                  className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
+                />
+                {fieldErrors["Motivo_Solicitud"] && (
+                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Solicitud"]}</span>
+                )}
+                {formErrors["Motivo_Solicitud"] && !fieldErrors["Motivo_Solicitud"] && (
+                  <span className="text-red-500 text-sm block mt-1">{formErrors["Motivo_Solicitud"]}</span>
+                )}
+              </div>
+            )}
+          </form.Field>
+
         </div>
+
+
 
         {/* Archivos */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
@@ -454,6 +488,8 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                     }}
                     className="hidden"
                     id="Planos_Terreno"
+                    ref={planosInputRef}
+                    key={archivoActual ? archivoActual.name : 'planos'} // Forzar reinicio del input cuando se elimina el archivo
                   />
                   <label
                     htmlFor="Planos_Terreno"
@@ -473,6 +509,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                             ...prev,
                             ["Planos_Terreno"]: `Debe subir el plano del terreno`,
                           }));
+                          if (planosInputRef.current) planosInputRef.current.value = "";
                         }}
                         className="text-red-500 hover:underline text-xs"
                       >
@@ -512,6 +549,8 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                     }}
                     className="hidden"
                     id="Escritura_Terreno"
+                    ref={escrituraInputRef}
+                    key={archivoActual ? archivoActual.name : 'escritura'} // Forzar reinicio del input cuando se elimina el archivo
                   />
                   <label
                     htmlFor="Escritura_Terreno"
@@ -531,6 +570,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                             ...prev,
                             ["Escritura_Terreno"]: `Debe subir la escritura del terreno`,
                           }));
+                          if (escrituraInputRef.current) escrituraInputRef.current.value = "";
                         }}
                         className="text-red-500 hover:underline text-xs"
                       >

@@ -136,6 +136,44 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
   const campos = data.requisitosSolicitudes[tipo];
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
 
+  function validateField(
+    fieldName: string,
+    value: any,
+    values: { 
+      Nombre: string; 
+      Apellido1: string; 
+      Apellido2: string; 
+      Tipo_Identificacion: TipoIdentificacion; 
+      Identificacion: string; 
+      Direccion_Exacta: string; 
+      Numero_Telefono: string; 
+      Correo: string; 
+      Motivo_Solicitud: string; 
+      Numero_Medidor_Anterior: number; 
+    }
+  ) {
+    if (fieldSchemas[fieldName]) {
+      try {
+        fieldSchemas[fieldName].parse(value);
+        setFieldErrors(prev => {
+          const newErrors = { ...prev };
+          delete newErrors[fieldName];
+          return newErrors;
+        });
+      } catch (error: any) {
+        let errorMessage = '';
+        if (error.errors && Array.isArray(error.errors)) {
+          errorMessage = error.errors[0]?.message || 'Error de validación';
+        } else if (error.message) {
+          errorMessage = error.message;
+        } else {
+          errorMessage = 'Error de validación';
+        }
+        setFieldErrors(prev => ({ ...prev, [fieldName]: errorMessage }));
+      }
+    }
+  }
+
   return (
     <div className="flex justify-center items-center min-h-screen text-gray-800 p-5 w-full">
       <form
@@ -145,7 +183,7 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
         <h2 className="text-center text-2xl font-semibold mb-10">Formulario de cambio de medidor</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-           {/* Tipo de Identificación y Número de Identificación */}
+          {/* Tipo de Identificación y Número de Identificación */}
           <form.Field name="Tipo_Identificacion">
             {(field) => (
               <div className="mb-3 w-full">
@@ -339,50 +377,53 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
               </div>
             )}
           </form.Field>
+         
+
+          {/* Motivo de Solicitud */}
           <form.Field name="Motivo_Solicitud">
             {(field) => (
               <div className="mb-3 w-full">
                 <label className="block mb-1 font-medium">Motivo de solicitud <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
+                <textarea
                   value={field.state.value}
                   onChange={(e) => {
                     field.handleChange(e.target.value);
-                    handleFieldChange("Motivo_Solicitud", e.target.value);
+                    validateField("Motivo_Solicitud", e.target.value, form.state.values);
                   }}
-                  placeholder={getPlaceholder("Motivo_Solicitud")}
-                  className={commonClasses}
+                  placeholder="Escribe el motivo de tu solicitud"
+                  className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
                 />
                 {fieldErrors["Motivo_Solicitud"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Solicitud"]}</span>
+                )}
+                {formErrors["Motivo_Solicitud"] && !fieldErrors["Motivo_Solicitud"] && (
+                  <span className="text-red-500 text-sm block mt-1">{formErrors["Motivo_Solicitud"]}</span>
                 )}
               </div>
             )}
           </form.Field>
 
-         
-
         </div>
 
-        {/* Mensaje general */}
-        {formErrors.general && (
-          <div className={`text-center mt-4 ${formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
-            {formErrors.general}
-          </div>
-        )}
+          {/* Mensaje general */}
+          {formErrors.general && (
+            <div className={`text-center mt-4 ${formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
+              {formErrors.general}
+            </div>
+          )}
 
-        <div className="flex justify-end items-end gap-4 mt-8">
-          <button type="button" onClick={onClose} className="w-[120px] bg-blue-900 text-white py-2 rounded hover:bg-blue-800 transition">Cerrar</button>
-          <div className="flex justify-end items-end">
-            <button
-              type="submit"
-              disabled={form.state.isSubmitting}
-              className={`w-[120px] py-2 rounded transition ${form.state.isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
-            >
-              {form.state.isSubmitting ? 'Enviando...' : 'Enviar'}
-            </button>
+          <div className="flex justify-end items-end gap-4 mt-8">
+            <button type="button" onClick={onClose} className="w-[120px] bg-blue-900 text-white py-2 rounded hover:bg-blue-800 transition">Cerrar</button>
+            <div className="flex justify-end items-end">
+              <button
+                type="submit"
+                disabled={form.state.isSubmitting}
+                className={`w-[120px] py-2 rounded transition ${form.state.isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
+              >
+                {form.state.isSubmitting ? 'Enviando...' : 'Enviar'}
+              </button>
+            </div>
           </div>
-        </div>
       </form>
     </div>
   );

@@ -1,5 +1,5 @@
 import { useForm } from "@tanstack/react-form";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import data from "../../../data/Data.json";
 import { DesconexionJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/DesconexionMedidorJuridica";
 import { useDesconexionJuridica } from "../../../Hook/Solicitudes/Juridica/hookDesconexionJuridica";
@@ -27,6 +27,9 @@ const DesconexionMedidorJuridica = ({ tipo, onClose }: Props) => {
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const mutation = useDesconexionJuridica();
+     const planosInputRef = useRef<HTMLInputElement>(null);
+      const escrituraInputRef = useRef<HTMLInputElement>(null);
+    
     const [mostrarFormulario] = useState(true);
 
     // Validación en tiempo real usando el schema
@@ -206,6 +209,9 @@ const DesconexionMedidorJuridica = ({ tipo, onClose }: Props) => {
                                                 }}
                                                 className="hidden"
                                                 id={fieldName}
+                                                ref={fieldName === "Planos_Terreno" ? planosInputRef : escrituraInputRef}
+                            
+                                                key={archivoActual ? archivoActual.name : fieldName} // Forzar reinicio del input cuando se elimina el archivo
                                             />
                                             <label
                                                 htmlFor={fieldName}
@@ -225,6 +231,12 @@ const DesconexionMedidorJuridica = ({ tipo, onClose }: Props) => {
                                                                 ...prev,
                                                                 [fieldName]: `Debe subir el archivo`,
                                                             }));
+                                                            if (fieldName === "Planos_Terreno" && planosInputRef.current) {
+                                                                planosInputRef.current.value = '';
+                                                            }
+                                                            if (fieldName === "Escritura_Terreno" && escrituraInputRef.current) {
+                                                                escrituraInputRef.current.value = '';
+                                                            }
                                                         }}
                                                         className="text-red-500 hover:underline text-xs"
                                                     >
