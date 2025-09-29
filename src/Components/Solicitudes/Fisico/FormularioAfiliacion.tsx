@@ -1,10 +1,11 @@
 import { useForm } from "@tanstack/react-form";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import data from "../../../data/Data.json";
-import { AfiliacionSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/Afiliacion";
+
 import { useAfiliaciones } from "../../../Hook/Solicitudes/Fisico/hookAfiliacion";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
+import { AfiliacionSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/Afiliacion";
 
 type AxiosError = {
   response?: {
@@ -33,8 +34,12 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const planosInputRef = useRef<HTMLInputElement>(null);
+  const escrituraInputRef = useRef<HTMLInputElement>(null);
+
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [mostrarFormulario, setMostrarFormulario] = useState(true);
   const mutation = useAfiliaciones();
-  const [mostrarFormulario] = useState(true);
 
   // Validación en tiempo real usando el schema
   const validateField = (fieldName: string, value: any, allValues?: any) => {
@@ -121,6 +126,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
       Edad: 0,
       Planos_Terreno: undefined as File | undefined,
       Escritura_Terreno: undefined as File | undefined,
+      Motivo_Solicitud: '', // <-- Add this line
     },
 
     onSubmit: async ({ value }) => {
@@ -153,9 +159,14 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
         await mutation.createAfiliacion(formData);
 
         form.reset();
-        setFormErrors({ general: "¡Solicitud enviada con éxito!" });
+        setFormErrors({});
         setFieldErrors({});
         setArchivoSeleccionado({});
+        setMostrarFormulario(false);
+        setShowSuccessAlert(true);
+        setTimeout(() => setShowSuccessAlert(false), 3000);
+        alert("¡Solicitud enviada con éxito!");
+        if (onClose) onClose();
       } catch (error: any) {
         setFormErrors({
           Numero_Telefono: error.message,
@@ -164,7 +175,16 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
     },
   });
 
-  if (!mostrarFormulario) return null;
+  if (!mostrarFormulario) {
+    return showSuccessAlert ? (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+        <div className="bg-white rounded-lg shadow-lg px-8 py-6 text-center">
+          <h3 className="text-green-600 text-xl font-semibold mb-2">¡Solicitud enviada con éxito!</h3>
+          <p className="text-gray-700">Gracias por enviar tu solicitud.</p>
+        </div>
+      </div>
+    ) : null;
+  }
 
   const campos = data.requisitosSolicitudes[tipo];
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
@@ -201,24 +221,14 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                         return newErrors;
                       });
                     }}
-                    className={`${commonClasses} ${fieldErrors['Tipo_Identificacion'] ? 'border-red-500 focus:ring-red-300' : ''}`}
+                    className={`${commonClasses} ${fieldErrors['Tipo_Identificacion'] ? 'border-blue-500 focus:ring-blue-300' : ''}`}
                   >
                     <option value="">Seleccione tipo de identificación</option>
                     {TipoIdentificacionValues.map((tipo) => (
                       <option key={tipo} value={tipo}>{tipo}</option>
                     ))}
                   </select>
-                  {fieldErrors['Tipo_Identificacion'] && (
-                    <span className="text-red-500 text-sm block mt-1">
-                      {fieldErrors['Tipo_Identificacion']}
-                    </span>
-                  )}
-                  {/* Mostrar error de formErrors si existe y no hay error en fieldErrors */}
-                  {formErrors['Tipo_Identificacion'] && !fieldErrors['Tipo_Identificacion'] && (
-                    <span className="text-red-500 text-sm block mt-1">
-                      {formErrors['Tipo_Identificacion']}
-                    </span>
-                  )}
+
                 </div>
               )}
             </form.Field>
@@ -426,7 +436,37 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
               </div>
             )}
           </form.Field>
+
+
+
+
+          {/* Motivo de Solicitud */}
+          <form.Field name="Motivo_Solicitud">
+            {(field) => (
+              <div className="mb-3 w-full">
+                <label className="block mb-1 font-medium">Motivo de solicitud <span className="text-red-500">*</span></label>
+                <textarea
+                  value={field.state.value}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                    validateField("Motivo_Solicitud", e.target.value, form.state.values);
+                  }}
+                  placeholder="Escribe el motivo de tu solicitud"
+                  className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
+                />
+                {fieldErrors["Motivo_Solicitud"] && (
+                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Solicitud"]}</span>
+                )}
+                {formErrors["Motivo_Solicitud"] && !fieldErrors["Motivo_Solicitud"] && (
+                  <span className="text-red-500 text-sm block mt-1">{formErrors["Motivo_Solicitud"]}</span>
+                )}
+              </div>
+            )}
+          </form.Field>
+
         </div>
+
+
 
         {/* Archivos */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
@@ -448,6 +488,8 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                     }}
                     className="hidden"
                     id="Planos_Terreno"
+                    ref={planosInputRef}
+                    key={archivoActual ? archivoActual.name : 'planos'} // Forzar reinicio del input cuando se elimina el archivo
                   />
                   <label
                     htmlFor="Planos_Terreno"
@@ -467,6 +509,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                             ...prev,
                             ["Planos_Terreno"]: `Debe subir el plano del terreno`,
                           }));
+                          if (planosInputRef.current) planosInputRef.current.value = "";
                         }}
                         className="text-red-500 hover:underline text-xs"
                       >
@@ -506,6 +549,8 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                     }}
                     className="hidden"
                     id="Escritura_Terreno"
+                    ref={escrituraInputRef}
+                    key={archivoActual ? archivoActual.name : 'escritura'} // Forzar reinicio del input cuando se elimina el archivo
                   />
                   <label
                     htmlFor="Escritura_Terreno"
@@ -525,6 +570,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                             ...prev,
                             ["Escritura_Terreno"]: `Debe subir la escritura del terreno`,
                           }));
+                          if (escrituraInputRef.current) escrituraInputRef.current.value = "";
                         }}
                         className="text-red-500 hover:underline text-xs"
                       >
@@ -556,13 +602,6 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
         )}
 
         <div className="flex justify-end items-end gap-4 mt-8">
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-[120px] bg-blue-900 text-white py-2 rounded hover:bg-blue-800 transition"
-          >
-            Cerrar
-          </button>
           <div className="flex justify-end items-end">
             <button
               type="submit"
@@ -579,3 +618,4 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
 };
 
 export default FormularioAfiliacion;
+//funciona 

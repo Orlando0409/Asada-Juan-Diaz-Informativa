@@ -1,5 +1,5 @@
 import { useForm } from "@tanstack/react-form";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import data from "../../../data/Data.json";
 import { DesconexionMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/DesconexionMedidor";
 import { useDesconexion } from "../../../Hook/Solicitudes/Fisico/hookDesconexion";
@@ -34,12 +34,15 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const mutation = useDesconexion();
-  const [mostrarFormulario] = useState(true);
+   const planosInputRef = useRef<HTMLInputElement>(null);
+    const escrituraInputRef = useRef<HTMLInputElement>(null);
+  
+ const [mostrarFormulario, setMostrarFormulario] = useState(true);
+
 
   // Validación en tiempo real usando el schema
   const validateField = (fieldName: string, value: any, allValues?: any) => {
     try {
-      // Dummy para validar solo el campo editado
       const dummy: any = {
         Nombre: "Test",
         Apellido1: "Test",
@@ -47,7 +50,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
         Tipo_Identificacion: "Cedula Nacional",
         Identificacion: "123456789",
         Direccion_Exacta: "Dirección válida",
-        Numero_Telefono: "88887777",
+        Numero_Telefono: "+50688887777",
         Correo: "test@test.com",
         Motivo_Solicitud: "Motivo válido",
         Planos_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
@@ -157,6 +160,9 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
         setFormErrors({ general: "¡Solicitud enviada con éxito!" });
         setFieldErrors({});
         setArchivoSeleccionado({});
+        alert("¡Solicitud enviada exitosamente!");
+        setMostrarFormulario(false);
+        if (onClose) onClose();
       } catch (error: any) {
         setFormErrors({
           Numero_Telefono: error.message,
@@ -202,23 +208,14 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                         return newErrors;
                       });
                     }}
-                    className={`${commonClasses} ${fieldErrors['Tipo_Identificacion'] ? 'border-red-500 focus:ring-red-300' : ''}`}
+                    className={`${commonClasses} ${fieldErrors['Tipo_Identificacion'] ? 'border-blue-500 focus:ring-blue-300' : ''}`}
                   >
                     <option value="">Seleccione tipo de identificación</option>
                     {TipoIdentificacionValues.map((tipo) => (
                       <option key={tipo} value={tipo}>{tipo}</option>
                     ))}
                   </select>
-                  {fieldErrors['Tipo_Identificacion'] && (
-                    <span className="text-red-500 text-sm block mt-1">
-                      {fieldErrors['Tipo_Identificacion']}
-                    </span>
-                  )}
-                  {formErrors['Tipo_Identificacion'] && !fieldErrors['Tipo_Identificacion'] && (
-                    <span className="text-red-500 text-sm block mt-1">
-                      {formErrors['Tipo_Identificacion']}
-                    </span>
-                  )}
+                 
                 </div>
               )}
             </form.Field>
@@ -243,6 +240,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                     disabled={!form.state.values.Tipo_Identificacion}
                     className={`${commonClasses} ${fieldErrors['Identificacion'] ? 'border-red-500 focus:ring-red-300' : ''} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                   />
+                  {/* Solo muestra errores de identificación aquí */}
                   {fieldErrors['Identificacion'] && (
                     <span className="text-red-500 text-sm block mt-1">
                       {fieldErrors['Identificacion']}
@@ -273,6 +271,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                   placeholder={getPlaceholder("Nombre")}
                   className={commonClasses}
                 />
+                {/* Solo muestra errores de nombre aquí */}
                 {fieldErrors["Nombre"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Nombre"]}</span>
                 )}
@@ -297,6 +296,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                   placeholder={getPlaceholder("Apellido1")}
                   className={commonClasses}
                 />
+                {/* Solo muestra errores de primer apellido aquí */}
                 {fieldErrors["Apellido1"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido1"]}</span>
                 )}
@@ -321,6 +321,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                   placeholder={getPlaceholder("Apellido2")}
                   className={commonClasses}
                 />
+                {/* Solo muestra errores de segundo apellido aquí */}
                 {fieldErrors["Apellido2"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido2"]}</span>
                 )}
@@ -345,6 +346,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                   placeholder={getPlaceholder("Direccion_Exacta")}
                   className={commonClasses}
                 />
+                {/* Solo muestra errores de dirección aquí */}
                 {fieldErrors["Direccion_Exacta"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Direccion_Exacta"]}</span>
                 )}
@@ -369,6 +371,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                   placeholder={getPlaceholder("Correo")}
                   className={commonClasses}
                 />
+                {/* Solo muestra errores de correo aquí */}
                 {fieldErrors["Correo"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Correo"]}</span>
                 )}
@@ -393,6 +396,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                   }}
                   className={`${commonClasses} ${fieldErrors["Numero_Telefono"] ? 'border-red-500 focus:ring-red-300' : ''}`}
                 />
+                {/* Solo muestra errores de teléfono aquí */}
                 {fieldErrors["Numero_Telefono"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
                 )}
@@ -416,6 +420,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                   placeholder={getPlaceholder("Motivo_Solicitud")}
                   className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
                 />
+                {/* Solo muestra errores de motivo aquí */}
                 {fieldErrors["Motivo_Solicitud"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Solicitud"]}</span>
                 )}
@@ -447,6 +452,8 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                     }}
                     className="hidden"
                     id="Planos_Terreno"
+                    ref={planosInputRef}
+                    key={archivoActual ? archivoActual.name : 'planos'} // Forzar reinicio del input cuando se elimina el archivo
                   />
                   <label
                     htmlFor="Planos_Terreno"
@@ -466,6 +473,9 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                             ...prev,
                             ["Planos_Terreno"]: `Debe subir el plano del terreno`,
                           }));
+                          if (planosInputRef.current) {
+                              planosInputRef.current.value = '';
+                          }
                         }}
                         className="text-red-500 hover:underline text-xs"
                       >
@@ -473,6 +483,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                       </button>
                     </div>
                   )}
+                  {/* Solo muestra errores de planos aquí */}
                   {fieldErrors["Planos_Terreno"] && (
                     <span className="text-red-500 text-sm block mt-1">
                       {fieldErrors["Planos_Terreno"]}
@@ -505,6 +516,8 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                     }}
                     className="hidden"
                     id="Escritura_Terreno"
+                    ref={escrituraInputRef}
+                    key={archivoActual ? archivoActual.name : 'escritura'} // Forzar reinicio del input cuando se elimina el archivo
                   />
                   <label
                     htmlFor="Escritura_Terreno"
@@ -524,6 +537,9 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                             ...prev,
                             ["Escritura_Terreno"]: `Debe subir la escritura del terreno`,
                           }));
+                          if (escrituraInputRef.current) {
+                              escrituraInputRef.current.value = '';
+                          }
                         }}
                         className="text-red-500 hover:underline text-xs"
                       >
@@ -531,6 +547,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                       </button>
                     </div>
                   )}
+                  {/* Solo muestra errores de escritura aquí */}
                   {fieldErrors["Escritura_Terreno"] && (
                     <span className="text-red-500 text-sm block mt-1">
                       {fieldErrors["Escritura_Terreno"]}
@@ -555,13 +572,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
         )}
 
         <div className="flex justify-end items-end gap-4 mt-8">
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-[120px] bg-blue-900 text-white py-2 rounded hover:bg-blue-800 transition"
-          >
-            Cerrar
-          </button>
+         
           <div className="flex justify-end items-end">
             <button
               type="submit"

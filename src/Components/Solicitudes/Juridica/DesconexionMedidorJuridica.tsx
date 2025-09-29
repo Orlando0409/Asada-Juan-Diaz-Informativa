@@ -1,5 +1,5 @@
 import { useForm } from "@tanstack/react-form";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import data from "../../../data/Data.json";
 import { DesconexionJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/DesconexionMedidorJuridica";
 import { useDesconexionJuridica } from "../../../Hook/Solicitudes/Juridica/hookDesconexionJuridica";
@@ -27,7 +27,10 @@ const DesconexionMedidorJuridica = ({ tipo, onClose }: Props) => {
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const mutation = useDesconexionJuridica();
-    const [mostrarFormulario] = useState(true);
+     const planosInputRef = useRef<HTMLInputElement>(null);
+      const escrituraInputRef = useRef<HTMLInputElement>(null);
+
+    const [mostrarFormulario, setMostrarFormulario] = useState(true);
 
     // Validación en tiempo real usando el schema
     const validateField = (fieldName: string, value: any, allValues?: any) => {
@@ -112,6 +115,9 @@ const DesconexionMedidorJuridica = ({ tipo, onClose }: Props) => {
                 setFormErrors({ general: "¡Solicitud enviada con éxito!" });
                 setArchivoSeleccionado({});
                 setFieldErrors({});
+                alert("¡Solicitud enviada exitosamente!");
+        setMostrarFormulario(false);
+        if (onClose) onClose();
             } catch (error: any) {
                 let errorMessage = "Error al enviar solicitud";
                 if (error?.response?.data?.message) {
@@ -206,6 +212,9 @@ const DesconexionMedidorJuridica = ({ tipo, onClose }: Props) => {
                                                 }}
                                                 className="hidden"
                                                 id={fieldName}
+                                                ref={fieldName === "Planos_Terreno" ? planosInputRef : escrituraInputRef}
+                            
+                                                key={archivoActual ? archivoActual.name : fieldName} // Forzar reinicio del input cuando se elimina el archivo
                                             />
                                             <label
                                                 htmlFor={fieldName}
@@ -225,6 +234,12 @@ const DesconexionMedidorJuridica = ({ tipo, onClose }: Props) => {
                                                                 ...prev,
                                                                 [fieldName]: `Debe subir el archivo`,
                                                             }));
+                                                            if (fieldName === "Planos_Terreno" && planosInputRef.current) {
+                                                                planosInputRef.current.value = '';
+                                                            }
+                                                            if (fieldName === "Escritura_Terreno" && escrituraInputRef.current) {
+                                                                escrituraInputRef.current.value = '';
+                                                            }
                                                         }}
                                                         className="text-red-500 hover:underline text-xs"
                                                     >
@@ -308,13 +323,7 @@ const DesconexionMedidorJuridica = ({ tipo, onClose }: Props) => {
                 )}
 
                 <div className="flex justify-end items-end gap-4 mt-8">
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="w-[120px] bg-blue-900 text-white py-2 rounded hover:bg-blue-800 transition"
-                    >
-                        Cerrar
-                    </button>
+                   
                     <button
                         type="submit"
                         disabled={form.state.isSubmitting}

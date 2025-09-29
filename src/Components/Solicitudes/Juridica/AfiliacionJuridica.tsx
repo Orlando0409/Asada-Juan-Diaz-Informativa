@@ -1,5 +1,5 @@
 import { useForm } from "@tanstack/react-form";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import data from "../../../data/Data.json";
 import { AfiliacionJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/AfiliacionJuridica";
 import { useAfiliacionJuridica } from "../../../Hook/Solicitudes/Juridica/hookAfiliacionJuridica";
@@ -25,7 +25,10 @@ const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const mutation = useAfiliacionJuridica();
-    const [mostrarFormulario] = useState(true);
+      const planosInputRef = useRef<HTMLInputElement>(null);
+      const escrituraInputRef = useRef<HTMLInputElement>(null);
+    
+     const [mostrarFormulario, setMostrarFormulario] = useState(true);
 
     // Validación en tiempo real usando el schema
     const validateField = (fieldName: string, value: any, allValues?: any) => {
@@ -110,6 +113,10 @@ const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
                 setFormErrors({ general: "¡Solicitud enviada con éxito!" });
                 setArchivoSeleccionado({});
                 setFieldErrors({});
+                  setArchivoSeleccionado({});
+        alert("¡Solicitud enviada exitosamente!");
+        setMostrarFormulario(false);
+        if (onClose) onClose();
             } catch (error) {
                 setFormErrors({
                     general: "Hubo un error al enviar el formulario. Intenta nuevamente."
@@ -276,6 +283,8 @@ const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
                                         }}
                                         className="hidden"
                                         id="Planos_Terreno"
+                                        ref={planosInputRef}
+                                        key={archivoActual ? archivoActual.name : 'planos'}
                                     />
                                     <label
                                         htmlFor="Planos_Terreno"
@@ -295,6 +304,9 @@ const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
                                                         ...prev,
                                                         ["Planos_Terreno"]: `Debe subir el plano del terreno`,
                                                     }));
+                                                    if (planosInputRef.current) {
+                                                        planosInputRef.current.value = '';
+                                                    }
                                                 }}
                                                 className="text-red-500 hover:underline text-xs"
                                             >
@@ -330,6 +342,8 @@ const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
                                         }}
                                         className="hidden"
                                         id="Escritura_Terreno"
+                                        ref={escrituraInputRef}
+                                        key={archivoActual ? archivoActual.name : 'escritura'}
                                     />
                                     <label
                                         htmlFor="Escritura_Terreno"
@@ -349,6 +363,9 @@ const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
                                                         ...prev,
                                                         ["Escritura_Terreno"]: `Debe subir la escritura del terreno`,
                                                     }));
+                                                    if (escrituraInputRef.current) {
+                                                        escrituraInputRef.current.value = '';
+                                                    }
                                                 }}
                                                 className="text-red-500 hover:underline text-xs"
                                             >
@@ -378,13 +395,7 @@ const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
                 )}
 
                 <div className="flex justify-end items-end gap-4 mt-8">
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="w-[120px] bg-gray-600 text-white py-2 rounded hover:bg-gray-700 transition-colors"
-                    >
-                        Cerrar
-                    </button>
+                    
                     <button
                         type="submit"
                         disabled={form.state.isSubmitting}

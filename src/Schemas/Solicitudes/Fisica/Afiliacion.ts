@@ -37,10 +37,9 @@ export const AfiliacionSchema = z.object({
   Tipo_Identificacion: z.enum(TipoIdentificacionValues, {
     errorMap: () => ({ message: 'Debe seleccionar un tipo de identificación válido' }),
   }),
-
-  Identificacion: z.string()
-    .min(1, 'El número de identificación es obligatorio'),
-
+Identificacion: z.string()
+  .min(1, 'El número de identificación es obligatorio')
+  .transform(val => val.trim()),
   Edad: z.coerce.number()
     .min(18, 'Solo se permite personas mayores de edad (mínimo 18 años)')
     .max(120, 'La edad no puede ser mayor a 120 años'),

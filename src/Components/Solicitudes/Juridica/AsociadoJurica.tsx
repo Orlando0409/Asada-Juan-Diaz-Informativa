@@ -12,44 +12,34 @@ type Props = {
     onClose: () => void;
 };
 
+const normalizePhoneNumber = (phone: string): string => {
+    if (!phone || !phone.startsWith('+')) {
+        throw new Error('El número debe incluir el código de país y comenzar con "+". Ejemplo: +50688887777');
+    }
+    return phone;
+};
+
 const FormularioAsociadoJuridico = ({ tipo, onClose }: Props) => {
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    const [touched, setTouched] = useState<Record<string, boolean>>({});
+    const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+    const [mostrarFormulario, setMostrarFormulario] = useState(true);
 
-    // Validación en tiempo real usando el schema
-    const validateField = (fieldName: string, value: any, allValues?: any) => {
+    // Validación en tiempo real de todo el formulario
+    const validateAllFields = (values: any) => {
         try {
-            // Crea un objeto dummy con valores válidos para todos los campos
-            const dummy: any = {
-                Cedula_Juridica: "3-123-123456",
-                Razon_Social: "Empresa S.A.",
-                Correo: "empresa@email.com",
-                Numero_Telefono: "+50688887777",
-                Motivo_Solicitud: "Motivo válido",
-            };
-            dummy[fieldName] = value;
-
-            AsociadoJuridicaSchema.parse(dummy);
-
-            setFieldErrors(prev => {
-                const newErrors = { ...prev };
-                delete newErrors[fieldName];
-                return newErrors;
-            });
+            AsociadoJuridicaSchema.parse(values);
+            setFieldErrors({});
         } catch (error: any) {
-            let errorMessage = '';
+            const errors: Record<string, string> = {};
             if (error.errors && Array.isArray(error.errors)) {
-                const fieldError = error.errors.find((err: any) => err.path.includes(fieldName));
-                errorMessage = fieldError?.message || error.errors[0]?.message || 'Error de validación';
-            } else if (error.message) {
-                errorMessage = error.message;
-            } else {
-                errorMessage = 'Error de validación';
+                error.errors.forEach((err: any) => {
+                    const field = err.path[0] as string;
+                    errors[field] = err.message;
+                });
             }
-            setFieldErrors(prev => ({
-                ...prev,
-                [fieldName]: errorMessage,
-            }));
+            setFieldErrors(errors);
         }
     };
 
@@ -63,32 +53,75 @@ const FormularioAsociadoJuridico = ({ tipo, onClose }: Props) => {
         },
         onSubmit: async ({ value }) => {
             setFormErrors({});
-
-            const validation = AsociadoJuridicaSchema.safeParse(value);
-            if (!validation.success) {
-                const fieldErrors: Record<string, string> = {};
-                validation.error.errors.forEach((err) => {
-                    const field = err.path[0] as string;
-                    fieldErrors[field] = err.message;
-                });
-                setFormErrors(fieldErrors);
-                return;
-            }
-
+            setFieldErrors({});
             try {
+                value.Numero_Telefono = normalizePhoneNumber(value.Numero_Telefono);
+
+                const validation = AsociadoJuridicaSchema.safeParse(value);
+                if (!validation.success) {
+                    const validationErrors: Record<string, string> = {};
+                    validation.error.errors.forEach((err) => {
+                        const field = err.path[0] as string;
+                        validationErrors[field] = err.message;
+                    });
+                    setFormErrors(validationErrors);
+                    setFieldErrors(validationErrors);
+                    setTouched(prev => {
+                        // Marca todos los campos como tocados al enviar
+                        const allTouched: Record<string, boolean> = { ...prev };
+                        Object.keys(validationErrors).forEach(key => {
+                            allTouched[key] = true;
+                        });
+                        return allTouched;
+                    });
+                    return;
+                }
+
                 await createAsociadoJuridica(value);
                 form.reset();
-                setFormErrors({ general: "¡Solicitud enviada con éxito!" });
-                setFieldErrors({});
-            } catch (error) {
-                console.error("Error al enviar formulario:", error);
+                setMostrarFormulario(false);
+                setShowSuccessAlert(true);
+                setTimeout(() => setShowSuccessAlert(false), 3000);
+                if (onClose) onClose();
+                alert("¡Formulario enviado con éxito!");
+            } catch (error: any) {
                 setFormErrors({
                     general:
+                        error?.message ||
                         "Hubo un error al enviar el formulario. Por favor intenta nuevamente.",
                 });
             }
         },
     });
+
+    // Validar todos los campos al intentar enviar
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        validateAllFields(form.state.values);
+        form.handleSubmit();
+    };
+
+    // Validar en tiempo real cada vez que cambia un campo y marcar como tocado
+    const handleFieldChange = (
+        fieldName: "Cedula_Juridica" | "Razon_Social" | "Correo" | "Numero_Telefono" | "Motivo_Solicitud",
+        value: any
+    ) => {
+        setTouched(prev => ({ ...prev, [fieldName]: true }));
+        const newValues = { ...form.state.values, [fieldName]: value };
+        validateAllFields(newValues);
+        form.setFieldValue(fieldName, value);
+    };
+
+    if (!mostrarFormulario) {
+        return showSuccessAlert ? (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+                <div className="bg-white rounded-lg shadow-lg px-8 py-6 text-center">
+                    <h3 className="text-green-600 text-xl font-semibold mb-2">¡Formulario enviado con éxito!</h3>
+                    <p className="text-gray-700">Gracias por enviar tu solicitud.</p>
+                </div>
+            </div>
+        ) : null;
+    }
 
     const commonClasses =
         "w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300";
@@ -96,10 +129,7 @@ const FormularioAsociadoJuridico = ({ tipo, onClose }: Props) => {
     return (
         <div className="flex justify-center items-center min-h-screen p-5 w-full text-gray-800">
             <form
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    form.handleSubmit();
-                }}
+                onSubmit={handleSubmit}
                 className="bg-white shadow-lg pl-24 pr-24 pt-8 pb-8 rounded-lg w-full max-w-7xl mx-auto"
             >
                 <h2 className="text-center text-2xl font-semibold mb-10">
@@ -118,13 +148,13 @@ const FormularioAsociadoJuridico = ({ tipo, onClose }: Props) => {
                                     type="text"
                                     value={field.state.value}
                                     onChange={(e) => {
-                                        field.handleChange(e.target.value);
-                                        validateField("Cedula_Juridica", e.target.value, form.state.values);
+                                        handleFieldChange("Cedula_Juridica", e.target.value);
                                     }}
+                                    onBlur={() => setTouched(prev => ({ ...prev, Cedula_Juridica: true }))}
                                     placeholder="3-XXX-XXXXXX"
                                     className={commonClasses}
                                 />
-                                {fieldErrors["Cedula_Juridica"] && (
+                                {touched["Cedula_Juridica"] && fieldErrors["Cedula_Juridica"] && (
                                     <span className="text-red-500 text-sm block mt-1">{fieldErrors["Cedula_Juridica"]}</span>
                                 )}
                                 {formErrors["Cedula_Juridica"] && !fieldErrors["Cedula_Juridica"] && (
@@ -144,13 +174,13 @@ const FormularioAsociadoJuridico = ({ tipo, onClose }: Props) => {
                                     type="text"
                                     value={field.state.value}
                                     onChange={(e) => {
-                                        field.handleChange(e.target.value);
-                                        validateField("Razon_Social", e.target.value, form.state.values);
+                                        handleFieldChange("Razon_Social", e.target.value);
                                     }}
+                                    onBlur={() => setTouched(prev => ({ ...prev, Razon_Social: true }))}
                                     placeholder="Ejemplo S.A."
                                     className={commonClasses}
                                 />
-                                {fieldErrors["Razon_Social"] && (
+                                {touched["Razon_Social"] && fieldErrors["Razon_Social"] && (
                                     <span className="text-red-500 text-sm block mt-1">{fieldErrors["Razon_Social"]}</span>
                                 )}
                                 {formErrors["Razon_Social"] && !fieldErrors["Razon_Social"] && (
@@ -170,13 +200,13 @@ const FormularioAsociadoJuridico = ({ tipo, onClose }: Props) => {
                                     type="email"
                                     value={field.state.value}
                                     onChange={(e) => {
-                                        field.handleChange(e.target.value);
-                                        validateField("Correo", e.target.value, form.state.values);
+                                        handleFieldChange("Correo", e.target.value);
                                     }}
+                                    onBlur={() => setTouched(prev => ({ ...prev, Correo: true }))}
                                     placeholder="empresa@email.com"
                                     className={commonClasses}
                                 />
-                                {fieldErrors["Correo"] && (
+                                {touched["Correo"] && fieldErrors["Correo"] && (
                                     <span className="text-red-500 text-sm block mt-1">{fieldErrors["Correo"]}</span>
                                 )}
                                 {formErrors["Correo"] && !fieldErrors["Correo"] && (
@@ -197,12 +227,12 @@ const FormularioAsociadoJuridico = ({ tipo, onClose }: Props) => {
                                     defaultCountry="CR"
                                     value={field.state.value}
                                     onChange={(value) => {
-                                        field.handleChange(value || "");
-                                        validateField("Numero_Telefono", value || "", form.state.values);
+                                        handleFieldChange("Numero_Telefono", value || "");
                                     }}
+                                    onBlur={() => setTouched(prev => ({ ...prev, Numero_Telefono: true }))}
                                     className={`${commonClasses} ${fieldErrors["Numero_Telefono"] ? 'border-red-500 focus:ring-red-300' : ''}`}
                                 />
-                                {fieldErrors["Numero_Telefono"] && (
+                                {touched["Numero_Telefono"] && fieldErrors["Numero_Telefono"] && (
                                     <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
                                 )}
                                 {formErrors["Numero_Telefono"] && !fieldErrors["Numero_Telefono"] && (
@@ -221,13 +251,13 @@ const FormularioAsociadoJuridico = ({ tipo, onClose }: Props) => {
                                 <textarea
                                     value={field.state.value}
                                     onChange={(e) => {
-                                        field.handleChange(e.target.value);
-                                        validateField("Motivo_Solicitud", e.target.value, form.state.values);
+                                        handleFieldChange("Motivo_Solicitud", e.target.value);
                                     }}
+                                    onBlur={() => setTouched(prev => ({ ...prev, Motivo_Solicitud: true }))}
                                     placeholder="Escribe el motivo de tu solicitud"
                                     className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
                                 />
-                                {fieldErrors["Motivo_Solicitud"] && (
+                                {touched["Motivo_Solicitud"] && fieldErrors["Motivo_Solicitud"] && (
                                     <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Solicitud"]}</span>
                                 )}
                                 {formErrors["Motivo_Solicitud"] && !fieldErrors["Motivo_Solicitud"] && (
@@ -246,13 +276,7 @@ const FormularioAsociadoJuridico = ({ tipo, onClose }: Props) => {
                 )}
 
                 <div className="flex justify-end items-end gap-4 mt-8">
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="w-[120px] bg-blue-900 text-white py-2 rounded hover:bg-blue-800 transition"
-                    >
-                        Cerrar
-                    </button>
+                   
                     <div className="flex justify-end items-end">
                         <button
                             type="submit"
