@@ -18,6 +18,14 @@ const normalizePhoneNumber = (phone: string): string => {
     }
     return phone;
 };
+function formatCedulaJuridica(value: string) {
+    const digits = value.replace(/\D/g, "");
+    let formatted = "";
+    if (digits.length > 0) formatted += digits[0];
+    if (digits.length > 1) formatted += "-" + digits.slice(1, 4);
+    if (digits.length > 4) formatted += "-" + digits.slice(4, 10);
+    return formatted;
+}
 
 const FormularioAsociadoJuridico = ({ tipo, onClose }: Props) => {
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -148,7 +156,8 @@ const FormularioAsociadoJuridico = ({ tipo, onClose }: Props) => {
                                     type="text"
                                     value={field.state.value}
                                     onChange={(e) => {
-                                        handleFieldChange("Cedula_Juridica", e.target.value);
+                                        const formatted = formatCedulaJuridica(e.target.value);
+                                        handleFieldChange("Cedula_Juridica", formatted);
                                     }}
                                     onBlur={() => setTouched(prev => ({ ...prev, Cedula_Juridica: true }))}
                                     placeholder="3-XXX-XXXXXX"
@@ -276,7 +285,7 @@ const FormularioAsociadoJuridico = ({ tipo, onClose }: Props) => {
                 )}
 
                 <div className="flex justify-end items-end gap-4 mt-8">
-                   
+
                     <div className="flex justify-end items-end">
                         <button
                             type="submit"

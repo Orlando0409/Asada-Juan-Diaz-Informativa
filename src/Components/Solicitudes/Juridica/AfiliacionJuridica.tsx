@@ -19,16 +19,24 @@ const normalizePhoneNumber = (phone: string): string => {
     }
     return phone;
 };
+function formatCedulaJuridica(value: string) {
+    const digits = value.replace(/\D/g, "");
+    let formatted = "";
+    if (digits.length > 0) formatted += digits[0];
+    if (digits.length > 1) formatted += "-" + digits.slice(1, 4);
+    if (digits.length > 4) formatted += "-" + digits.slice(4, 10);
+    return formatted;
+}
 
 const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
     const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const mutation = useAfiliacionJuridica();
-      const planosInputRef = useRef<HTMLInputElement>(null);
-      const escrituraInputRef = useRef<HTMLInputElement>(null);
-    
-     const [mostrarFormulario, setMostrarFormulario] = useState(true);
+    const planosInputRef = useRef<HTMLInputElement>(null);
+    const escrituraInputRef = useRef<HTMLInputElement>(null);
+
+    const [mostrarFormulario, setMostrarFormulario] = useState(true);
 
     // Validación en tiempo real usando el schema
     const validateField = (fieldName: string, value: any, allValues?: any) => {
@@ -113,10 +121,10 @@ const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
                 setFormErrors({ general: "¡Solicitud enviada con éxito!" });
                 setArchivoSeleccionado({});
                 setFieldErrors({});
-                  setArchivoSeleccionado({});
-        alert("¡Solicitud enviada exitosamente!");
-        setMostrarFormulario(false);
-        if (onClose) onClose();
+                setArchivoSeleccionado({});
+                alert("¡Solicitud enviada exitosamente!");
+                setMostrarFormulario(false);
+                if (onClose) onClose();
             } catch (error) {
                 setFormErrors({
                     general: "Hubo un error al enviar el formulario. Intenta nuevamente."
@@ -169,16 +177,20 @@ const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
                     <form.Field name="Cedula_Juridica">
                         {(field) => (
                             <div className="mb-3">
-                                <label className="block mb-1 font-semibold text-gray-700">Cédula Jurídica <span className="text-red-500">*</span></label>
+                                <label className="block mb-1 font-semibold text-gray-700">
+                                    Cédula Jurídica <span className="text-red-500">*</span>
+                                </label>
                                 <input
                                     type="text"
                                     value={field.state.value}
                                     onChange={(e) => {
-                                        field.handleChange(e.target.value);
-                                        validateField("Cedula_Juridica", e.target.value, form.state.values);
+                                        const formatted = formatCedulaJuridica(e.target.value);
+                                        field.handleChange(formatted);
+                                        validateField("Cedula_Juridica", formatted, form.state.values);
                                     }}
                                     placeholder="3-XXX-XXXXXX"
                                     className={commonClasses}
+                                    maxLength={12}
                                 />
                                 {fieldErrors["Cedula_Juridica"] && (
                                     <span className="text-red-500 text-sm block mt-1">{fieldErrors["Cedula_Juridica"]}</span>
@@ -395,7 +407,7 @@ const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
                 )}
 
                 <div className="flex justify-end items-end gap-4 mt-8">
-                    
+
                     <button
                         type="submit"
                         disabled={form.state.isSubmitting}

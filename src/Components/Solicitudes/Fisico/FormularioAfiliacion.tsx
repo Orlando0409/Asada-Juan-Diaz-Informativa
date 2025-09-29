@@ -437,33 +437,6 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
             )}
           </form.Field>
 
-
-
-
-          {/* Motivo de Solicitud */}
-          <form.Field name="Motivo_Solicitud">
-            {(field) => (
-              <div className="mb-3 w-full">
-                <label className="block mb-1 font-medium">Motivo de solicitud <span className="text-red-500">*</span></label>
-                <textarea
-                  value={field.state.value}
-                  onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    validateField("Motivo_Solicitud", e.target.value, form.state.values);
-                  }}
-                  placeholder="Escribe el motivo de tu solicitud"
-                  className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
-                />
-                {fieldErrors["Motivo_Solicitud"] && (
-                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Solicitud"]}</span>
-                )}
-                {formErrors["Motivo_Solicitud"] && !fieldErrors["Motivo_Solicitud"] && (
-                  <span className="text-red-500 text-sm block mt-1">{formErrors["Motivo_Solicitud"]}</span>
-                )}
-              </div>
-            )}
-          </form.Field>
-
         </div>
 
 

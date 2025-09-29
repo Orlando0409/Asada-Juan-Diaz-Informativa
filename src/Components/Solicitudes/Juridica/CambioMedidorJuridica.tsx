@@ -21,6 +21,16 @@ const normalizePhoneNumber = (phone: string): string => {
     }
     return phoneNumber.format('E.164');
 };
+function formatCedulaJuridica(value: string) {
+    // Elimina todo lo que no sea número
+    const digits = value.replace(/\D/g, "");
+    // Aplica el formato: 3-XXX-XXXXXX
+    let formatted = "";
+    if (digits.length > 0) formatted += digits[0];
+    if (digits.length > 1) formatted += "-" + digits.slice(1, 4);
+    if (digits.length > 4) formatted += "-" + digits.slice(4, 10);
+    return formatted;
+}
 
 const fieldSchemas: Record<string, z.ZodTypeAny> = CambioMedidorJuridicaSchema.shape;
 
@@ -97,8 +107,8 @@ const CambioMedidorJuridica = ({ tipo, onClose }: Props) => {
                 setFormErrors({ general: "¡Solicitud enviada con éxito!" });
                 setFieldErrors({});
                 alert("¡Solicitud enviada exitosamente!");
-        setMostrarFormulario(false);
-        if (onClose) onClose();
+                setMostrarFormulario(false);
+                if (onClose) onClose();
             } catch (error: any) {
                 if (error?.response?.data?.message) {
                     setFormErrors({ general: error.response.data.message });
@@ -158,8 +168,9 @@ const CambioMedidorJuridica = ({ tipo, onClose }: Props) => {
                                     type="text"
                                     value={field.state.value}
                                     onChange={(e) => {
-                                        field.handleChange(e.target.value);
-                                        handleFieldChange("Cedula_Juridica", e.target.value);
+                                        const formatted = formatCedulaJuridica(e.target.value);
+                                        field.handleChange(formatted);
+                                        handleFieldChange("Cedula_Juridica", formatted);
                                     }}
                                     placeholder={getPlaceholder("Cedula_Juridica")}
                                     className={commonClasses}
