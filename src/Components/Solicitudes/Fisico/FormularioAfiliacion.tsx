@@ -1,10 +1,11 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import data from "../../../data/Data.json";
-import { AfiliacionSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/Afiliacion";
+
 import { useAfiliaciones } from "../../../Hook/Solicitudes/Fisico/hookAfiliacion";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
+import { AfiliacionSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/Afiliacion";
 
 type AxiosError = {
   response?: {
@@ -33,8 +34,9 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [mostrarFormulario, setMostrarFormulario] = useState(true);
   const mutation = useAfiliaciones();
-  const [mostrarFormulario] = useState(true);
 
   // Validación en tiempo real usando el schema
   const validateField = (fieldName: string, value: any, allValues?: any) => {
@@ -153,9 +155,14 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
         await mutation.createAfiliacion(formData);
 
         form.reset();
-        setFormErrors({ general: "¡Solicitud enviada con éxito!" });
+        setFormErrors({});
         setFieldErrors({});
         setArchivoSeleccionado({});
+        setMostrarFormulario(false);
+        setShowSuccessAlert(true);
+        setTimeout(() => setShowSuccessAlert(false), 3000);
+        alert("¡Solicitud enviada con éxito!");
+        if (onClose) onClose();
       } catch (error: any) {
         setFormErrors({
           Numero_Telefono: error.message,
@@ -164,7 +171,16 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
     },
   });
 
-  if (!mostrarFormulario) return null;
+  if (!mostrarFormulario) {
+    return showSuccessAlert ? (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
+        <div className="bg-white rounded-lg shadow-lg px-8 py-6 text-center">
+          <h3 className="text-green-600 text-xl font-semibold mb-2">¡Solicitud enviada con éxito!</h3>
+          <p className="text-gray-700">Gracias por enviar tu solicitud.</p>
+        </div>
+      </div>
+    ) : null;
+  }
 
   const campos = data.requisitosSolicitudes[tipo];
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
@@ -213,7 +229,6 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                       {fieldErrors['Tipo_Identificacion']}
                     </span>
                   )}
-                  {/* Mostrar error de formErrors si existe y no hay error en fieldErrors */}
                   {formErrors['Tipo_Identificacion'] && !fieldErrors['Tipo_Identificacion'] && (
                     <span className="text-red-500 text-sm block mt-1">
                       {formErrors['Tipo_Identificacion']}
@@ -556,13 +571,6 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
         )}
 
         <div className="flex justify-end items-end gap-4 mt-8">
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-[120px] bg-blue-900 text-white py-2 rounded hover:bg-blue-800 transition"
-          >
-            Cerrar
-          </button>
           <div className="flex justify-end items-end">
             <button
               type="submit"
