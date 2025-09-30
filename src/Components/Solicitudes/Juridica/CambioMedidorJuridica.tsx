@@ -320,6 +320,7 @@ const CambioMedidorJuridica = ({ tipo, onClose }: Props) => {
                                 <label className="block mb-1 font-medium">Número de Medidor <span className="text-red-500">*</span></label>
                                 <input
                                     type="number"
+                                    min={0}
                                     value={field.state.value}
                                     onChange={(e) => {
                                         field.handleChange(Number(e.target.value));
@@ -347,7 +348,7 @@ const CambioMedidorJuridica = ({ tipo, onClose }: Props) => {
                 )}
 
                 <div className="flex justify-end items-end gap-4 mt-8">
-                    <button type="button" onClick={onClose} className="w-[120px] bg-blue-900 text-white py-2 rounded hover:bg-blue-800 transition">Cerrar</button>
+                   
                     <div className="flex justify-end items-end">
                         <button
                             type="submit"
