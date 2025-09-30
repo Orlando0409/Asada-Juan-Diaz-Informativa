@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { createAfiliacion } from "../../Services/Solicitudes/AfiliacionService";
+import { createAfiliacion } from "../../../Services/Solicitudes/Fisico/AfiliacionService";
 
  export const useAfiliaciones=()=>{
     const queryClient=useQueryClient();
@@ -16,6 +16,8 @@ import { createAfiliacion } from "../../Services/Solicitudes/AfiliacionService";
     return {
         createAfiliacion: createMutation.mutateAsync,
     }
+
+    
 
 
  }

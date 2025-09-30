@@ -1,4 +1,5 @@
-import { z } from 'zod'
+import { z } from 'zod';
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/heic"];
@@ -16,16 +17,21 @@ export const DesconexionJuridicaSchema = z.object({
   Direccion_Exacta: z.string()
     .min(10, 'La dirección debe tener al menos 10 caracteres')
     .max(255, 'La dirección no puede tener más de 255 caracteres'),
-  
+
   Correo: z.string()
     .min(1, 'El correo electrónico es obligatorio')
     .max(100, 'El correo no puede tener más de 100 caracteres')
     .email('El correo electrónico no es válido'),
 
   Numero_Telefono: z.string()
-    .min(8, 'El número de teléfono debe tener al menos 8 dígitos')
-    .regex(/^\d+$/, 'El teléfono solo debe contener números'),
-    
+    .min(1, 'El número de teléfono es obligatorio')
+    .refine((phone) => {
+      const phoneNumber = parsePhoneNumberFromString(phone || "");
+      return !!phoneNumber && phoneNumber.isValid();
+    }, {
+      message: 'Debe ingresar un número de teléfono válido con código de país, ej. +50688887777'
+    }),
+
   Motivo_Solicitud: z.string()
     .min(10, 'El motivo de la solicitud debe tener al menos 10 caracteres')
     .max(500, 'El motivo de la solicitud no puede tener más de 500 caracteres'),

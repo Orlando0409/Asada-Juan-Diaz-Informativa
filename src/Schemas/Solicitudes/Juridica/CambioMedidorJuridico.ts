@@ -13,10 +13,9 @@ export const CambioMedidorJuridicaSchema = z.object({
     .min(1, 'El correo electrónico es obligatorio')
     .max(100, 'El correo no puede tener más de 100 caracteres')
     .email('El correo electrónico no es válido'),
-
-  Numero_Telefono: z.string()
+ Numero_Telefono: z.string()
     .min(8, 'El número de teléfono debe tener al menos 8 dígitos')
-     .regex(/^\d+$/, 'El teléfono solo debe contener números'),
+    .regex(/^\+?[0-9]{8,15}$/, 'El número de teléfono debe estar en formato internacional, ej. +50688887777'),
   Direccion_Exacta: z.string()
     .min(10, 'La dirección debe tener al menos 10 caracteres')
     .max(255, 'La dirección no puede tener más de 255 caracteres'),

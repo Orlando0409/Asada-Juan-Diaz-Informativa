@@ -1,14 +1,15 @@
 import { useState } from "react";
 import data from '../../data/Data.json';
-import FormularioAsociado from "../../Components/Solicitudes/Asociado";
 import FormularioAsociadoJuridico from "../../Components/Solicitudes/Juridica/AsociadoJurica";
+import FormularioAsociado from "../../Components/Solicitudes/Fisico/Asociado";
 
 const Asociado = () => {
   const [mostrarFormularioFisico, setMostrarFormularioFisico] = useState(false);
   const [mostrarFormularioJuridico, setMostrarFormularioJuridico] = useState(false);
 
-  const requisitosFisico = data.requisitosSolicitudes.asociado;
-  const requisitosJuridico = data.requisitosSolicitudes.juridica?.asociado;
+  const requisitosFisico = data.requisitosSolicitudes.asociado ?? {};
+  // CORREGIDO: Acceso correcto a los requisitos jurídicos
+  const requisitosJuridico = data.juridica?.asociado ?? {};
 
   return (
     <section className="min-h-screen w-full bg-white flex flex-col items-center py-10 px-4 sm:px-6 lg:px-8">
@@ -37,7 +38,7 @@ const Asociado = () => {
             Para empresas, organizaciones o entidades legales
           </p>
           <ul className="list-disc pl-6 space-y-2 text-gray-700 flex-1 overflow-auto max-h-64">
-            {Object.entries(requisitosJuridico).map(([key, value]) => (
+            {Object.entries(requisitosJuridico).map(([key, value]: any) => (
               <li key={key}>{value.label}</li>
             ))}
           </ul>
@@ -58,7 +59,7 @@ const Asociado = () => {
             Para personas individuales
           </p>
           <ul className="list-disc pl-6 space-y-2 text-gray-700 flex-1 overflow-auto max-h-64">
-            {Object.entries(requisitosFisico).map(([key, value]) => (
+            {Object.entries(requisitosFisico).map(([key, value]: any) => (
               <li key={key}>{value.label}</li>
             ))}
           </ul>
@@ -81,7 +82,7 @@ const Asociado = () => {
             onClick={() => setMostrarFormularioJuridico(false)}
           ></div>
           {/* Contenedor del formulario */}
-          <div className="rounded relative w-[90%] max-w-md max-h-[550px] overflow-y-scroll [scroll-whit:none] [-ms-overflow-style:none]"
+          <div className="rounded relative w-[90%] max-w-5xl max-h-[550px] overflow-y-scroll [scroll-whit:none] [-ms-overflow-style:none]"
             style={{ scrollbarWidth: "none" }}>
             <FormularioAsociadoJuridico tipo="juridico" onClose={() => setMostrarFormularioJuridico(false)} />
           </div>
@@ -95,7 +96,7 @@ const Asociado = () => {
             className="absolute inset-0 bg-black/10 backdrop-blur-sm"
             onClick={() => setMostrarFormularioFisico(false)}
           ></div>
-          <div className="rounded relative w-[90%] max-w-md max-h-[550px] overflow-y-scroll [scroll-whit:none] [-ms-overflow-style:none]"
+          <div className="rounded relative w-[90%] max-w-5xl max-h-[550px] overflow-y-scroll [scroll-whit:none] [-ms-overflow-style:none]"
             style={{ scrollbarWidth: "none" }}>
             <FormularioAsociado tipo="asociado" onClose={() => setMostrarFormularioFisico(false)} />
           </div>
