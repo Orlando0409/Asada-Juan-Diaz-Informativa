@@ -171,6 +171,15 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
         const backendMessage = error?.response?.data?.message;
         if (
           backendMessage &&
+          backendMessage.includes("Ya existe un afiliado físico con la identificación")
+        ) {
+          setFormErrors({
+            general: "Ya existe un afiliado con esa identificación",
+          });
+          return;
+        }
+        if (
+          backendMessage &&
           backendMessage.includes("Ya existe una solicitud activa de afiliación")
         ) {
           setFormErrors({
