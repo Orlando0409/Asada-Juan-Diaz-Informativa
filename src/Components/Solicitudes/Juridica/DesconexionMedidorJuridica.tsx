@@ -22,13 +22,23 @@ const normalizePhoneNumber = (phone: string): string => {
     return phoneNumber.format('E.164');
 };
 
+// Función para formatear la cédula jurídica con guiones
+function formatCedulaJuridica(value: string) {
+  const digits = value.replace(/\D/g, "");
+  let formatted = "";
+  if (digits.length > 0) formatted += digits[0];
+  if (digits.length > 1) formatted += "-" + digits.slice(1, 4);
+  if (digits.length > 4) formatted += "-" + digits.slice(4, 10);
+  return formatted;
+}
+
 const DesconexionMedidorJuridica = ({ tipo, onClose }: Props) => {
     const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const mutation = useDesconexionJuridica();
-     const planosInputRef = useRef<HTMLInputElement>(null);
-      const escrituraInputRef = useRef<HTMLInputElement>(null);
+    const planosInputRef = useRef<HTMLInputElement>(null);
+    const escrituraInputRef = useRef<HTMLInputElement>(null);
 
     const [mostrarFormulario, setMostrarFormulario] = useState(true);
 
@@ -116,8 +126,8 @@ const DesconexionMedidorJuridica = ({ tipo, onClose }: Props) => {
                 setArchivoSeleccionado({});
                 setFieldErrors({});
                 alert("¡Solicitud enviada exitosamente!");
-        setMostrarFormulario(false);
-        if (onClose) onClose();
+                setMostrarFormulario(false);
+                if (onClose) onClose();
             } catch (error: any) {
                 let errorMessage = "Error al enviar solicitud";
                 if (error?.response?.data?.message) {
@@ -191,6 +201,36 @@ const DesconexionMedidorJuridica = ({ tipo, onClose }: Props) => {
                                     );
                                 }
 
+                                // Cédula Jurídica con guiones
+                                if (fieldName === "Cedula_Juridica") {
+                                  return (
+                                    <div className="mb-3 w-full">
+                                      <label className="block mb-1 font-medium">
+                                        {fieldLabels[fieldName]}
+                                        {fieldProps.required && <span className="text-red-500">*</span>}
+                                      </label>
+                                      <input
+                                        type="text"
+                                        value={typeof field.state.value === "string" ? field.state.value : ""}
+                                        onChange={(e) => {
+                                          const formatted = formatCedulaJuridica(e.target.value);
+                                          field.handleChange(formatted);
+                                          validateField(fieldName, formatted, form.state.values);
+                                        }}
+                                        placeholder="3-XXX-XXXXXX"
+                                        className={commonClasses}
+                                        maxLength={12}
+                                      />
+                                      {fieldErrors[fieldName] && (
+                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors[fieldName]}</span>
+                                      )}
+                                      {formErrors[fieldName] && !fieldErrors[fieldName] && (
+                                        <span className="text-red-500 text-sm block mt-1">{formErrors[fieldName]}</span>
+                                      )}
+                                    </div>
+                                  );
+                                }
+
                                 // Archivos
                                 if (fieldName === "Planos_Terreno" || fieldName === "Escritura_Terreno") {
                                     const archivoActual = archivoSeleccionado[fieldName] ?? null;
@@ -213,8 +253,7 @@ const DesconexionMedidorJuridica = ({ tipo, onClose }: Props) => {
                                                 className="hidden"
                                                 id={fieldName}
                                                 ref={fieldName === "Planos_Terreno" ? planosInputRef : escrituraInputRef}
-                            
-                                                key={archivoActual ? archivoActual.name : fieldName} // Forzar reinicio del input cuando se elimina el archivo
+                                                key={archivoActual ? archivoActual.name : fieldName}
                                             />
                                             <label
                                                 htmlFor={fieldName}
@@ -323,7 +362,6 @@ const DesconexionMedidorJuridica = ({ tipo, onClose }: Props) => {
                 )}
 
                 <div className="flex justify-end items-end gap-4 mt-8">
-                   
                     <button
                         type="submit"
                         disabled={form.state.isSubmitting}

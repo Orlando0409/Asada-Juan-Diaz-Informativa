@@ -1,9 +1,10 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { AsociadoJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/AsociadoJuridica";
-import { createAsociadoJuridica } from "../../../Services/Solicitudes/Juridica/AsociadoJuricaService";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
+import { createAsociadoJuridica } from "../../../Services/Solicitudes/Juridica/AsociadoJuricaService";
+//import { createAsociadoJuridica } from "../../../Services/Solicitudes/Juridica/AsociadoJuridicaService";
 
 type SolicitudTipo = "juridico";
 
@@ -18,6 +19,14 @@ const normalizePhoneNumber = (phone: string): string => {
     }
     return phone;
 };
+function formatCedulaJuridica(value: string) {
+    const digits = value.replace(/\D/g, "");
+    let formatted = "";
+    if (digits.length > 0) formatted += digits[0];
+    if (digits.length > 1) formatted += "-" + digits.slice(1, 4);
+    if (digits.length > 4) formatted += "-" + digits.slice(4, 10);
+    return formatted;
+}
 
 const FormularioAsociadoJuridico = ({ tipo, onClose }: Props) => {
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -85,11 +94,23 @@ const FormularioAsociadoJuridico = ({ tipo, onClose }: Props) => {
                 if (onClose) onClose();
                 alert("¡Formulario enviado con éxito!");
             } catch (error: any) {
+                // --- CAMBIO SOLICITADO ---
+                const backendMessage = error?.response?.data?.message;
+                if (
+                  backendMessage &&
+                  backendMessage.includes("No existe un afiliado jurídico")
+                ) {
+                  setFormErrors({
+                    general: "No existe un afiliado jurídico con esa cédula. Debe ser afiliado antes de realizar esta solicitud.",
+                  });
+                  return;
+                }
                 setFormErrors({
                     general:
                         error?.message ||
                         "Hubo un error al enviar el formulario. Por favor intenta nuevamente.",
                 });
+                // --- FIN CAMBIO SOLICITADO ---
             }
         },
     });
@@ -148,7 +169,8 @@ const FormularioAsociadoJuridico = ({ tipo, onClose }: Props) => {
                                     type="text"
                                     value={field.state.value}
                                     onChange={(e) => {
-                                        handleFieldChange("Cedula_Juridica", e.target.value);
+                                        const formatted = formatCedulaJuridica(e.target.value);
+                                        handleFieldChange("Cedula_Juridica", formatted);
                                     }}
                                     onBlur={() => setTouched(prev => ({ ...prev, Cedula_Juridica: true }))}
                                     placeholder="3-XXX-XXXXXX"
@@ -268,15 +290,15 @@ const FormularioAsociadoJuridico = ({ tipo, onClose }: Props) => {
                     </form.Field>
                 </div>
 
-                {/* Mensaje general */}
+                {/* Mensaje de afiliado jurídico no encontrado */}
                 {formErrors.general && (
-                    <div className={`text-center mt-4 ${formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
-                        {formErrors.general}
-                    </div>
+                  <div className="text-center mt-4 text-red-500">
+                    {formErrors.general}
+                  </div>
                 )}
 
                 <div className="flex justify-end items-end gap-4 mt-8">
-                   
+
                     <div className="flex justify-end items-end">
                         <button
                             type="submit"
