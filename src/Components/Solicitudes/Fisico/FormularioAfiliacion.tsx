@@ -167,16 +167,22 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
         setTimeout(() => setShowSuccessAlert(false), 3000);
         alert("¡Solicitud enviada con éxito!");
         if (onClose) onClose();
-        // ...dentro de onSubmit...
       } catch (error: any) {
         const backendMessage = error?.response?.data?.message;
-        // Si el mensaje es "Ya existe un afiliado físico..." NO lo muestres
+
+        // Verificar si es error de cédula ya existe
         if (
           backendMessage &&
           backendMessage.includes("Ya existe un afiliado físico con la identificación")
         ) {
-          // No mostrar nada, ni retornar
-        } else if (
+          setFormErrors({
+            Identificacion: "Ya existe una solicitud con esa identificación",
+          });
+          return;
+        }
+
+        // Verificar si es error de solicitud activa
+        if (
           backendMessage &&
           backendMessage.includes("Ya existe una solicitud activa de afiliación")
         ) {
@@ -184,13 +190,13 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
             general: "Ya existe una solicitud activa de afiliación con esa cédula",
           });
           return;
-        } else {
-          setFormErrors({
-            general:
-              error?.message ||
-              "Hubo un error al enviar el formulario. Intenta nuevamente."
-          });
         }
+
+        setFormErrors({
+          general:
+            error?.message ||
+            "Hubo un error al enviar el formulario. Intenta nuevamente."
+        });
       }
     },
   });
@@ -240,6 +246,12 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                         delete newErrors['Identificacion'];
                         return newErrors;
                       });
+                      // Limpiar error de identificación duplicada al cambiar tipo
+                      setFormErrors(prev => {
+                        const newErrors = { ...prev };
+                        delete newErrors['Identificacion'];
+                        return newErrors;
+                      });
                     }}
                     className={`${commonClasses} ${fieldErrors['Tipo_Identificacion'] ? 'border-blue-500 focus:ring-blue-300' : ''}`}
                   >
@@ -254,33 +266,37 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
           </div>
 
           {/* Número de Identificación */}
-
-
-
-          {/* Número de Identificación */}
           <div className="mb-3">
             <form.Field name="Identificacion">
               {(field) => (
                 <div>
                   <label className="block mb-1 font-medium">
-                    Número de Identificación <span className="text-red-500">*</span>
+                  Número de Identificación <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
                     value={field.state.value}
                     onChange={(e) => {
                       field.handleChange(e.target.value);
+                      validateField('Identificacion', e.target.value, form.state.values);
+                      // Limpiar error de identificación duplicada al cambiar valor
+                      setFormErrors(prev => {
+                        const newErrors = { ...prev };
+                        delete newErrors['Identificacion'];
+                        return newErrors;
+                      });
                     }}
                     placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion as TipoIdentificacion)}
                     disabled={!form.state.values.Tipo_Identificacion}
-                    className={`${commonClasses} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                    className={`${commonClasses} ${(fieldErrors['Identificacion'] || formErrors['Identificacion']) ? 'border-red-500 focus:ring-red-300' : ''} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                   />
-                  {/* Mensajes de error para Identificacion */}
+                  {/* Mostrar error de validación de formato */}
                   {fieldErrors['Identificacion'] && (
                     <span className="text-red-500 text-sm block mt-1">
                       {fieldErrors['Identificacion']}
                     </span>
                   )}
+                  {/* Mostrar error de identificación duplicada */}
                   {formErrors['Identificacion'] && !fieldErrors['Identificacion'] && (
                     <span className="text-red-500 text-sm block mt-1">
                       {formErrors['Identificacion']}
@@ -290,9 +306,6 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
               )}
             </form.Field>
           </div>
-
-
-
 
           {/* Nombre */}
           <form.Field name="Nombre">
