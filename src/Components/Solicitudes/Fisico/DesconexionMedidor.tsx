@@ -454,7 +454,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                   <label className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
                   <input
                     type="file"
-                    accept=".png,.jpg,.jpeg,.heic"
+                    accept=".png,.jpg,.jpeg,.heic,.pdf"
                     disabled={!!archivoActual}
                     onChange={(e) => {
                       const file = e.target.files?.[0] ?? null;
@@ -518,7 +518,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
                   <label className="block mb-1 font-medium">Escritura del terreno <span className="text-red-500">*</span></label>
                   <input
                     type="file"
-                    accept=".png,.jpg,.jpeg,.heic"
+                    accept=".png,.jpg,.jpeg,.heic,.pdf"
                     disabled={!!archivoActual}
                     onChange={(e) => {
                       const file = e.target.files?.[0] ?? null;

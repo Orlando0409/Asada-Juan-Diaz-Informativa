@@ -271,7 +271,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
               {(field) => (
                 <div>
                   <label className="block mb-1 font-medium">
-                  Número de Identificación <span className="text-red-500">*</span>
+                    Número de Identificación <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -549,7 +549,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                   <label className="block mb-1 font-medium">Escritura del terreno <span className="text-red-500">*</span></label>
                   <input
                     type="file"
-                    accept=".png,.jpg,.jpeg,.heic"
+                    accept=".png,.jpg,.jpeg,.heic,.pdf"  // 🔥 CAMBIO: Agregué .pdf
                     disabled={!!archivoActual}
                     onChange={(e) => {
                       const file = e.target.files?.[0] ?? null;
