@@ -118,7 +118,7 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
         form.reset();
         setFormErrors({ general: "¡Solicitud enviada con éxito!" });
         setFieldErrors({});
-        
+
         alert("¡Solicitud enviada exitosamente!");
         setMostrarFormulario(false);
         if (onClose) onClose();
@@ -143,17 +143,17 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
   function validateField(
     fieldName: string,
     value: any,
-    values: { 
-      Nombre: string; 
-      Apellido1: string; 
-      Apellido2: string; 
-      Tipo_Identificacion: TipoIdentificacion; 
-      Identificacion: string; 
-      Direccion_Exacta: string; 
-      Numero_Telefono: string; 
-      Correo: string; 
-      Motivo_Solicitud: string; 
-      Numero_Medidor_Anterior: number; 
+    values: {
+      Nombre: string;
+      Apellido1: string;
+      Apellido2: string;
+      Tipo_Identificacion: TipoIdentificacion;
+      Identificacion: string;
+      Direccion_Exacta: string;
+      Numero_Telefono: string;
+      Correo: string;
+      Motivo_Solicitud: string;
+      Numero_Medidor_Anterior: number;
     }
   ) {
     if (fieldSchemas[fieldName]) {
@@ -367,6 +367,7 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
                 <label className="block mb-1 font-medium">Número de Medidor <span className="text-red-500">*</span></label>
                 <input
                   type="number"
+                  min={0}
                   value={field.state.value}
                   onChange={(e) => {
                     field.handleChange(Number(e.target.value));
@@ -381,7 +382,7 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
               </div>
             )}
           </form.Field>
-         
+
 
           {/* Motivo de Solicitud */}
           <form.Field name="Motivo_Solicitud">
@@ -409,25 +410,25 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
 
         </div>
 
-          {/* Mensaje general */}
-          {formErrors.general && (
-            <div className={`text-center mt-4 ${formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
-              {formErrors.general}
-            </div>
-          )}
-
-          <div className="flex justify-end items-end gap-4 mt-8">
-            <button type="button" onClick={onClose} className="w-[120px] bg-blue-900 text-white py-2 rounded hover:bg-blue-800 transition">Cerrar</button>
-            <div className="flex justify-end items-end">
-              <button
-                type="submit"
-                disabled={form.state.isSubmitting}
-                className={`w-[120px] py-2 rounded transition ${form.state.isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
-              >
-                {form.state.isSubmitting ? 'Enviando...' : 'Enviar'}
-              </button>
-            </div>
+        {/* Mensaje general */}
+        {formErrors.general && (
+          <div className={`text-center mt-4 ${formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
+            {formErrors.general}
           </div>
+        )}
+
+        <div className="flex justify-end items-end gap-4 mt-8">
+         
+          <div className="flex justify-end items-end">
+            <button
+              type="submit"
+              disabled={form.state.isSubmitting}
+              className={`w-[120px] py-2 rounded transition ${form.state.isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
+            >
+              {form.state.isSubmitting ? 'Enviando...' : 'Enviar'}
+            </button>
+          </div>
+        </div>
       </form>
     </div>
   );

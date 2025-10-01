@@ -168,8 +168,29 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
         alert("¡Solicitud enviada con éxito!");
         if (onClose) onClose();
       } catch (error: any) {
+        const backendMessage = error?.response?.data?.message;
+        if (
+          backendMessage &&
+          backendMessage.includes("Ya existe un afiliado físico con la identificación")
+        ) {
+          setFormErrors({
+            general: "Ya existe un afiliado con esa identificación",
+          });
+          return;
+        }
+        if (
+          backendMessage &&
+          backendMessage.includes("Ya existe una solicitud activa de afiliación")
+        ) {
+          setFormErrors({
+            general: "Ya existe una solicitud activa de afiliación con esa cédula",
+          });
+          return;
+        }
         setFormErrors({
-          Numero_Telefono: error.message,
+          general:
+            error?.message ||
+            "Hubo un error al enviar el formulario. Por favor intenta nuevamente.",
         });
       }
     },
@@ -419,6 +440,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                 <label className="block mb-1 font-medium">Edad <span className="text-red-500">*</span></label>
                 <input
                   type="number"
+                  min={18}
                   value={field.state.value}
                   onChange={(e) => {
                     field.handleChange(Number(e.target.value));
