@@ -61,15 +61,15 @@ Numero_Telefono: z.string()
   Planos_Terreno: z.instanceof(File, { message: "Debe subir el plano del terreno" })
     .refine(file => file.size <= 5 * 1024 * 1024, 'El plano del terreno no debe superar los 5MB')
     .refine(
-      file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic'].includes(file.type),
-      'El plano del terreno debe ser JPG, JPEG, PNG o HEIC'
+      file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
+      'El plano del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
     ),
 
   Escritura_Terreno: z.instanceof(File, { message: "Debe subir la escritura del terreno" })
     .refine(file => file.size <= 5 * 1024 * 1024, 'La escritura del terreno no debe superar los 5MB')
     .refine(
-      file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic'].includes(file.type),
-      'La escritura del terreno debe ser JPG, JPEG, PNG o HEIC'
+      file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
+      'La escritura del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
     ),
 }).refine(
   (data) => {

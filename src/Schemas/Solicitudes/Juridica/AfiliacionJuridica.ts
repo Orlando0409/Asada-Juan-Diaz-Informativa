@@ -28,6 +28,18 @@ export const AfiliacionJuridicaSchema = z.object({
     .min(10, 'La dirección debe tener al menos 10 caracteres')
     .max(255, 'La dirección no puede tener más de 255 caracteres'),
 
-  Planos_Terreno: z.instanceof(File, { message: "Debe subir el plano del terreno" }),
-  Escritura_Terreno: z.instanceof(File, { message: "Debe subir la escritura del terreno" }),
+   Planos_Terreno: z.instanceof(File, { message: "Debe subir el plano del terreno" })
+    .refine(file => file.size <= 5 * 1024 * 1024, 'El plano del terreno no debe superar los 5MB')
+    .refine(
+      file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
+      'El plano del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
+    ),
+
+  
+  Escritura_Terreno: z.instanceof(File, { message: "Debe subir la escritura del terreno" })
+    .refine(file => file.size <= 5 * 1024 * 1024, 'La escritura del terreno no debe superar los 5MB')
+    .refine(
+      file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
+      'La escritura del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
+    ),
 });

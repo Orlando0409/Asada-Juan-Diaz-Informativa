@@ -125,13 +125,32 @@ const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
                 alert("¡Solicitud enviada exitosamente!");
                 setMostrarFormulario(false);
                 if (onClose) onClose();
-            } catch (error) {
-                setFormErrors({
-                    general: "Hubo un error al enviar el formulario. Intenta nuevamente."
-                });
-            }
-        },
-    });
+            } catch (error: any) {
+               const backendMessage = error?.response?.data?.message;
+        // Si el mensaje es "Ya existe un afiliado físico..." NO lo muestres
+        if (
+          backendMessage &&
+          backendMessage.includes("Ya existe un afiliado físico con la identificación")
+        ) {
+          // No mostrar nada, ni retornar
+        } else if (
+          backendMessage &&
+          backendMessage.includes("Ya existe una solicitud activa de afiliación")
+        ) {
+          setFormErrors({
+            general: "Ya existe una solicitud activa de afiliación con esa cédula",
+          });
+          return;
+        } else {
+          setFormErrors({
+            general:
+              error?.message ||
+              "Hubo un error al enviar el formulario. Intenta nuevamente."
+          });
+        }
+      }
+    },
+  });
 
     if (!mostrarFormulario) return null;
     const campos = data.juridica[tipo];

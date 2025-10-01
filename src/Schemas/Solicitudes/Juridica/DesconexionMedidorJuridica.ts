@@ -39,13 +39,15 @@ export const DesconexionJuridicaSchema = z.object({
   Planos_Terreno: z
     .instanceof(File)
     .refine((file) => file.size <= MAX_FILE_SIZE, 'El archivo no debe exceder 5MB')
-    .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), 'Solo se aceptan archivos .jpg, .jpeg, .png, .heic')
+    
+    .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), 'Solo se aceptan archivos .jpg, .jpeg, .png, .heic, .pdf')
     .optional(),
 
   Escritura_Terreno: z
     .instanceof(File)
     .refine((file) => file.size <= MAX_FILE_SIZE, 'El archivo no debe exceder 5MB')
-    .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), 'Solo se aceptan archivos .jpg, .jpeg, .png, .heic')
+    
+    .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), 'Solo se aceptan archivos .jpg, .jpeg, .png, .heic, .pdf')
     .optional(),
 });
 
