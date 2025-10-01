@@ -242,7 +242,7 @@ const DesconexionMedidorJuridica = ({ tipo, onClose }: Props) => {
                                             </label>
                                             <input
                                                 type="file"
-                                                accept=".png,.jpg,.jpeg,.heic"
+                                                accept=".png,.jpg,.jpeg,.heic,.pdf"
                                                 disabled={!!archivoActual}
                                                 onChange={(e) => {
                                                     const file = e.target.files?.[0] ?? undefined;
