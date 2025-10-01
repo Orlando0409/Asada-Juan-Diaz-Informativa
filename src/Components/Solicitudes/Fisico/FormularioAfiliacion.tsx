@@ -126,7 +126,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
       Edad: 0,
       Planos_Terreno: undefined as File | undefined,
       Escritura_Terreno: undefined as File | undefined,
-      Motivo_Solicitud: '', // <-- Add this line
+      Motivo_Solicitud: '',
     },
 
     onSubmit: async ({ value }) => {
@@ -167,18 +167,16 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
         setTimeout(() => setShowSuccessAlert(false), 3000);
         alert("¡Solicitud enviada con éxito!");
         if (onClose) onClose();
+        // ...dentro de onSubmit...
       } catch (error: any) {
         const backendMessage = error?.response?.data?.message;
+        // Si el mensaje es "Ya existe un afiliado físico..." NO lo muestres
         if (
           backendMessage &&
           backendMessage.includes("Ya existe un afiliado físico con la identificación")
         ) {
-          setFormErrors({
-            general: "Ya existe un afiliado con esa identificación",
-          });
-          return;
-        }
-        if (
+          // No mostrar nada, ni retornar
+        } else if (
           backendMessage &&
           backendMessage.includes("Ya existe una solicitud activa de afiliación")
         ) {
@@ -186,12 +184,13 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
             general: "Ya existe una solicitud activa de afiliación con esa cédula",
           });
           return;
+        } else {
+          setFormErrors({
+            general:
+              error?.message ||
+              "Hubo un error al enviar el formulario. Intenta nuevamente."
+          });
         }
-        setFormErrors({
-          general:
-            error?.message ||
-            "Hubo un error al enviar el formulario. Por favor intenta nuevamente.",
-        });
       }
     },
   });
@@ -249,11 +248,14 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                       <option key={tipo} value={tipo}>{tipo}</option>
                     ))}
                   </select>
-
                 </div>
               )}
             </form.Field>
           </div>
+
+          {/* Número de Identificación */}
+
+
 
           {/* Número de Identificación */}
           <div className="mb-3">
@@ -268,12 +270,12 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                     value={field.state.value}
                     onChange={(e) => {
                       field.handleChange(e.target.value);
-                      validateField('Identificacion', e.target.value, form.state.values);
                     }}
                     placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion as TipoIdentificacion)}
                     disabled={!form.state.values.Tipo_Identificacion}
-                    className={`${commonClasses} ${fieldErrors['Identificacion'] ? 'border-red-500 focus:ring-red-300' : ''} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                    className={`${commonClasses} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                   />
+                  {/* Mensajes de error para Identificacion */}
                   {fieldErrors['Identificacion'] && (
                     <span className="text-red-500 text-sm block mt-1">
                       {fieldErrors['Identificacion']}
@@ -288,6 +290,9 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
               )}
             </form.Field>
           </div>
+
+
+
 
           {/* Nombre */}
           <form.Field name="Nombre">
@@ -458,10 +463,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
               </div>
             )}
           </form.Field>
-
         </div>
-
-
 
         {/* Archivos */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
@@ -473,7 +475,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                   <label className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
                   <input
                     type="file"
-                    accept=".png,.jpg,.jpeg,.heic"
+                    accept=".png,.jpg,.jpeg,.heic,.pdf"
                     disabled={!!archivoActual}
                     onChange={(e) => {
                       const file = e.target.files?.[0] ?? null;
@@ -484,7 +486,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                     className="hidden"
                     id="Planos_Terreno"
                     ref={planosInputRef}
-                    key={archivoActual ? archivoActual.name : 'planos'} // Forzar reinicio del input cuando se elimina el archivo
+                    key={archivoActual ? archivoActual.name : 'planos'}
                   />
                   <label
                     htmlFor="Planos_Terreno"
@@ -545,7 +547,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
                     className="hidden"
                     id="Escritura_Terreno"
                     ref={escrituraInputRef}
-                    key={archivoActual ? archivoActual.name : 'escritura'} // Forzar reinicio del input cuando se elimina el archivo
+                    key={archivoActual ? archivoActual.name : 'escritura'}
                   />
                   <label
                     htmlFor="Escritura_Terreno"
@@ -613,4 +615,3 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
 };
 
 export default FormularioAfiliacion;
-//funciona 
