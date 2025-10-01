@@ -11,13 +11,13 @@ export type TipoIdentificacion = typeof TipoIdentificacionValues[number];
 const IDENTITY_PATTERNS: Record<TipoIdentificacion, RegExp> = {
   'Cedula Nacional': /^\d{9}$/,
   'Dimex': /^\d{11,12}$/,
-  'Pasaporte': /^[A-Za-z0-9]{6,9}$/,
+  'Pasaporte': /^[A-Za-z0-9]{6,12}$/,
 } as const;
 
 const IDENTITY_ERROR_MESSAGES: Record<TipoIdentificacion, string> = {
-  'Cedula Nacional': 'La cédula debe tener exactamente 9 dígitos',
-  'Dimex': 'El Dimex debe tener 11 o 12 dígitos',
-  'Pasaporte': 'El pasaporte debe tener 6-9 caracteres alfanuméricos',
+  'Cedula Nacional': 'La cédula debe tener exactamente 9 dígitos y no puede comenzar con 0',
+  'Dimex': 'El DIMEX debe tener 11 o 12 dígitos y debe comenzar con 12, 13 o 18',
+  'Pasaporte': 'El pasaporte debe tener 6-12 caracteres alfanuméricos, con al menos 1 y máximo 3 letras',
 } as const;
 
 // Regex para validar el formato E.164
