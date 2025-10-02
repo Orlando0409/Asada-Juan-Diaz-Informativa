@@ -3,14 +3,14 @@ import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 export const TipoIdentificacionValues = [
   'Cedula Nacional',
-  'DIMEX',
+  'Dimex',
   'Pasaporte',
 ] as const;
 export type TipoIdentificacion = typeof TipoIdentificacionValues[number];
 
 const IDENTITY_PATTERNS: Record<TipoIdentificacion, RegExp> = {
   'Cedula Nacional': /^\d{9}$/,
-  'DIMEX': /^\d{11,12}$/,
+  'Dimex': /^\d{11,12}$/,
   'Pasaporte': /^[A-Za-z0-9]{6,9}$/,
 } as const;
 

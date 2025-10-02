@@ -4,7 +4,7 @@ import { parsePhoneNumberFromString } from 'libphonenumber-js';
 // Enum para tipo de identificación
 export const TipoIdentificacionValues = [
   'Cedula Nacional',
-  'DIMEX',
+  'Dimex',
   'Pasaporte',
 ] as const;
 export type TipoIdentificacion = typeof TipoIdentificacionValues[number];
@@ -12,13 +12,13 @@ export type TipoIdentificacion = typeof TipoIdentificacionValues[number];
 // Patrones y mensajes de error para identificación
 const IDENTITY_PATTERNS: Record<TipoIdentificacion, RegExp> = {
   'Cedula Nacional': /^\d{9}$/,
-  'DIMEX': /^\d{11,12}$/,
+  'Dimex': /^\d{11,12}$/,
   'Pasaporte': /^[A-Za-z0-9]{6,9}$/,
 };
 
 const IDENTITY_ERROR_MESSAGES: Record<TipoIdentificacion, string> = {
   'Cedula Nacional': 'La cédula debe tener exactamente 9 dígitos',
-  'DIMEX': 'El DIMEX debe tener 11 o 12 dígitos',
+  'Dimex': 'El DIMEX debe tener 11 o 12 dígitos',
   'Pasaporte': 'El pasaporte debe tener 6-9 caracteres alfanuméricos',
 };
 

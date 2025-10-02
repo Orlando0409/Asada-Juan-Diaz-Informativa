@@ -67,7 +67,7 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
       switch (tipoIdentificacion) {
         case "Cedula Nacional":
           return "123456789";
-        case "DIMEX":
+        case "Dimex":
           return "123456789012";
         case "Pasaporte":
           return "A1234567";

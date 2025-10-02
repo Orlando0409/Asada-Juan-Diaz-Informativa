@@ -105,7 +105,7 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
     if (fieldName === 'Identificacion') {
       switch (tipoIdentificacion) {
         case "Cedula Nacional": return '123456789';
-        case "DIMEX": return '123456789012';
+        case "Dimex": return '123456789012';
         case "Pasaporte": return 'A1234567';
         default: return 'Seleccione tipo de identificación primero';
       }
