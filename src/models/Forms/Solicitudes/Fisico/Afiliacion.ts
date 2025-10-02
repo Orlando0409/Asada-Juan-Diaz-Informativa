@@ -7,7 +7,7 @@ export interface Afiliacion {
   Direccion_Exacta: string;
   Numero_Telefono: string;
   Edad: number;
-  Tipo_Identificacion: 'Cedula Nacional' | 'DIMEX' | 'Pasaporte';
+  Tipo_Identificacion: 'Cedula Nacional' | 'Dimex' | 'Pasaporte';
   Planos_Terreno?: File | string;
   Escritura_Terreno?: File | string;
 }
@@ -30,7 +30,7 @@ export interface AfiliacionFormData {
   Nombre: string;
   Apellido1: string;
   Apellido2: string;
-  Tipo_Identidad: 'Cedula Nacional' | 'DIMEX' | 'Pasaporte';
+  Tipo_Identidad: 'Cedula Nacional' | 'Dimex' | 'Pasaporte';
   Numero_Identidad: string;
   Correo: string;
   Direccion_Exacta: string;

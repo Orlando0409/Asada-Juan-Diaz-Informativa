@@ -2,7 +2,7 @@ import parsePhoneNumberFromString from "libphonenumber-js";
 import { z } from "zod";
 
 // Valores permitidos para el tipo de identificación
-export const TipoIdentificacionValues = ["Cedula Nacional", "DIMEX", "Pasaporte"] as const;
+export const TipoIdentificacionValues = ["Cedula Nacional", "Dimex", "Pasaporte"] as const;
 export type TipoIdentificacion = typeof TipoIdentificacionValues[number];
 const validarTelefono = (phone: string) => {
   const phoneNumber = parsePhoneNumberFromString(phone);

@@ -79,7 +79,7 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
     if (fieldName === 'Identificacion') {
       switch (tipoIdentificacion) {
         case "Cedula Nacional": return '123456789';
-        case "DIMEX": return '123456789012';
+        case "Dimex": return '123456789012'; // ✅ corregido aquí
         case "Pasaporte": return 'A1234567';
         default: return 'Seleccione tipo de identificación primero';
       }
@@ -383,7 +383,6 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
             )}
           </form.Field>
 
-
           {/* Motivo de Solicitud */}
           <form.Field name="Motivo_Solicitud">
             {(field) => (
@@ -407,18 +406,16 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
               </div>
             )}
           </form.Field>
-
         </div>
 
         {/* Mensaje general */}
         {formErrors.general && (
-          <div className={`text-center mt-4 ${formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
+          <div className={`text-center mt-4 ${typeof formErrors.general === 'string' && formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
             {formErrors.general}
           </div>
         )}
 
         <div className="flex justify-end items-end gap-4 mt-8">
-         
           <div className="flex justify-end items-end">
             <button
               type="submit"
