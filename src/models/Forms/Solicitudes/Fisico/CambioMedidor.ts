@@ -34,7 +34,7 @@ export interface CambioMedidorFormData {
   Apellido1: string;
   Apellido2: string;
   Identificacion: string;
-  Tipo_Identificacion: 'Cedula Nacional' | 'DIMEX' | 'Pasaporte';
+  Tipo_Identificacion: 'Cedula Nacional' | 'Dimex' | 'Pasaporte';
   Correo: string;
   Direccion_Exacta: string;
   Numero_Telefono: string;
