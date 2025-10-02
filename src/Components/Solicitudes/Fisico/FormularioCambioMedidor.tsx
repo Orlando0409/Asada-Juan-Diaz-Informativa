@@ -17,6 +17,7 @@ type AxiosError = {
   message: string;
 };
 
+
 type SolicitudTipo = 'cambioMedidor';
 
 type Props = {
@@ -79,7 +80,7 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
     if (fieldName === 'Identificacion') {
       switch (tipoIdentificacion) {
         case "Cedula Nacional": return '123456789';
-        case "Dimex": return '123456789012'; // ✅ corregido aquí
+        case "Dimex": return '123456789012'; //  corregido aquí
         case "Pasaporte": return 'A1234567';
         default: return 'Seleccione tipo de identificación primero';
       }
@@ -234,7 +235,7 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
               </div>
             )}
           </form.Field>
-          {/* Nombre y Primer Apellido */}
+          {/* Nombre y Primer Apellido  */}
           <form.Field name="Nombre">
             {(field) => (
               <div className="mb-3 w-full">
