@@ -12,7 +12,8 @@ export class GeminiAPIClient {
     }
     
     this.ApiKey = apiKey;
-    this.apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${this.ApiKey}`;
+    // Usar gemini-2.0-flash-001 que está disponible en GA según las notas de versión
+    this.apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash-001:generateContent?key=${this.ApiKey}`;
   }
 
   //Envía un prompt a la API de Gemini
