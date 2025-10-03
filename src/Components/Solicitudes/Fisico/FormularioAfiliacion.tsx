@@ -168,29 +168,6 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
         alert("¡Solicitud enviada con éxito!");
         if (onClose) onClose();
       } catch (error: any) {
-        const backendMessage = error?.response?.data?.message;
-
-        // Verificar si es error de cédula ya existe
-        if (
-          backendMessage &&
-          backendMessage.includes("Ya existe un afiliado físico con la identificación")
-        ) {
-          setFormErrors({
-            Identificacion: "Ya existe una solicitud con esa identificación",
-          });
-          return;
-        }
-
-        // Verificar si es error de solicitud activa
-        if (
-          backendMessage &&
-          backendMessage.includes("Ya existe una solicitud activa de afiliación")
-        ) {
-          setFormErrors({
-            general: "Ya existe una solicitud activa de afiliación con esa cédula",
-          });
-          return;
-        }
 
         setFormErrors({
           general:
