@@ -1,87 +1,87 @@
 import { z } from 'zod';
 
-// Tipo para TipoIdentificacion
+// Tipo para TipoIdentificacion - Debe coincidir con el backend
 export const TipoIdentificacionValues = [
   'Cedula Nacional',
-  'Dimex',
+  'Dimex', 
   'Pasaporte',
 ] as const;
 export type TipoIdentificacion = typeof TipoIdentificacionValues[number];
 
-const IDENTITY_PATTERNS: Record<TipoIdentificacion, RegExp> = {
-  'Cedula Nacional': /^[1-9]\d{8}$/,
-  'Dimex': /^(12|13|18)\d{9,10}$/,
-  'Pasaporte': /^[A-Za-z0-9]{6,12}$/,
-} as const;
-
-const IDENTITY_ERROR_MESSAGES: Record<TipoIdentificacion, string> = {
-  'Cedula Nacional': 'La cédula debe tener exactamente 9 dígitos y no puede comenzar con 0',
-  'Dimex': 'El DIMEX debe tener 11 o 12 dígitos y debe comenzar con 12, 13 o 18',
-  'Pasaporte': 'El pasaporte debe tener 6-12 caracteres alfanuméricos, con al menos 1 y máximo 3 letras',
-} as const;
-
-// Regex para validar el formato E.164
-const E164_REGEX = /^\+?[1-9]\d{1,14}$/;
-
+// Validaciones adaptadas del backend DTO
 export const AfiliacionSchema = z.object({
+  // Validaciones de CreateSolicitudFisicaDto - COMUNES
+  Tipo_Identificacion: z.enum(TipoIdentificacionValues, {
+    errorMap: () => ({ message: 'El tipo de identificación debe ser uno de los siguientes: Cedula Nacional, Dimex, Pasaporte' }),
+  }),
+
+  Identificacion: z.string()
+    .min(1, 'La identificación no puede estar vacía')
+    .refine(val => val.trim().length > 0, 'La identificación no puede estar vacía')
+    .transform(val => val.trim()),
+
   Nombre: z.string()
-    .min(2, 'El nombre es obligatorio, debe tener al menos 2 caracteres')
-    .refine(val => val.trim().length > 0, 'El nombre no puede estar vacío'),
+    .min(1, 'El nombre no puede estar vacío')
+    .min(2, 'El nombre debe tener al menos 2 caracteres')
+    .max(50, 'El nombre no puede tener más de 50 caracteres')
+    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, { message: 'El nombre solo puede contener letras y espacios' })
+    .refine(val => val.trim().length > 0, 'El nombre no puede estar vacío')
+    .transform(val => val.trim()),
 
   Apellido1: z.string()
-    .min(2, 'El primer apellido es obligatorio debe tener al menos 2 caracteres')
-    .refine(val => val.trim().length > 0, 'El primer apellido no puede estar vacío'),
+    .min(1, 'El primer apellido no puede estar vacío')
+    .min(2, 'El primer apellido debe tener al menos 2 caracteres')
+    .max(50, 'El primer apellido no puede tener más de 50 caracteres')
+    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, { message: 'El primer apellido solo puede contener letras y espacios' })
+    .refine(val => val.trim().length > 0, 'El primer apellido no puede estar vacío')
+    .transform(val => val.trim()),
 
-  Apellido2: z.string().optional(),
+  Apellido2: z.string()
+    .max(50, 'El segundo apellido no puede tener más de 50 caracteres')
+    .optional()
+    .or(z.literal(''))
+    .transform(val => val === '' ? undefined : val),
 
-  Tipo_Identificacion: z.enum(TipoIdentificacionValues, {
-    errorMap: () => ({ message: 'Debe seleccionar un tipo de identificación válido' }),
-  }),
-Identificacion: z.string()
-  .min(1, 'El número de identificación es obligatorio')
-  .transform(val => val.trim()),
-  Edad: z.coerce.number()
-    .min(18, 'Solo se permite personas mayores de edad (mínimo 18 años)')
-    .max(120, 'La edad no puede ser mayor a 120 años'),
-
-  Direccion_Exacta: z.string()
-    .min(10, 'La dirección debe tener al menos 10 caracteres')
-    .max(50, 'La dirección no puede tener más de 50 caracteres'),
-
-
-Numero_Telefono: z.string()
-  .min(1, 'El número de teléfono es obligatorio')
-  .regex(E164_REGEX, 'El número de teléfono debe estar en formato E.164 (ejemplo: +50688887777)'),
-  
   Correo: z.string()
-    .min(1, 'El correo electrónico es obligatorio')
-    .max(50, 'El correo no puede tener más de 50 caracteres')
-    .email('El correo electrónico no es válido'),
+    .min(1, 'El correo no puede estar vacío')
+    .max(100, 'El correo no puede tener más de 100 caracteres')
+    .email('El correo electrónico debe tener un formato válido')
+    .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, { message: 'El formato del correo electrónico no es válido' })
+    .transform(val => val.trim().toLowerCase()),
 
+  Numero_Telefono: z.string()
+    .min(1, 'El número de teléfono no puede estar vacío')
+    .refine(val => val.trim().length > 0, 'El número de teléfono no puede estar vacío')
+    .transform(val => val.trim()),
+
+  // Validaciones específicas de CreateSolicitudAfiliacionFisicaDto
+  Direccion_Exacta: z.string()
+    .min(1, 'La dirección no puede estar vacía')
+    .min(10, 'La dirección debe tener al menos 10 caracteres')
+    .max(255, 'La dirección no puede tener más de 255 caracteres')
+    .regex(/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s.,#-]+$/, { message: 'La dirección solo puede contener letras, números, espacios y los caracteres .,-#' })
+    .refine(val => val.trim().length > 0, 'La dirección no puede estar vacía')
+    .transform(val => val.trim()),
+
+  Edad: z.coerce.number()
+    .int('La edad debe ser un numero entero')
+    .min(18, 'La edad mínima para realizar la solicitud es 18 años')
+    .max(120, 'La edad máxima permitida es 120 años')
+    .positive('La edad debe ser un número positivo'),
+
+  // Validaciones de archivos (específicas del frontend)
   Planos_Terreno: z.instanceof(File, { message: "Debe subir el plano del terreno" })
-    .refine(file => file.size <= 5 * 1024 * 1024, 'El plano del terreno no debe superar los 5MB')
     .refine(
       file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
       'El plano del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
     ),
 
   Escritura_Terreno: z.instanceof(File, { message: "Debe subir la escritura del terreno" })
-    .refine(file => file.size <= 5 * 1024 * 1024, 'La escritura del terreno no debe superar los 5MB')
     .refine(
       file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
       'La escritura del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
     ),
-}).refine(
-  (data) => {
-    // Validación de identidad usando patrones
-    const { Tipo_Identificacion, Identificacion } = data;
-    const pattern = IDENTITY_PATTERNS[Tipo_Identificacion];
-    return pattern ? pattern.test(Identificacion) : false;
-  },
-  {
-    message: 'El número de identificación no es válido para el tipo seleccionado',
-    path: ["Identificacion"],
-  }
-);
+});
 
+export type FormularioAfiliacionData = z.infer<typeof AfiliacionSchema>;
 export type Afiliacion = z.infer<typeof AfiliacionSchema>;

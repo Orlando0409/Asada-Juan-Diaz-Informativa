@@ -1,26 +1,11 @@
 import { useForm } from "@tanstack/react-form";
 import { useRef, useState } from "react";
-import data from "../../../data/Data.json";
-
-
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { useDesconexion } from "../../../Hook/Solicitudes/Fisico/hookDesconexion";
 import { DesconexionMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/DesconexionMedidor";
 
-type AxiosError = {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-  message: string;
-};
-
-type SolicitudTipo = 'desconexion';
-
 type Props = {
-  tipo: SolicitudTipo;
   onClose: () => void;
 };
 
@@ -31,7 +16,7 @@ const normalizePhoneNumber = (phone: string): string => {
   return phone;
 };
 
-const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
+const FormularioDesconexionMedidor = ({ onClose }: Props) => {
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -165,20 +150,49 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
         setMostrarFormulario(false);
         if (onClose) onClose();
       } catch (error: any) {
-        // --- CAMBIO: Mostrar mensaje si no existe afiliado físico ---
+        console.log("🔍 ERROR EN SOLICITUD DE DESCONEXIÓN:", error);
+
+        // Log detallado del error
+        const axiosError = error as any;
+        console.log("📊 Detalles del error:");
+        console.log("  - Status:", axiosError?.response?.status);
+        console.log("  - Status Text:", axiosError?.response?.statusText);
+        console.log("  - Data:", axiosError?.response?.data);
+        console.log("  - Message:", axiosError?.message);
+        console.log("  - Name:", axiosError?.name);
+
         const backendMessage = error?.response?.data?.message;
-        if (
-          backendMessage &&
-          backendMessage.includes("No existe un afiliado físico")
-        ) {
-          setFormErrors({
-            general: "No existe un afiliado físico con esa cédula. Debe ser afiliado antes de realizar esta solicitud.",
-          });
-          return;
+        console.log("🔎 Backend message extraído:", backendMessage);
+
+        // Verificar errores específicos del backend
+        if (backendMessage) {
+          if (backendMessage.includes("No existe un afiliado físico")) {
+            setFormErrors({
+              Identificacion: "No existe un afiliado físico con esa identificación. Debe afiliarse primero antes de realizar esta solicitud.",
+            });
+            return;
+          } else if (backendMessage.includes("Ya existe un afiliado físico")) {
+            // Caso similar al formulario Asociado - error de lógica del backend
+            setFormErrors({
+              general: "⚠️ Error en el sistema: El backend tiene un error de lógica. Contacte al administrador del sistema.",
+            });
+            console.error("🐛 BUG DEL BACKEND: Lógica incorrecta en validación de afiliado");
+            return;
+          }
         }
-        // --- FIN CAMBIO ---
+
+        // Error genérico
+        let errorMsg = '';
+        if (error?.response?.data?.message) {
+          errorMsg = error.response.data.message;
+        } else if (error?.message) {
+          errorMsg = error.message;
+        } else {
+          errorMsg = 'Error desconocido al procesar la solicitud';
+        }
+
         setFormErrors({
-          Numero_Telefono: error.message,
+          general: errorMsg,
         });
       }
     },
@@ -186,7 +200,6 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
 
   if (!mostrarFormulario) return null;
 
-  const campos = data.requisitosSolicitudes[tipo];
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
 
   return (

@@ -3,7 +3,6 @@ import { useState } from "react";
 import { AsociadoSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/Asociado";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-import data from "../../../data/Data.json";
 import { useAsociadoMedidor } from "../../../Hook/Solicitudes/Fisico/hookAsociado";
 
 type AxiosError = {
@@ -15,10 +14,7 @@ type AxiosError = {
   message: string;
 };
 
-type SolicitudTipo = "asociado";
-
 type Props = {
-  tipo: SolicitudTipo;
   onClose: () => void;
 };
 
@@ -29,7 +25,7 @@ const normalizePhoneNumber = (phone: string): string => {
   return phone;
 };
 
-const FormularioAsociado = ({ tipo, onClose }: Props) => {
+const FormularioAsociado = ({ onClose }: Props) => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -128,7 +124,29 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
         if (onClose) onClose();
         alert("¡Formulario enviado con éxito!");
       } catch (error: unknown) {
+        console.log("🔍 ERROR EN SOLICITUD DE ASOCIADO:", error);
+        
+        // Log detallado del error
+        const axiosError = error as AxiosError;
+        
         let errorMsg = '';
+        const backendMessage = (error as AxiosError)?.response?.data?.message;
+        console.log("🔎 Backend message extraído:", backendMessage);
+
+        // Verificar si es error de "no existe afiliado físico"
+        if (
+          backendMessage &&
+          (backendMessage.includes("No existe un afiliado físico") ||
+            backendMessage.includes("no existe") ||
+            backendMessage.includes("No se puede crear la solicitud de asociado"))
+        ) {
+          setFormErrors({
+            Identificacion: "No existe un afiliado físico con esa identificación. Debe afiliarse primero antes de solicitar ser asociado.",
+          });
+          return;
+        }
+
+        // Error genérico
         if (
           typeof error === "object" &&
           error !== null &&
@@ -143,6 +161,7 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
         } else {
           errorMsg = String(error);
         }
+
         setFormErrors({
           general: errorMsg,
         });
@@ -179,7 +198,6 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
     ) : null;
   }
 
-  const campos = data.requisitosSolicitudes[tipo];
   const commonClasses =
     "w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300";
 
@@ -402,7 +420,7 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
         )}
 
         <div className="flex justify-end items-end gap-4 mt-8">
-        
+
           <div className="flex justify-end items-end">
             <button
               type="submit"

@@ -1,60 +1,81 @@
-import parsePhoneNumberFromString from "libphonenumber-js";
 import { z } from "zod";
 
-// Valores permitidos para el tipo de identificación
+// Tipo para TipoIdentificacion - Debe coincidir con el backend
 export const TipoIdentificacionValues = ["Cedula Nacional", "Dimex", "Pasaporte"] as const;
 export type TipoIdentificacion = typeof TipoIdentificacionValues[number];
-const validarTelefono = (phone: string) => {
-  const phoneNumber = parsePhoneNumberFromString(phone);
-  if (!phoneNumber || !phoneNumber.isValid()) {
-    return false;
-  }
-  
-  return true;
-};
-// Schema de validación para el formulario de cambio de medidor
+
+// Validaciones adaptadas del backend DTO
 export const CambioMedidorSchema = z.object({
-  Nombre: z.string()
-    .min(2, { message: "El nombre debe tener al menos 2 caracteres" }),
-
-  Apellido1: z.string()
-    .min(2, { message: "El primer apellido debe tener al menos 2 caracteres" }),
-
-  Apellido2: z.string()
-    .optional()
-    .or(z.string().min(2, { message: "El segundo apellido debe tener al menos 2 caracteres" })),
-
-  Direccion_Exacta: z.string()
-    .min(5, { message: "La dirección debe tener al menos 5 caracteres" }),
-
-  Correo: z.string()
-    .email({ message: "Debe ser un correo electrónico válido" }),
-Numero_Telefono: z.string().refine(
-  (phone) => {
-    const phoneNumber = parsePhoneNumberFromString(phone);
-    return !!phoneNumber && phoneNumber.isValid();
-  },
-  {
-    message: "Debe ingresar un número de teléfono válido con código de país, ej. +50688088690"
-  }
-),
-  //Numero_Telefono: z.string()
-    //.regex(/^\+506\d{8}$/, { message: "Debe ser un número válido con formato +506XXXXXXXX" }),
-
-  Tipo_Identificacion: z.enum(TipoIdentificacionValues, { 
-    required_error: "Debe seleccionar un tipo de identificación" 
+  // Validaciones de CreateSolicitudFisicaDto - COMUNES
+  Tipo_Identificacion: z.enum(TipoIdentificacionValues, {
+    errorMap: () => ({ message: 'El tipo de identificación debe ser uno de los siguientes: Cedula Nacional, Dimex, Pasaporte' }),
   }),
 
   Identificacion: z.string()
-    .min(9, { message: "El número de identificación debe tener al menos 9 caracteres" }),
+    .min(1, 'La identificación no puede estar vacía')
+    .refine(val => val.trim().length > 0, 'La identificación no puede estar vacía')
+    .transform(val => val.trim()),
+
+  Nombre: z.string()
+    .min(1, 'El nombre no puede estar vacío')
+    .min(2, 'El nombre debe tener al menos 2 caracteres')
+    .max(50, 'El nombre no puede tener más de 50 caracteres')
+    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, { message: 'El nombre solo puede contener letras y espacios' })
+    .refine(val => val.trim().length > 0, 'El nombre no puede estar vacío')
+    .transform(val => val.trim()),
+
+  Apellido1: z.string()
+    .min(1, 'El primer apellido no puede estar vacío')
+    .min(2, 'El primer apellido debe tener al menos 2 caracteres')
+    .max(50, 'El primer apellido no puede tener más de 50 caracteres')
+    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, { message: 'El primer apellido solo puede contener letras y espacios' })
+    .refine(val => val.trim().length > 0, 'El primer apellido no puede estar vacío')
+    .transform(val => val.trim()),
+
+  Apellido2: z.string()
+    .max(50, 'El segundo apellido no puede tener más de 50 caracteres')
+    .optional()
+    .or(z.literal(''))
+    .transform(val => val === '' ? undefined : val),
+
+  Correo: z.string()
+    .min(1, 'El correo no puede estar vacío')
+    .max(100, 'El correo no puede tener más de 100 caracteres')
+    .email('El correo electrónico debe tener un formato válido')
+    .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, { message: 'El formato del correo electrónico no es válido' })
+    .transform(val => val.trim().toLowerCase()),
+
+  Numero_Telefono: z.string()
+    .min(1, 'El número de teléfono no puede estar vacío')
+    .refine(val => val.trim().length > 0, 'El número de teléfono no puede estar vacío')
+    .transform(val => val.trim()),
+
+  // Validaciones específicas de CreateSolicitudCambioMedidorFisicaDto
+  Direccion_Exacta: z.string()
+    .min(1, 'La dirección no puede estar vacía')
+    .min(10, 'La dirección debe tener al menos 10 caracteres')
+    .max(255, 'La dirección no puede tener más de 255 caracteres')
+    .regex(/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s.,#-]+$/, { message: 'La dirección solo puede contener letras, números, espacios y los caracteres .,-#' })
+    .refine(val => val.trim().length > 0, 'La dirección no puede estar vacía')
+    .transform(val => val.trim()),
 
   Motivo_Solicitud: z.string()
-    .min(10, { message: "Debe tener al menos 10 caracteres" }),
+    .min(1, 'El motivo de la solicitud no puede estar vacío')
+    .min(10, 'El motivo de la solicitud debe tener al menos 10 caracteres')
+    .max(500, 'El motivo de la solicitud no puede tener más de 500 caracteres')
+    .regex(/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s.,!?¿¡()-]+$/, { message: 'El motivo de la solicitud solo puede contener letras, números, espacios y los caracteres .,!?¿¡()-' })
+    .refine(val => val.trim().length > 0, 'El motivo de la solicitud no puede estar vacío')
+    .transform(val => val.trim()),
 
-    Numero_Medidor_Anterior: z.coerce.number({
-    invalid_type_error: "El número de medidor debe ser un número válido",
+  Numero_Medidor_Anterior: z.coerce.number({
+    invalid_type_error: 'El numero de medidor anterior debe ser un numero entero',
   })
-    .min(1, { message: "Debe ingresar un número de medidor válido" })
-    .max(9999999, { message: "El número de medidor no puede ser mayor a 9,999,999" }),
+    .int('El numero de medidor anterior debe ser un numero entero')
+    .min(1, { message: 'El número de medidor anterior debe ser mayor a 0' })
+    .max(9999999, { message: 'El número de medidor anterior no puede ser mayor a 9,999,999' })
+    .positive('El número de medidor anterior debe ser positivo'),
 });
+
+export type FormularioCambioMedidorData = z.infer<typeof CambioMedidorSchema>;
+export type CambioMedidor = z.infer<typeof CambioMedidorSchema>;
 
