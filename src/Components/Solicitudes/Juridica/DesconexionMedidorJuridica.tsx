@@ -7,10 +7,7 @@ import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 
-type SolicitudTipo = 'desconexion';
-
 type Props = {
-    tipo: SolicitudTipo;
     onClose: () => void;
 };
 

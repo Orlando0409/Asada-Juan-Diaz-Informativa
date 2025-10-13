@@ -1,15 +1,12 @@
 import { useForm } from "@tanstack/react-form";
 import { useRef, useState } from "react";
-import data from "../../../data/Data.json";
 import { AfiliacionJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/AfiliacionJuridica";
 import { useAfiliacionJuridica } from "../../../Hook/Solicitudes/Juridica/hookAfiliacionJuridica";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 
-type SolicitudTipo = 'afiliacion';
 
 type Props = {
-    tipo: SolicitudTipo;
     onClose: () => void;
 };
 
@@ -22,7 +19,7 @@ function formatCedulaJuridica(value: string) {
     return formatted;
 }
 
-const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
+const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
     const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});

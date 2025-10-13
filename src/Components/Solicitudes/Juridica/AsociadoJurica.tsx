@@ -5,10 +5,7 @@ import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { createAsociadoJuridica } from "../../../Services/Solicitudes/Juridica/AsociadoJuricaService";
 
-type SolicitudTipo = "juridico";
-
 type Props = {
-    tipo: SolicitudTipo;
     onClose: () => void;
 };
 

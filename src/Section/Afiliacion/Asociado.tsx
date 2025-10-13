@@ -84,7 +84,7 @@ const Asociado = () => {
           {/* Contenedor del formulario */}
           <div className="rounded relative w-[90%] max-w-5xl max-h-[550px] overflow-y-scroll [scroll-whit:none] [-ms-overflow-style:none]"
             style={{ scrollbarWidth: "none" }}>
-            <FormularioAsociadoJuridico tipo="juridico" onClose={() => setMostrarFormularioJuridico(false)} />
+            <FormularioAsociadoJuridico  onClose={() => setMostrarFormularioJuridico(false)} />
           </div>
         </div>
       )}
@@ -98,7 +98,7 @@ const Asociado = () => {
           ></div>
           <div className="rounded relative w-[90%] max-w-5xl max-h-[550px] overflow-y-scroll [scroll-whit:none] [-ms-overflow-style:none]"
             style={{ scrollbarWidth: "none" }}>
-            <FormularioAsociado tipo="asociado" onClose={() => setMostrarFormularioFisico(false)} />
+            <FormularioAsociado onClose={() => setMostrarFormularioFisico(false)} />
           </div>
         </div>
       )}
