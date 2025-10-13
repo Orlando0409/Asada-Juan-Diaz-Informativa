@@ -4,14 +4,6 @@ import { z } from "zod";
 // Valores permitidos para el tipo de identificación
 export const TipoIdentificacionValues = ["Cedula Nacional", "Dimex", "Pasaporte"] as const;
 export type TipoIdentificacion = typeof TipoIdentificacionValues[number];
-const validarTelefono = (phone: string) => {
-  const phoneNumber = parsePhoneNumberFromString(phone);
-  if (!phoneNumber || !phoneNumber.isValid()) {
-    return false;
-  }
-  
-  return true;
-};
 // Schema de validación para el formulario de cambio de medidor
 export const CambioMedidorSchema = z.object({
   Nombre: z.string()

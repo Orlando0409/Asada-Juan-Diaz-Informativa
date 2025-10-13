@@ -4,7 +4,6 @@ import { AsociadoJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/As
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { createAsociadoJuridica } from "../../../Services/Solicitudes/Juridica/AsociadoJuricaService";
-//import { createAsociadoJuridica } from "../../../Services/Solicitudes/Juridica/AsociadoJuridicaService";
 
 type SolicitudTipo = "juridico";
 
@@ -28,7 +27,7 @@ function formatCedulaJuridica(value: string) {
     return formatted;
 }
 
-const FormularioAsociadoJuridico = ({ tipo, onClose }: Props) => {
+const FormularioAsociadoJuridico = ({ onClose }: Props) => {
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const [touched, setTouched] = useState<Record<string, boolean>>({});

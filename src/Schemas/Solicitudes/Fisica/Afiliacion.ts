@@ -14,11 +14,6 @@ const IDENTITY_PATTERNS: Record<TipoIdentificacion, RegExp> = {
   'Pasaporte': /^[A-Za-z0-9]{6,12}$/,
 } as const;
 
-const IDENTITY_ERROR_MESSAGES: Record<TipoIdentificacion, string> = {
-  'Cedula Nacional': 'La cédula debe tener exactamente 9 dígitos y no puede comenzar con 0',
-  'Dimex': 'El DIMEX debe tener 11 o 12 dígitos y debe comenzar con 12, 13 o 18',
-  'Pasaporte': 'El pasaporte debe tener 6-12 caracteres alfanuméricos, con al menos 1 y máximo 3 letras',
-} as const;
 
 // Regex para validar el formato E.164
 const E164_REGEX = /^\+?[1-9]\d{1,14}$/;

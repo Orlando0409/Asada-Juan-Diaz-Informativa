@@ -23,7 +23,7 @@ type Props = {
 };
 
 const normalizePhoneNumber = (phone: string): string => {
-  if (!phone || !phone.startsWith('+')) {
+  if (!phone?.startsWith('+')) {
     throw new Error('El número debe incluir el código de país y comenzar con "+". Ejemplo: +50688887777');
   }
   return phone;
@@ -37,7 +37,7 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
   const mutation = useAsociadoMedidor();
   const [mostrarFormulario, setMostrarFormulario] = useState(true);
 
-  // Validación en tiempo real de todo el formulario
+  // Validación en tiempo real del formulario
   const validateAllFields = (values: any) => {
     try {
       AsociadoSchema.parse(values);
@@ -118,7 +118,7 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
 
         await mutation.createAsociado({
           ...value,
-          Tipo_Identificacion: value.Tipo_Identificacion as TipoIdentificacion
+          Tipo_Identificacion: value.Tipo_Identificacion
         });
 
         form.reset();
@@ -179,7 +179,6 @@ const FormularioAsociado = ({ tipo, onClose }: Props) => {
     ) : null;
   }
 
-  const campos = data.requisitosSolicitudes[tipo];
   const commonClasses =
     "w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300";
 

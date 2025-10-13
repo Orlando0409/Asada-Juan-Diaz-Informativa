@@ -8,14 +8,6 @@ import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 
-type AxiosError = {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-  message: string;
-};
 
 
 type SolicitudTipo = 'cambioMedidor';
@@ -138,24 +130,12 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
 
   if (!mostrarFormulario) return null;
 
-  const campos = data.requisitosSolicitudes[tipo];
+
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
 
   function validateField(
     fieldName: string,
-    value: any,
-    values: {
-      Nombre: string;
-      Apellido1: string;
-      Apellido2: string;
-      Tipo_Identificacion: TipoIdentificacion;
-      Identificacion: string;
-      Direccion_Exacta: string;
-      Numero_Telefono: string;
-      Correo: string;
-      Motivo_Solicitud: string;
-      Numero_Medidor_Anterior: number;
-    }
+    value: any
   ) {
     if (fieldSchemas[fieldName]) {
       try {
@@ -393,7 +373,7 @@ const FormularioCambioMedidor = ({ tipo, onClose }: Props) => {
                   value={field.state.value}
                   onChange={(e) => {
                     field.handleChange(e.target.value);
-                    validateField("Motivo_Solicitud", e.target.value, form.state.values);
+                    validateField("Motivo_Solicitud", e.target.value);
                   }}
                   placeholder="Escribe el motivo de tu solicitud"
                   className={`${commonClasses} resize-none h-24 overflow-y-scroll`}

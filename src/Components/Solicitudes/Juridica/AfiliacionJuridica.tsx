@@ -13,12 +13,6 @@ type Props = {
     onClose: () => void;
 };
 
-const normalizePhoneNumber = (phone: string): string => {
-    if (!phone || !phone.startsWith('+')) {
-        throw new Error('El número debe incluir el código de país y comenzar con "+". Ejemplo: +50688887777');
-    }
-    return phone;
-};
 function formatCedulaJuridica(value: string) {
     const digits = value.replace(/\D/g, "");
     let formatted = "";
@@ -39,7 +33,7 @@ const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
     const [mostrarFormulario, setMostrarFormulario] = useState(true);
 
     // Validación en tiempo real usando el schema
-    const validateField = (fieldName: string, value: any, allValues?: any) => {
+    const validateField = (fieldName: string, value: any) => {
         try {
             // Crea un objeto dummy con valores válidos para todos los campos
             const dummy: any = {
@@ -153,7 +147,6 @@ const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
   });
 
     if (!mostrarFormulario) return null;
-    const campos = data.juridica[tipo];
     const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300 bg-white';
 
     return (
@@ -178,7 +171,7 @@ const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
                                     value={field.state.value}
                                     onChange={(e) => {
                                         field.handleChange(e.target.value);
-                                        validateField("Razon_Social", e.target.value, form.state.values);
+                                        validateField("Razon_Social", e.target.value);
                                     }}
                                     placeholder="Ejemplo S.A."
                                     className={commonClasses}
@@ -205,7 +198,7 @@ const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
                                     onChange={(e) => {
                                         const formatted = formatCedulaJuridica(e.target.value);
                                         field.handleChange(formatted);
-                                        validateField("Cedula_Juridica", formatted, form.state.values);
+                                        validateField("Cedula_Juridica", formatted);
                                     }}
                                     placeholder="3-XXX-XXXXXX"
                                     className={commonClasses}
@@ -230,7 +223,7 @@ const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
                                     value={field.state.value}
                                     onChange={(e) => {
                                         field.handleChange(e.target.value);
-                                        validateField("Correo", e.target.value, form.state.values);
+                                        validateField("Correo", e.target.value);
                                     }}
                                     placeholder="empresa@email.com"
                                     className={commonClasses}
@@ -255,7 +248,7 @@ const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
                                     value={field.state.value}
                                     onChange={(value) => {
                                         field.handleChange(value || "");
-                                        validateField("Numero_Telefono", value || "", form.state.values);
+                                        validateField("Numero_Telefono", value || "");
                                     }}
                                     className={`${commonClasses} ${fieldErrors["Numero_Telefono"] ? 'border-red-500 focus:ring-red-300' : ''}`}
                                 />
@@ -278,7 +271,7 @@ const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
                                     value={field.state.value}
                                     onChange={(e) => {
                                         field.handleChange(e.target.value);
-                                        validateField("Direccion_Exacta", e.target.value, form.state.values);
+                                        validateField("Direccion_Exacta", e.target.value);
                                     }}
                                     placeholder="San José, del Banco Nacional 200m sur"
                                     className={commonClasses}
@@ -310,7 +303,7 @@ const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
                                             const file = e.target.files?.[0] ?? null;
                                             field.handleChange(file ?? undefined);
                                             setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: file }));
-                                            validateField("Planos_Terreno", file, form.state.values);
+                                            validateField("Planos_Terreno", file);
                                         }}
                                         className="hidden"
                                         id="Planos_Terreno"
@@ -369,7 +362,7 @@ const FormularioAfiliacionJuridico = ({ tipo, onClose }: Props) => {
                                             const file = e.target.files?.[0] ?? null;
                                             field.handleChange(file ?? undefined);
                                             setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: file }));
-                                            validateField("Escritura_Terreno", file, form.state.values);
+                                            validateField("Escritura_Terreno", file);
                                         }}
                                         className="hidden"
                                         id="Escritura_Terreno"
