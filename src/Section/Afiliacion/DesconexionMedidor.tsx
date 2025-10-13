@@ -107,7 +107,7 @@ const DesconexionMedidor = () => {
                          {/* Contenedor del formulario */}
                          <div className="rounded relative w-[95%] sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] max-w-5xl max-h-[80vh] sm:max-h-[85vh] md:max-h-[550px] overflow-y-scroll scrollbar-hide"
                               style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
-                              <DesconexionMedidorJuridica tipo="desconexion" onClose={() => setMostrarFormularioJuridico(false)} />
+                              <DesconexionMedidorJuridica onClose={() => setMostrarFormularioJuridico(false)} />
                          </div>
                     </div>
                )}
@@ -123,7 +123,7 @@ const DesconexionMedidor = () => {
                          {/* Contenedor del formulario */}
                          <div className="rounded relative w-[95%] sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] max-w-5xl max-h-[80vh] sm:max-h-[85vh] md:max-h-[550px] overflow-y-scroll scrollbar-hide"
                               style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
-                              <FormularioDesconexion tipo="desconexion" onClose={() => setMostrarFormularioFisico(false)} />
+                              <FormularioDesconexion onClose={() => setMostrarFormularioFisico(false)} />
                          </div>
                     </div>
                )}
