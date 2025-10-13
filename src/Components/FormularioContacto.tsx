@@ -14,6 +14,7 @@ const FormularioContacto = ({ tipo }: Props) => {
   const [formkey, setFormKey] = useState<number>(0); // Estado para forzar el reinicio del formulario
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<File | null>(null)
   const [formErrors, setFormErrors] = useState<Record<string, string>>({}) // Agrega un arreglo para manejo de errores
+  const [successMessage, setSuccessMessage] = useState<string>('') // Estado para mensaje de éxito
   const mutation = useCreateContacto()
 
   const requisitos = data.RequisitosContacto as unknown as RequisitosContacto
@@ -39,6 +40,7 @@ const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps
   
     onSubmit: async ({ value }) => {
       setFormErrors({}) // Limpia errores previos
+      setSuccessMessage('') // Limpia mensajes de éxito previos
 
       // Valida con Zod al hacer submit
       const validation = DynamicContactoSchema.safeParse(value)
@@ -56,12 +58,29 @@ const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps
       try {
          await mutation.mutateAsync({ data: value, tipo })
          setFormKey((prev) => prev + 1) // Reinicia el formulario
-        setArchivoSeleccionado(null)
-      } catch (error) {
+         setArchivoSeleccionado(null)
+         setSuccessMessage(`¡Tu ${tipo} ha sido enviado exitosamente!`)
+         // Limpiar el mensaje de éxito después de 5 segundos
+         setTimeout(() => setSuccessMessage(''), 5000)
+      } catch (error: any) {
         console.error('Error al enviar formulario:', error)
-        setFormErrors({
-          general: 'Hubo un error al enviar el formulario. \n Por favor intenta nuevamente.'
-        })
+        
+        // Extraer el mensaje de error del backend si está disponible
+        let errorMessage = 'Hubo un error al enviar el formulario. Por favor intenta nuevamente.'
+        
+        if (error?.response?.data?.message) {
+          // Si el backend retorna message como string
+          if (typeof error.response.data.message === 'string') {
+            errorMessage = error.response.data.message
+          } else if (Array.isArray(error.response.data.message)) {
+            // Si el backend retorna un array de mensajes
+            errorMessage = error.response.data.message.join(', ')
+          }
+        } else if (error?.message) {
+          errorMessage = error.message
+        }
+        
+        setFormErrors({ general: errorMessage })
       }
     },
   })
@@ -201,6 +220,20 @@ const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps
             {form.state.isSubmitting ? 'Enviando...' : 'Enviar'}
           </button>
         </div>
+
+        {/* Mensaje de éxito */}
+        {successMessage && (
+          <div className="mt-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded-md text-center">
+            {successMessage}
+          </div>
+        )}
+
+        {/* Mensaje de error general */}
+        {formErrors.general && (
+          <div className="mt-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded-md text-center">
+            {formErrors.general}
+          </div>
+        )}
       </form>
     </div>
   )

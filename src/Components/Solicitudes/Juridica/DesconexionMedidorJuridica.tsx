@@ -16,7 +16,7 @@ type Props = {
 
 const normalizePhoneNumber = (phone: string): string => {
     const phoneNumber = parsePhoneNumberFromString(phone);
-    if (!phoneNumber || !phoneNumber.isValid()) {
+    if (!phoneNumber?.isValid()) {
         throw new Error('Debe ingresar un número de teléfono válido con código de país, ej. +50688887777');
     }
     return phoneNumber.format('E.164');
@@ -32,7 +32,7 @@ function formatCedulaJuridica(value: string) {
   return formatted;
 }
 
-const DesconexionMedidorJuridica = ({ tipo, onClose }: Props) => {
+const DesconexionMedidorJuridica = ({ onClose }: Props) => {
     const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -43,7 +43,7 @@ const DesconexionMedidorJuridica = ({ tipo, onClose }: Props) => {
     const [mostrarFormulario, setMostrarFormulario] = useState(true);
 
     // Validación en tiempo real usando el schema
-    const validateField = (fieldName: string, value: any, allValues?: any) => {
+    const validateField = (fieldName: string, value: any) => {
         try {
             // Crea un objeto dummy con valores válidos para todos los campos
             const dummy: any = {
@@ -187,7 +187,7 @@ const DesconexionMedidorJuridica = ({ tipo, onClose }: Props) => {
                                                 value={typeof field.state.value === "string" ? field.state.value : ""}
                                                 onChange={(value) => {
                                                     field.handleChange(value || "");
-                                                    validateField(fieldName, value || "", form.state.values);
+                                                    validateField(fieldName, value || "");
                                                 }}
                                                 className={`${commonClasses} ${fieldErrors[fieldName] ? 'border-red-500 focus:ring-red-300' : ''}`}
                                             />
@@ -215,7 +215,7 @@ const DesconexionMedidorJuridica = ({ tipo, onClose }: Props) => {
                                         onChange={(e) => {
                                           const formatted = formatCedulaJuridica(e.target.value);
                                           field.handleChange(formatted);
-                                          validateField(fieldName, formatted, form.state.values);
+                                          validateField(fieldName, formatted);
                                         }}
                                         placeholder="3-XXX-XXXXXX"
                                         className={commonClasses}
@@ -248,7 +248,7 @@ const DesconexionMedidorJuridica = ({ tipo, onClose }: Props) => {
                                                     const file = e.target.files?.[0] ?? undefined;
                                                     field.handleChange(file);
                                                     setArchivoSeleccionado(prev => ({ ...prev, [fieldName]: file ?? null }));
-                                                    validateField(fieldName, file, form.state.values);
+                                                    validateField(fieldName, file);
                                                 }}
                                                 className="hidden"
                                                 id={fieldName}
@@ -308,7 +308,7 @@ const DesconexionMedidorJuridica = ({ tipo, onClose }: Props) => {
                                                 value={field.state.value as string}
                                                 onChange={(e) => {
                                                     field.handleChange(e.target.value);
-                                                    validateField(fieldName, e.target.value, form.state.values);
+                                                    validateField(fieldName, e.target.value);
                                                 }}
                                                 placeholder={fieldLabels[fieldName]}
                                                 className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
@@ -336,7 +336,7 @@ const DesconexionMedidorJuridica = ({ tipo, onClose }: Props) => {
                                             value={(field.state.value as string | number) ?? ""}
                                             onChange={(e) => {
                                                 field.handleChange(e.target.value);
-                                                validateField(fieldName, e.target.value, form.state.values);
+                                                validateField(fieldName, e.target.value);
                                             }}
                                             placeholder={fieldLabels[fieldName]}
                                             className={commonClasses}

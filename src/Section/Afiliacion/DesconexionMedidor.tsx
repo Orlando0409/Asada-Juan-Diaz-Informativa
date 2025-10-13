@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import data from '../../data/Data.json';
-//import FormularioDesconexionMedidor from "../../Components/Solicitudes/DesconexionMedidor";
 import DesconexionMedidorJuridica from "../../Components/Solicitudes/Juridica/DesconexionMedidorJuridica";
 import FormularioDesconexion from "../../Components/Solicitudes/Fisico/DesconexionMedidor";
 

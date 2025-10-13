@@ -1,7 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { z } from "zod";
-import data from '../../../data/Data.json';
 import { CambioMedidorJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/CambioMedidorJuridico";
 import { useCambioMedidorJuridica } from "../../../Hook/Solicitudes/Juridica/hookCambioMedidorJuridica";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
@@ -25,7 +24,7 @@ function formatCedulaJuridica(value: string) {
 
 const fieldSchemas: Record<string, z.ZodTypeAny> = CambioMedidorJuridicaSchema.shape;
 
-const CambioMedidorJuridica = ({ tipo, onClose }: Props) => {
+const CambioMedidorJuridica = ({ onClose }: Props) => {
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const mutation = useCambioMedidorJuridica();
@@ -84,7 +83,7 @@ const CambioMedidorJuridica = ({ tipo, onClose }: Props) => {
             try {
                 // Validar y normalizar el teléfono internacional
                 const phoneNumber = parsePhoneNumberFromString(value.Numero_Telefono || "");
-                if (!phoneNumber || !phoneNumber.isValid()) {
+                if (!phoneNumber?.isValid()) {
                     setFormErrors({ Numero_Telefono: "Número de teléfono inválido" });
                     return;
                 }
@@ -122,43 +121,8 @@ const CambioMedidorJuridica = ({ tipo, onClose }: Props) => {
 
     if (!mostrarFormulario) return null;
 
-    const campos = data.juridica[tipo];
+    
     const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
-
-    function validateField(
-        fieldName: string,
-        value: string,
-        values: {
-            Razon_Social: string;
-            Cedula_Juridica: string;
-            Correo: string;
-            Numero_Telefono: string;
-            Direccion_Exacta: string;
-            Motivo_Solicitud: string;
-            Numero_Medidor_Anterior: number;
-        }
-    ) {
-        if (fieldSchemas[fieldName]) {
-            try {
-                fieldSchemas[fieldName].parse(value);
-                setFieldErrors(prev => {
-                    const newErrors = { ...prev };
-                    delete newErrors[fieldName];
-                    return newErrors;
-                });
-            } catch (error: any) {
-                let errorMessage = '';
-                if (error.errors && Array.isArray(error.errors)) {
-                    errorMessage = error.errors[0]?.message || 'Error de validación';
-                } else if (error.message) {
-                    errorMessage = error.message;
-                } else {
-                    errorMessage = 'Error de validación';
-                }
-                setFieldErrors(prev => ({ ...prev, [fieldName]: errorMessage }));
-            }
-        }
-    }
 
     return (
         <div className="flex justify-center items-center min-h-screen text-gray-800 p-5 w-full">
@@ -173,7 +137,7 @@ const CambioMedidorJuridica = ({ tipo, onClose }: Props) => {
                     <form.Field name="Razon_Social">
                         {(field) => (
                             <div className="mb-3 w-full">
-                                <label className="block mb-1 font-medium">Razón Social <span className="text-red-500">*</span></label>
+                                <label htmlFor="RazonSocial" className="block mb-1 font-medium">Razón Social <span className="text-red-500">*</span></label>
                                 <input
                                     type="text"
                                     value={field.state.value}
@@ -197,7 +161,7 @@ const CambioMedidorJuridica = ({ tipo, onClose }: Props) => {
                     <form.Field name="Cedula_Juridica">
                         {(field) => (
                             <div className="mb-3 w-full">
-                                <label className="block mb-1 font-medium">Cédula Jurídica <span className="text-red-500">*</span></label>
+                                <label htmlFor="CedulaJuridica" className="block mb-1 font-medium">Cédula Jurídica <span className="text-red-500">*</span></label>
                                 <input
                                     type="text"
                                     value={field.state.value}
@@ -222,7 +186,7 @@ const CambioMedidorJuridica = ({ tipo, onClose }: Props) => {
                     <form.Field name="Correo">
                         {(field) => (
                             <div className="mb-3 w-full">
-                                <label className="block mb-1 font-medium">Correo electrónico <span className="text-red-500">*</span></label>
+                                <label htmlFor="Correo" className="block mb-1 font-medium">Correo electrónico <span className="text-red-500">*</span></label>
                                 <input
                                     type="email"
                                     value={field.state.value}
@@ -246,7 +210,7 @@ const CambioMedidorJuridica = ({ tipo, onClose }: Props) => {
                     <form.Field name="Numero_Telefono">
                         {(field) => (
                             <div className="mb-3 w-full">
-                                <label className="block mb-1 font-medium">Número de teléfono <span className="text-red-500">*</span></label>
+                                <label htmlFor="Numero_Telefono" className="block mb-1 font-medium">Número de teléfono <span className="text-red-500">*</span></label>
                                 <PhoneInput
                                     international
                                     defaultCountry="CR"
@@ -270,7 +234,7 @@ const CambioMedidorJuridica = ({ tipo, onClose }: Props) => {
                     <form.Field name="Direccion_Exacta">
                         {(field) => (
                             <div className="mb-3 w-full">
-                                <label className="block mb-1 font-medium">Dirección exacta <span className="text-red-500">*</span></label>
+                                <label htmlFor="Direccion_Exacta" className="block mb-1 font-medium">Dirección exacta <span className="text-red-500">*</span></label>
                                 <input
                                     type="text"
                                     value={field.state.value}
@@ -294,12 +258,12 @@ const CambioMedidorJuridica = ({ tipo, onClose }: Props) => {
                     <form.Field name="Motivo_Solicitud">
                         {(field) => (
                             <div className="mb-3 w-full">
-                                <label className="block mb-1 font-medium">Motivo de solicitud <span className="text-red-500">*</span></label>
+                                <label htmlFor="Motivo_Solicitud" className="block mb-1 font-medium">Motivo de solicitud <span className="text-red-500">*</span></label>
                                 <textarea
                                     value={field.state.value}
                                     onChange={(e) => {
                                         field.handleChange(e.target.value);
-                                        validateField("Motivo_Solicitud", e.target.value, form.state.values);
+                                        handleFieldChange("Motivo_Solicitud", e.target.value);
                                     }}
                                     placeholder="Escribe el motivo de tu solicitud"
                                     className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
@@ -317,7 +281,7 @@ const CambioMedidorJuridica = ({ tipo, onClose }: Props) => {
                     <form.Field name="Numero_Medidor_Anterior">
                         {(field) => (
                             <div className="mb-3 w-full">
-                                <label className="block mb-1 font-medium">Número de Medidor <span className="text-red-500">*</span></label>
+                                <label htmlFor="Numero_Medidor_Anterior" className="block mb-1 font-medium">Número de Medidor <span className="text-red-500">*</span></label>
                                 <input
                                     type="number"
                                     min={0}
