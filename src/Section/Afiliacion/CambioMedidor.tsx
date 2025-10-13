@@ -1,14 +1,15 @@
 import { useState } from "react"
 import data from '../../data/Data.json'
-import FormularioCambioMedidor from "../../Components/Solicitudes/FormularioCambioMedidor"
+//import FormularioCambioMedidor from "../../Components/Solicitudes/FormularioCambioMedidor"
 import CambioMedidorJuridica from "../../Components/Solicitudes/Juridica/CambioMedidorJuridica"
+import FormularioCambioMedidor from "../../Components/Solicitudes/Fisico/FormularioCambioMedidor"
 
 const CambioMedidor = () => {
   const [mostrarFormularioFisico, setMostrarFormularioFisico] = useState(false)
   const [mostrarFormularioJuridico, setMostrarFormularioJuridico] = useState(false)
 
   const requisitosFisico = data.requisitosSolicitudes.cambioMedidor
-  const requisitosJuridico = data.requisitosSolicitudes.juridica?.cambioMedidor
+  const requisitosJuridico = data.juridica?.cambioMedidor??{}
 
   return (
     <section className="min-h-screen w-full bg-white flex flex-col items-center py-6 sm:py-8 md:py-10 px-2 sm:px-4 md:px-6 lg:px-8">
@@ -104,7 +105,7 @@ const CambioMedidor = () => {
             onClick={() => setMostrarFormularioJuridico(false)}
           ></div>
           {/* Contenedor del formulario */}
-          <div className="rounded relative w-[95%] sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] max-w-md max-h-[80vh] sm:max-h-[85vh] md:max-h-[550px] overflow-y-scroll scrollbar-hide"
+          <div className="rounded relative w-[95%] sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] max-w-5xl max-h-[80vh] sm:max-h-[85vh] md:max-h-[550px] overflow-y-scroll scrollbar-hide"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
             <CambioMedidorJuridica tipo="cambioMedidor" onClose={() => setMostrarFormularioJuridico(false)} />
           </div>
@@ -120,7 +121,7 @@ const CambioMedidor = () => {
             onClick={() => setMostrarFormularioFisico(false)}
           ></div>
           {/* Contenedor del formulario */}
-          <div className="rounded relative w-[95%] sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] max-w-md max-h-[80vh] sm:max-h-[85vh] md:max-h-[550px] overflow-y-scroll scrollbar-hide"
+          <div className="rounded relative w-[95%] sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] max-w-5xl max-h-[80vh] sm:max-h-[85vh] md:max-h-[550px] overflow-y-scroll scrollbar-hide"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
             <FormularioCambioMedidor tipo="cambioMedidor" onClose={() => setMostrarFormularioFisico(false)} />
           </div>

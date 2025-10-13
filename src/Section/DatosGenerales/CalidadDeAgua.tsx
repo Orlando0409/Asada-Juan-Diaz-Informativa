@@ -1,35 +1,30 @@
-import Data from '../../data/Data.json';
-import { useCalidadAguaQuery } from '../../Hook/CalidadDeAgua/hookCalidadAgua';
+import { useCalidadAguaVisiblesQuery } from '../../Hook/CalidadDeAgua/hookCalidadAgua';
 const CalidadDeAgua = () => {
 
-  const { data: archivos = [], isLoading } = useCalidadAguaQuery();
+  const { data: archivos = [], isLoading } = useCalidadAguaVisiblesQuery();
 
-  return (
+  const renderContent = () => {
+    if (isLoading) {
+      return (
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      );
+    }
 
-    <section className='bg-white text-gray-800 p-6 sm:p-10 md:-16 flex flex-col gap-12'>
+    if (archivos.length === 0) {
+      return (
+        <div className="text-center py-12">
+          <p className="text-gray-500 text-lg">No hay documentos disponibles en este momento.</p>
+        </div>
+      );
+    }
 
-      <div className="max-w-4xl mx-auto text-center">
-        <h1 className='font-bold text-2xl sm:text-3xl md:text-4xl text-blue-900 mb-4'>Calidad de Agua</h1>
-        <blockquote className='border-l-4 border-blue-400 pl-4 sm:pl-6'>
-          <p className='text- base sm:text-lg md-text-xl leading-relaxed'>
-
-            <span className='font-semibold text-blue-700'>
-              Con el fin de dar transparencia y confianza a la comunidad, les brindamos estos documentos para que puedan ver la pureza del agua.
-            </span>
-          </p>
-
-        </blockquote>
-      </div>
-
-      {/*grid */}
-      <div className="max-w-6xl mx-auto w-full">
-        <h2 className=' font-bold text-blue-900 mb-8 text-center text-xl sm:text-2xl md:text-3xl '>
-          Documentos disponibles
-        </h2>
+      return (
         <div className='grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
-          {archivos.map((archivo: any, idx: number) => (
+          {archivos.map((archivo, idx: number) => (
             <div
-              key={archivo.id ?? idx}
+              key={archivo.Id_Calidad_Agua ?? idx}
               className='bg-white rounded-3xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 p-5 flex flex-col items-center text-center'
             >
               {/*icono */}
@@ -54,17 +49,16 @@ const CalidadDeAgua = () => {
                 Ver PDF
               </a>
             </div>
-
           ))}
         </div>
+      );
+    };
 
-
-      </div>
-
-
-    </section>
-
-  )
+    return (
+      <section className="container mx-auto px-4 py-8">
+        {renderContent()}
+      </section>
+    );
 }
 
 export default CalidadDeAgua

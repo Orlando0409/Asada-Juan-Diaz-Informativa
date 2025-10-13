@@ -1,4 +1,4 @@
-import Mapa from './Mapa'
+import Mapa from './mapa';
 import Redes from './Redes';
 
 const Footer = () => {

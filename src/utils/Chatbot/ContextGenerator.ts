@@ -78,7 +78,7 @@ export class ContextGenerator {
 
     CONTROL DE CALIDAD:
     Documentos disponibles (${CalidadAguaArchivos.length} reportes):
-    ${CalidadAguaArchivos.map(archivo => `- ${archivo.nombre}`).join('\n')}
+    ${CalidadAguaArchivos.map(archivo => `- ${archivo.Titulo || archivo.Titullo}`).join('\n')}
 
     Responde preguntas sobre servicios, calidad del agua, cobertura y documentación de calidad.`;
   }
