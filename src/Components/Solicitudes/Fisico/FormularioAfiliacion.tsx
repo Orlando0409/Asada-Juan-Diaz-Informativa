@@ -7,14 +7,7 @@ import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { AfiliacionSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/Afiliacion";
 
-type AxiosError = {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-  message: string;
-};
+
 
 type SolicitudTipo = 'abonado';
 
@@ -189,7 +182,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
     ) : null;
   }
 
-  const campos = data.requisitosSolicitudes[tipo];
+ 
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
 
   return (

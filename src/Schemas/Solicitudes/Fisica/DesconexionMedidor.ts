@@ -16,11 +16,6 @@ const IDENTITY_PATTERNS: Record<TipoIdentificacion, RegExp> = {
   'Pasaporte': /^[A-Za-z0-9]{6,9}$/,
 };
 
-const IDENTITY_ERROR_MESSAGES: Record<TipoIdentificacion, string> = {
-  'Cedula Nacional': 'La cédula debe tener exactamente 9 dígitos',
-  'Dimex': 'El DIMEX debe tener 11 o 12 dígitos',
-  'Pasaporte': 'El pasaporte debe tener 6-9 caracteres alfanuméricos',
-};
 
 export const DesconexionMedidorSchema = z.object({
   Nombre: z.string()

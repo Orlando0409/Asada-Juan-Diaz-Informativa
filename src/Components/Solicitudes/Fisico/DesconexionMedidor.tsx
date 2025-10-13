@@ -8,14 +8,6 @@ import "react-phone-number-input/style.css";
 import { useDesconexion } from "../../../Hook/Solicitudes/Fisico/hookDesconexion";
 import { DesconexionMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/DesconexionMedidor";
 
-type AxiosError = {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-  message: string;
-};
 
 type SolicitudTipo = 'desconexion';
 
@@ -186,7 +178,6 @@ const FormularioDesconexionMedidor = ({ tipo, onClose }: Props) => {
 
   if (!mostrarFormulario) return null;
 
-  const campos = data.requisitosSolicitudes[tipo];
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
 
   return (
