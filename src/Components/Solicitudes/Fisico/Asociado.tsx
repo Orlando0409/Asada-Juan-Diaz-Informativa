@@ -126,8 +126,6 @@ const FormularioAsociado = ({ onClose }: Props) => {
       } catch (error: unknown) {
         console.log("🔍 ERROR EN SOLICITUD DE ASOCIADO:", error);
         
-        // Log detallado del error
-        const axiosError = error as AxiosError;
         
         let errorMsg = '';
         const backendMessage = (error as AxiosError)?.response?.data?.message;
