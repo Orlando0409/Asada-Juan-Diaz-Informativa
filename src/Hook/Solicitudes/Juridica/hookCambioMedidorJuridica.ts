@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createCambioMedidorJuridica } from "../../../Services/Solicitudes/Juridica/CambioMedidorJurica";
-//import type { CambioMedidor } from "../../../Schemas/Solicitudes/CambioMedidor";
 import type { CambioMedidorJuridica } from "../../../Schemas/Solicitudes/Juridica/CambioMedidorJuridico";
 
 export const useCambioMedidorJuridica = () => {

@@ -19,7 +19,7 @@ type Props = {
 };
 
 const normalizePhoneNumber = (phone: string): string => {
-  if (!phone || !phone.startsWith('+')) {
+  if (!phone?.startsWith('+')) {
     throw new Error('El número debe incluir el código de país y comenzar con "+". Ejemplo: +50688887777');
   }
   return phone;
@@ -33,7 +33,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
   const mutation = useAsociadoMedidor();
   const [mostrarFormulario, setMostrarFormulario] = useState(true);
 
-  // Validación en tiempo real de todo el formulario
+  // Validación en tiempo real del formulario
   const validateAllFields = (values: any) => {
     try {
       AsociadoSchema.parse(values);
@@ -114,7 +114,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
 
         await mutation.createAsociado({
           ...value,
-          Tipo_Identificacion: value.Tipo_Identificacion as TipoIdentificacion
+          Tipo_Identificacion: value.Tipo_Identificacion
         });
 
         form.reset();
@@ -244,7 +244,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
           <form.Field name="Identificacion">
             {(field) => (
               <div className="mb-3 w-full">
-                <label className="block mb-1 font-medium">
+                <label htmlFor="Identificaion" className="block mb-1 font-medium">
                   Número de Identificación <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -254,7 +254,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
                     handleFieldChange('Identificacion', e.target.value);
                   }}
                   onBlur={() => setTouched(prev => ({ ...prev, Identificacion: true }))}
-                  placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion as TipoIdentificacion)}
+                  placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion)}
                   disabled={!form.state.values.Tipo_Identificacion}
                   className={`${commonClasses} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                 />
@@ -271,7 +271,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
           <form.Field name="Nombre">
             {(field) => (
               <div className="mb-3 w-full">
-                <label className="block mb-1 font-medium">Nombre <span className="text-red-500">*</span></label>
+                <label htmlFor="Nombre" className="block mb-1 font-medium">Nombre <span className="text-red-500">*</span></label>
                 <input
                   type="text"
                   value={field.state.value}
@@ -295,7 +295,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
           <form.Field name="Apellido1">
             {(field) => (
               <div className="mb-3 w-full">
-                <label className="block mb-1 font-medium">Primer Apellido <span className="text-red-500">*</span></label>
+                <label htmlFor="Apellido1" className="block mb-1 font-medium">Primer Apellido <span className="text-red-500">*</span></label>
                 <input
                   type="text"
                   value={field.state.value}
@@ -319,7 +319,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
           <form.Field name="Apellido2">
             {(field) => (
               <div className="mb-3 w-full">
-                <label className="block mb-1 font-medium">Segundo Apellido</label>
+                <label htmlFor="Apellido2" className="block mb-1 font-medium">Segundo Apellido</label>
                 <input
                   type="text"
                   value={field.state.value}
@@ -343,7 +343,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
           <form.Field name="Correo">
             {(field) => (
               <div className="mb-3 w-full">
-                <label className="block mb-1 font-medium">Correo electrónico <span className="text-red-500">*</span></label>
+                <label htmlFor="Correo" className="block mb-1 font-medium">Correo electrónico <span className="text-red-500">*</span></label>
                 <input
                   type="email"
                   value={field.state.value}
@@ -367,7 +367,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
           <form.Field name="Numero_Telefono">
             {(field) => (
               <div className="mb-3 w-full">
-                <label className="block mb-1 font-medium">Número de teléfono <span className="text-red-500">*</span></label>
+                <label htmlFor="Numero_Telefono" className="block mb-1 font-medium">Número de teléfono <span className="text-red-500">*</span></label>
                 <PhoneInput
                   international
                   defaultCountry="CR"
@@ -391,7 +391,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
           <form.Field name="Motivo_Solicitud">
             {(field) => (
               <div className="mb-3 w-full">
-                <label className="block mb-1 font-medium">Motivo de solicitud <span className="text-red-500">*</span></label>
+                <label htmlFor="Motivo_Solicitud" className="block mb-1 font-medium">Motivo de solicitud <span className="text-red-500">*</span></label>
                 <textarea
                   value={field.state.value}
                   onChange={(e) => {

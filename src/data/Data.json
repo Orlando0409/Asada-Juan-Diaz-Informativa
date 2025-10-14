@@ -399,17 +399,17 @@
 },
 "RequisitosContacto": {
   "requisitosReportes": {
-    "nombre": {
+    "name": {
       "label": "Nombre completo",
       "type": "text",
       "required": true
     },
-    "primerApellido": {
+    "Papellido": {
       "label": "Primer apellido",
       "type": "text",
       "required": true
     },
-    "segundoApellido": {
+    "Sapellido": {
       "label": "Segundo apellido",
       "type": "text",
       "required": false
@@ -419,51 +419,51 @@
       "type": "text",
       "required": true
     },
-    "mensaje": {
+    "descripcion": {
       "label": "Descripción de tu queja",
       "type": "textarea",
       "required": true
     },
-    "adjunto": {
+    "Adjunto": {
       "label": "Adjuntar imagen",
       "type": "file",
       "required": false
     }
   },
   "requisitosQuejas": {
-    "nombre": {
+    "name": {
       "label": "Nombre completo",
       "type": "text",
       "required": true
     },
-    "primerApellido": {
+    "Papellido": {
       "label": "Primer apellido",
       "type": "text",
       "required": true
     },
-    "segundoApellido": {
+    "Sapellido": {
       "label": "Segundo apellido",
       "type": "text",
       "required": false
     },
-    "mensaje": {
+    "descripcion": {
       "label": "Descripción de tu queja",
       "type": "textarea",
       "required": true
     },
-    "adjunto": {
+    "Adjunto": {
       "label": "Adjuntar imagen",
       "type": "file",
       "required": false
     }
   },
   "requisitosSugerencias": {
-    "mensaje": {
+    "Mensaje": {
       "label": "Descripción de tu sugerencia",
       "type": "textarea",
       "required": true
     },
-    "adjunto": {
+    "Adjunto": {
       "label": "Adjuntar imagen",
       "type": "file",
       "required": false

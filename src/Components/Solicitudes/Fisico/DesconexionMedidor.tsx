@@ -1,16 +1,18 @@
 import { useForm } from "@tanstack/react-form";
 import { useRef, useState } from "react";
+
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { useDesconexion } from "../../../Hook/Solicitudes/Fisico/hookDesconexion";
 import { DesconexionMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/DesconexionMedidor";
+
 
 type Props = {
   onClose: () => void;
 };
 
 const normalizePhoneNumber = (phone: string): string => {
-  if (!phone || !phone.startsWith('+')) {
+  if (!phone?.startsWith('+')) {
     throw new Error('El número debe incluir el código de país y comenzar con "+". Ejemplo: +50688887777');
   }
   return phone;
@@ -162,35 +164,15 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
         console.log("  - Name:", axiosError?.name);
 
         const backendMessage = error?.response?.data?.message;
-        console.log("🔎 Backend message extraído:", backendMessage);
-
-        // Verificar errores específicos del backend
-        if (backendMessage) {
-          if (backendMessage.includes("No existe un afiliado físico")) {
-            setFormErrors({
-              Identificacion: "No existe un afiliado físico con esa identificación. Debe afiliarse primero antes de realizar esta solicitud.",
-            });
-            return;
-          } else if (backendMessage.includes("Ya existe un afiliado físico")) {
-            // Caso similar al formulario Asociado - error de lógica del backend
-            setFormErrors({
-              general: "⚠️ Error en el sistema: El backend tiene un error de lógica. Contacte al administrador del sistema.",
-            });
-            console.error("🐛 BUG DEL BACKEND: Lógica incorrecta en validación de afiliado");
-            return;
-          }
+        if (
+          backendMessage?.includes("No existe un afiliado físico")
+        ) {
+          setFormErrors({
+            general: "No existe un afiliado físico con esa cédula. Debe ser afiliado antes de realizar esta solicitud.",
+          });
+          return;
         }
-
-        // Error genérico
-        let errorMsg = '';
-        if (error?.response?.data?.message) {
-          errorMsg = error.response.data.message;
-        } else if (error?.message) {
-          errorMsg = error.message;
-        } else {
-          errorMsg = 'Error desconocido al procesar la solicitud';
-        }
-
+        // --- FIN CAMBIO ---
         setFormErrors({
           general: errorMsg,
         });
@@ -219,7 +201,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
             <form.Field name="Tipo_Identificacion">
               {(field) => (
                 <div>
-                  <label className="block mb-1 font-medium">
+                  <label htmlFor="Tipo_Identificacion" className="block mb-1 font-medium">
                     Tipo de Identificación <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -251,7 +233,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
             <form.Field name="Identificacion">
               {(field) => (
                 <div>
-                  <label className="block mb-1 font-medium">
+                  <label htmlFor="Identificacion" className="block mb-1 font-medium">
                     Número de Identificación <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -285,7 +267,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
           <form.Field name="Nombre">
             {(field) => (
               <div className="mb-3 w-full">
-                <label className="block mb-1 font-medium">Nombre <span className="text-red-500">*</span></label>
+                <label htmlFor="Nombre" className="block mb-1 font-medium">Nombre <span className="text-red-500">*</span></label>
                 <input
                   type="text"
                   value={field.state.value}
@@ -310,7 +292,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
           <form.Field name="Apellido1">
             {(field) => (
               <div className="mb-3 w-full">
-                <label className="block mb-1 font-medium">Primer Apellido <span className="text-red-500">*</span></label>
+                <label htmlFor="Apellido1" className="block mb-1 font-medium">Primer Apellido <span className="text-red-500">*</span></label>
                 <input
                   type="text"
                   value={field.state.value}
@@ -335,7 +317,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
           <form.Field name="Apellido2">
             {(field) => (
               <div className="mb-3 w-full">
-                <label className="block mb-1 font-medium">Segundo Apellido</label>
+                <label htmlFor="Apellido2" className="block mb-1 font-medium">Segundo Apellido</label>
                 <input
                   type="text"
                   value={field.state.value}
@@ -360,8 +342,8 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
           <form.Field name="Direccion_Exacta">
             {(field) => (
               <div className="mb-3 w-full">
-                <label className="block mb-1 font-medium">Dirección exacta <span className="text-red-500">*</span></label>
-                <input
+                <label htmlFor="Direccion_Exacta" className="block mb-1 font-medium">Dirección exacta <span className="text-red-500">*</span></label>
+                <input  
                   type="text"
                   value={field.state.value}
                   onChange={(e) => {
@@ -385,7 +367,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
           <form.Field name="Correo">
             {(field) => (
               <div className="mb-3 w-full">
-                <label className="block mb-1 font-medium">Correo electrónico <span className="text-red-500">*</span></label>
+                <label htmlFor="Correo" className="block mb-1 font-medium">Correo electrónico <span className="text-red-500">*</span></label>
                 <input
                   type="email"
                   value={field.state.value}
@@ -410,7 +392,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
           <form.Field name="Numero_Telefono">
             {(field) => (
               <div className="mb-3 w-full">
-                <label className="block mb-1 font-medium">Número de teléfono <span className="text-red-500">*</span></label>
+                <label htmlFor="Numero_Telefono" className="block mb-1 font-medium">Número de teléfono <span className="text-red-500">*</span></label>
                 <PhoneInput
                   international
                   defaultCountry="CR"
@@ -435,7 +417,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
           <form.Field name="Motivo_Solicitud">
             {(field) => (
               <div className="mb-3 w-full">
-                <label className="block mb-1 font-medium">Motivo de solicitud <span className="text-red-500">*</span></label>
+                <label htmlFor="Motivo_Solicitud" className="block mb-1 font-medium">Motivo de solicitud <span className="text-red-500">*</span></label>
                 <textarea
                   value={field.state.value}
                   onChange={(e) => {
@@ -464,7 +446,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
               const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
               return (
                 <div className="w-full mb-2">
-                  <label className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
+                  <label htmlFor="Planos_Terreno" className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
                   <input
                     type="file"
                     accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -528,7 +510,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
               const archivoActual = archivoSeleccionado["Escritura_Terreno"] ?? null;
               return (
                 <div className="w-full mb-2">
-                  <label className="block mb-1 font-medium">Escritura del terreno <span className="text-red-500">*</span></label>
+                  <label htmlFor="Escritura_Terreno" className="block mb-1 font-medium">Escritura del terreno <span className="text-red-500">*</span></label>
                   <input
                     type="file"
                     accept=".png,.jpg,.jpeg,.heic,.pdf"
