@@ -153,7 +153,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
         console.log("🔍 ERROR EN SOLICITUD DE DESCONEXIÓN:", error);
 
         // Log detallado del error
-        const axiosError = error as any;
+        const axiosError = error;
         console.log("📊 Detalles del error:");
         console.log("  - Status:", axiosError?.response?.status);
         console.log("  - Status Text:", axiosError?.response?.statusText);
