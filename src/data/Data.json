@@ -449,7 +449,7 @@
     "Segundo_Apellido": {
       "label": "Segundo apellido",
       "type": "text",
-      "required": false
+      "required": true
     },
     "Correo": {
       "label": "Correo electrónico",
