@@ -124,7 +124,29 @@ const FormularioAsociado = ({ onClose }: Props) => {
         if (onClose) onClose();
         alert("¡Formulario enviado con éxito!");
       } catch (error: unknown) {
+        console.log("🔍 ERROR EN SOLICITUD DE ASOCIADO:", error);
+        
+        // Log detallado del error
+        const axiosError = error as AxiosError;
+        
         let errorMsg = '';
+        const backendMessage = (error as AxiosError)?.response?.data?.message;
+        console.log("🔎 Backend message extraído:", backendMessage);
+
+        // Verificar si es error de "no existe afiliado físico"
+        if (
+          backendMessage &&
+          (backendMessage.includes("No existe un afiliado físico") ||
+            backendMessage.includes("no existe") ||
+            backendMessage.includes("No se puede crear la solicitud de asociado"))
+        ) {
+          setFormErrors({
+            Identificacion: "No existe un afiliado físico con esa identificación. Debe afiliarse primero antes de solicitar ser asociado.",
+          });
+          return;
+        }
+
+        // Error genérico
         if (
           typeof error === "object" &&
           error !== null &&
@@ -139,6 +161,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
         } else {
           errorMsg = String(error);
         }
+
         setFormErrors({
           general: errorMsg,
         });
@@ -397,7 +420,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
         )}
 
         <div className="flex justify-end items-end gap-4 mt-8">
-        
+
           <div className="flex justify-end items-end">
             <button
               type="submit"
