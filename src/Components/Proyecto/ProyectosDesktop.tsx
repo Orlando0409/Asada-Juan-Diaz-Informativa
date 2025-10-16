@@ -88,7 +88,8 @@ function ProyectosDesktop({
               style={{ transform: `translateX(-${slideActual * 100}%)` }}
             >
               {proyectos.map((proyecto, index) => {
-                const nombreEstado = proyecto.estado?.Nombre_Estado ?? (proyecto as any).Estado?.Nombre_Estado ?? '';
+                //const nombreEstado = proyecto.estado?.Nombre_Estado ?? (proyecto as any).Estado?.Nombre_Estado ?? '';
+                const nombreEstado = proyecto.Estado?.Nombre_Estado ?? '';
                 return (
                   <div key={proyecto.Id_Proyecto} className="w-full flex-shrink-0">
                     {/* Card   */}
