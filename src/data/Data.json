@@ -468,14 +468,14 @@
     }
   },
   "requisitosSugerencias": {
+      "Mensaje": {
+      "label": "Descripción de tu sugerencia",
+      "type": "textarea",
+      "required": true
+    },
     "Correo": {
       "label": "Correo electrónico",
       "type": "email",
-      "required": true
-    },
-    "Mensaje": {
-      "label": "Descripción de tu sugerencia",
-      "type": "textarea",
       "required": true
     },
     "Adjunto": {
