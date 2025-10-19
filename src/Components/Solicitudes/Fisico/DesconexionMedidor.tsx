@@ -150,11 +150,11 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
         setMostrarFormulario(false);
         if (onClose) onClose();
       } catch (error: any) {
-        console.log("🔍 ERROR EN SOLICITUD DE DESCONEXIÓN:", error);
+        console.log("ERROR EN SOLICITUD DE DESCONEXIÓN:", error);
 
         // Log detallado del error
         const axiosError = error;
-        console.log("📊 Detalles del error:");
+        console.log("Detalles del error:");
         console.log("  - Status:", axiosError?.response?.status);
         console.log("  - Status Text:", axiosError?.response?.statusText);
         console.log("  - Data:", axiosError?.response?.data);
@@ -174,15 +174,15 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
           } else if (backendMessage.includes("Ya existe un afiliado físico")) {
             // Caso similar al formulario Asociado - error de lógica del backend
             setFormErrors({
-              general: "⚠️ Error en el sistema: El backend tiene un error de lógica. Contacte al administrador del sistema.",
+              general: "Error en el sistema: El backend tiene un error de lógica. Contacte al administrador del sistema.",
             });
-            console.error("🐛 BUG DEL BACKEND: Lógica incorrecta en validación de afiliado");
+            console.error("BUG DEL BACKEND: Lógica incorrecta en validación de afiliado");
             return;
           }
         }
         // --- FIN CAMBIO ---
         setFormErrors({
-          general: errorMsg,
+          general: backendMessage || error?.message || 'Ocurrió un error al enviar la solicitud.',
         });
       }
     },
