@@ -399,29 +399,34 @@
 },
 "RequisitosContacto": {
   "requisitosReportes": {
-    "name": {
+    "Nombre": {
       "label": "Nombre completo",
       "type": "text",
       "required": true
     },
-    "Papellido": {
+    "Primer_Apellido": {
       "label": "Primer apellido",
       "type": "text",
       "required": true
     },
-    "Sapellido": {
+    "Segundo_Apellido": {
       "label": "Segundo apellido",
-      "type": "text",
-      "required": false
-    },
-    "ubicacion": {
-      "label": "Ubicación del lugar afectado",
       "type": "text",
       "required": true
     },
-    "descripcion": {
+    "Correo": {
+      "label": "Correo electrónico",
+      "type": "email",
+      "required": true
+    },
+    "Descripcion": {
       "label": "Descripción de tu queja",
       "type": "textarea",
+      "required": true
+    },
+    "Ubicacion": {
+      "label": "Ubicación del lugar afectado",
+      "type": "text",
       "required": true
     },
     "Adjunto": {
@@ -431,22 +436,27 @@
     }
   },
   "requisitosQuejas": {
-    "name": {
+    "Nombre": {
       "label": "Nombre completo",
       "type": "text",
       "required": true
     },
-    "Papellido": {
+    "Primer_Apellido": {
       "label": "Primer apellido",
       "type": "text",
       "required": true
     },
-    "Sapellido": {
+    "Segundo_Apellido": {
       "label": "Segundo apellido",
       "type": "text",
-      "required": false
+      "required": true
     },
-    "descripcion": {
+    "Correo": {
+      "label": "Correo electrónico",
+      "type": "email",
+      "required": true
+    },
+    "Descripcion": {
       "label": "Descripción de tu queja",
       "type": "textarea",
       "required": true
@@ -458,9 +468,14 @@
     }
   },
   "requisitosSugerencias": {
-    "Mensaje": {
+      "Mensaje": {
       "label": "Descripción de tu sugerencia",
       "type": "textarea",
+      "required": true
+    },
+    "Correo": {
+      "label": "Correo electrónico",
+      "type": "email",
       "required": true
     },
     "Adjunto": {

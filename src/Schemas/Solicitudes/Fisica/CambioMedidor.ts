@@ -3,7 +3,8 @@ import { z } from "zod";
 // Tipo para TipoIdentificacion - Debe coincidir con el backend
 export const TipoIdentificacionValues = ["Cedula Nacional", "Dimex", "Pasaporte"] as const;
 export type TipoIdentificacion = typeof TipoIdentificacionValues[number];
-// Schema de validación para el formulario de cambio de medidor
+
+// Validaciones adaptadas del backend DTO
 export const CambioMedidorSchema = z.object({
   // Validaciones de CreateSolicitudFisicaDto - COMUNES
   Tipo_Identificacion: z.enum(TipoIdentificacionValues, {

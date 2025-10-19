@@ -8,16 +8,7 @@ export const TipoIdentificacionValues = [
 ] as const;
 export type TipoIdentificacion = typeof TipoIdentificacionValues[number];
 
-const IDENTITY_PATTERNS: Record<TipoIdentificacion, RegExp> = {
-  'Cedula Nacional': /^[1-9]\d{8}$/,
-  'Dimex': /^(12|13|18)\d{9,10}$/,
-  'Pasaporte': /^[A-Za-z0-9]{6,12}$/,
-} as const;
-
-
-// Regex para validar el formato E.164
-const E164_REGEX = /^\+?[1-9]\d{1,14}$/;
-
+// Validaciones adaptadas del backend DTO
 export const AfiliacionSchema = z.object({
   // Validaciones de CreateSolicitudFisicaDto - COMUNES
   Tipo_Identificacion: z.enum(TipoIdentificacionValues, {
