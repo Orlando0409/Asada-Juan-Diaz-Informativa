@@ -1,17 +1,15 @@
-import type { IconType,  } from 'react-icons'
 
 export type SubOpcion = {
   id: number
   texto: string
-  ruta: string
+  ruta: string 
 }
 
 export type MenuItem = {
   id: number
   texto: string
-  ruta: string
-  tipo: 'link' | 'dropdown'
-  icono?: IconType 
+  ruta?: string
+  tipo: string
   subopciones?: SubOpcion[]
 }
 export interface DropdownProps {

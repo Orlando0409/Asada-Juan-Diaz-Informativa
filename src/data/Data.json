@@ -558,7 +558,7 @@
       },
       {
         "id": 4,
-        "texto": "Contacto",
+        "texto": "Contáctanos",
         "tipo": "dropdown",
         "subopciones": [
           {
@@ -582,8 +582,7 @@
         "id": 5,
         "tipo": "PreguntasFrecuentes",
         "texto": "Preguntas Frecuentes",
-        "ruta": "/PreguntasFrecuentes",
-        "icono": "FaQuestionCircle"
+        "ruta": "/PreguntasFrecuentes"
       }
     ]
   }
