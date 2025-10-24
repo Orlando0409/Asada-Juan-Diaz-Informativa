@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
+// Tipo para TipoIdentificacion - Debe coincidir con el backend
 export const TipoIdentificacionValues = [
   'Cedula Nacional',
   'Dimex',
@@ -8,55 +8,61 @@ export const TipoIdentificacionValues = [
 ] as const;
 export type TipoIdentificacion = typeof TipoIdentificacionValues[number];
 
-const IDENTITY_PATTERNS: Record<TipoIdentificacion, RegExp> = {
-  'Cedula Nacional': /^\d{9}$/,
-  'Dimex': /^\d{11,12}$/,
-  'Pasaporte': /^[A-Za-z0-9]{6,9}$/,
-} as const;
-
+// Validaciones adaptadas del backend DTO
 export const AsociadoSchema = z.object({
-  Nombre: z.string()
-    .min(2, 'El nombre debe tener al menos 2 caracteres')
-    .refine(val => val.trim().length > 1, 'El nombre debe tener al menos 2 caracteres'),
-
-  Apellido1: z.string()
-    .min(2, 'El primer apellido debe tener al menos 2 caracteres')
-    .refine(val => val.trim().length > 1, 'El primer apellido debe tener al menos 2 caracteres'),
-
-  Apellido2: z.string().optional(),
-
+  // Validaciones de CreateSolicitudFisicaDto - COMUNES
   Tipo_Identificacion: z.enum(TipoIdentificacionValues, {
-    errorMap: () => ({ message: 'Debe seleccionar un tipo de identificación válido' }),
+    errorMap: () => ({ message: 'El tipo de identificación debe ser uno de los siguientes: Cedula Nacional, Dimex, Pasaporte' }),
   }),
 
   Identificacion: z.string()
-    .min(1, 'El número de identificación es obligatorio'),
+    .min(1, 'La identificación no puede estar vacía')
+    .refine(val => val.trim().length > 0, 'La identificación no puede estar vacía')
+    .transform(val => val.trim()),
 
-  Numero_Telefono: z.string()
-    .min(1, 'El número de teléfono es obligatorio')
-    .refine((phone) => {
-      const phoneNumber = parsePhoneNumberFromString(phone || "");
-      return !!phoneNumber && phoneNumber.isValid();
-    }, {
-      message: 'Debe ingresar un número de teléfono válido con código de país, ej. +50688887777'
-    }),
+  Nombre: z.string()
+    .min(1, 'El nombre no puede estar vacío')
+    .min(2, 'El nombre debe tener al menos 2 caracteres')
+    .max(50, 'El nombre no puede tener más de 50 caracteres')
+    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, { message: 'El nombre solo puede contener letras y espacios' })
+    .refine(val => val.trim().length > 0, 'El nombre no puede estar vacío')
+    .transform(val => val.trim()),
 
-  Motivo_Solicitud: z.string()
-    .min(10, 'El motivo debe tener al menos 10 caracteres'),
+  Apellido1: z.string()
+    .min(1, 'El primer apellido no puede estar vacío')
+    .min(2, 'El primer apellido debe tener al menos 2 caracteres')
+    .max(50, 'El primer apellido no puede tener más de 50 caracteres')
+    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, { message: 'El primer apellido solo puede contener letras y espacios' })
+    .refine(val => val.trim().length > 0, 'El primer apellido no puede estar vacío')
+    .transform(val => val.trim()),
+
+  Apellido2: z.string()
+    .max(50, 'El segundo apellido no puede tener más de 50 caracteres')
+    .optional()
+    .or(z.literal(''))
+    .transform(val => val === '' ? undefined : val),
 
   Correo: z.string()
-    .min(1, 'El correo electrónico es obligatorio')
-    .email('El correo electrónico no es válido'),
-}).refine(
-  (data) => {
-    const { Tipo_Identificacion, Identificacion } = data;
-    const pattern = IDENTITY_PATTERNS[Tipo_Identificacion];
-    return pattern ? pattern.test(Identificacion) : false;
-  },
-  {
-    message: 'El número de identificación no es válido para el tipo seleccionado',
-    path: ["Identificacion"],
-  }
-);
+    .min(1, 'El correo no puede estar vacío')
+    .max(100, 'El correo no puede tener más de 100 caracteres')
+    .email('El correo electrónico debe tener un formato válido')
+    .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, { message: 'El formato del correo electrónico no es válido' })
+    .transform(val => val.trim().toLowerCase()),
 
+  Numero_Telefono: z.string()
+    .min(1, 'El número de teléfono no puede estar vacío')
+    .refine(val => val.trim().length > 0, 'El número de teléfono no puede estar vacío')
+    .transform(val => val.trim()),
+
+  // Validaciones específicas de CreateSolicitudAsociadoFisicaDto
+  Motivo_Solicitud: z.string()
+    .min(1, 'El motivo de la solicitud no puede estar vacío')
+    .min(10, 'El motivo de la solicitud debe tener al menos 10 caracteres')
+    .max(500, 'El motivo de la solicitud no puede tener más de 500 caracteres')
+    .regex(/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s.,!?¿¡()-]+$/, { message: 'El motivo de la solicitud solo puede contener letras, números, espacios y los caracteres .,!?¿¡()-' })
+    .refine(val => val.trim().length > 0, 'El motivo de la solicitud no puede estar vacío')
+    .transform(val => val.trim()),
+});
+
+export type FormularioAsociadoData = z.infer<typeof AsociadoSchema>;
 export type Asociado = z.infer<typeof AsociadoSchema>;

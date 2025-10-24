@@ -1,11 +1,9 @@
 import { useForm } from "@tanstack/react-form";
 import { useRef, useState } from "react";
-
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { useDesconexion } from "../../../Hook/Solicitudes/Fisico/hookDesconexion";
 import { DesconexionMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/DesconexionMedidor";
-
 
 type Props = {
   onClose: () => void;
@@ -152,19 +150,49 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
         setMostrarFormulario(false);
         if (onClose) onClose();
       } catch (error: any) {
-        // --- CAMBIO: Mostrar mensaje si no existe afiliado físico ---
+        console.log("🔍 ERROR EN SOLICITUD DE DESCONEXIÓN:", error);
+
+        // Log detallado del error
+        const axiosError = error;
+        console.log("📊 Detalles del error:");
+        console.log("  - Status:", axiosError?.response?.status);
+        console.log("  - Status Text:", axiosError?.response?.statusText);
+        console.log("  - Data:", axiosError?.response?.data);
+        console.log("  - Message:", axiosError?.message);
+        console.log("  - Name:", axiosError?.name);
+
         const backendMessage = error?.response?.data?.message;
-        if (
-          backendMessage?.includes("No existe un afiliado físico")
-        ) {
-          setFormErrors({
-            general: "No existe un afiliado físico con esa cédula. Debe ser afiliado antes de realizar esta solicitud.",
-          });
-          return;
+        console.log("🔎 Backend message extraído:", backendMessage);
+
+        // Verificar errores específicos del backend
+        if (backendMessage) {
+          if (backendMessage.includes("No existe un afiliado físico")) {
+            setFormErrors({
+              Identificacion: "No existe un afiliado físico con esa identificación. Debe afiliarse primero antes de realizar esta solicitud.",
+            });
+            return;
+          } else if (backendMessage.includes("Ya existe un afiliado físico")) {
+            // Caso similar al formulario Asociado - error de lógica del backend
+            setFormErrors({
+              general: "⚠️ Error en el sistema: El backend tiene un error de lógica. Contacte al administrador del sistema.",
+            });
+            console.error("🐛 BUG DEL BACKEND: Lógica incorrecta en validación de afiliado");
+            return;
+          }
         }
-        // --- FIN CAMBIO ---
+
+        // Error genérico
+        let errorMsg = '';
+        if (error?.response?.data?.message) {
+          errorMsg = error.response.data.message;
+        } else if (error?.message) {
+          errorMsg = error.message;
+        } else {
+          errorMsg = 'Error desconocido al procesar la solicitud';
+        }
+
         setFormErrors({
-          Numero_Telefono: error.message,
+          general: errorMsg,
         });
       }
     },
