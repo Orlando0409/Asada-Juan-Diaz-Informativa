@@ -1,25 +1,13 @@
 import { useForm } from "@tanstack/react-form";
 import { useRef, useState } from "react";
-import data from "../../../data/Data.json";
-
 import { useAfiliaciones } from "../../../Hook/Solicitudes/Fisico/hookAfiliacion";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import { AfiliacionSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/Afiliacion";
 
-type AxiosError = {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-  message: string;
-};
 
-type SolicitudTipo = 'abonado';
 
 type Props = {
-  tipo: SolicitudTipo;
   onClose: () => void;
 };
 
@@ -30,7 +18,7 @@ const normalizePhoneNumber = (phone: string): string => {
   return phone;
 };
 
-const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
+const FormularioAfiliacion = ({ onClose }: Props) => {
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -189,7 +177,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
     ) : null;
   }
 
-  const campos = data.requisitosSolicitudes[tipo];
+ 
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
 
   return (
@@ -209,7 +197,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
             <form.Field name="Tipo_Identificacion">
               {(field) => (
                 <div>
-                  <label className="block mb-1 font-medium">
+                  <label htmlFor="Tipo_Identificacion" className="block mb-1 font-medium">
                     Tipo de Identificación <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -247,7 +235,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
             <form.Field name="Identificacion">
               {(field) => (
                 <div>
-                  <label className="block mb-1 font-medium">
+                  <label htmlFor="Identificacion" className="block mb-1 font-medium">
                     Número de Identificación <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -288,7 +276,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
           <form.Field name="Nombre">
             {(field) => (
               <div className="mb-3 w-full">
-                <label className="block mb-1 font-medium">Nombre <span className="text-red-500">*</span></label>
+                <label htmlFor="Nombre" className="block mb-1 font-medium">Nombre <span className="text-red-500">*</span></label>
                 <input
                   type="text"
                   value={field.state.value}
@@ -312,7 +300,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
           <form.Field name="Apellido1">
             {(field) => (
               <div className="mb-3 w-full">
-                <label className="block mb-1 font-medium">Primer Apellido <span className="text-red-500">*</span></label>
+                <label htmlFor="Apellido1" className="block mb-1 font-medium">Primer Apellido <span className="text-red-500">*</span></label>
                 <input
                   type="text"
                   value={field.state.value}
@@ -336,7 +324,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
           <form.Field name="Apellido2">
             {(field) => (
               <div className="mb-3 w-full">
-                <label className="block mb-1 font-medium">Segundo Apellido</label>
+                <label htmlFor="Apellido2" className="block mb-1 font-medium">Segundo Apellido</label>
                 <input
                   type="text"
                   value={field.state.value}
@@ -360,7 +348,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
           <form.Field name="Direccion_Exacta">
             {(field) => (
               <div className="mb-3 w-full">
-                <label className="block mb-1 font-medium">Dirección exacta <span className="text-red-500">*</span></label>
+                <label htmlFor="Direccion_Exacta" className="block mb-1 font-medium">Dirección exacta <span className="text-red-500">*</span></label>
                 <input
                   type="text"
                   value={field.state.value}
@@ -384,7 +372,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
           <form.Field name="Correo">
             {(field) => (
               <div className="mb-3 w-full">
-                <label className="block mb-1 font-medium">Correo electrónico <span className="text-red-500">*</span></label>
+                <label htmlFor="Correo" className="block mb-1 font-medium">Correo electrónico <span className="text-red-500">*</span></label>
                 <input
                   type="email"
                   value={field.state.value}
@@ -408,7 +396,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
           <form.Field name="Numero_Telefono">
             {(field) => (
               <div className="mb-3 w-full">
-                <label className="block mb-1 font-medium">Número de teléfono <span className="text-red-500">*</span></label>
+                <label htmlFor="Numero_Telefono" className="block mb-1 font-medium">Número de teléfono <span className="text-red-500">*</span></label>
                 <PhoneInput
                   international
                   defaultCountry="CR"
@@ -432,7 +420,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
           <form.Field name="Edad">
             {(field) => (
               <div className="mb-3 w-full">
-                <label className="block mb-1 font-medium">Edad <span className="text-red-500">*</span></label>
+                <label htmlFor="Edad" className="block mb-1 font-medium">Edad <span className="text-red-500">*</span></label>
                 <input
                   type="number"
                   min={18}
@@ -462,7 +450,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
               const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
               return (
                 <div className="w-full mb-2">
-                  <label className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
+                  <label htmlFor="Planos_Terreno" className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
                   <input
                     type="file"
                     accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -523,7 +511,7 @@ const FormularioAfiliacion = ({ tipo, onClose }: Props) => {
               const archivoActual = archivoSeleccionado["Escritura_Terreno"] ?? null;
               return (
                 <div className="w-full mb-2">
-                  <label className="block mb-1 font-medium">Escritura del terreno <span className="text-red-500">*</span></label>
+                  <label htmlFor="Escritura_Terreno" className="block mb-1 font-medium">Escritura del terreno <span className="text-red-500">*</span></label>
                   <input
                     type="file"
                     accept=".png,.jpg,.jpeg,.heic,.pdf"  // 🔥 CAMBIO: Agregué .pdf

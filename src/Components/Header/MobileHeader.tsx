@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Link } from '@tanstack/react-router'
 import { FaBars, FaTimes, FaChevronDown } from 'react-icons/fa'
-import type { MobileHeaderProps } from '../../types/header/MenuItem'
+import type { MenuItem } from '../../types/header/MenuItem'
 
-const MobileHeader = ({ menuItems }: MobileHeaderProps) => {
+
+const MobileHeader = ({ menuItems }: { menuItems: MenuItem[] }) => {
   const [isOpen, setIsOpen] = useState(false)
   const [expandedItem, setExpandedItem] = useState<number | null>(null)
 
@@ -33,7 +34,6 @@ const MobileHeader = ({ menuItems }: MobileHeaderProps) => {
         <div className='absolute top-full left-0 w-full bg-white border-t border-gray-200 shadow-lg md:hidden z-40'>
           <div className='py-4 px-4 space-y-2'>
             {menuItems.map((item) => {
-              const Icon = item.icono
               return (
                 <div key={item.id}>
                   {item.tipo === 'dropdown' ? (
@@ -43,7 +43,6 @@ const MobileHeader = ({ menuItems }: MobileHeaderProps) => {
                         onClick={() => toggleExpanded(item.id)}
                       >
                         <span className='flex items-center gap-2'>
-                          {Icon && <Icon size={16} />}
                           {item.texto}
                         </span>
                         <FaChevronDown 
@@ -75,7 +74,6 @@ const MobileHeader = ({ menuItems }: MobileHeaderProps) => {
                       onClick={() => setIsOpen(false)}
                     >
                       {item.texto}
-                      {Icon && <Icon size={16} />}
                     </Link>
                   )}
                 </div>

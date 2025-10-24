@@ -399,71 +399,86 @@
 },
 "RequisitosContacto": {
   "requisitosReportes": {
-    "nombre": {
+    "Nombre": {
       "label": "Nombre completo",
       "type": "text",
       "required": true
     },
-    "primerApellido": {
+    "Primer_Apellido": {
       "label": "Primer apellido",
       "type": "text",
       "required": true
     },
-    "segundoApellido": {
+    "Segundo_Apellido": {
       "label": "Segundo apellido",
-      "type": "text",
-      "required": false
-    },
-    "ubicacion": {
-      "label": "Ubicación del lugar afectado",
       "type": "text",
       "required": true
     },
-    "mensaje": {
+    "Correo": {
+      "label": "Correo electrónico",
+      "type": "email",
+      "required": true
+    },
+    "Descripcion": {
       "label": "Descripción de tu queja",
       "type": "textarea",
       "required": true
     },
-    "adjunto": {
+    "Ubicacion": {
+      "label": "Ubicación del lugar afectado",
+      "type": "text",
+      "required": true
+    },
+    "Adjunto": {
       "label": "Adjuntar imagen",
       "type": "file",
       "required": false
     }
   },
   "requisitosQuejas": {
-    "nombre": {
+    "Nombre": {
       "label": "Nombre completo",
       "type": "text",
       "required": true
     },
-    "primerApellido": {
+    "Primer_Apellido": {
       "label": "Primer apellido",
       "type": "text",
       "required": true
     },
-    "segundoApellido": {
+    "Segundo_Apellido": {
       "label": "Segundo apellido",
       "type": "text",
-      "required": false
+      "required": true
     },
-    "mensaje": {
+    "Correo": {
+      "label": "Correo electrónico",
+      "type": "email",
+      "required": true
+    },
+    "Descripcion": {
       "label": "Descripción de tu queja",
       "type": "textarea",
       "required": true
     },
-    "adjunto": {
+    "Adjunto": {
       "label": "Adjuntar imagen",
       "type": "file",
       "required": false
     }
   },
   "requisitosSugerencias": {
-    "mensaje": {
+      "Mensaje": {
       "label": "Descripción de tu sugerencia",
       "type": "textarea",
       "required": true
     },
-    "adjunto": {
+    "Correo": {
+      "label": "Correo electrónico",
+      "type": "email",
+      "required": true
+    },
+    "Adjunto": {
       "label": "Adjuntar imagen",
       "type": "file",
       "required": false
@@ -543,7 +558,7 @@
       },
       {
         "id": 4,
-        "texto": "Contacto",
+        "texto": "Contáctanos",
         "tipo": "dropdown",
         "subopciones": [
           {
@@ -567,8 +582,7 @@
         "id": 5,
         "tipo": "PreguntasFrecuentes",
         "texto": "Preguntas Frecuentes",
-        "ruta": "/PreguntasFrecuentes",
-        "icono": "FaQuestionCircle"
+        "ruta": "/PreguntasFrecuentes"
       }
     ]
   }
