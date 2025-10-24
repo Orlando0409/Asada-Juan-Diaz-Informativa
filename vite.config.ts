@@ -13,4 +13,7 @@ export default defineConfig({
     host: true,  // necesario para que funcione bien en DevTunnel
     port: 5174,
   },
+    build: {
+    outDir: 'dist', // importante para Cloudflare
+  },
 })
