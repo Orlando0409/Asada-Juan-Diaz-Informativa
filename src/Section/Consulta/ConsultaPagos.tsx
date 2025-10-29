@@ -1,21 +1,17 @@
 import { useState } from 'react';
 import { useForm } from '@tanstack/react-form';
-import { Search, FileText, User, Landmark, CreditCard, AlertCircle } from 'lucide-react';
+import { Search, User, Landmark, CreditCard } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
+import ModalConsulta from './ModalConsulta';
 
 const ConsultaRecibos = () => {
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [successMessage, setSuccessMessage] = useState<string>('');
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const navigate = useNavigate();
-
-    // 🔑 CLAVE PARA EL FIX:
-    // Creamos un estado local de React para guardar los valores clave
-    // y asegurar que el componente principal se re-renderice.
     const [clientType, setClientType] = useState('');
     const [idType, setIdType] = useState('');
     
-    // NOTA: Usamos los estados locales (clientType, idType) para la lógica de visibilidad.
-
     const form = useForm({
         defaultValues: {
             tipoCliente: '',
@@ -24,7 +20,6 @@ const ConsultaRecibos = () => {
             numeroMedidor: '',
         },
         onSubmit: async ({ value }) => {
-            // ... (Lógica de onSubmit es la misma)
             setFormErrors({});
             setSuccessMessage('');
 
@@ -38,6 +33,7 @@ const ConsultaRecibos = () => {
             try {
                 await new Promise((resolve) => setTimeout(resolve, 1200));
                 setSuccessMessage('¡Recibos encontrados con éxito!');
+                setIsModalOpen(true);
                 setTimeout(() => setSuccessMessage(''), 5000);
             } catch (error) {
                 console.error('Error:', error);
@@ -50,28 +46,43 @@ const ConsultaRecibos = () => {
 
     const handleAfiliarse = () => navigate({ to: '/Afiliacion' });
 
+    // Función para obtener placeholders dinámicos según el tipo de identificación
+    const getPlaceholderIdentificacion = () => {
+        if (isJuridica) {
+            return '3-101-123456 (Cédula Jurídica)';
+        }
+        
+        if (isFisica && idType) {
+            switch (idType) {
+                case 'Cedula Nacional':
+                    return '123456789';
+                case 'Dimex':
+                    return '123456789012';
+                case 'Pasaporte':
+                    return 'A1234567';
+                default:
+                    return 'Ingrese su número de identificación';
+            }
+        }
+        
+        return 'Seleccione tipo de identificación primero';
+    };
+
     const commonInput =
         'w-full pl-10 pr-4 py-2.5 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition-all text-sm text-gray-700';
         
-    // *** Lógica de Visibilidad basada en el estado LOCAL de React ***
     const isFisica = clientType === 'fisica';
     const isJuridica = clientType === 'juridica';
-
     const showTipoIdentificacionSelect = isFisica; 
-
-    const showNumeroIdentificacionInput = 
-        (isFisica && idType) || isJuridica;
+    const showNumeroIdentificacionInput =  (isFisica && idType) || isJuridica;
         
-    // --- Renderizado del Componente ---
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-gray-50 flex items-center justify-center p-4">
             <div className="w-full max-w-6xl flex flex-col lg:flex-row items-stretch gap-6">
 
                 {/* Panel Izquierdo */}
-                <div className="flex-1 bg-white rounded-2xl shadow-xl p-6 space-y-6">
-                    {/* ... (Encabezado y advertencia son iguales) ... */}
-                    
+                <div className="flex-1 bg-white rounded-2xl shadow-xl p-6 space-y-6">     
                     <form
                         onSubmit={(e) => {
                             e.preventDefault();
@@ -95,17 +106,16 @@ const ConsultaRecibos = () => {
                                                 const newValue = e.target.value;
                                                 field.handleChange(newValue);
                                                 
-                                                // 🔑 FIX: Actualizar el estado local para forzar el re-renderizado
                                                 setClientType(newValue); 
 
                                                 form.setFieldValue('numeroIdentificacion', '');
                                                 
                                                 if (newValue === 'juridica') {
                                                     form.setFieldValue('tipoIdentificacion', 'juridica');
-                                                    setIdType('juridica'); // 🔑 FIX: Actualizar estado local
+                                                    setIdType('juridica'); 
                                                 } else {
                                                     form.setFieldValue('tipoIdentificacion', '');
-                                                    setIdType(''); // 🔑 FIX: Limpiar estado local
+                                                    setIdType(''); 
                                                 }
                                             }}
                                             className={commonInput}
@@ -134,16 +144,15 @@ const ConsultaRecibos = () => {
                                                 value={field.state.value as string}
                                                 onChange={(e) => {
                                                     field.handleChange(e.target.value);
-                                                    // 🔑 FIX: Actualizar el estado local para forzar el re-renderizado
                                                     setIdType(e.target.value); 
                                                     form.setFieldValue('numeroIdentificacion', '');
                                                 }}
                                                 className={commonInput}
                                             >
                                                 <option value="">Seleccione...</option>
-                                                <option value="cedula">Cédula Nacional</option>
-                                                <option value="dimex">DIMEX</option>
-                                                <option value="pasaporte">Pasaporte</option>
+                                                <option value="Cedula Nacional">Cédula Nacional</option>
+                                                <option value="Dimex">DIMEX</option>
+                                                <option value="Pasaporte">Pasaporte</option>
                                             </select>
                                         </div>
                                     </div>
@@ -169,11 +178,7 @@ const ConsultaRecibos = () => {
                                                 type="text"
                                                 value={field.state.value as string}
                                                 onChange={(e) => field.handleChange(e.target.value)}
-                                                placeholder={
-                                                    isFisica
-                                                        ? '1-2345-6789 (Cédula o Pasaporte)'
-                                                        : '3-101-123456 (Cédula Jurídica)'
-                                                }
+                                                placeholder={getPlaceholderIdentificacion()}
                                                 className={commonInput}
                                             />
                                         </div>
@@ -182,9 +187,6 @@ const ConsultaRecibos = () => {
                             </form.Field>
                         )}
 
-                        {/* ... (El resto del formulario, medidor, botón y mensajes se mantienen igual) ... */}
-                        
-                        {/* Separador */}
                         <div className="flex items-center gap-3">
                             <div className="flex-1 h-px bg-gray-200" />
                             <span className="text-sm font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
@@ -214,7 +216,6 @@ const ConsultaRecibos = () => {
                             )}
                         </form.Field>
 
-                        {/* Botón y mensajes */}
                         <button
                             type="submit"
                             disabled={form.state.isSubmitting}
@@ -251,7 +252,6 @@ const ConsultaRecibos = () => {
                     </form>
                 </div>
 
-                {/* Panel Derecho */}
                 <div className="hidden lg:flex w-1/3 items-start justify-center">
                     <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-6 border-2 border-blue-100">
                         <h3 className="text-lg font-bold text-gray-800 mb-2">¿No estás afiliado?</h3>
@@ -267,6 +267,12 @@ const ConsultaRecibos = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Modal de Resultados */}
+            <ModalConsulta 
+                isOpen={isModalOpen} 
+                onClose={() => setIsModalOpen(false)} 
+            />
         </div>
     );
 };
