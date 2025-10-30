@@ -1,15 +1,12 @@
-// Modelo para historias
-export interface Historia {
-  Imagen_Url: string;
-   id: number; 
+export interface Imagen {
+  Id_Imagen: number;
+  Nombre_Imagen: string;
+  Imagen: string; // URL pública (Dropbox o servidor)
 }
 
 // Estado inicial vacío
-export const HistoriaInicialState: Historia = {
-  Imagen_Url: "",
-   id: 0,
+export const ImagenInicialState: Imagen = {
+  Id_Imagen: 0,
+  Nombre_Imagen: "",
+  Imagen: "",
 };
-    
-
-
-

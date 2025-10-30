@@ -1,7 +1,7 @@
 import type { Proyecto } from "../../types/Proyecto/Proyecto";
 import { getAllProyectos,  } from "../../Services/Proyectos/ProyectoService";
 import { useQuery } from "@tanstack/react-query";
-import { getProyectosVisibles } from "../../Services/Proyectos/proyecto.service";
+//import { getProyectosVisibles } from "../../Services/Proyectos/proyecto.service";
 
 // Hook para obtener TODOS los proyectos (panel de administración)
 export const useProyectos = () => {
@@ -17,7 +17,7 @@ export const useProyectos = () => {
 export const useProyectosVisibles = () => {
   return useQuery<Proyecto[]>({
     queryKey: ["proyectos-visibles"],
-    queryFn: getProyectosVisibles,
+    queryFn: useProyectosVisibles,
     staleTime: 5 * 60 * 1000, // cache de 5 min
     refetchOnWindowFocus: false,
   });
