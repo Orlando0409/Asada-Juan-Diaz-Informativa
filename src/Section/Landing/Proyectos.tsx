@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useProyectos } from "../../Hook/Proyecto/hookProyecto";
+import { useProyectos, useProyectosVisibles } from "../../Hook/Proyecto/hookProyecto";
 import ProyectosMobile from "../../Components/Proyecto/ProyectosMobile";
 import ProyectosDesktop from "../../Components/Proyecto/ProyectosDesktop";
 import Data from "../../data/Data.json";
@@ -10,7 +10,7 @@ function Proyectos() {
   const [estaPausado, setEstaPausado] = useState(false);
   const [proyectoExpandido, setProyectoExpandido] = useState<number | null>(null);
   const {titulo, descripcion } = Data.ProyectoSeccion;
-  const { data: proyectos, isLoading } = useProyectos();
+  const { data: proyectos, isLoading } = useProyectosVisibles();
 
   // Auto-cambio cada 2 segundos
   useEffect(() => {

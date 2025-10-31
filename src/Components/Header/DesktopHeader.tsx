@@ -26,7 +26,6 @@ const DesktopHeader = ({ menuItems }: DesktopHeaderProps) => {
       {/* Menú principal */}
       <ul className='hidden md:flex gap-6 items-center font-medium text-gray-700'>
         {menuItems.map((item) => {
-          const Icon = item.icono
 
           if (item.tipo === 'dropdown') {
             return (
@@ -38,7 +37,6 @@ const DesktopHeader = ({ menuItems }: DesktopHeaderProps) => {
                 onMouseLeave={handleMouseLeave}
               >
                 <button className='flex items-center gap-1 hover:text-[#6FCAF1] transition-colors duration-10'>
-                  {Icon && <Icon size={13} />}
                   {item.texto}
                   <MdExpandMore 
                     size={13} 
@@ -76,7 +74,6 @@ const DesktopHeader = ({ menuItems }: DesktopHeaderProps) => {
                 className='hover:text-[#6FCAF1] transition-colors duration-200 flex items-center gap-2'
               >
                 {item.texto}
-                {Icon && <Icon size={13} />}
               </Link>
             </li>
           )

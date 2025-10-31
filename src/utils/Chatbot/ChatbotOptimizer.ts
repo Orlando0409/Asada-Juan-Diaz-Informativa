@@ -1,6 +1,6 @@
 import { IntentionDetector } from './IntentionDetector';
 import { TokenMonitor } from './TokenMonitor';
-import contextoOrganizacion from '../../data/ChatContexto.json';
+import datosGenerales from '../../data/Data.json';
 
 export class RequestAnalyzer {
   
@@ -125,19 +125,17 @@ export class RequestAnalyzer {
   
   // Optimiza el contexto para usar menos tokens
   static optimizeContext(intention: string | null): string {
-    const org = contextoOrganizacion.organizacion;
-    
     // Contexto súper minimal para ahorrar tokens
-    const minimalBase = `Asistente ${org.nombreCorto}. Solo responde sobre ASADA.`;
+    const minimalBase = `Asistente ASADA Juan Díaz. Solo responde sobre ASADA.`;
     
     if (!intention) return minimalBase;
     
     // Contextos optimizados por intención
     const optimizedContexts: Record<string, string> = {
-      organizacion: `${minimalBase} Es ${org.descripcion}`,
+      organizacion: `${minimalBase} Es ${datosGenerales.DatosGenerales.descripcion}`,
       servicios: `${minimalBase} Servicio: agua potable para Juan Díaz y Oriente`,
       afiliacion: `${minimalBase} Afiliación: formulario web, cédula, documentos requeridos`,
-      contacto: `${minimalBase} Contacto: ${contextoOrganizacion.contacto.informacion.telefono}`,
+      contacto: `${minimalBase} Contacto: ${datosGenerales.footer.contacto.telefono}`,
       pagos: `${minimalBase} Consulta pagos: número abonado + cédula en web`,
       solicitudes: `${minimalBase} Solicitudes: afiliación, cambio medidor, desconexión en web`
     };

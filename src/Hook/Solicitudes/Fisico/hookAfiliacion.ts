@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { createAfiliacion } from "../../../Services/Solicitudes/Fisico/AfiliacionService";
 
  export const useAfiliaciones=()=>{
