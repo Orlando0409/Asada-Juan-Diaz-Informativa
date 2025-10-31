@@ -4,7 +4,6 @@ import ProyectosDesktop from "../../Components/Proyecto/ProyectosDesktop";
 import Data from "../../data/Data.json";
 import { useProyectos } from "../../Hook/Proyecto/hookProyecto";
 
-
 function Proyectos() {
   const [slideActual, setSlideActual] = useState(0);
   const [estaPausado, setEstaPausado] = useState(false);
