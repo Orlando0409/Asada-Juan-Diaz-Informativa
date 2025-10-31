@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import { useProyectos } from "../../Hook/Proyecto/hookProyecto";
 import ProyectosMobile from "../../Components/Proyecto/ProyectosMobile";
 import ProyectosDesktop from "../../Components/Proyecto/ProyectosDesktop";
 import Data from "../../data/Data.json";
+import { useProyectos } from "../../Hook/Proyecto/hookProyecto";
 
 
 function Proyectos() {
