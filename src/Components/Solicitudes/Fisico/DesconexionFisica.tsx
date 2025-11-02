@@ -1,33 +1,30 @@
 import { useForm } from "@tanstack/react-form";
 import { useRef, useState } from "react";
-import { useAfiliaciones } from "../../../Hook/Solicitudes/Fisico/hookAfiliacion";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-import { AfiliacionSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/Afiliacion";
-
-
+import { DesconexionMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/DesconexionMedidor";
+import { useDesconexionFisica } from "../../../Hook/Solicitudes/HookFisicas";
 
 type Props = {
   onClose: () => void;
 };
 
 const normalizePhoneNumber = (phone: string): string => {
-  if (!phone.startsWith('+')) {
-    throw new Error('El número debe incluir el código de país y comenzar con "+". Ejemplo: +5215512345678');
+  if (!phone?.startsWith('+')) {
+    throw new Error('El número debe incluir el código de país y comenzar con "+". Ejemplo: +50688887777');
   }
   return phone;
 };
 
-const FormularioAfiliacion = ({ onClose }: Props) => {
+const FormularioDesconexionMedidor = ({ onClose }: Props) => {
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const mutation = useDesconexionFisica();
   const planosInputRef = useRef<HTMLInputElement>(null);
   const escrituraInputRef = useRef<HTMLInputElement>(null);
 
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [mostrarFormulario, setMostrarFormulario] = useState(true);
-  const mutation = useAfiliaciones();
 
   // Validación en tiempo real usando el schema
   const validateField = (fieldName: string, value: any, allValues?: any) => {
@@ -38,10 +35,10 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
         Apellido2: "",
         Tipo_Identificacion: "Cedula Nacional",
         Identificacion: "123456789",
-        Edad: 18,
-        Direccion_Exacta: "1234567890",
+        Direccion_Exacta: "Dirección válida",
         Numero_Telefono: "+50688887777",
         Correo: "test@test.com",
+        Motivo_Solicitud: "Motivo válido",
         Planos_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
         Escritura_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
       };
@@ -56,7 +53,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
         dummy[fieldName] = value;
       }
 
-      AfiliacionSchema.parse(dummy);
+      DesconexionMedidorSchema.parse(dummy);
 
       setFieldErrors(prev => {
         const newErrors = { ...prev };
@@ -88,7 +85,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
       Correo: 'ejemplo@gmail.com',
       Numero_Telefono: '+50688887777',
       Direccion_Exacta: 'San José, del Banco Nacional 200m sur',
-      Edad: '25',
+      Motivo_Solicitud: 'Escribe el motivo de tu solicitud',
     };
     if (fieldName === 'Identificacion') {
       switch (tipoIdentificacion) {
@@ -103,18 +100,17 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
 
   const form = useForm({
     defaultValues: {
-      Nombre: '',
-      Apellido1: '',
-      Apellido2: '',
+      Nombre: "",
+      Apellido1: "",
+      Apellido2: "",
       Tipo_Identificacion: "Cedula Nacional",
-      Identificacion: '',
-      Correo: '',
-      Direccion_Exacta: '',
-      Numero_Telefono: '',
-      Edad: 0,
+      Identificacion: "",
+      Direccion_Exacta: "",
+      Numero_Telefono: "",
+      Correo: "",
+      Motivo_Solicitud: "",
       Planos_Terreno: undefined as File | undefined,
       Escritura_Terreno: undefined as File | undefined,
-      Motivo_Solicitud: '',
     },
 
     onSubmit: async ({ value }) => {
@@ -122,7 +118,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
       try {
         value.Numero_Telefono = normalizePhoneNumber(value.Numero_Telefono);
 
-        const validation = AfiliacionSchema.safeParse(value);
+        const validation = DesconexionMedidorSchema.safeParse(value);
         if (!validation.success) {
           const validationErrors: Record<string, string> = {};
           validation.error.errors.forEach((err) => {
@@ -144,40 +140,56 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
           }
         });
 
-        await mutation.createAfiliacion(formData);
+        await mutation.createDesconexion(formData);
 
         form.reset();
-        setFormErrors({});
+        setFormErrors({ general: "¡Solicitud enviada con éxito!" });
         setFieldErrors({});
         setArchivoSeleccionado({});
+        alert("¡Solicitud enviada exitosamente!");
         setMostrarFormulario(false);
-        setShowSuccessAlert(true);
-        setTimeout(() => setShowSuccessAlert(false), 3000);
-        alert("¡Solicitud enviada con éxito!");
         if (onClose) onClose();
       } catch (error: any) {
+        console.log("ERROR EN SOLICITUD DE DESCONEXIÓN:", error);
 
+        // Log detallado del error
+        const axiosError = error;
+        console.log("Detalles del error:");
+        console.log("  - Status:", axiosError?.response?.status);
+        console.log("  - Status Text:", axiosError?.response?.statusText);
+        console.log("  - Data:", axiosError?.response?.data);
+        console.log("  - Message:", axiosError?.message);
+        console.log("  - Name:", axiosError?.name);
+
+        const backendMessage = error?.response?.data?.message;
+        console.log("🔎 Backend message extraído:", backendMessage);
+
+        // Verificar errores específicos del backend
+        if (backendMessage) {
+          if (backendMessage.includes("No existe un afiliado físico")) {
+            setFormErrors({
+              Identificacion: "No existe un afiliado físico con esa identificación. Debe afiliarse primero antes de realizar esta solicitud.",
+            });
+            return;
+          } else if (backendMessage.includes("Ya existe un afiliado físico")) {
+            // Caso similar al formulario Asociado - error de lógica del backend
+            setFormErrors({
+              general: "Error en el sistema: El backend tiene un error de lógica. Contacte al administrador del sistema.",
+            });
+            console.error("BUG DEL BACKEND: Lógica incorrecta en validación de afiliado");
+            return;
+          }
+        }
+        // --- FIN CAMBIO ---
         setFormErrors({
-          general:
-            error?.message ||
-            "Hubo un error al enviar el formulario. Intenta nuevamente."
+          general: backendMessage || error?.message || 'Ocurrió un error al enviar la solicitud.',
         });
       }
     },
   });
 
-  if (!mostrarFormulario) {
-    return showSuccessAlert ? (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-        <div className="bg-white rounded-lg shadow-lg px-8 py-6 text-center">
-          <h3 className="text-green-600 text-xl font-semibold mb-2">¡Solicitud enviada con éxito!</h3>
-          <p className="text-gray-700">Gracias por enviar tu solicitud.</p>
-        </div>
-      </div>
-    ) : null;
-  }
+  if (!mostrarFormulario) return null;
 
- 
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
 
   return (
@@ -189,7 +201,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
         }}
         className="bg-white shadow-lg pl-24 pr-24 pt-8 pb-8 rounded-lg w-full max-w-7xl mx-auto"
       >
-        <h2 className="text-center text-2xl font-semibold mb-10">Formulario de afiliación</h2>
+        <h2 className="text-center text-2xl font-semibold mb-10">Formulario de desconexión de medidor</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
           {/* Tipo de Identificación */}
@@ -207,12 +219,6 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                       validateField('Tipo_Identificacion', e.target.value, form.state.values);
                       form.setFieldValue('Identificacion', '');
                       setFieldErrors(prev => {
-                        const newErrors = { ...prev };
-                        delete newErrors['Identificacion'];
-                        return newErrors;
-                      });
-                      // Limpiar error de identificación duplicada al cambiar tipo
-                      setFormErrors(prev => {
                         const newErrors = { ...prev };
                         delete newErrors['Identificacion'];
                         return newErrors;
@@ -244,24 +250,17 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                     onChange={(e) => {
                       field.handleChange(e.target.value);
                       validateField('Identificacion', e.target.value, form.state.values);
-                      // Limpiar error de identificación duplicada al cambiar valor
-                      setFormErrors(prev => {
-                        const newErrors = { ...prev };
-                        delete newErrors['Identificacion'];
-                        return newErrors;
-                      });
                     }}
                     placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion as TipoIdentificacion)}
                     disabled={!form.state.values.Tipo_Identificacion}
-                    className={`${commonClasses} ${(fieldErrors['Identificacion'] || formErrors['Identificacion']) ? 'border-red-500 focus:ring-red-300' : ''} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                    className={`${commonClasses} ${fieldErrors['Identificacion'] ? 'border-red-500 focus:ring-red-300' : ''} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                   />
-                  {/* Mostrar error de validación de formato */}
+                  {/* Solo muestra errores de identificación aquí */}
                   {fieldErrors['Identificacion'] && (
                     <span className="text-red-500 text-sm block mt-1">
                       {fieldErrors['Identificacion']}
                     </span>
                   )}
-                  {/* Mostrar error de identificación duplicada */}
                   {formErrors['Identificacion'] && !fieldErrors['Identificacion'] && (
                     <span className="text-red-500 text-sm block mt-1">
                       {formErrors['Identificacion']}
@@ -287,6 +286,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                   placeholder={getPlaceholder("Nombre")}
                   className={commonClasses}
                 />
+                {/* Solo muestra errores de nombre aquí */}
                 {fieldErrors["Nombre"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Nombre"]}</span>
                 )}
@@ -311,6 +311,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                   placeholder={getPlaceholder("Apellido1")}
                   className={commonClasses}
                 />
+                {/* Solo muestra errores de primer apellido aquí */}
                 {fieldErrors["Apellido1"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido1"]}</span>
                 )}
@@ -335,6 +336,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                   placeholder={getPlaceholder("Apellido2")}
                   className={commonClasses}
                 />
+                {/* Solo muestra errores de segundo apellido aquí */}
                 {fieldErrors["Apellido2"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido2"]}</span>
                 )}
@@ -349,7 +351,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
             {(field) => (
               <div className="mb-3 w-full">
                 <label htmlFor="Direccion_Exacta" className="block mb-1 font-medium">Dirección exacta <span className="text-red-500">*</span></label>
-                <input
+                <input  
                   type="text"
                   value={field.state.value}
                   onChange={(e) => {
@@ -359,6 +361,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                   placeholder={getPlaceholder("Direccion_Exacta")}
                   className={commonClasses}
                 />
+                {/* Solo muestra errores de dirección aquí */}
                 {fieldErrors["Direccion_Exacta"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Direccion_Exacta"]}</span>
                 )}
@@ -383,6 +386,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                   placeholder={getPlaceholder("Correo")}
                   className={commonClasses}
                 />
+                {/* Solo muestra errores de correo aquí */}
                 {fieldErrors["Correo"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Correo"]}</span>
                 )}
@@ -407,6 +411,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                   }}
                   className={`${commonClasses} ${fieldErrors["Numero_Telefono"] ? 'border-red-500 focus:ring-red-300' : ''}`}
                 />
+                {/* Solo muestra errores de teléfono aquí */}
                 {fieldErrors["Numero_Telefono"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
                 )}
@@ -416,27 +421,26 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
               </div>
             )}
           </form.Field>
-          {/* Edad */}
-          <form.Field name="Edad">
+          {/* Motivo de Solicitud */}
+          <form.Field name="Motivo_Solicitud">
             {(field) => (
               <div className="mb-3 w-full">
-                <label htmlFor="Edad" className="block mb-1 font-medium">Edad <span className="text-red-500">*</span></label>
-                <input
-                  type="number"
-                  min={18}
+                <label htmlFor="Motivo_Solicitud" className="block mb-1 font-medium">Motivo de solicitud <span className="text-red-500">*</span></label>
+                <textarea
                   value={field.state.value}
                   onChange={(e) => {
-                    field.handleChange(Number(e.target.value));
-                    validateField("Edad", Number(e.target.value), form.state.values);
+                    field.handleChange(e.target.value);
+                    validateField("Motivo_Solicitud", e.target.value, form.state.values);
                   }}
-                  placeholder={getPlaceholder("Edad")}
-                  className={commonClasses}
+                  placeholder={getPlaceholder("Motivo_Solicitud")}
+                  className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
                 />
-                {fieldErrors["Edad"] && (
-                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Edad"]}</span>
+                {/* Solo muestra errores de motivo aquí */}
+                {fieldErrors["Motivo_Solicitud"] && (
+                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Solicitud"]}</span>
                 )}
-                {formErrors["Edad"] && !fieldErrors["Edad"] && (
-                  <span className="text-red-500 text-sm block mt-1">{formErrors["Edad"]}</span>
+                {formErrors["Motivo_Solicitud"] && !fieldErrors["Motivo_Solicitud"] && (
+                  <span className="text-red-500 text-sm block mt-1">{formErrors["Motivo_Solicitud"]}</span>
                 )}
               </div>
             )}
@@ -484,7 +488,9 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                             ...prev,
                             ["Planos_Terreno"]: `Debe subir el plano del terreno`,
                           }));
-                          if (planosInputRef.current) planosInputRef.current.value = "";
+                          if (planosInputRef.current) {
+                            planosInputRef.current.value = '';
+                          }
                         }}
                         className="text-red-500 hover:underline text-xs"
                       >
@@ -492,6 +498,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                       </button>
                     </div>
                   )}
+                  {/* Solo muestra errores de planos aquí */}
                   {fieldErrors["Planos_Terreno"] && (
                     <span className="text-red-500 text-sm block mt-1">
                       {fieldErrors["Planos_Terreno"]}
@@ -514,7 +521,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                   <label htmlFor="Escritura_Terreno" className="block mb-1 font-medium">Escritura del terreno <span className="text-red-500">*</span></label>
                   <input
                     type="file"
-                    accept=".png,.jpg,.jpeg,.heic,.pdf"  // 🔥 CAMBIO: Agregué .pdf
+                    accept=".png,.jpg,.jpeg,.heic,.pdf"
                     disabled={!!archivoActual}
                     onChange={(e) => {
                       const file = e.target.files?.[0] ?? null;
@@ -545,7 +552,9 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                             ...prev,
                             ["Escritura_Terreno"]: `Debe subir la escritura del terreno`,
                           }));
-                          if (escrituraInputRef.current) escrituraInputRef.current.value = "";
+                          if (escrituraInputRef.current) {
+                            escrituraInputRef.current.value = '';
+                          }
                         }}
                         className="text-red-500 hover:underline text-xs"
                       >
@@ -553,6 +562,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                       </button>
                     </div>
                   )}
+                  {/* Solo muestra errores de escritura aquí */}
                   {fieldErrors["Escritura_Terreno"] && (
                     <span className="text-red-500 text-sm block mt-1">
                       {fieldErrors["Escritura_Terreno"]}
@@ -569,9 +579,9 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
           </form.Field>
         </div>
 
-        {/* Mensaje general */}
+        {/* Mensaje de afiliado físico no encontrado */}
         {formErrors.general && (
-          <div className={`text-center mt-4 ${formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
+          <div className="text-center mt-4 text-red-500">
             {formErrors.general}
           </div>
         )}
@@ -592,4 +602,4 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
   );
 };
 
-export default FormularioAfiliacion;
+export default FormularioDesconexionMedidor;

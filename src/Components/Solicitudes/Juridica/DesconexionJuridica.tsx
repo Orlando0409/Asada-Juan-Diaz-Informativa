@@ -2,10 +2,10 @@ import { useForm } from "@tanstack/react-form";
 import { useRef, useState } from "react";
 import data from "../../../data/Data.json";
 import { DesconexionJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/DesconexionMedidorJuridica";
-import { useDesconexionJuridica } from "../../../Hook/Solicitudes/Juridica/hookDesconexionJuridica";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
+import { useDesconexionJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
 
 type Props = {
     onClose: () => void;
@@ -116,7 +116,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                     }
                 });
 
-                await mutation.createDesconexionJuridica(formData);
+                await mutation.createDesconexion(formData);
 
                 form.reset();
                 setFormErrors({ general: "¡Solicitud enviada con éxito!" });
