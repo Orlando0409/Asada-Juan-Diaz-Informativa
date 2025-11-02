@@ -1,10 +1,9 @@
 import { useForm } from "@tanstack/react-form";
 import { useRef, useState } from "react";
 import { AfiliacionJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/AfiliacionJuridica";
-import { useAfiliacionJuridica } from "../../../Hook/Solicitudes/Juridica/hookAfiliacionJuridica";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-
+import { useAfiliacionJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
 
 type Props = {
     onClose: () => void;
@@ -106,7 +105,7 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                     }
                 });
 
-                await mutation.createAfiliacionJuridica(formData);
+                await mutation.createAfiliacion(formData);
 
                 form.reset();
                 setFormErrors({ general: "¡Solicitud enviada con éxito!" });
@@ -117,31 +116,31 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                 setMostrarFormulario(false);
                 if (onClose) onClose();
             } catch (error: any) {
-               const backendMessage = error?.response?.data?.message;
-        // Si el mensaje es "Ya existe un afiliado físico..." NO lo muestres
-        if (
-          backendMessage &&
-          backendMessage.includes("Ya existe un afiliado físico con la identificación")
-        ) {
-          // No mostrar nada, ni retornar
-        } else if (
-          backendMessage &&
-          backendMessage.includes("Ya existe una solicitud activa de afiliación")
-        ) {
-          setFormErrors({
-            general: "Ya existe una solicitud activa de afiliación con esa cédula",
-          });
-          return;
-        } else {
-          setFormErrors({
-            general:
-              error?.message ||
-              "Hubo un error al enviar el formulario. Intenta nuevamente."
-          });
-        }
-      }
-    },
-  });
+                const backendMessage = error?.response?.data?.message;
+                // Si el mensaje es "Ya existe un afiliado físico..." NO lo muestres
+                if (
+                    backendMessage &&
+                    backendMessage.includes("Ya existe un afiliado físico con la identificación")
+                ) {
+                    // No mostrar nada, ni retornar
+                } else if (
+                    backendMessage &&
+                    backendMessage.includes("Ya existe una solicitud activa de afiliación")
+                ) {
+                    setFormErrors({
+                        general: "Ya existe una solicitud activa de afiliación con esa cédula",
+                    });
+                    return;
+                } else {
+                    setFormErrors({
+                        general:
+                            error?.message ||
+                            "Hubo un error al enviar el formulario. Intenta nuevamente."
+                    });
+                }
+            }
+        },
+    });
 
     if (!mostrarFormulario) return null;
     const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300 bg-white';

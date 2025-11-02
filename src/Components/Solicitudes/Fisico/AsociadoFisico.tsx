@@ -3,7 +3,11 @@ import { useState } from "react";
 import { AsociadoSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/Asociado";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-import { useAsociadoMedidor } from "../../../Hook/Solicitudes/Fisico/hookAsociado";
+import { useAsociadoFisica } from "../../../Hook/Solicitudes/HookFisicas";
+
+type Props = {
+  onClose: () => void;
+};
 
 type AxiosError = {
   response?: {
@@ -12,10 +16,6 @@ type AxiosError = {
     };
   };
   message: string;
-};
-
-type Props = {
-  onClose: () => void;
 };
 
 const normalizePhoneNumber = (phone: string): string => {
@@ -30,7 +30,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  const mutation = useAsociadoMedidor();
+  const mutation = useAsociadoFisica();
   const [mostrarFormulario, setMostrarFormulario] = useState(true);
 
   // Validación en tiempo real del formulario
@@ -125,8 +125,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
         alert("¡Formulario enviado con éxito!");
       } catch (error: unknown) {
         console.log("🔍 ERROR EN SOLICITUD DE ASOCIADO:", error);
-        
-        
+
         let errorMsg = '';
         const backendMessage = (error as AxiosError)?.response?.data?.message;
         console.log("🔎 Backend message extraído:", backendMessage);

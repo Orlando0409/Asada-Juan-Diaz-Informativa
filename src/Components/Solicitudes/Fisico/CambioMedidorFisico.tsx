@@ -2,11 +2,10 @@ import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { z } from "zod";
 import { CambioMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/CambioMedidor";
-import { useCambioMedidor } from "../../../Hook/Solicitudes/Fisico/hookCambioMedidor";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-
+import { useCambioMedidorFisica } from "../../../Hook/Solicitudes/HookFisicas";
 
 type Props = {
   onClose: () => void;
@@ -26,7 +25,7 @@ const fieldSchemas: Record<string, z.ZodTypeAny> = CambioMedidorSchema.shape;
 const FormularioCambioMedidor = ({ onClose }: Props) => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const mutation = useCambioMedidor();
+  const mutation = useCambioMedidorFisica();
   const [mostrarFormulario, setMostrarFormulario] = useState(true);
 
   // Validación en tiempo real SOLO del campo editado

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import data from '../../data/Data.json';
 import FormularioAsociadoJuridico from "../../Components/Solicitudes/Juridica/AsociadoJurica";
-import FormularioAsociado from "../../Components/Solicitudes/Fisico/Asociado";
+import FormularioAsociado from "../../Components/Solicitudes/Fisico/AsociadoFisico";
 
 const Asociado = () => {
   const [mostrarFormularioFisico, setMostrarFormularioFisico] = useState(false);
