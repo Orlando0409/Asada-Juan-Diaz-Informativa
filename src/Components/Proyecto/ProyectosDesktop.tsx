@@ -88,7 +88,6 @@ function ProyectosDesktop({
               style={{ transform: `translateX(-${slideActual * 100}%)` }}
             >
               {proyectos.map((proyecto, index) => {
-                //const nombreEstado = proyecto.estado?.Nombre_Estado ?? (proyecto as any).Estado?.Nombre_Estado ?? '';
                 const nombreEstado = proyecto.Estado?.Nombre_Estado ?? '';
                 return (
                   <div key={proyecto.Id_Proyecto} className="w-full flex-shrink-0">
@@ -137,35 +136,41 @@ function ProyectosDesktop({
             </div>
           </div>
 
-          {/* Botones navegación desktop */}
-          <button
-            onClick={irAAnterior}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 border border-gray-200"
-          >
-            <IoChevronBack className="w-5 h-5 text-gray-700" />
-          </button>
-          
-          <button
-            onClick={irASiguiente}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 border border-gray-200"
-          >
-            <IoChevronForward className="w-5 h-5 text-gray-700" />
-          </button>
-
-          {/* Indicadores desktop */}
-          <div className="flex justify-center mt-6 space-x-3">
-            {proyectos.map((proyecto, index) => (
+          {/* Botones navegación desktop - Solo mostrar si hay más de un proyecto */}
+          {proyectos.length > 1 && (
+            <>
               <button
-                key={proyecto.Id_Proyecto}
-                onClick={() => irASlide(index)}
-                className={`transition-all duration-300 rounded-full ${
-                  index === slideActual 
-                    ? 'w-8 h-3 bg-gradient-to-r from-blue-500 to-indigo-500 shadow-lg' 
-                    : 'w-3 h-3 bg-gray-300 hover:bg-gray-400 hover:scale-110'
-                }`}
-              />
-            ))}
-          </div>
+                onClick={irAAnterior}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 border border-gray-200"
+              >
+                <IoChevronBack className="w-5 h-5 text-gray-700" />
+              </button>
+              
+              <button
+                onClick={irASiguiente}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 border border-gray-200"
+              >
+                <IoChevronForward className="w-5 h-5 text-gray-700" />
+              </button>
+            </>
+          )}
+
+          {/* Indicadores desktop - Solo mostrar si hay más de un proyecto */}
+          {proyectos.length > 1 && (
+            <div className="flex justify-center mt-6 space-x-3">
+              {proyectos.map((proyecto, index) => (
+                <button
+                  key={proyecto.Id_Proyecto}
+                  onClick={() => irASlide(index)}
+                  className={`transition-all duration-300 rounded-full ${
+                    index === slideActual 
+                      ? 'w-8 h-3 bg-gradient-to-r from-blue-500 to-indigo-500 shadow-lg' 
+                      : 'w-3 h-3 bg-gray-300 hover:bg-gray-400 hover:scale-110'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
 
           {/* Barra progreso desktop */}
           <div className="mt-4 w-full bg-gray-200 rounded-full h-1 overflow-hidden">

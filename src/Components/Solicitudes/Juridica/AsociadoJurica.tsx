@@ -91,23 +91,20 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                 if (onClose) onClose();
                 alert("¡Formulario enviado con éxito!");
             } catch (error: any) {
-                // --- CAMBIO SOLICITADO ---
-                const backendMessage = error?.response?.data?.message;
-                if (
-                    backendMessage &&
-                    backendMessage.includes("No existe un afiliado jurídico")
-                ) {
-                    setFormErrors({
-                        general: "No existe un afiliado jurídico con esa cédula. Debe ser afiliado antes de realizar esta solicitud.",
-                    });
-                    return;
+                // Capturar el mensaje del backend si existe
+                let errorMessage = "Hubo un error al enviar el formulario. Por favor intenta nuevamente.";
+                
+                if (error?.response?.data?.message) {
+                    // Si el backend envía un mensaje específico, usarlo
+                    errorMessage = error.response.data.message;
+                } else if (error?.message) {
+                    // Si no, usar el mensaje del error general
+                    errorMessage = error.message;
                 }
+
                 setFormErrors({
-                    general:
-                        error?.message ||
-                        "Hubo un error al enviar el formulario. Por favor intenta nuevamente.",
+                    general: errorMessage
                 });
-                // --- FIN CAMBIO SOLICITADO ---
             }
         },
     });
