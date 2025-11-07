@@ -10,6 +10,44 @@ interface PhoneInputComponentProps {
 }
 
 const PhoneInputComponent = ({ value, onChange, className = '' }: PhoneInputComponentProps) => {
+    // Mapeo de países con la longitud máxima de sus números telefónicos
+    const getPhoneLengthForCountry = (country: string): number => {
+        const phoneLengths: Record<string, number> = {
+            'CR': 8,  // Costa Rica
+            'US': 10, // Estados Unidos
+            'CA': 10, // Canadá
+            'MX': 10, // México
+            'GT': 8,  // Guatemala
+            'HN': 8,  // Honduras
+            'SV': 8,  // El Salvador
+            'NI': 8,  // Nicaragua
+            'PA': 8,  // Panamá
+            'ES': 9,  // España
+            'AR': 10, // Argentina
+            'CO': 10, // Colombia
+            'CL': 9,  // Chile
+            'PE': 9,  // Perú
+            'VE': 10, // Venezuela
+            'EC': 9,  // Ecuador
+            'BO': 8,  // Bolivia
+            'PY': 9,  // Paraguay
+            'UY': 8,  // Uruguay
+            'BR': 11, // Brasil
+            'GB': 10, // Reino Unido
+            'FR': 9,  // Francia
+            'DE': 10, // Alemania
+            'IT': 10, // Italia
+            'PT': 9,  // Portugal
+            'CN': 11, // China
+            'JP': 10, // Japón
+            'KR': 10, // Corea del Sur
+            'IN': 10, // India
+            'AU': 9,  // Australia
+            'NZ': 9,  // Nueva Zelanda
+        };
+        return phoneLengths[country] || 15; // Default 15 si no está en el mapeo
+    };
+
     // Extraer el código de país del valor actual
     const getCountryFromValue = (phoneValue: string): string => {
         if (!phoneValue || !phoneValue.startsWith('+')) return 'CR';
@@ -50,9 +88,14 @@ const PhoneInputComponent = ({ value, onChange, className = '' }: PhoneInputComp
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         // Solo permitir números
         const cleanPhone = e.target.value.replace(/\D/g, '');
-        setPhoneNumber(cleanPhone);
+        
+        // Limitar según el país seleccionado
+        const maxLength = getPhoneLengthForCountry(selectedCountry);
+        const limitedPhone = cleanPhone.slice(0, maxLength);
+        
+        setPhoneNumber(limitedPhone);
         const callingCode = getCountryCallingCode(selectedCountry as any);
-        const newValue = cleanPhone ? `+${callingCode}${cleanPhone}` : `+${callingCode}`;
+        const newValue = limitedPhone ? `+${callingCode}${limitedPhone}` : `+${callingCode}`;
         onChange(newValue);
     };
 
@@ -61,13 +104,13 @@ const PhoneInputComponent = ({ value, onChange, className = '' }: PhoneInputComp
     const callingCode = getCountryCallingCode(selectedCountry as any);
 
     return (
-        <div className={`flex ${className}`}>
+        <div className={`flex flex-col sm:flex-row ${className}`}>
             {/* Selector de país con bandera y código (bloqueado) */}
-            <div className="relative" style={{ minWidth: '110px', width: '110px' }}>
+            <div className="relative flex-shrink-0" style={{ minWidth: '110px', width: '110px' }}>
                 <select
                     value={selectedCountry}
                     onChange={handleCountryChange}
-                    className="w-full h-full border border-gray-300 rounded-l py-2 focus:outline-none focus:ring focus:ring-blue-300 cursor-pointer bg-white appearance-none border-r-0"
+                    className="w-full h-full border border-gray-300 sm:rounded-l rounded-t sm:rounded-t-none py-2 focus:outline-none focus:ring focus:ring-blue-300 cursor-pointer bg-white appearance-none sm:border-r-0 border-b-0 sm:border-b"
                     style={{
                         paddingLeft: '0.5rem',
                         paddingRight: '1.5rem',
@@ -105,7 +148,8 @@ const PhoneInputComponent = ({ value, onChange, className = '' }: PhoneInputComp
                 value={phoneNumber}
                 onChange={handlePhoneChange}
                 placeholder="8888 7777"
-                className="flex-1 border border-gray-300 rounded-r px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+                maxLength={getPhoneLengthForCountry(selectedCountry)}
+                className="flex-1 min-w-0 border border-gray-300 sm:rounded-r rounded-b sm:rounded-b-none px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
             />
         </div>
     );
