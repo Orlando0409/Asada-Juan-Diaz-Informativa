@@ -116,28 +116,20 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                 setMostrarFormulario(false);
                 if (onClose) onClose();
             } catch (error: any) {
-                const backendMessage = error?.response?.data?.message;
-                // Si el mensaje es "Ya existe un afiliado físico..." NO lo muestres
-                if (
-                    backendMessage &&
-                    backendMessage.includes("Ya existe un afiliado físico con la identificación")
-                ) {
-                    // No mostrar nada, ni retornar
-                } else if (
-                    backendMessage &&
-                    backendMessage.includes("Ya existe una solicitud activa de afiliación")
-                ) {
-                    setFormErrors({
-                        general: "Ya existe una solicitud activa de afiliación con esa cédula",
-                    });
-                    return;
-                } else {
-                    setFormErrors({
-                        general:
-                            error?.message ||
-                            "Hubo un error al enviar el formulario. Intenta nuevamente."
-                    });
+                // Capturar el mensaje del backend si existe
+                let errorMessage = "Hubo un error al enviar el formulario. Intenta nuevamente.";
+                
+                if (error?.response?.data?.message) {
+                    // Si el backend envía un mensaje específico, usarlo
+                    errorMessage = error.response.data.message;
+                } else if (error?.message) {
+                    // Si no, usar el mensaje del error general
+                    errorMessage = error.message;
                 }
+
+                setFormErrors({
+                    general: errorMessage
+                });
             }
         },
     });

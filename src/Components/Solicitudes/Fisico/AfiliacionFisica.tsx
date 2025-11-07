@@ -68,12 +68,10 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
       let errorMessage = '';
       if (error.errors && Array.isArray(error.errors)) {
         const fieldError = error.errors.find((err: any) => err.path.includes(fieldName));
-        errorMessage = fieldError?.message || error.errors[0]?.message || 'Error de validación';
+        errorMessage = fieldError?.message || error.errors[0]?.message;
       } else if (error.message) {
         errorMessage = error.message;
-      } else {
-        errorMessage = 'Error de validación';
-      }
+      } 
       setFieldErrors(prev => ({
         ...prev,
         [fieldName]: errorMessage,
@@ -181,11 +179,19 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
         alert("¡Solicitud enviada con éxito!");
         if (onClose) onClose();
       } catch (error: any) {
+        // Capturar el mensaje del backend si existe
+        let errorMessage = "Hubo un error al enviar el formulario. Intenta nuevamente.";
+        
+        if (error?.response?.data?.message) {
+          // Si el backend envía un mensaje específico, usarlo
+          errorMessage = error.response.data.message;
+        } else if (error?.message) {
+          // Si no, usar el mensaje del error general
+          errorMessage = error.message;
+        }
 
         setFormErrors({
-          general:
-            error?.message ||
-            "Hubo un error al enviar el formulario. Intenta nuevamente."
+          general: errorMessage
         });
       }
     },
