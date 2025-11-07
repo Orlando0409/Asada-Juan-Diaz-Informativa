@@ -3,9 +3,8 @@ import { useRef, useState } from "react";
 import data from "../../../data/Data.json";
 import { DesconexionJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/DesconexionMedidorJuridica";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
-import PhoneInput from "react-phone-number-input";
-import "react-phone-number-input/style.css";
 import { useDesconexionJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
+import PhoneInputComponent from "../PhoneInputComponent";
 
 type Props = {
     onClose: () => void;
@@ -178,15 +177,13 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                                                 {fieldLabels[fieldName]}
                                                 {fieldProps.required && <span className="text-red-500">*</span>}
                                             </label>
-                                            <PhoneInput
-                                                international
-                                                defaultCountry="CR"
+                                            <PhoneInputComponent
                                                 value={typeof field.state.value === "string" ? field.state.value : ""}
                                                 onChange={(value) => {
                                                     field.handleChange(value || "");
                                                     validateField(fieldName, value || "");
                                                 }}
-                                                className={`${commonClasses} ${fieldErrors[fieldName] ? 'border-red-500 focus:ring-red-300' : ''}`}
+                                                className={`${fieldErrors[fieldName] ? 'border-red-500' : ''}`}
                                             />
                                             {fieldErrors[fieldName] && (
                                                 <span className="text-red-500 text-sm block mt-1">{fieldErrors[fieldName]}</span>

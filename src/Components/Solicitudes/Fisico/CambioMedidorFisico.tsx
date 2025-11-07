@@ -3,11 +3,10 @@ import { useState } from "react";
 import { z } from "zod";
 import { CambioMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/CambioMedidor";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
-import PhoneInput from "react-phone-number-input";
-import "react-phone-number-input/style.css";
 import { useCambioMedidorFisica } from "../../../Hook/Solicitudes/HookFisicas";
 import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import { Loader2 } from "lucide-react";
+import PhoneInputComponent from "../PhoneInputComponent";
 
 type Props = {
   onClose: () => void;
@@ -318,15 +317,13 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
             {(field) => (
               <div className="mb-3 w-full">
                 <label htmlFor="Numero_Telefono" className="block mb-1 font-medium">Número de teléfono <span className="text-red-500">*</span></label>
-                <PhoneInput
-                  international
-                  defaultCountry="CR"
+                <PhoneInputComponent
                   value={field.state.value}
                   onChange={(value) => {
                     field.handleChange(value || "");
                     handleFieldChange("Numero_Telefono", value || "");
                   }}
-                  className={`${commonClasses} border-green-500 focus:ring-green-300 ${fieldErrors["Numero_Telefono"] ? 'border-red-500 focus:ring-red-300' : ''}`}
+                  className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
                 />
                 {fieldErrors["Numero_Telefono"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>

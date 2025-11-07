@@ -1,11 +1,10 @@
 import { useForm } from "@tanstack/react-form";
 import { useRef, useState } from "react";
-import PhoneInput from "react-phone-number-input";
-import "react-phone-number-input/style.css";
 import { DesconexionMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/DesconexionMedidor";
 import { useDesconexionFisica } from "../../../Hook/Solicitudes/HookFisicas";
 import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import { Loader2 } from "lucide-react";
+import PhoneInputComponent from "../PhoneInputComponent";
 
 type Props = {
   onClose: () => void;
@@ -426,15 +425,13 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
             {(field) => (
               <div className="mb-3 w-full">
                 <label htmlFor="Numero_Telefono" className="block mb-1 font-medium">Número de teléfono <span className="text-red-500">*</span></label>
-                <PhoneInput
-                  international
-                  defaultCountry="CR"
+                <PhoneInputComponent
                   value={field.state.value}
                   onChange={(value) => {
                     field.handleChange(value || "");
                     validateField("Numero_Telefono", value || "", form.state.values);
                   }}
-                  className={`${commonClasses} ${fieldErrors["Numero_Telefono"] ? 'border-red-500 focus:ring-red-300' : ''}`}
+                  className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
                 />
                 {/* Solo muestra errores de teléfono aquí */}
                 {fieldErrors["Numero_Telefono"] && (

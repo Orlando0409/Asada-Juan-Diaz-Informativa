@@ -1,9 +1,8 @@
 import { useForm } from "@tanstack/react-form";
 import { useRef, useState } from "react";
 import { AfiliacionJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/AfiliacionJuridica";
-import PhoneInput from "react-phone-number-input";
-import "react-phone-number-input/style.css";
 import { useAfiliacionJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
+import PhoneInputComponent from "../PhoneInputComponent";
 
 type Props = {
     onClose: () => void;
@@ -230,15 +229,13 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                         {(field) => (
                             <div className="mb-3">
                                 <label className="block mb-1 font-semibold text-gray-700">Número de teléfono <span className="text-red-500">*</span></label>
-                                <PhoneInput
-                                    international
-                                    defaultCountry="CR"
+                                <PhoneInputComponent
                                     value={field.state.value}
                                     onChange={(value) => {
                                         field.handleChange(value || "");
                                         validateField("Numero_Telefono", value || "");
                                     }}
-                                    className={`${commonClasses} ${fieldErrors["Numero_Telefono"] ? 'border-red-500 focus:ring-red-300' : ''}`}
+                                    className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
                                 />
                                 {fieldErrors["Numero_Telefono"] && (
                                     <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
