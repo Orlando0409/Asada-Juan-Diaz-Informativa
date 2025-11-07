@@ -1,9 +1,8 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { AsociadoJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/AsociadoJuridica";
-import PhoneInput from "react-phone-number-input";
-import "react-phone-number-input/style.css";
 import { useAsociadoJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
+import PhoneInputComponent from "../PhoneInputComponent";
 
 type Props = {
     onClose: () => void;
@@ -242,15 +241,12 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                                 <label className="block mb-1 font-medium">
                                     Número de teléfono <span className="text-red-500">*</span>
                                 </label>
-                                <PhoneInput
-                                    international
-                                    defaultCountry="CR"
+                                <PhoneInputComponent
                                     value={field.state.value}
                                     onChange={(value) => {
                                         handleFieldChange("Numero_Telefono", value || "");
                                     }}
-                                    onBlur={() => setTouched(prev => ({ ...prev, Numero_Telefono: true }))}
-                                    className={`${commonClasses} ${fieldErrors["Numero_Telefono"] ? 'border-red-500 focus:ring-red-300' : ''}`}
+                                    className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
                                 />
                                 {touched["Numero_Telefono"] && fieldErrors["Numero_Telefono"] && (
                                     <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>

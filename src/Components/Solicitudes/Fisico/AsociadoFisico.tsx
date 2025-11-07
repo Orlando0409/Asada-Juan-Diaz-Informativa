@@ -1,9 +1,8 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { AsociadoSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/Asociado";
-import PhoneInput from "react-phone-number-input";
-import "react-phone-number-input/style.css";
 import { useAsociadoFisica } from "../../../Hook/Solicitudes/HookFisicas";
+import PhoneInputComponent from "../PhoneInputComponent";
 
 type Props = {
   onClose: () => void;
@@ -365,15 +364,12 @@ const FormularioAsociado = ({ onClose }: Props) => {
             {(field) => (
               <div className="mb-3 w-full">
                 <label htmlFor="Numero_Telefono" className="block mb-1 font-medium">Número de teléfono <span className="text-red-500">*</span></label>
-                <PhoneInput
-                  international
-                  defaultCountry="CR"
+                <PhoneInputComponent
                   value={field.state.value}
                   onChange={(value) => {
                     handleFieldChange("Numero_Telefono", value || "");
                   }}
-                  onBlur={() => setTouched(prev => ({ ...prev, Numero_Telefono: true }))}
-                  className={`${commonClasses} ${fieldErrors["Numero_Telefono"] ? 'border-red-500 focus:ring-red-300' : ''}`}
+                  className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
                 />
                 {touched["Numero_Telefono"] && fieldErrors["Numero_Telefono"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
