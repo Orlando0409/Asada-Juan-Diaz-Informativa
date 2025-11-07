@@ -2,6 +2,7 @@ import { useForm } from "@tanstack/react-form";
 import { useRef, useState } from "react";
 import { AfiliacionSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/Afiliacion";
 import { useAfiliacionFisica } from "../../../Hook/Solicitudes/HookFisicas";
+import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import PhoneInputComponent from "../PhoneInputComponent";
 
 type Props = {
@@ -25,6 +26,8 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const [mostrarFormulario, setMostrarFormulario] = useState(true);
   const mutation = useAfiliacionFisica();
+
+  const { lookup, isLoading: loadingCedula } = useCedulaLookup()
 
   // Validación en tiempo real usando el schema
   const validateField = (fieldName: string, value: any, allValues?: any) => {
@@ -74,6 +77,30 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
         ...prev,
         [fieldName]: errorMessage,
       }));
+    }
+  };
+
+  // Función para manejar el cambio de cédula con búsqueda automática
+  const handleCedulaChange = async (cedula: string) => {
+    form.setFieldValue('Identificacion', cedula);
+    validateField('Identificacion', cedula, form.state.values);
+    
+    // Limpiar errores
+    setFormErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors['Identificacion'];
+      return newErrors;
+    });
+
+    // Buscar datos solo si es cédula nacional y tiene 9 dígitos
+    if (form.state.values.Tipo_Identificacion === 'Cedula Nacional' && /^\d{9}$/.test(cedula)) {
+      const resultado = await lookup(cedula);
+      if (resultado) {
+        // Autocompletar campos con los datos de la API
+        form.setFieldValue('Nombre', resultado.firstname || '');
+        form.setFieldValue('Apellido1', resultado.lastname1 || '');
+        form.setFieldValue('Apellido2', resultado.lastname2 || '');
+      }
     }
   };
 
@@ -235,23 +262,25 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                   <label htmlFor="Identificacion" className="block mb-1 font-medium">
                     Número de Identificación <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
-                    value={field.state.value}
-                    onChange={(e) => {
-                      field.handleChange(e.target.value);
-                      validateField('Identificacion', e.target.value, form.state.values);
-                      // Limpiar error de identificación duplicada al cambiar valor
-                      setFormErrors(prev => {
-                        const newErrors = { ...prev };
-                        delete newErrors['Identificacion'];
-                        return newErrors;
-                      });
-                    }}
-                    placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion as TipoIdentificacion)}
-                    disabled={!form.state.values.Tipo_Identificacion}
-                    className={`${commonClasses} ${(fieldErrors['Identificacion'] || formErrors['Identificacion']) ? 'border-red-500 focus:ring-red-300' : ''} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={field.state.value}
+                      onChange={(e) => handleCedulaChange(e.target.value)}
+                      placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion as TipoIdentificacion)}
+                      disabled={!form.state.values.Tipo_Identificacion || loadingCedula}
+                      className={`${commonClasses} ${(fieldErrors['Identificacion'] || formErrors['Identificacion']) ? 'border-red-500 focus:ring-red-300' : ''} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                    />
+                    {loadingCedula && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                  {loadingCedula && <p className="text-xs text-blue-600 mt-1">Buscando información...</p>}
                   {/* Mostrar error de validación de formato */}
                   {fieldErrors['Identificacion'] && (
                     <span className="text-red-500 text-sm block mt-1">

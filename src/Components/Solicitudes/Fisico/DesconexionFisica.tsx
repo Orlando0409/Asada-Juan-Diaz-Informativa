@@ -2,6 +2,8 @@ import { useForm } from "@tanstack/react-form";
 import { useRef, useState } from "react";
 import { DesconexionMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/DesconexionMedidor";
 import { useDesconexionFisica } from "../../../Hook/Solicitudes/HookFisicas";
+import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
+import { Loader2 } from "lucide-react";
 import PhoneInputComponent from "../PhoneInputComponent";
 
 type Props = {
@@ -22,8 +24,25 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
   const mutation = useDesconexionFisica();
   const planosInputRef = useRef<HTMLInputElement>(null);
   const escrituraInputRef = useRef<HTMLInputElement>(null);
-
   const [mostrarFormulario, setMostrarFormulario] = useState(true);
+  const { lookup, isLoading } = useCedulaLookup();
+
+  // Función para manejar el cambio de cédula con búsqueda automática
+  const handleCedulaChange = async (cedula: string) => {
+    form.setFieldValue('Identificacion', cedula);
+    validateField('Identificacion', cedula, form.state.values);
+
+    // Buscar datos solo si es cédula nacional y tiene 9 dígitos
+    if (form.state.values.Tipo_Identificacion === 'Cedula Nacional' && /^\d{9}$/.test(cedula)) {
+      const resultado = await lookup(cedula);
+      if (resultado) {
+        // Autocompletar campos con los datos de la API
+        form.setFieldValue('Nombre', resultado.firstname || '');
+        form.setFieldValue('Apellido1', resultado.lastname1 || '');
+        form.setFieldValue('Apellido2', resultado.lastname2 || '');
+      }
+    }
+  };
 
   // Validación en tiempo real usando el schema
   const validateField = (fieldName: string, value: any, allValues?: any) => {
@@ -243,17 +262,23 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                   <label htmlFor="Identificacion" className="block mb-1 font-medium">
                     Número de Identificación <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="text"
-                    value={field.state.value}
-                    onChange={(e) => {
-                      field.handleChange(e.target.value);
-                      validateField('Identificacion', e.target.value, form.state.values);
-                    }}
-                    placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion as TipoIdentificacion)}
-                    disabled={!form.state.values.Tipo_Identificacion}
-                    className={`${commonClasses} ${fieldErrors['Identificacion'] ? 'border-red-500 focus:ring-red-300' : ''} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                  />
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={field.state.value}
+                      onChange={(e) => {
+                        handleCedulaChange(e.target.value);
+                      }}
+                      placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion as TipoIdentificacion)}
+                      disabled={!form.state.values.Tipo_Identificacion}
+                      className={`${commonClasses} ${fieldErrors['Identificacion'] ? 'border-red-500 focus:ring-red-300' : ''} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                    />
+                    {isLoading && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+                      </div>
+                    )}
+                  </div>
                   {/* Solo muestra errores de identificación aquí */}
                   {fieldErrors['Identificacion'] && (
                     <span className="text-red-500 text-sm block mt-1">
