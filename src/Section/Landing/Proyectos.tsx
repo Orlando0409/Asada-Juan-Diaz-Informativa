@@ -4,7 +4,6 @@ import ProyectosDesktop from "../../Components/Proyecto/ProyectosDesktop";
 import Data from "../../data/Data.json";
 import { useProyectos } from "../../Hook/Proyecto/hookProyecto";
 
-
 function Proyectos() {
   const [slideActual, setSlideActual] = useState(0);
   const [estaPausado, setEstaPausado] = useState(false);
@@ -17,7 +16,7 @@ function Proyectos() {
     if (estaPausado || !proyectos) return;
 
     const intervalo = setInterval(() => {
-      setSlideActual(prevSlide => 
+      setSlideActual(prevSlide =>
         prevSlide === proyectos.length - 1 ? 0 : prevSlide + 1
       );
     }, 3000);
@@ -69,7 +68,7 @@ function Proyectos() {
   }
 
   if (!proyectos) {
-     return (
+    return (
       <section className="py-8 md:py-16 bg-gradient-to-br from-slate-50 to-blue-100 text-center">
         <div className="container mx-auto px-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>

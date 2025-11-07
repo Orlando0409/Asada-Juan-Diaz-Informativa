@@ -3,7 +3,13 @@ import { useState } from "react";
 import { AsociadoSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/Asociado";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-import { useAsociadoMedidor } from "../../../Hook/Solicitudes/Fisico/hookAsociado";
+import { useAsociadoFisica } from "../../../Hook/Solicitudes/HookFisicas";
+import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
+import { Loader2 } from "lucide-react";
+
+type Props = {
+  onClose: () => void;
+};
 
 type AxiosError = {
   response?: {
@@ -12,10 +18,6 @@ type AxiosError = {
     };
   };
   message: string;
-};
-
-type Props = {
-  onClose: () => void;
 };
 
 const normalizePhoneNumber = (phone: string): string => {
@@ -30,8 +32,25 @@ const FormularioAsociado = ({ onClose }: Props) => {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  const mutation = useAsociadoMedidor();
+  const mutation = useAsociadoFisica();
   const [mostrarFormulario, setMostrarFormulario] = useState(true);
+  const { lookup, isLoading } = useCedulaLookup();
+
+  // Función para manejar el cambio de cédula con búsqueda automática
+  const handleCedulaChange = async (cedula: string) => {
+    form.setFieldValue('Identificacion', cedula);
+
+    // Buscar datos solo si es cédula nacional y tiene 9 dígitos
+    if (form.state.values.Tipo_Identificacion === 'Cedula Nacional' && /^\d{9}$/.test(cedula)) {
+      const resultado = await lookup(cedula);
+      if (resultado) {
+        // Autocompletar campos con los datos de la API
+        form.setFieldValue('Nombre', resultado.firstname || '');
+        form.setFieldValue('Apellido1', resultado.lastname1 || '');
+        form.setFieldValue('Apellido2', resultado.lastname2 || '');
+      }
+    }
+  };
 
   // Validación en tiempo real del formulario
   const validateAllFields = (values: any) => {
@@ -125,8 +144,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
         alert("¡Formulario enviado con éxito!");
       } catch (error: unknown) {
         console.log("🔍 ERROR EN SOLICITUD DE ASOCIADO:", error);
-        
-        
+
         let errorMsg = '';
         const backendMessage = (error as AxiosError)?.response?.data?.message;
         console.log("🔎 Backend message extraído:", backendMessage);
@@ -245,17 +263,24 @@ const FormularioAsociado = ({ onClose }: Props) => {
                 <label htmlFor="Identificaion" className="block mb-1 font-medium">
                   Número de Identificación <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
-                  value={field.state.value}
-                  onChange={(e) => {
-                    handleFieldChange('Identificacion', e.target.value);
-                  }}
-                  onBlur={() => setTouched(prev => ({ ...prev, Identificacion: true }))}
-                  placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion)}
-                  disabled={!form.state.values.Tipo_Identificacion}
-                  className={`${commonClasses} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={field.state.value}
+                    onChange={(e) => {
+                      handleCedulaChange(e.target.value);
+                    }}
+                    onBlur={() => setTouched(prev => ({ ...prev, Identificacion: true }))}
+                    placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion)}
+                    disabled={!form.state.values.Tipo_Identificacion}
+                    className={`${commonClasses} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                  />
+                  {isLoading && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+                    </div>
+                  )}
+                </div>
                 {touched["Identificacion"] && fieldErrors["Identificacion"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Identificacion"]}</span>
                 )}

@@ -2,10 +2,10 @@ import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { z } from "zod";
 import { CambioMedidorJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/CambioMedidorJuridico";
-import { useCambioMedidorJuridica } from "../../../Hook/Solicitudes/Juridica/hookCambioMedidorJuridica";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
+import { useCambioMedidorJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
 
 type Props = {
     onClose: () => void;
@@ -98,7 +98,9 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                     setFormErrors(validationErrors);
                     return;
                 }
-                await mutation.createCambioMedidorJuridica(value);
+
+                await mutation.createCambioMedidor(value);
+
                 form.reset();
                 setFormErrors({ general: "¡Solicitud enviada con éxito!" });
                 setFieldErrors({});
@@ -119,7 +121,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
 
     if (!mostrarFormulario) return null;
 
-    
+
     const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
 
     return (
@@ -310,7 +312,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                 )}
 
                 <div className="flex justify-end items-end gap-4 mt-8">
-                   
+
                     <div className="flex justify-end items-end">
                         <button
                             type="submit"

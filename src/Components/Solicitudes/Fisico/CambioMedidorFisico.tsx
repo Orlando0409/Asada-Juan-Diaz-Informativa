@@ -2,11 +2,12 @@ import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { z } from "zod";
 import { CambioMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/CambioMedidor";
-import { useCambioMedidor } from "../../../Hook/Solicitudes/Fisico/hookCambioMedidor";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-
+import { useCambioMedidorFisica } from "../../../Hook/Solicitudes/HookFisicas";
+import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
+import { Loader2 } from "lucide-react";
 
 type Props = {
   onClose: () => void;
@@ -26,8 +27,26 @@ const fieldSchemas: Record<string, z.ZodTypeAny> = CambioMedidorSchema.shape;
 const FormularioCambioMedidor = ({ onClose }: Props) => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const mutation = useCambioMedidor();
+  const mutation = useCambioMedidorFisica();
   const [mostrarFormulario, setMostrarFormulario] = useState(true);
+  const { lookup, isLoading } = useCedulaLookup();
+
+  // Función para manejar el cambio de cédula con búsqueda automática
+  const handleCedulaChange = async (cedula: string) => {
+    form.setFieldValue('Identificacion', cedula);
+    handleFieldChange('Identificacion', cedula);
+
+    // Buscar datos solo si es cédula nacional y tiene 9 dígitos
+    if (form.state.values.Tipo_Identificacion === 'Cedula Nacional' && /^\d{9}$/.test(cedula)) {
+      const resultado = await lookup(cedula);
+      if (resultado) {
+        // Autocompletar campos con los datos de la API
+        form.setFieldValue('Nombre', resultado.firstname || '');
+        form.setFieldValue('Apellido1', resultado.lastname1 || '');
+        form.setFieldValue('Apellido2', resultado.lastname2 || '');
+      }
+    }
+  };
 
   // Validación en tiempo real SOLO del campo editado
   const handleFieldChange = (fieldName: string, value: any) => {
@@ -167,17 +186,23 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
             {(field) => (
               <div className="mb-3 w-full">
                 <label htmlFor="Identificacion" className="block mb-1 font-medium">Número de Identificación <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  value={field.state.value}
-                  onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    handleFieldChange("Identificacion", e.target.value);
-                  }}
-                  placeholder={getPlaceholder("Identificacion", form.state.values.Tipo_Identificacion)}
-                  disabled={!form.state.values.Tipo_Identificacion}
-                  className={`${commonClasses} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                />
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={field.state.value}
+                    onChange={(e) => {
+                      handleCedulaChange(e.target.value);
+                    }}
+                    placeholder={getPlaceholder("Identificacion", form.state.values.Tipo_Identificacion)}
+                    disabled={!form.state.values.Tipo_Identificacion}
+                    className={`${commonClasses} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                  />
+                  {isLoading && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+                    </div>
+                  )}
+                </div>
                 {fieldErrors["Identificacion"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Identificacion"]}</span>
                 )}

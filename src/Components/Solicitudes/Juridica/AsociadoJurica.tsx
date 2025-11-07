@@ -3,7 +3,7 @@ import { useState } from "react";
 import { AsociadoJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/AsociadoJuridica";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
-import { createAsociadoJuridica } from "../../../Services/Solicitudes/Juridica/AsociadoJuricaService";
+import { useAsociadoJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
 
 type Props = {
     onClose: () => void;
@@ -28,6 +28,7 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const [touched, setTouched] = useState<Record<string, boolean>>({});
+    const mutation = useAsociadoJuridica();
     const [showSuccessAlert, setShowSuccessAlert] = useState(false);
     const [mostrarFormulario, setMostrarFormulario] = useState(true);
 
@@ -82,7 +83,8 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                     return;
                 }
 
-                await createAsociadoJuridica(value);
+                await mutation.createAsociado(value);
+
                 form.reset();
                 setMostrarFormulario(false);
                 setShowSuccessAlert(true);
@@ -93,13 +95,13 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                 // --- CAMBIO SOLICITADO ---
                 const backendMessage = error?.response?.data?.message;
                 if (
-                  backendMessage &&
-                  backendMessage.includes("No existe un afiliado jurídico")
+                    backendMessage &&
+                    backendMessage.includes("No existe un afiliado jurídico")
                 ) {
-                  setFormErrors({
-                    general: "No existe un afiliado jurídico con esa cédula. Debe ser afiliado antes de realizar esta solicitud.",
-                  });
-                  return;
+                    setFormErrors({
+                        general: "No existe un afiliado jurídico con esa cédula. Debe ser afiliado antes de realizar esta solicitud.",
+                    });
+                    return;
                 }
                 setFormErrors({
                     general:
@@ -288,9 +290,9 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
 
                 {/* Mensaje de afiliado jurídico no encontrado */}
                 {formErrors.general && (
-                  <div className="text-center mt-4 text-red-500">
-                    {formErrors.general}
-                  </div>
+                    <div className="text-center mt-4 text-red-500">
+                        {formErrors.general}
+                    </div>
                 )}
 
                 <div className="flex justify-end items-end gap-4 mt-8">

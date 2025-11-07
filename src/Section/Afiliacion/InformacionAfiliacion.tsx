@@ -1,6 +1,6 @@
 import { useState } from "react"
 import data from '../../data/Data.json'
-import FormularioAfiliacion from "../../Components/Solicitudes/Fisico/FormularioAfiliacion"
+import FormularioAfiliacion from "../../Components/Solicitudes/Fisico/AfiliacionFisica"
 import FormularioAfiliacionJuridico from "../../Components/Solicitudes/Juridica/AfiliacionJuridica"
 
 const InformacionAfiliacion = () => {
