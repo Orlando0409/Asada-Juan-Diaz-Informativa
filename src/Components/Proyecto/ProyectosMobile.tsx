@@ -73,8 +73,6 @@ function ProyectosMobile({
               style={{ transform: `translateX(-${slideActual * 100}%)` }}
             >
               {proyectos.map((proyecto, index) => {
-                // Soporta tanto "estado" como "Estado"
-                //const nombreEstado = (proyecto.estado?.Nombre_Estado ?? (proyecto as any).Estado?.Nombre_Estado) ?? '';
                 const nombreEstado = proyecto.Estado?.Nombre_Estado ?? '';
                 return (
                   <div key={`${proyecto.Id_Proyecto}-${index}`} className="w-full flex-shrink-0">
@@ -127,43 +125,51 @@ function ProyectosMobile({
             </div>
           </div>
 
-          {/* Botones navegación móvil */}
-          <button
-            onClick={irAAnterior}
-            className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-2 shadow-md transition-all duration-200 border border-gray-200"
-          >
-            <IoChevronBack className="w-4 h-4 text-gray-700" />
-          </button>
-          
-          <button
-            onClick={irASiguiente}
-            className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-2 shadow-md transition-all duration-200 border border-gray-200"
-          >
-            <IoChevronForward className="w-4 h-4 text-gray-700" />
-          </button>
-
-          {/* Indicadores móvil */}
-          <div className="flex justify-center mt-4 space-x-2">
-            {proyectos.map((proyecto, index) => (
+          {/* Botones navegación móvil - Solo mostrar si hay más de un proyecto */}
+          {proyectos.length > 1 && (
+            <>
               <button
-                key={`${proyecto.Id_Proyecto}-dot-${index}`}
-                onClick={() => irASlide(index)}
-                className={`transition-all duration-300 rounded-full ${
-                  index === slideActual 
-                    ? 'w-6 h-2 bg-gradient-to-r from-blue-500 to-indigo-500' 
-                    : 'w-2 h-2 bg-gray-300 hover:bg-gray-400'
-                }`}
-              />
-            ))}
-          </div>
+                onClick={irAAnterior}
+                className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-2 shadow-md transition-all duration-200 border border-gray-200"
+              >
+                <IoChevronBack className="w-4 h-4 text-gray-700" />
+              </button>
+              
+              <button
+                onClick={irASiguiente}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-2 shadow-md transition-all duration-200 border border-gray-200"
+              >
+                <IoChevronForward className="w-4 h-4 text-gray-700" />
+              </button>
+            </>
+          )}
 
-          {/* Barra progreso móvil */}
-          <div className="mt-3 w-full bg-gray-200 rounded-full h-1">
-            <div 
-              className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-300"
-              style={{ width: `${porcentajeProgreso}%` }}
-            ></div>
-          </div>
+          {/* Indicadores móvil - Solo mostrar si hay más de un proyecto */}
+          {proyectos.length > 1 && (
+            <div className="flex justify-center mt-4 space-x-2">
+              {proyectos.map((proyecto, index) => (
+                <button
+                  key={`${proyecto.Id_Proyecto}-dot-${index}`}
+                  onClick={() => irASlide(index)}
+                  className={`transition-all duration-300 rounded-full ${
+                    index === slideActual 
+                      ? 'w-6 h-2 bg-gradient-to-r from-blue-500 to-indigo-500' 
+                      : 'w-2 h-2 bg-gray-300 hover:bg-gray-400'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+
+          {/* Barra progreso móvil - Solo mostrar si hay más de un proyecto */}
+          {proyectos.length > 1 && (
+            <div className="mt-3 w-full bg-gray-200 rounded-full h-1">
+              <div 
+                className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-300"
+                style={{ width: `${porcentajeProgreso}%` }}
+              ></div>
+            </div>
+          )}
         </div>
       </div>
     </section>
