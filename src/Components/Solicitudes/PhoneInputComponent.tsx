@@ -7,9 +7,19 @@ interface PhoneInputComponentProps {
     value: string;
     onChange: (value: string) => void;
     className?: string;
+    onBlur?: () => void;
+    hasError?: boolean;
 }
 
-const PhoneInputComponent = ({ value, onChange, className = '' }: PhoneInputComponentProps) => {
+const PhoneInputComponent = ({ 
+    value, 
+    onChange, 
+    className = '', 
+    onBlur,
+    hasError = false 
+}: PhoneInputComponentProps) => {
+    const [isFocused, setIsFocused] = useState(false);
+    
     // Mapeo de países con la longitud máxima de sus números telefónicos
     const getPhoneLengthForCountry = (country: string): number => {
         const phoneLengths: Record<string, number> = {
@@ -100,17 +110,35 @@ const PhoneInputComponent = ({ value, onChange, className = '' }: PhoneInputComp
     };
 
     const countries = getCountries();
-
     const callingCode = getCountryCallingCode(selectedCountry as any);
 
+    // Clases de borde según estado
+    const getBorderClasses = () => {
+        if (hasError) {
+            return 'border border-red-300';
+        }
+        if (isFocused) {
+            return 'border border-blue-500 ring-2 ring-blue-500';
+        }
+        return 'border border-gray-300';
+    };
+
+    const handleFocus = () => setIsFocused(true);
+    const handleBlur = () => {
+        setIsFocused(false);
+        if (onBlur) onBlur();
+    };
+
     return (
-        <div className={`flex flex-col sm:flex-row ${className}`}>
-            {/* Selector de país con bandera y código (bloqueado) */}
-            <div className="relative flex-shrink-0" style={{ minWidth: '110px', width: '110px' }}>
+        <div className={`flex flex-col sm:flex-row rounded overflow-hidden ${getBorderClasses()} ${className}`}>
+            {/* Selector de país con bandera y código */}
+            <div className="relative flex-shrink-0 border-r border-gray-200" style={{ minWidth: '110px', width: '110px' }}>
                 <select
                     value={selectedCountry}
                     onChange={handleCountryChange}
-                    className="w-full h-full border border-gray-300 sm:rounded-l rounded-t sm:rounded-t-none py-2 focus:outline-none focus:ring focus:ring-blue-300 cursor-pointer bg-white appearance-none sm:border-r-0 border-b-0 sm:border-b"
+                    onFocus={handleFocus}
+                    onBlur={handleBlur}
+                    className="w-full h-full py-2 focus:outline-none transition-colors cursor-pointer bg-white appearance-none border-0"
                     style={{
                         paddingLeft: '0.5rem',
                         paddingRight: '1.5rem',
@@ -147,9 +175,11 @@ const PhoneInputComponent = ({ value, onChange, className = '' }: PhoneInputComp
                 type="tel"
                 value={phoneNumber}
                 onChange={handlePhoneChange}
+                onFocus={handleFocus}
+                onBlur={handleBlur}
                 placeholder="8888 7777"
                 maxLength={getPhoneLengthForCountry(selectedCountry)}
-                className="flex-1 min-w-0 border border-gray-300 sm:rounded-r rounded-b sm:rounded-b-none px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+                className="flex-1 min-w-0 px-3 py-2 focus:outline-none transition-colors border-0"
             />
         </div>
     );

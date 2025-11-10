@@ -99,7 +99,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
     const placeholders: Record<string, string> = {
       Nombre: 'Juan Carlos',
       Apellido1: 'Pérez',
-      Apellido2: 'González (opcional)',
+      Apellido2: 'González',
       Correo: 'ejemplo@gmail.com',
       Numero_Telefono: '+50688887777',
       Direccion_Exacta: 'San José, del Banco Nacional 200m sur',
@@ -349,7 +349,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
           <form.Field name="Apellido2">
             {(field) => (
               <div className="mb-3 w-full">
-                <label htmlFor="Apellido2" className="block mb-1 font-medium">Segundo Apellido</label>
+                <label htmlFor="Apellido2" className="block mb-1 font-medium">Segundo Apellido <span className="text-red-500">*</span></label>
                 <input
                   type="text"
                   value={field.state.value}
