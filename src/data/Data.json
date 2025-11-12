@@ -6,7 +6,7 @@
     "ubicacion": "Juan Díaz de Nicoya, Guanacaste, Costa Rica",
     "añoFundacion": 2005,
     "servicios": {
-      "imagen": "/ASADA_JUAN_D.png",
+      "imagen": "/agua.mp4",
       "descripcion": "Brindando agua potable para las comunidades de Juan Díaz y Oriente"
     },
     "descripcion": "En la ASADA de Juan Díaz trabajamos para brindar un servicio  de agua potable eficiente,sostenible y de alta calidad.Nuestro Compromiso es con la comunidad y el ambiente,garantizando una gestion responsable de este recurso."
@@ -491,7 +491,7 @@
     "ruta": "/"
   },
   "hero": {
-    "imagen": "/ASADA_JUAN_D.png",
+    "imagen": "/Agua2.mp4",
     "titulo1": "ASADA Juan Díaz",
     "subtitulo": "Trabajamos juntos para que el agua llegue segura a cada hogar",
     "ResumenHistoria": "La ASADA de Juan Díaz fue fundada en el año 2005. En un inicio, la idea principal era construir un acueducto para uso agrícola, pensando en beneficiar a los agricultores de la zona. Sin embargo..."
