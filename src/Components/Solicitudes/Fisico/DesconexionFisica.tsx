@@ -99,7 +99,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
     const placeholders: Record<string, string> = {
       Nombre: 'Juan Carlos',
       Apellido1: 'Pérez',
-      Apellido2: 'González (opcional)',
+      Apellido2: 'González',
       Correo: 'ejemplo@gmail.com',
       Numero_Telefono: '+50688887777',
       Direccion_Exacta: 'San José, del Banco Nacional 200m sur',
@@ -161,47 +161,13 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
         await mutation.createDesconexion(formData);
 
         form.reset();
-        setFormErrors({ general: "¡Solicitud enviada con éxito!" });
         setFieldErrors({});
         setArchivoSeleccionado({});
-        alert("¡Solicitud enviada exitosamente!");
         setMostrarFormulario(false);
-        if (onClose) onClose();
+        onClose();
       } catch (error: any) {
         console.log("ERROR EN SOLICITUD DE DESCONEXIÓN:", error);
-
-        // Log detallado del error
-        const axiosError = error;
-        console.log("Detalles del error:");
-        console.log("  - Status:", axiosError?.response?.status);
-        console.log("  - Status Text:", axiosError?.response?.statusText);
-        console.log("  - Data:", axiosError?.response?.data);
-        console.log("  - Message:", axiosError?.message);
-        console.log("  - Name:", axiosError?.name);
-
-        const backendMessage = error?.response?.data?.message;
-        console.log("🔎 Backend message extraído:", backendMessage);
-
-        // Verificar errores específicos del backend
-        if (backendMessage) {
-          if (backendMessage.includes("No existe un afiliado físico")) {
-            setFormErrors({
-              Identificacion: "No existe un afiliado físico con esa identificación. Debe afiliarse primero antes de realizar esta solicitud.",
-            });
-            return;
-          } else if (backendMessage.includes("Ya existe un afiliado físico")) {
-            // Caso similar al formulario Asociado - error de lógica del backend
-            setFormErrors({
-              general: "Error en el sistema: El backend tiene un error de lógica. Contacte al administrador del sistema.",
-            });
-            console.error("BUG DEL BACKEND: Lógica incorrecta en validación de afiliado");
-            return;
-          }
-        }
-        // --- FIN CAMBIO ---
-        setFormErrors({
-          general: backendMessage || error?.message || 'Ocurrió un error al enviar la solicitud.',
-        });
+      
       }
     },
   });
@@ -211,13 +177,13 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
 
   return (
-    <div className="flex justify-center items-center min-h-screen text-gray-800 p-5 w-full">
+    <div className="flex justify-center items-center min-h-screen text-gray-800 p-7 w-full">
       <form
         onSubmit={(e) => {
           e.preventDefault();
           form.handleSubmit();
         }}
-        className="bg-white shadow-lg pl-24 pr-24 pt-8 pb-8 rounded-lg w-full max-w-7xl mx-auto"
+         className="bg-white shadow-lg  pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
       >
         <h2 className="text-center text-2xl font-semibold mb-10">Formulario de desconexión de medidor</h2>
 
@@ -349,7 +315,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
           <form.Field name="Apellido2">
             {(field) => (
               <div className="mb-3 w-full">
-                <label htmlFor="Apellido2" className="block mb-1 font-medium">Segundo Apellido</label>
+                <label htmlFor="Apellido2" className="block mb-1 font-medium">Segundo Apellido <span className="text-red-500">*</span></label>
                 <input
                   type="text"
                   value={field.state.value}
@@ -375,8 +341,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
             {(field) => (
               <div className="mb-3 w-full">
                 <label htmlFor="Direccion_Exacta" className="block mb-1 font-medium">Dirección exacta <span className="text-red-500">*</span></label>
-                <input  
-                  type="text"
+                <textarea
                   value={field.state.value}
                   onChange={(e) => {
                     field.handleChange(e.target.value);
@@ -600,13 +565,6 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
             }}
           </form.Field>
         </div>
-
-        {/* Mensaje de afiliado físico no encontrado */}
-        {formErrors.general && (
-          <div className="text-center mt-4 text-red-500">
-            {formErrors.general}
-          </div>
-        )}
 
         <div className="flex justify-end items-end gap-4 mt-8">
           <div className="flex justify-end items-end">

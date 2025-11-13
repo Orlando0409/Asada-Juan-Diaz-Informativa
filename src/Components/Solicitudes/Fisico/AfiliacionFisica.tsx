@@ -23,8 +23,8 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
   const planosInputRef = useRef<HTMLInputElement>(null);
   const escrituraInputRef = useRef<HTMLInputElement>(null);
 
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-  const [mostrarFormulario, setMostrarFormulario] = useState(true);
+
+  const [_mostrarFormulario, setMostrarFormulario] = useState(true);
   const mutation = useAfiliacionFisica();
 
   const { lookup, isLoading: loadingCedula } = useCedulaLookup()
@@ -82,7 +82,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
   const handleCedulaChange = async (cedula: string) => {
     form.setFieldValue('Identificacion', cedula);
     validateField('Identificacion', cedula, form.state.values);
-    
+
     // Limpiar errores
     setFormErrors(prev => {
       const newErrors = { ...prev };
@@ -106,7 +106,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
     const placeholders: Record<string, string> = {
       Nombre: 'Juan Carlos',
       Apellido1: 'Pérez',
-      Apellido2: 'González (opcional)',
+      Apellido2: 'González',
       Correo: 'ejemplo@gmail.com',
       Numero_Telefono: '+50688887777',
       Direccion_Exacta: 'San José, del Banco Nacional 200m sur',
@@ -173,51 +173,25 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
         setFieldErrors({});
         setArchivoSeleccionado({});
         setMostrarFormulario(false);
-        setShowSuccessAlert(true);
-        setTimeout(() => setShowSuccessAlert(false), 3000);
-        alert("¡Solicitud enviada con éxito!");
-        if (onClose) onClose();
-      } catch (error: any) {
-        // Capturar el mensaje del backend si existe
-        let errorMessage = "Hubo un error al enviar el formulario. Intenta nuevamente.";
-        
-        if (error?.response?.data?.message) {
-          // Si el backend envía un mensaje específico, usarlo
-          errorMessage = error.response.data.message;
-        } else if (error?.message) {
-          // Si no, usar el mensaje del error general
-          errorMessage = error.message;
-        }
 
-        setFormErrors({
-          general: errorMessage
-        });
+        onClose();
+      } catch (error: any) {
+        console.log('Error al enviar formulario de afiliación:', error);
       }
     },
   });
-
-  if (!mostrarFormulario) {
-    return showSuccessAlert ? (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-        <div className="bg-white rounded-lg shadow-lg px-8 py-6 text-center">
-          <h3 className="text-green-600 text-xl font-semibold mb-2">¡Solicitud enviada con éxito!</h3>
-          <p className="text-gray-700">Gracias por enviar tu solicitud.</p>
-        </div>
-      </div>
-    ) : null;
-  }
 
  
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
 
   return (
-    <div className="flex justify-center items-center min-h-screen text-gray-800 p-5 w-full">
+    <div className="flex justify-center items-center min-h-screen text-gray-800 p-7 w-full">
       <form
         onSubmit={(e) => {
           e.preventDefault();
           form.handleSubmit();
         }}
-        className="bg-white shadow-lg pl-24 pr-24 pt-8 pb-8 rounded-lg w-full max-w-7xl mx-auto"
+        className="bg-white shadow-lg  pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
       >
         <h2 className="text-center text-2xl font-semibold mb-10">Formulario de afiliación</h2>
 
@@ -356,7 +330,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
           <form.Field name="Apellido2">
             {(field) => (
               <div className="mb-3 w-full">
-                <label htmlFor="Apellido2" className="block mb-1 font-medium">Segundo Apellido</label>
+                <label htmlFor="Apellido2" className="block mb-1 font-medium">Segundo Apellido <span className="text-red-500">*</span></label>
                 <input
                   type="text"
                   value={field.state.value}
@@ -381,8 +355,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
             {(field) => (
               <div className="mb-3 w-full">
                 <label htmlFor="Direccion_Exacta" className="block mb-1 font-medium">Dirección exacta <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
+                <textarea
                   value={field.state.value}
                   onChange={(e) => {
                     field.handleChange(e.target.value);
@@ -598,13 +571,6 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
             }}
           </form.Field>
         </div>
-
-        {/* Mensaje general */}
-        {formErrors.general && (
-          <div className={`text-center mt-4 ${formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
-            {formErrors.general}
-          </div>
-        )}
 
         <div className="flex justify-end items-end gap-4 mt-8">
           <div className="flex justify-end items-end">

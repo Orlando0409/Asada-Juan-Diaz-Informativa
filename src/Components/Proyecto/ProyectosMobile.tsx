@@ -49,16 +49,16 @@ function ProyectosMobile({
   };
 
   return (
-    <section className="py-8 md:py-12 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 lg:hidden">
+    <section className="py-8 md:py-12 bg-white lg:hidden">
       <div className="container mx-auto px-4">
         
         {/* Título móvil */}
         <div className="text-center space-y-4 mb-8">
-          <h2 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+          <h2 className="text-3xl md:text-4xl font-bold text-blue-600 mb-2">
             {titulo}
           </h2>
           <div className="h-1 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full w-24 mx-auto"></div>
-          <p className="text-gray-500 text-md leading-relaxed max-w-md mx-auto px-4">
+          <p className="text-gray-700 text-md leading-relaxed max-w-md mx-auto px-4">
             {descripcion}
           </p>
         </div>
@@ -101,13 +101,13 @@ function ProyectosMobile({
 
                       {/* Contenido tarjeta móvil */}
                       <div className="p-4 space-y-3">
-                        <h3 className="text-lg md:text-xl font-bold text-gray-900">
+                        <h3 className="text-lg md:text-xl font-bold text-blue-600">
                           {proyecto.Titulo}
                         </h3>
                         
-                        <div className="flex items-center space-x-2 text-sm text-gray-500">
+                        <div className="flex items-center space-x-2 text-sm text-gray-700">
                           <span className={`w-2 h-2 rounded-full ${getDotColor(nombreEstado)}`}></span>
-                          <span className="text-xs">
+                          <span className="text-xs text-gray-700">
                             {new Date(proyecto.Fecha_Actualizacion).toLocaleDateString('es-ES')}
                           </span>
                         </div>

@@ -4,7 +4,7 @@ export async function fetchCedulaData(cedula: string) {
   const data = await res.json()
 
   if (!data.results || data.results.length === 0) throw new Error("Sin resultados")
-  
+
   const persona = data.results[0]
   if (persona.fullname?.toUpperCase().includes("NO REGISTRADA")) {
     throw new Error("Cédula no registrada")

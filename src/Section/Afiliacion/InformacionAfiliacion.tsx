@@ -89,7 +89,7 @@ const InformacionAfiliacion = () => {
           <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 text-center italic leading-relaxed">
             Para personas individuales
           </p>
-          <ul className="list-disc pl-4 sm:pl-5 md:pl-6 space-y-1 sm:space-y-2 text-gray-700 flex-1 overflow-auto max-h-48 sm:max-h-56 md:max-h-64">
+          <ul className="list-disc pl-4 sm:pl-5 md:pl-6 space-y-1 sm:space-y-2 text-gray-700 flex-1 overflow-auto max-h-48 sm:max-h-56 md:max-h-64 scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100">
             {Object.entries(requisitos).map(([key, value]) => (
               <li key={key} className="text-xs sm:text-sm md:text-base leading-relaxed">{value.label}</li>
             ))}
@@ -129,7 +129,7 @@ const InformacionAfiliacion = () => {
             onClick={() => setMostrarFormulario(false)}
           ></div>
           {/* Contenedor del formulario */}
-          <div className="rounded relative w-[95%] sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] max-w-5xl max-h-[80vh] sm:max-h-[85vh] md:max-h-[550px] overflow-y-scroll scrollbar-hide"
+          <div className="rounded relative w-[95%] sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] max-w-5xl max-h-[80vh] sm:max-h-[85vh] md:max-h-[550px] overflow-y-scroll scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
             <FormularioAfiliacion onClose={() => setMostrarFormulario(false)} />
           </div>

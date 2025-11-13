@@ -10,14 +10,6 @@ type Props = {
   onClose: () => void;
 };
 
-type AxiosError = {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-  message: string;
-};
 
 const normalizePhoneNumber = (phone: string): string => {
   if (!phone?.startsWith('+')) {
@@ -30,9 +22,8 @@ const FormularioAsociado = ({ onClose }: Props) => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
   const mutation = useAsociadoFisica();
-  const [mostrarFormulario, setMostrarFormulario] = useState(true);
+  const [_mostrarFormulario, setMostrarFormulario] = useState(true);
   const { lookup, isLoading } = useCedulaLookup();
 
   // Función para manejar el cambio de cédula con búsqueda automática
@@ -72,7 +63,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
     const placeholders: Record<string, string> = {
       Nombre: "Juan Carlos",
       Apellido1: "Pérez",
-      Apellido2: "González (opcional)",
+      Apellido2: "González",
       Correo: "ejemplo@gmail.com",
       Numero_Telefono: "+50688887777",
       Motivo_Solicitud: "Escribe el motivo de tu solicitud",
@@ -137,49 +128,9 @@ const FormularioAsociado = ({ onClose }: Props) => {
 
         form.reset();
         setMostrarFormulario(false);
-        setShowSuccessAlert(true);
-        setTimeout(() => setShowSuccessAlert(false), 3000);
-        if (onClose) onClose();
-        alert("¡Formulario enviado con éxito!");
+        onClose();
       } catch (error: unknown) {
         console.log("🔍 ERROR EN SOLICITUD DE ASOCIADO:", error);
-
-        let errorMsg = '';
-        const backendMessage = (error as AxiosError)?.response?.data?.message;
-        console.log("🔎 Backend message extraído:", backendMessage);
-
-        // Verificar si es error de "no existe afiliado físico"
-        if (
-          backendMessage &&
-          (backendMessage.includes("No existe un afiliado físico") ||
-            backendMessage.includes("no existe") ||
-            backendMessage.includes("No se puede crear la solicitud de asociado"))
-        ) {
-          setFormErrors({
-            Identificacion: "No existe un afiliado físico con esa identificación. Debe afiliarse primero antes de solicitar ser asociado.",
-          });
-          return;
-        }
-
-        // Error genérico
-        if (
-          typeof error === "object" &&
-          error !== null &&
-          "response" in error &&
-          "message" in error
-        ) {
-          errorMsg =
-            (error as AxiosError).response?.data?.message ||
-            (error as AxiosError).message;
-        } else if (error instanceof Error) {
-          errorMsg = error.message;
-        } else {
-          errorMsg = String(error);
-        }
-
-        setFormErrors({
-          general: errorMsg,
-        });
       }
     },
   });
@@ -202,25 +153,15 @@ const FormularioAsociado = ({ onClose }: Props) => {
     form.setFieldValue(fieldName, value);
   };
 
-  if (!mostrarFormulario) {
-    return showSuccessAlert ? (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-        <div className="bg-white rounded-lg shadow-lg px-8 py-6 text-center">
-          <h3 className="text-green-600 text-xl font-semibold mb-2">¡Formulario enviado con éxito!</h3>
-          <p className="text-gray-700">Gracias por enviar tu solicitud.</p>
-        </div>
-      </div>
-    ) : null;
-  }
 
   const commonClasses =
     "w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300";
 
   return (
-    <div className="flex justify-center items-center min-h-screen text-gray-800 p-5 w-full">
+   <div className="flex justify-center items-center min-h-screen text-gray-800 p-7 w-full">
       <form
         onSubmit={handleSubmit}
-        className="bg-white shadow-lg pl-24 pr-24 pt-8 pb-8 rounded-lg w-full max-w-7xl mx-auto"
+         className="bg-white shadow-lg  pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
       >
         <h2 className="text-center text-2xl font-semibold mb-10">Formulario para ser asociado</h2>
 
@@ -341,7 +282,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
           <form.Field name="Apellido2">
             {(field) => (
               <div className="mb-3 w-full">
-                <label htmlFor="Apellido2" className="block mb-1 font-medium">Segundo Apellido</label>
+                <label htmlFor="Apellido2" className="block mb-1 font-medium">Segundo Apellido <span className="text-red-500">*</span></label>
                 <input
                   type="text"
                   value={field.state.value}
@@ -431,12 +372,6 @@ const FormularioAsociado = ({ onClose }: Props) => {
           </form.Field>
         </div>
 
-        {/* Mensaje general */}
-        {formErrors.general && (
-          <div className={`text-center mt-4 ${formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
-            {formErrors.general}
-          </div>
-        )}
 
         <div className="flex justify-end items-end gap-4 mt-8">
 

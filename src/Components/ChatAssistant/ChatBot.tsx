@@ -74,7 +74,7 @@ export function ChatBot() {
 
       {/* Modal del chat */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-end p-4">
+        <div className="fixed inset-0 z-50 flex items-end justify-end p-4 ">
           <button 
             className="absolute inset-0 bg-black/20 cursor-default" 
             onClick={() => setIsOpen(false)}
@@ -112,7 +112,7 @@ export function ChatBot() {
             {/* Mensajes */}
             <div 
               ref={messagesContainerRef}
-              className="flex-1 overflow-y-auto p-4 space-y-4"
+              className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
               style={{ 
                 scrollBehavior: 'smooth',
                 overflowAnchor: 'none'

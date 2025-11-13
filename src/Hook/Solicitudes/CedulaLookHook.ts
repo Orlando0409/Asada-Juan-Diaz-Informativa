@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { fetchCedulaData } from "../../Services/Solicitudes/CedulaApiService"
 
-
 export function useCedulaLookup() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)

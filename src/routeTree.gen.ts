@@ -21,7 +21,6 @@ import { Route as ContactoSugerenciasRouteImport } from './routes/(Contacto)/Sug
 import { Route as ContactoReportesRouteImport } from './routes/(Contacto)/Reportes'
 import { Route as ContactoQuejasRouteImport } from './routes/(Contacto)/Quejas'
 import { Route as AboutUsHistoriaRouteImport } from './routes/(AboutUs)/Historia'
-import { Route as AboutUsDatosGeneralesRouteImport } from './routes/(AboutUs)/DatosGenerales'
 import { Route as AboutUsCalidadAguaRouteImport } from './routes/(AboutUs)/CalidadAgua'
 
 const AuthRoute = AuthRouteImport.update({
@@ -86,11 +85,6 @@ const AboutUsHistoriaRoute = AboutUsHistoriaRouteImport.update({
   path: '/Historia',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AboutUsDatosGeneralesRoute = AboutUsDatosGeneralesRouteImport.update({
-  id: '/(AboutUs)/DatosGenerales',
-  path: '/DatosGenerales',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AboutUsCalidadAguaRoute = AboutUsCalidadAguaRouteImport.update({
   id: '/(AboutUs)/CalidadAgua',
   path: '/CalidadAgua',
@@ -103,7 +97,6 @@ export interface FileRoutesByFullPath {
   '/PreguntasFrecuentes': typeof PreguntasFrecuentesRoute
   '/auth': typeof AuthRoute
   '/CalidadAgua': typeof AboutUsCalidadAguaRoute
-  '/DatosGenerales': typeof AboutUsDatosGeneralesRoute
   '/Historia': typeof AboutUsHistoriaRoute
   '/Quejas': typeof ContactoQuejasRoute
   '/Reportes': typeof ContactoReportesRoute
@@ -119,7 +112,6 @@ export interface FileRoutesByTo {
   '/PreguntasFrecuentes': typeof PreguntasFrecuentesRoute
   '/auth': typeof AuthRoute
   '/CalidadAgua': typeof AboutUsCalidadAguaRoute
-  '/DatosGenerales': typeof AboutUsDatosGeneralesRoute
   '/Historia': typeof AboutUsHistoriaRoute
   '/Quejas': typeof ContactoQuejasRoute
   '/Reportes': typeof ContactoReportesRoute
@@ -136,7 +128,6 @@ export interface FileRoutesById {
   '/PreguntasFrecuentes': typeof PreguntasFrecuentesRoute
   '/auth': typeof AuthRoute
   '/(AboutUs)/CalidadAgua': typeof AboutUsCalidadAguaRoute
-  '/(AboutUs)/DatosGenerales': typeof AboutUsDatosGeneralesRoute
   '/(AboutUs)/Historia': typeof AboutUsHistoriaRoute
   '/(Contacto)/Quejas': typeof ContactoQuejasRoute
   '/(Contacto)/Reportes': typeof ContactoReportesRoute
@@ -154,7 +145,6 @@ export interface FileRouteTypes {
     | '/PreguntasFrecuentes'
     | '/auth'
     | '/CalidadAgua'
-    | '/DatosGenerales'
     | '/Historia'
     | '/Quejas'
     | '/Reportes'
@@ -170,7 +160,6 @@ export interface FileRouteTypes {
     | '/PreguntasFrecuentes'
     | '/auth'
     | '/CalidadAgua'
-    | '/DatosGenerales'
     | '/Historia'
     | '/Quejas'
     | '/Reportes'
@@ -186,7 +175,6 @@ export interface FileRouteTypes {
     | '/PreguntasFrecuentes'
     | '/auth'
     | '/(AboutUs)/CalidadAgua'
-    | '/(AboutUs)/DatosGenerales'
     | '/(AboutUs)/Historia'
     | '/(Contacto)/Quejas'
     | '/(Contacto)/Reportes'
@@ -203,7 +191,6 @@ export interface RootRouteChildren {
   PreguntasFrecuentesRoute: typeof PreguntasFrecuentesRoute
   AuthRoute: typeof AuthRoute
   AboutUsCalidadAguaRoute: typeof AboutUsCalidadAguaRoute
-  AboutUsDatosGeneralesRoute: typeof AboutUsDatosGeneralesRoute
   AboutUsHistoriaRoute: typeof AboutUsHistoriaRoute
   ContactoQuejasRoute: typeof ContactoQuejasRoute
   ContactoReportesRoute: typeof ContactoReportesRoute
@@ -300,13 +287,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutUsHistoriaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(AboutUs)/DatosGenerales': {
-      id: '/(AboutUs)/DatosGenerales'
-      path: '/DatosGenerales'
-      fullPath: '/DatosGenerales'
-      preLoaderRoute: typeof AboutUsDatosGeneralesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/(AboutUs)/CalidadAgua': {
       id: '/(AboutUs)/CalidadAgua'
       path: '/CalidadAgua'
@@ -323,7 +303,6 @@ const rootRouteChildren: RootRouteChildren = {
   PreguntasFrecuentesRoute: PreguntasFrecuentesRoute,
   AuthRoute: AuthRoute,
   AboutUsCalidadAguaRoute: AboutUsCalidadAguaRoute,
-  AboutUsDatosGeneralesRoute: AboutUsDatosGeneralesRoute,
   AboutUsHistoriaRoute: AboutUsHistoriaRoute,
   ContactoQuejasRoute: ContactoQuejasRoute,
   ContactoReportesRoute: ContactoReportesRoute,

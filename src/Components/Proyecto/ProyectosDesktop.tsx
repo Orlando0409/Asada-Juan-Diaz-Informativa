@@ -29,33 +29,33 @@ function ProyectosDesktop({
 }: Readonly<ProyectosDesktopProps>) {
   
   const getBadgeClasses = (estadoNombre: string) => {
-    if (estadoNombre === 'En planeamiento') {
-      return 'bg-green-100 text-green-800 border-green-200';
+    if (estadoNombre === 'En Planeamiento') {
+      return 'bg-yellow-100 text-yellow-700 border border-yellow-300';
     }
-    if (estadoNombre === 'En progreso') {
-      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    if (estadoNombre === 'En Progreso') {
+      return 'bg-blue-100 text-blue-700 border-blue-300';
     }
     if (estadoNombre === 'Terminado') {
-      return 'bg-blue-100 text-blue-800 border-blue-200';
+      return 'bg-green-100 text-green-700 border-green-300';
     }
-    return 'bg-gray-100 text-gray-800 border-gray-200';
+    return 'bg-gray-100 text-gray-700 border-gray-300';
   };
 
   const getDotColor = (estadoNombre: string) => {
-    if (estadoNombre === 'En planeamiento') {
-      return 'bg-green-500';
-    }
-    if (estadoNombre === 'En progreso') {
+    if (estadoNombre === 'En Planeamiento') {
       return 'bg-yellow-500';
     }
-    if (estadoNombre === 'Terminado') {
+    if (estadoNombre === 'En Progreso') {
       return 'bg-blue-500';
+    }
+    if (estadoNombre === 'Terminado') {
+      return 'bg-green-500';
     }
     return 'bg-gray-500';
   };
 
   return (
-    <section className="hidden lg:block py-16 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative">
+    <section className="hidden lg:block py-16 bg-white relative">
       
       {/* Fondo decorativo desktop */}
       <div className="absolute top-20 left-10 w-32 h-32 bg-blue-200/20 rounded-full blur-3xl"></div>
@@ -66,11 +66,11 @@ function ProyectosDesktop({
 
         {/* Título izquierda */}
         <div className="text-right space-y-4">
-          <h2 className="text-4xl xl:text-5xl 2xl:text-6xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent leading-tight">
+          <h2 className="text-4xl xl:text-5xl 2xl:text-6xl font-bold text-blue-600">
             {titulo}
           </h2>
           <div className="h-1 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full w-24 ml-auto"></div>
-          <p className="text-gray-500 text-md leading-relaxed max-w-sm">
+          <p className="text-gray-700 text-md leading-relaxed max-w-sm">
             {descripcion}
           </p>
         </div>
@@ -114,12 +114,12 @@ function ProyectosDesktop({
                       </div>
                       {/* Contenido tarjeta desktop */}
                       <div className="p-6 space-y-4">
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">
+                        <h3 className="text-xl font-bold text-blue-600 mb-2">
                           {proyecto.Titulo}
                         </h3>
-                        <div className="flex items-center space-x-2 text-sm text-gray-500 mb-4">
+                        <div className="flex items-center space-x-2 text-sm text-gray-700 mb-4">
                           <span className={`w-2 h-2 rounded-full ${getDotColor(nombreEstado)}`}></span>
-                          <span>
+                          <span className="text-gray-700">
                             Actualizado: {new Date(proyecto.Fecha_Actualizacion).toLocaleDateString('es-ES')}
                           </span>
                         </div>
