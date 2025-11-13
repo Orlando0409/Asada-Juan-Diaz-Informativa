@@ -122,21 +122,11 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
         }
         await mutation.createCambioMedidor(value);
         form.reset();
-        setFormErrors({ general: "¡Solicitud enviada con éxito!" });
         setFieldErrors({});
-
-        alert("¡Solicitud enviada exitosamente!");
         setMostrarFormulario(false);
-        if (onClose) onClose();
+        onClose();
       } catch (error: any) {
-        // Axios error handling
-        if (error?.response?.data?.message) {
-          setFormErrors({ general: error.response.data.message });
-        } else if (error?.message) {
-          setFormErrors({ general: error.message });
-        } else {
-          setFormErrors({ general: "Error al enviar la solicitud" });
-        }
+       console.log('Error al enviar formulario de cambio de medidor:', error);
       }
     },
   });
@@ -147,10 +137,10 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
 
   return (
-    <div className="flex justify-center items-center min-h-screen text-gray-800 p-5 w-full">
+   <div className="flex justify-center items-center min-h-screen text-gray-800 p-7 w-full">
       <form
         onSubmit={(e) => { e.preventDefault(); form.handleSubmit(); }}
-        className="bg-white shadow-lg pl-24 pr-24 pt-8 pb-8 rounded-lg w-full max-w-7xl mx-auto"
+          className="bg-white shadow-lg  pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
       >
         <h2 className="text-center text-2xl font-semibold mb-10">Formulario de cambio de medidor</h2>
 
@@ -275,8 +265,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
             {(field) => (
               <div className="mb-3 w-full">
                 <label htmlFor="Direccion_Exacta" className="block mb-1 font-medium">Dirección exacta <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
+                <textarea
                   value={field.state.value}
                   onChange={(e) => {
                     field.handleChange(e.target.value);
@@ -380,13 +369,6 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
             )}
           </form.Field>
         </div>
-
-        {/* Mensaje general */}
-        {formErrors.general && (
-          <div className={`text-center mt-4 ${typeof formErrors.general === 'string' && formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
-            {formErrors.general}
-          </div>
-        )}
 
         <div className="mt-6 flex justify-center">
           <button

@@ -2,17 +2,22 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createAfiliacionJuridica, createAsociadoJuridica, createCambioMedidorJuridica, createDesconexionJuridica } from "../../Services/Solicitudes/SolicitudesJuridicas";
 import type { CambioMedidorJuridica } from "../../Schemas/Solicitudes/Juridica/CambioMedidorJuridico";
 import type { AsociadoJuridico } from "../../models/Forms/Solicitudes/Juridica/AsociadoJuridica";
+import { useAlerts } from "../../context/AlertContext";
 
 export const useAfiliacionJuridica = () => {
     const queryClient = useQueryClient();
+    const { showSuccess, showError } = useAlerts();
 
     const createAfiliacionJuridicaMutation = useMutation({
         mutationFn: (data: FormData) => createAfiliacionJuridica(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["afiliaciones"] });
+            showSuccess("¡Solicitud creada!", "La solicitud de afiliación ha sido creada con éxito.");
         },
         onError: (error: any) => {
-            console.error("Error al crear la solicitud:", error?.response?.data || error);
+            const errorMessage = error?.response?.data?.message || 'Error al enviar el formulario.';
+            console.log("Error al crear la solicitud:", error?.response?.data || error);
+            showError("Error", errorMessage);
         }
     });
 
@@ -23,14 +28,18 @@ export const useAfiliacionJuridica = () => {
 
 export const useDesconexionJuridica = () => {
     const queryClient = useQueryClient();
+    const { showSuccess, showError } = useAlerts();
 
     const createDesconexionJuridicaMutation = useMutation({
         mutationFn: (data: FormData) => createDesconexionJuridica(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["desconexion"] });
+            showSuccess("¡Solicitud creada!", "La solicitud de desconexión ha sido creada con éxito.");
         },
         onError: (error: any) => {
-            console.error("Error al crear la solicitud:", error?.response?.data || error);
+            const errorMessage = error?.response?.data?.message || 'Error al enviar el formulario.';
+            console.log("Error al crear la solicitud:", error?.response?.data || error);
+            showError("Error", errorMessage);
         }
     });
 
@@ -41,14 +50,18 @@ export const useDesconexionJuridica = () => {
 
 export const useCambioMedidorJuridica = () => {
     const queryClient = useQueryClient();
+    const { showSuccess, showError } = useAlerts();
 
     const createCambioMedidorJuridicaMutation = useMutation({
         mutationFn: (data: CambioMedidorJuridica) => createCambioMedidorJuridica(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cambio-medidor"] });
+            showSuccess("¡Solicitud creada!", "La solicitud de cambio de medidor ha sido creada con éxito.");
         },
         onError: (error: any) => {
-            console.error("Error al crear la solicitud:", error?.response?.data || error);
+            const errorMessage = error?.response?.data?.message || 'Error al enviar el formulario.';
+            console.log("Error al crear la solicitud:", error?.response?.data || error);
+            showError("Error", errorMessage);
         }
     });
 
@@ -59,14 +72,19 @@ export const useCambioMedidorJuridica = () => {
 
 export const useAsociadoJuridica = () => {
     const queryClient = useQueryClient();
+    const { showSuccess, showError } = useAlerts();
 
     const createAsociadoJuridicoMutation = useMutation({
         mutationFn: (data: AsociadoJuridico) => createAsociadoJuridica(data),
+        
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["asociado"] });
+            showSuccess("¡Solicitud creada!", "La solicitud de asociado ha sido creada con éxito.");
         },
         onError: (error: any) => {
-            console.error("Error al crear la solicitud:", error?.response?.data || error);
+            const errorMessage = error?.response?.data?.message || 'Error al enviar el formulario.';
+            console.log("Error al crear la solicitud:", error?.response?.data || error);
+            showError("Error", errorMessage);
         }
     });
 

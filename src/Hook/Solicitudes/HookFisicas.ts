@@ -2,17 +2,22 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createAfiliacionFisica, createAsociadoFisica, createCambioMedidorFisica, createDesconexionFisica } from "../../Services/Solicitudes/SolicitudesFisicas";
 import type { CambioMedidorFisico } from "../../models/Forms/Solicitudes/Fisico/CambioMedidor";
 import type { AsociadoFisico } from "../../Schemas/Solicitudes/Fisica/Asociado";
+import { useAlerts } from "../../context/AlertContext";
 
 export const useAfiliacionFisica = () => {
     const queryClient = useQueryClient();
+    const { showSuccess, showError } = useAlerts();
 
     const createAfiliacionFisicaMutation = useMutation({
         mutationFn: (data: FormData) => createAfiliacionFisica(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["afiliaciones"] });
+            showSuccess("¡Solicitud creada!", "La solicitud de afiliación ha sido creada con éxito.");
         },
         onError: (error: any) => {
-            console.error("Error al crear la solicitud:", error?.response?.data || error);
+            const errorMessage = error?.response?.data?.message;
+            console.log("Error al crear la solicitud:", error?.response?.data || error);
+            showError("Error", errorMessage);
         }
     });
 
@@ -23,14 +28,18 @@ export const useAfiliacionFisica = () => {
 
 export const useDesconexionFisica = () => {
     const queryClient = useQueryClient();
+    const { showSuccess, showError } = useAlerts();
 
     const createDesconexionFisicaMutation = useMutation({
         mutationFn: (data: FormData) => createDesconexionFisica(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["desconexion"] });
+            showSuccess("¡Solicitud creada!", "La solicitud de desconexión ha sido creada con éxito.");
         },
         onError: (error: any) => {
-            console.error("Error al crear la solicitud:", error?.response?.data || error);
+            const errorMessage = error?.response?.data?.message || 'Error al enviar el formulario.';
+            console.log("Error al crear la solicitud:", error?.response?.data || error);
+            showError("Error", errorMessage);
         }
     });
 
@@ -41,14 +50,18 @@ export const useDesconexionFisica = () => {
 
 export const useCambioMedidorFisica = () => {
     const queryClient = useQueryClient();
+    const { showSuccess, showError } = useAlerts();
 
     const createCambioMedidorFisicoMutation = useMutation({
         mutationFn: (data: CambioMedidorFisico) => createCambioMedidorFisica(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cambio-medidor"] });
+            showSuccess("¡Solicitud creada!", "La solicitud de cambio de medidor ha sido creada con éxito.");
         },
         onError: (error: any) => {
-            console.error("Error al crear la solicitud:", error?.response?.data || error);
+            const errorMessage = error?.response?.data?.message || 'Error al enviar el formulario.';
+            console.log("Error al crear la solicitud:", error?.response?.data || error);
+            showError("Error", errorMessage);
         }
     });
 
@@ -59,14 +72,19 @@ export const useCambioMedidorFisica = () => {
 
 export const useAsociadoFisica = () => {
     const queryClient = useQueryClient();
+    const { showSuccess, showError } = useAlerts();
 
     const createAsociadoFisicoMutation = useMutation({
         mutationFn: (data: AsociadoFisico) => createAsociadoFisica(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["asociado"] });
+            showSuccess("¡Solicitud creada!", "La solicitud de asociado ha sido creada con éxito.");
         },
-        onError: (error: any) =>
-            console.error("Error al crear la solicitud:", error?.response?.data || error),
+        onError: (error: any) => {
+            const errorMessage = error?.response?.data?.message || 'Error al enviar el formulario.';
+            console.log("Error al crear la solicitud:", error?.response?.data || error);
+            showError("Error", errorMessage);
+        },
     });
 
     return {

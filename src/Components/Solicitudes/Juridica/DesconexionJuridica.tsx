@@ -118,20 +118,12 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                 await mutation.createDesconexion(formData);
 
                 form.reset();
-                setFormErrors({ general: "¡Solicitud enviada con éxito!" });
                 setArchivoSeleccionado({});
                 setFieldErrors({});
-                alert("¡Solicitud enviada exitosamente!");
                 setMostrarFormulario(false);
-                if (onClose) onClose();
+                onClose();
             } catch (error: any) {
-                let errorMessage = "Error al enviar solicitud";
-                if (error?.response?.data?.message) {
-                    errorMessage = error.response.data.message;
-                } else if (error?.message) {
-                    errorMessage = error.message;
-                }
-                setFormErrors({ general: errorMessage });
+               console.log("🔍 ERROR EN SOLICITUD DE DESCONEXIÓN JURÍDICA:", error);
             }
         },
     });
@@ -154,13 +146,13 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
     };
 
     return (
-        <div className="flex justify-center items-center min-h-screen text-gray-800 p-5 w-full">
+        <div className="flex justify-center items-center min-h-screen text-gray-800 p-7 w-full">
             <form
                 onSubmit={(e) => {
                     e.preventDefault();
                     form.handleSubmit();
                 }}
-                className="bg-white gap-2 shadow-lg pl-24 pr-24 pt-8 pb-8 rounded-lg w-full max-w-7xl mx-auto"
+                className="bg-white gap-2 shadow-lg pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
             >
                 <h2 className="text-center text-2xl font-semibold mb-10">Formulario de desconexión de medidor - Jurídica</h2>
 
@@ -291,7 +283,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                                 }
 
                                 // Motivo de Solicitud (textarea)
-                                if (fieldName === "Motivo_Solicitud") {
+                                if (fieldName === "Motivo_Solicitud"|| fieldName === "Direccion_Exacta") {
                                     return (
                                         <div className="mb-3 w-full">
                                             <label className="block mb-1 font-medium">
@@ -347,13 +339,6 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                         </form.Field>
                     ))}
                 </div>
-
-                {/* Mensaje general de éxito */}
-                {formErrors.general && (
-                    <div className={`text-center mt-4 ${formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
-                        {formErrors.general}
-                    </div>
-                )}
 
                 <div className="flex justify-end items-end gap-4 mt-8">
                     <button

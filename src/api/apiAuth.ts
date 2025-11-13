@@ -6,7 +6,7 @@ const apiAuth = axios.create({
   //URL API RAILWAY = https://saga-jd-back-end-production.up.railway.app/api
   //URL API LOCAL = http://localhost:3000/api
 
-  baseURL: "http://localhost:3000/api", 
+  baseURL: "https://saga-jd-back-end-production.up.railway.app/api", 
 });
 
 export default apiAuth;

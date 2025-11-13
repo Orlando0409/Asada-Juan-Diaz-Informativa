@@ -72,7 +72,7 @@
       },
       "Direccion_Exacta": {
         "label": "Dirección exacta de residencia",
-        "type": "text",
+        "type": "textarea",
         "required": true
       },
       "Numero_Telefono": {
@@ -124,7 +124,7 @@
       },
       "Direccion_Exacta": {
         "label": "Dirección exacta",
-        "type": "text",
+        "type": "textarea",
         "required": true
       },
       "Correo": {
@@ -144,7 +144,7 @@
       },
       "Motivo_Solicitud": {
         "label": "Motivo de solicitud",
-        "type": "text",
+        "type": "textarea",
         "required": true
       }
     },
@@ -176,7 +176,7 @@
       },
       "Direccion_Exacta": {
         "label": "Dirección exacta de residencia",
-        "type": "text",
+        "type": "textarea",
         "required": true
       },
       "Numero_Telefono": {
@@ -191,7 +191,7 @@
       },
       "Motivo_Solicitud": {
         "label": "Motivo de solicitud",
-        "type": "text",
+        "type": "textarea",
         "required": true
       },
       "Planos_Terreno": {
@@ -243,7 +243,7 @@
       },
       "Motivo_Solicitud": {
         "label": "Motivo de solicitud",
-        "type": "text",
+        "type": "textarea",
         "required": true
       }
     }
@@ -262,7 +262,7 @@
       },
       "Direccion_Exacta": {
         "label": "Dirección exacta",
-        "type": "text",
+        "type": "textarea",
         "required": true
       },
       "Correo": {
@@ -299,7 +299,7 @@
       },
       "Direccion_Exacta": {
         "label": "Dirección exacta",
-        "type": "text",
+        "type": "textarea",
         "required": true
       },
       "Correo": {
@@ -314,7 +314,7 @@
       },
       "Motivo_Solicitud": {
         "label": "Motivo de solicitud",
-        "type": "text",
+        "type": "textarea",
         "required": true
       },
       "Planos_Terreno": {
@@ -341,7 +341,7 @@
       },
       "Direccion_Exacta": {
         "label": "Dirección exacta",
-        "type": "text",
+        "type": "textarea",
         "required": true
       },
       "Correo": {
@@ -361,7 +361,7 @@
       },
       "Motivo_Solicitud": {
         "label": "Motivo de solicitud",
-        "type": "text",
+        "type": "textarea",
         "required": true
       }
     },
@@ -388,7 +388,7 @@
       },
       "Motivo_Solicitud": {
         "label": "Motivo de solicitud",
-        "type": "text",
+        "type": "textarea",
         "required": true
       }
     }
@@ -506,11 +506,6 @@
         "texto": "Sobre Nosotros",
         "tipo": "dropdown",
         "subopciones": [
-          {
-            "id": 10,
-            "texto": "Datos Generales",
-            "ruta": "/DatosGenerales"
-          },
           {
             "id": 11,
             "texto": "Historia",
