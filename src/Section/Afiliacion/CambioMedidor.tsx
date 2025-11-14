@@ -2,7 +2,7 @@ import { useState } from "react"
 import data from '../../data/Data.json'
 //import FormularioCambioMedidor from "../../Components/Solicitudes/FormularioCambioMedidor"
 import CambioMedidorJuridica from "../../Components/Solicitudes/Juridica/CambioMedidorJuridica"
-import FormularioCambioMedidor from "../../Components/Solicitudes/Fisico/FormularioCambioMedidor"
+import FormularioCambioMedidor from "../../Components/Solicitudes/Fisico/CambioMedidorFisico"
 
 const CambioMedidor = () => {
   const [mostrarFormularioFisico, setMostrarFormularioFisico] = useState(false)
@@ -81,7 +81,7 @@ const CambioMedidor = () => {
           <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 text-center italic leading-relaxed">
             Para personas individuales
           </p>
-          <ul className="list-disc pl-4 sm:pl-5 md:pl-6 space-y-1 sm:space-y-2 text-gray-700 flex-1 overflow-auto max-h-48 sm:max-h-56 md:max-h-64">
+          <ul className="list-disc pl-4 sm:pl-5 md:pl-6 space-y-1 sm:space-y-2 text-gray-700 flex-1 overflow-auto max-h-48 sm:max-h-56 md:max-h-64 scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100">
             {Object.entries(requisitosFisico).map(([key, value]) => (
               <li key={key} className="text-xs sm:text-sm md:text-base leading-relaxed">{value.label}</li>
             ))}

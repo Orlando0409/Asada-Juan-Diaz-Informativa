@@ -65,4 +65,4 @@ export const AsociadoSchema = z.object({
 });
 
 export type FormularioAsociadoData = z.infer<typeof AsociadoSchema>;
-export type Asociado = z.infer<typeof AsociadoSchema>;
+export type AsociadoFisico = z.infer<typeof AsociadoSchema>;

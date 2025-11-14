@@ -7,10 +7,12 @@ const Servicio = () => {
   return (
     <div className="relative w-full h-[50vh] sm:h-[60vh] lg:h-[70vh]">
    
-      <img
-        alt="Servicio de la ASADA de Juan Díaz"
+      <video
         src={imagen}
         className="w-full h-full object-cover"
+        autoPlay
+        loop
+        muted
       />
 
    

@@ -1,6 +1,6 @@
 import type { FAQ } from "../models/FAQ";
 import { useQuery } from "@tanstack/react-query";
-import { GetAllPreguntasFrecuentes } from "../Services/FAQ/PreguntasFreceuntesService";
+import { GetAllPreguntasFrecuentes } from "../Services/FAQ/PreguntasFrecuentesService";
 
 export const useFAQ = () => {
     return useQuery<FAQ[], Error>({

@@ -5,10 +5,12 @@ const Hero = () => {
 
   return (
     <div className="relative w-full h-[70vh] sm:h-[80vh] lg:h-[75vh]">
-      <img
-        alt="Historia de la ASADA de Juan Díaz"
+      <video
         src={imagen}
         className="w-full h-full object-cover"
+        autoPlay
+        loop
+        muted
       />
 
       {/* lo que hace oscuro el fondo */}

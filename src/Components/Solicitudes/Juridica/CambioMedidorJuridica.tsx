@@ -2,10 +2,9 @@ import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { z } from "zod";
 import { CambioMedidorJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/CambioMedidorJuridico";
-import { useCambioMedidorJuridica } from "../../../Hook/Solicitudes/Juridica/hookCambioMedidorJuridica";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
-import PhoneInput from "react-phone-number-input";
-import "react-phone-number-input/style.css";
+import { useCambioMedidorJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
+import PhoneInputComponent from "../PhoneInputComponent";
 
 type Props = {
     onClose: () => void;
@@ -98,35 +97,29 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                     setFormErrors(validationErrors);
                     return;
                 }
-                await mutation.createCambioMedidorJuridica(value);
+
+                await mutation.createCambioMedidor(value);
+
                 form.reset();
-                setFormErrors({ general: "¡Solicitud enviada con éxito!" });
                 setFieldErrors({});
-                alert("¡Solicitud enviada exitosamente!");
                 setMostrarFormulario(false);
-                if (onClose) onClose();
+                onClose();
             } catch (error: any) {
-                if (error?.response?.data?.message) {
-                    setFormErrors({ general: error.response.data.message });
-                } else if (error?.message) {
-                    setFormErrors({ general: error.message });
-                } else {
-                    setFormErrors({ general: "Error al enviar la solicitud" });
-                }
+                console.log("🔍 ERROR EN SOLICITUD DE CAMBIO DE MEDIDOR JURÍDICA:", error);
             }
         },
     });
 
     if (!mostrarFormulario) return null;
 
-    
+
     const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
 
     return (
-        <div className="flex justify-center items-center min-h-screen text-gray-800 p-5 w-full">
+       <div className="flex justify-center items-center min-h-screen text-gray-800 p-7 w-full">
             <form
                 onSubmit={(e) => { e.preventDefault(); form.handleSubmit(); }}
-                className="bg-white shadow-lg pl-24 pr-24 pt-8 pb-8 rounded-lg w-full max-w-7xl mx-auto"
+                  className="bg-white shadow-lg  pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
             >
                 <h2 className="text-center text-2xl font-semibold mb-10">Formulario de cambio de medidor - Jurídica</h2>
 
@@ -209,15 +202,13 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                         {(field) => (
                             <div className="mb-3 w-full">
                                 <label htmlFor="Numero_Telefono" className="block mb-1 font-medium">Número de teléfono <span className="text-red-500">*</span></label>
-                                <PhoneInput
-                                    international
-                                    defaultCountry="CR"
+                                <PhoneInputComponent
                                     value={field.state.value}
                                     onChange={(value) => {
                                         field.handleChange(value || "");
                                         handleFieldChange("Numero_Telefono", value || "");
                                     }}
-                                    className={`${commonClasses} ${fieldErrors["Numero_Telefono"] ? 'border-red-500 focus:ring-red-300' : ''}`}
+                                    className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
                                 />
                                 {fieldErrors["Numero_Telefono"] && (
                                     <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
@@ -233,8 +224,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                         {(field) => (
                             <div className="mb-3 w-full">
                                 <label htmlFor="Direccion_Exacta" className="block mb-1 font-medium">Dirección exacta <span className="text-red-500">*</span></label>
-                                <input
-                                    type="text"
+                                <textarea
                                     value={field.state.value}
                                     onChange={(e) => {
                                         field.handleChange(e.target.value);
@@ -302,15 +292,9 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                     </form.Field>
                 </div>
 
-                {/* Mensaje general */}
-                {formErrors.general && (
-                    <div className={`text-center mt-4 ${formErrors.general.includes("éxito") ? "text-green-600" : "text-red-500"}`}>
-                        {formErrors.general}
-                    </div>
-                )}
 
                 <div className="flex justify-end items-end gap-4 mt-8">
-                   
+
                     <div className="flex justify-end items-end">
                         <button
                             type="submit"

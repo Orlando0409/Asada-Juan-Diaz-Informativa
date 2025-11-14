@@ -1,9 +1,8 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import { AsociadoJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/AsociadoJuridica";
-import PhoneInput from "react-phone-number-input";
-import "react-phone-number-input/style.css";
-import { createAsociadoJuridica } from "../../../Services/Solicitudes/Juridica/AsociadoJuricaService";
+import { useAsociadoJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
+import PhoneInputComponent from "../PhoneInputComponent";
 
 type Props = {
     onClose: () => void;
@@ -28,8 +27,8 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const [touched, setTouched] = useState<Record<string, boolean>>({});
-    const [showSuccessAlert, setShowSuccessAlert] = useState(false);
-    const [mostrarFormulario, setMostrarFormulario] = useState(true);
+    const mutation = useAsociadoJuridica();
+    const [_mostrarFormulario, setMostrarFormulario] = useState(true);
 
     // Validación en tiempo real de todo el formulario
     const validateAllFields = (values: any) => {
@@ -82,31 +81,14 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                     return;
                 }
 
-                await createAsociadoJuridica(value);
+                await mutation.createAsociado(value);
+
                 form.reset();
                 setMostrarFormulario(false);
-                setShowSuccessAlert(true);
-                setTimeout(() => setShowSuccessAlert(false), 3000);
-                if (onClose) onClose();
+                onClose();
                 alert("¡Formulario enviado con éxito!");
             } catch (error: any) {
-                // --- CAMBIO SOLICITADO ---
-                const backendMessage = error?.response?.data?.message;
-                if (
-                  backendMessage &&
-                  backendMessage.includes("No existe un afiliado jurídico")
-                ) {
-                  setFormErrors({
-                    general: "No existe un afiliado jurídico con esa cédula. Debe ser afiliado antes de realizar esta solicitud.",
-                  });
-                  return;
-                }
-                setFormErrors({
-                    general:
-                        error?.message ||
-                        "Hubo un error al enviar el formulario. Por favor intenta nuevamente.",
-                });
-                // --- FIN CAMBIO SOLICITADO ---
+                console.log("🔍 ERROR EN SOLICITUD DE ASOCIADO JURÍDICO:", error);
             }
         },
     });
@@ -129,25 +111,15 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
         form.setFieldValue(fieldName, value);
     };
 
-    if (!mostrarFormulario) {
-        return showSuccessAlert ? (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-                <div className="bg-white rounded-lg shadow-lg px-8 py-6 text-center">
-                    <h3 className="text-green-600 text-xl font-semibold mb-2">¡Formulario enviado con éxito!</h3>
-                    <p className="text-gray-700">Gracias por enviar tu solicitud.</p>
-                </div>
-            </div>
-        ) : null;
-    }
 
     const commonClasses =
         "w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300";
 
     return (
-        <div className="flex justify-center items-center min-h-screen p-5 w-full text-gray-800">
+        <div className="flex justify-center items-center min-h-screen text-gray-800 p-7 w-full">
             <form
                 onSubmit={handleSubmit}
-                className="bg-white shadow-lg pl-24 pr-24 pt-8 pb-8 rounded-lg w-full max-w-7xl mx-auto"
+                className="bg-white shadow-lg  pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
             >
                 <h2 className="text-center text-2xl font-semibold mb-10">
                     Formulario para Cliente Jurídico
@@ -240,15 +212,12 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                                 <label className="block mb-1 font-medium">
                                     Número de teléfono <span className="text-red-500">*</span>
                                 </label>
-                                <PhoneInput
-                                    international
-                                    defaultCountry="CR"
+                                <PhoneInputComponent
                                     value={field.state.value}
                                     onChange={(value) => {
                                         handleFieldChange("Numero_Telefono", value || "");
                                     }}
-                                    onBlur={() => setTouched(prev => ({ ...prev, Numero_Telefono: true }))}
-                                    className={`${commonClasses} ${fieldErrors["Numero_Telefono"] ? 'border-red-500 focus:ring-red-300' : ''}`}
+                                    className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
                                 />
                                 {touched["Numero_Telefono"] && fieldErrors["Numero_Telefono"] && (
                                     <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
@@ -286,12 +255,6 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                     </form.Field>
                 </div>
 
-                {/* Mensaje de afiliado jurídico no encontrado */}
-                {formErrors.general && (
-                  <div className="text-center mt-4 text-red-500">
-                    {formErrors.general}
-                  </div>
-                )}
 
                 <div className="flex justify-end items-end gap-4 mt-8">
 

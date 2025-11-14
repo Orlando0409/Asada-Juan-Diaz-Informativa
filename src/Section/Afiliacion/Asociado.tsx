@@ -1,7 +1,7 @@
 import { useState } from "react";
 import data from '../../data/Data.json';
 import FormularioAsociadoJuridico from "../../Components/Solicitudes/Juridica/AsociadoJurica";
-import FormularioAsociado from "../../Components/Solicitudes/Fisico/Asociado";
+import FormularioAsociado from "../../Components/Solicitudes/Fisico/AsociadoFisico";
 
 const Asociado = () => {
   const [mostrarFormularioFisico, setMostrarFormularioFisico] = useState(false);
@@ -96,7 +96,7 @@ const Asociado = () => {
             className="absolute inset-0 bg-black/10 backdrop-blur-sm"
             onClick={() => setMostrarFormularioFisico(false)}
           ></div>
-          <div className="rounded relative w-[90%] max-w-5xl max-h-[550px] overflow-y-scroll [scroll-whit:none] [-ms-overflow-style:none]"
+          <div className="rounded relative w-[90%] max-w-5xl max-h-[550px] overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
             style={{ scrollbarWidth: "none" }}>
             <FormularioAsociado onClose={() => setMostrarFormularioFisico(false)} />
           </div>

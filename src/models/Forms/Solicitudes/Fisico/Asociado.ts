@@ -1,36 +1,34 @@
-export interface Asociado {
+export type TipoIdentificacion = 'Cedula Nacional' | 'Dimex' | 'Pasaporte';
+
+export interface AsociadoFisico {
+  Tipo_Identificacion: TipoIdentificacion;
+  Identificacion: string;
   Nombre: string;
   Apellido1: string;
   Apellido2: string;
- Identificacion: string;
- Tipo_Identificacion: 'Cedula Nacional' | 'DIMEX' | 'Pasaporte';
   Correo: string;
+  Numero_Telefono: string;
   Motivo_Solicitud: string;
-  Numero_Telefono:number
- 
- 
 }
 
-export const AsociadoInicialState= {
+export const AsociadoInicialState : AsociadoFisico = {
+  Tipo_Identificacion: 'Cedula Nacional',
+  Identificacion: "",
   Nombre: "",
   Apellido1: "",
   Apellido2: "",
-  Identificacion: "",
-  Tipo_Identificacion: "Cedula Nacional",
   Correo: "",
-  Motivo_Solicitud: "",
-  Numero_Telefono:0,
-  
+  Numero_Telefono: "",
+  Motivo_Solicitud: ""
 };
 
-export interface AfiliacionFormData {
+export interface AsociadoFisico {
+  Tipo_Identificacion: 'Cedula Nacional' | 'Dimex' | 'Pasaporte';
+  Identificacion: string;
   Nombre: string;
   Apellido1: string;
   Apellido2: string;
-  Identificacion: string;
-  Tipo_Identificacion: 'Cedula Nacional' | 'DIMEX' | 'Pasaporte';
   Correo: string;
+  Numero_Telefono: string;
   Motivo_Solicitud: string;
-  Numero_Telefono: number;
-  
 }
