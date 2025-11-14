@@ -22,7 +22,7 @@ const DesktopHeader = ({ menuItems }: DesktopHeaderProps) => {
 
 
   return (
-    <>
+    <div className='hidden md:block bg-transparent'>
       {/* Menú principal */}
       <ul className='hidden md:flex gap-6 items-center font-medium text-gray-700'>
         {menuItems.map((item) => {
@@ -79,7 +79,7 @@ const DesktopHeader = ({ menuItems }: DesktopHeaderProps) => {
           )
         })}
       </ul>
-    </>
+    </div>
   )
 }
 
