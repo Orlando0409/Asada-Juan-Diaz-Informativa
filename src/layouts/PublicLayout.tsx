@@ -13,7 +13,7 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
     <ChatProvider> 
       <div className='overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100'>
         <Header />
-        <main className="flex flex-col pt-[70px]">
+        <main className="flex flex-col">
           {children}
           <ChatBot />
         </main>

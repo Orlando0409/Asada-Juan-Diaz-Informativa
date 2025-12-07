@@ -9,8 +9,8 @@ export const useAlert = () => {
 
   const alertTimestamps = useRef<number[]>([]);
   const MAX_ALERTS = 4;
-  const ALERT_LIMIT_TIME = 5000;
-  const BLOCK_DURATION = 5000;
+  const ALERT_LIMIT_TIME = 4000;
+  const BLOCK_DURATION = 4000;
 
       // Función para generar IDs únicos más robustos
   const generateUniqueId = useCallback(() => {

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import {
   Accordion,
   AccordionHeader,
@@ -63,18 +64,50 @@ const Faq: React.FC = () => {
       className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-gray-50 py-12 px-4 sm:px-6 lg:px-8"
     >
       <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-10">
+        <motion.div 
+          className="text-center mb-10"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <h1 className="text-4xl font-bold text-blue-600 mb-2">
             Preguntas Frecuentes
           </h1>
           <p className="text-gray-600">
             Aquí encontrarás respuestas a las preguntas más comunes.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="space-y-5">
+        <motion.div 
+          className="space-y-5"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          variants={{
+            hidden: {},
+            visible: {
+              transition: {
+                staggerChildren: 0.08
+              }
+            }
+          }}
+        >
           {faqs.map((faq, idx) => (
-            <MTAccordion
+            <motion.div
+              key={faq.id ?? idx}
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { 
+                  opacity: 1, 
+                  y: 0,
+                  transition: {
+                    duration: 0.4,
+                    ease: "easeOut"
+                  }
+                }
+              }}
+            >
+              <MTAccordion
               key={faq.id ?? idx}
               open={open === idx}
               icon={<Icon id={idx} open={open} />}
@@ -99,8 +132,9 @@ const Faq: React.FC = () => {
                 </p>
               </MTAccordionBody>
             </MTAccordion>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

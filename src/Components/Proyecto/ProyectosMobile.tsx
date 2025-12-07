@@ -1,4 +1,5 @@
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
+import { motion } from "framer-motion";
 import BotonLeerMas from "../Proyecto/BotonLeermas";
 import type { Proyecto } from "../../types/Proyecto/Proyecto";
 
