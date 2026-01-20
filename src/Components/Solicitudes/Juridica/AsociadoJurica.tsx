@@ -168,6 +168,7 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                                     }}
                                     onBlur={() => setTouched(prev => ({ ...prev, Razon_Social: true }))}
                                     placeholder="Ejemplo S.A."
+                                    maxLength={50}
                                     className={commonClasses}
                                 />
                                 {touched["Razon_Social"] && fieldErrors["Razon_Social"] && (
@@ -194,6 +195,7 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                                     }}
                                     onBlur={() => setTouched(prev => ({ ...prev, Correo: true }))}
                                     placeholder="empresa@email.com"
+                                    maxLength={100}
                                     className={commonClasses}
                                 />
                                 {touched["Correo"] && fieldErrors["Correo"] && (
@@ -242,6 +244,7 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                                     }}
                                     onBlur={() => setTouched(prev => ({ ...prev, Motivo_Solicitud: true }))}
                                     placeholder="Escribe el motivo de tu solicitud"
+                                    maxLength={250}
                                     className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
                                 />
                                 {touched["Motivo_Solicitud"] && fieldErrors["Motivo_Solicitud"] && (

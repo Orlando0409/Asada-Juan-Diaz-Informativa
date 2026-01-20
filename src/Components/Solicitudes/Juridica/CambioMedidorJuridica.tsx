@@ -137,6 +137,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                         handleFieldChange("Razon_Social", e.target.value);
                                     }}
                                     placeholder={getPlaceholder("Razon_Social")}
+                                    maxLength={50}
                                     className={commonClasses}
                                 />
                                 {fieldErrors["Razon_Social"] && (
@@ -186,6 +187,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                         handleFieldChange("Correo", e.target.value);
                                     }}
                                     placeholder={getPlaceholder("Correo")}
+                                        maxLength={100}
                                     className={commonClasses}
                                 />
                                 {fieldErrors["Correo"] && (
@@ -231,6 +233,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                         handleFieldChange("Direccion_Exacta", e.target.value);
                                     }}
                                     placeholder={getPlaceholder("Direccion_Exacta")}
+                                    maxLength={100}
                                     className={commonClasses}
                                 />
                                 {fieldErrors["Direccion_Exacta"] && (
@@ -254,6 +257,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                         handleFieldChange("Motivo_Solicitud", e.target.value);
                                     }}
                                     placeholder="Escribe el motivo de tu solicitud"
+                                    maxLength={250}
                                     className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
                                 />
                                 {fieldErrors["Motivo_Solicitud"] && (
