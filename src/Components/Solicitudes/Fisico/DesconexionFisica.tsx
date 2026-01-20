@@ -274,6 +274,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                     validateField("Nombre", e.target.value, form.state.values);
                   }}
                   placeholder={getPlaceholder("Nombre")}
+                  maxLength={50}
                   className={commonClasses}
                 />
                 {/* Solo muestra errores de nombre aquí */}
@@ -299,6 +300,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                     validateField("Apellido1", e.target.value, form.state.values);
                   }}
                   placeholder={getPlaceholder("Apellido1")}
+                  maxLength={50}
                   className={commonClasses}
                 />
                 {/* Solo muestra errores de primer apellido aquí */}
@@ -324,6 +326,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                     validateField("Apellido2", e.target.value, form.state.values);
                   }}
                   placeholder={getPlaceholder("Apellido2")}
+                  maxLength={50}
                   className={commonClasses}
                 />
                 {/* Solo muestra errores de segundo apellido aquí */}
@@ -348,6 +351,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                     validateField("Direccion_Exacta", e.target.value, form.state.values);
                   }}
                   placeholder={getPlaceholder("Direccion_Exacta")}
+                  maxLength={100}
                   className={commonClasses}
                 />
                 {/* Solo muestra errores de dirección aquí */}
@@ -373,6 +377,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                     validateField("Correo", e.target.value, form.state.values);
                   }}
                   placeholder={getPlaceholder("Correo")}
+                  maxLength={100}
                   className={commonClasses}
                 />
                 {/* Solo muestra errores de correo aquí */}
@@ -420,6 +425,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                     validateField("Motivo_Solicitud", e.target.value, form.state.values);
                   }}
                   placeholder={getPlaceholder("Motivo_Solicitud")}
+                  maxLength={250}
                   className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
                 />
                 {/* Solo muestra errores de motivo aquí */}

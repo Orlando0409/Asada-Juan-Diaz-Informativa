@@ -70,7 +70,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
         errorMessage = fieldError?.message || error.errors[0]?.message;
       } else if (error.message) {
         errorMessage = error.message;
-      } 
+      }
       setFieldErrors(prev => ({
         ...prev,
         [fieldName]: errorMessage,
@@ -181,7 +181,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
     },
   });
 
- 
+
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
 
   return (
@@ -291,6 +291,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                     validateField("Nombre", e.target.value, form.state.values);
                   }}
                   placeholder={getPlaceholder("Nombre")}
+                  maxLength={50}
                   className={commonClasses}
                 />
                 {fieldErrors["Nombre"] && (
@@ -315,6 +316,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                     validateField("Apellido1", e.target.value, form.state.values);
                   }}
                   placeholder={getPlaceholder("Apellido1")}
+                  maxLength={50}
                   className={commonClasses}
                 />
                 {fieldErrors["Apellido1"] && (
@@ -339,6 +341,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                     validateField("Apellido2", e.target.value, form.state.values);
                   }}
                   placeholder={getPlaceholder("Apellido2")}
+                  maxLength={50}
                   className={commonClasses}
                 />
                 {fieldErrors["Apellido2"] && (
@@ -362,6 +365,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                     validateField("Direccion_Exacta", e.target.value, form.state.values);
                   }}
                   placeholder={getPlaceholder("Direccion_Exacta")}
+                  maxLength={100}
                   className={commonClasses}
                 />
                 {fieldErrors["Direccion_Exacta"] && (
@@ -386,6 +390,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                     validateField("Correo", e.target.value, form.state.values);
                   }}
                   placeholder={getPlaceholder("Correo")}
+                  maxLength={100}
                   className={commonClasses}
                 />
                 {fieldErrors["Correo"] && (
