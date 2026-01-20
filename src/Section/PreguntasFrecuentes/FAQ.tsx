@@ -63,7 +63,7 @@ const Faq: React.FC = () => {
       aria-label="Preguntas frecuentes"
       className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-gray-50 py-12 px-4 sm:px-6 lg:px-8"
     >
-      <div className="max-w-4xl mx-auto">
+      <div className="p-12 max-w-4xl mx-auto">
         <motion.div 
           className="text-center mb-10"
           initial={{ opacity: 0, y: -20 }}

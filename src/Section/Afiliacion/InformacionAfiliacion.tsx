@@ -113,7 +113,7 @@ const InformacionAfiliacion = () => {
             onClick={() => setMostrarFormularioJuridico(false)}
           ></div>
           {/* Contenedor del formulario */}
-          <div className="rounded relative w-[95%] sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] max-w-5xl max-h-[80vh] sm:max-h-[85vh] md:max-h-[550px] overflow-y-scroll scrollbar-hide"
+          <div className="rounded relative w-[95dvw] h-[100dvh] sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] max-w-5xl overflow-y-scroll scrollbar-hide"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
             <FormularioAfiliacionJuridico  onClose={() => setMostrarFormularioJuridico(false)} />
           </div>
@@ -129,7 +129,7 @@ const InformacionAfiliacion = () => {
             onClick={() => setMostrarFormulario(false)}
           ></div>
           {/* Contenedor del formulario */}
-          <div className="rounded relative w-[95%] sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] max-w-5xl max-h-[80vh] sm:max-h-[85vh] md:max-h-[550px] overflow-y-scroll scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
+          <div className="rounded relative w-[95dvw] h-[90dvh] sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] max-w-5xl overflow-y-scroll scrollbar-hide"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
             <FormularioAfiliacion onClose={() => setMostrarFormulario(false)} />
           </div>

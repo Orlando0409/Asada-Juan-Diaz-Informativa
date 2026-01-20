@@ -29,9 +29,26 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-
-
 }
 
+@layer base {
+  /* Firefox */
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.blue.600') theme('colors.blue.100');
+  }
 
+  /* Chrome / Edge / Safari */
+  html::-webkit-scrollbar {
+    width: 6px; /* scrollbar-thin */
+  }
+
+  html::-webkit-scrollbar-track {
+    background-color: theme('colors.blue.100');
+  }
+
+  html::-webkit-scrollbar-thumb {
+    background-color: theme('colors.blue.600');
+    border-radius: 9999px;
+  }
+}
