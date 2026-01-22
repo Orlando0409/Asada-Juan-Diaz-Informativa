@@ -1,73 +1,90 @@
+import { motion } from 'framer-motion';
 import { useCalidadAguaVisiblesQuery } from '../../Hook/CalidadDeAgua/hookCalidadAgua';
 const CalidadDeAgua = () => {
 
-  const { data: archivos = [], isLoading } = useCalidadAguaVisiblesQuery();
+  const { data: archivos = [], isLoading } = useCalidadAguaVisiblesQuery();
 
-  return (
-    <section className='bg-white text-gray-800 p-6 sm:p-10 md:-16 flex flex-col gap-12'>
-      <div className="max-w-4xl mx-auto text-center">
-        <h1 className='font-bold text-2xl sm:text-3xl md:text-4xl text-blue-900 mb-4'>Calidad de Agua</h1>
-        <blockquote className='border-l-4 border-blue-400 pl-4 sm:pl-6'>
-          <p className='text- base sm:text-lg md-text-xl leading-relaxed'>
+  return (
+    <section className='bg-white text-gray-800 p-6 sm:p-10 md:-16 flex flex-col gap-12'>
+      <div className="max-w-4xl mx-auto text-center">
+        <h1 className='font-bold text-2xl sm:text-3xl md:text-4xl text-blue-900 mb-4'>Calidad de Agua</h1>
+        <blockquote className='border-l-4 border-blue-400 pl-4 sm:pl-6'>
+          <p className='text-base sm:text-lg md:text-xl leading-relaxed'>            <span className='font-semibold text-blue-700'>
+              Con el fin de dar transparencia y confianza a la comunidad, les brindamos estos documentos para que puedan ver la pureza del agua.
+            </span>
+          </p>
 
-            <span className='font-semibold text-blue-700'>
-              Con el fin de dar transparencia y confianza a la comunidad, les brindamos estos documentos para que puedan ver la pureza del agua.
-            </span>
-          </p>
+        </blockquote>
+      </div>
 
-        </blockquote>
-      </div>
+      {/*grid */}
+      <div className="max-w-6xl mx-auto w-full">
+        <h2 className=' font-bold text-blue-900 mb-8 text-center text-xl sm:text-2xl md:text-3xl '>
+          Documentos disponibles
+        </h2>
 
-      {/*grid */}
-      <div className="max-w-6xl mx-auto w-full">
-        <h2 className=' font-bold text-blue-900 mb-8 text-center text-xl sm:text-2xl md:text-3xl '>
-          Documentos disponibles
-        </h2>
-
-        {isLoading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          </div>
-        ) : archivos.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">No hay documentos disponibles en este momento.</p>
-          </div>
-        ) : (
-          <div className='grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'>
-            {archivos.map((archivo, idx: number) => (
-              <div
-                key={archivo.Id_Calidad_Agua ?? idx}
-                className='bg-white rounded-3xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 p-5 flex flex-col items-center text-center'
-              >
-                {/*icono */}
-                <div className='bg-blue-100 p-4 sm:p-5 rounded-full mb-4 flex items-center justify-center'>
-                  <img
-                    src='\file_16425457.png'
-                    alt=' PDF Icon'
-                    className='w-10 sm:w-12 md:w-14 lg:w-16 h-auto max-w-full hover:scale-110 transition-transform duration-200'
-                  />
-                </div>
-                {/*titulos */}
-                <h3 className='font-semibold text-base sm:text-lg md:text-xl text-gray-700 mb-4 line-clamp-2'>
-                  {archivo.Titulo}
-                </h3>
-                {/*boton */}
-                <a
-                  href={archivo.Url_Archivo}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='mt-auto inline-block bg-blue-600 text-white px-4 py-2 sm:px-5 sm:py-2 rounded-2xl hover:bg-blue-700 shadow-sm hover:shadow-md transition text-sm sm:text-base'
-                >
-                  Ver PDF
-                </a>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </section>
-
-  )
+        {isLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          </div>
+        ) : archivos.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500 text-lg">No hay documentos disponibles en este momento.</p>
+          </div>
+        ) : (
+          <motion.div 
+            className='grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-50px" }}
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { 
+                opacity: 1,
+                transition: { staggerChildren: 0.1 }
+              }
+            }}
+          >
+            {archivos.map((archivo, idx: number) => (
+              <motion.div
+                key={archivo.Id_Calidad_Agua ?? idx}
+                className='bg-white rounded-3xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 p-5 flex flex-col items-center text-center'
+                variants={{
+                  hidden: { opacity: 0, y: 20 },
+                  visible: { 
+                    opacity: 1, 
+                    y: 0,
+                    transition: { type: "spring", stiffness: 300, damping: 20 }
+                  }
+                }}
+              >
+                {/*icono */}
+                <div className='bg-blue-100 p-4 sm:p-5 rounded-full mb-4 flex items-center justify-center'>
+                  <img
+                    src='\file_16425457.png'
+                    alt=' PDF Icon'
+                    className='w-10 sm:w-12 md:w-14 lg:w-16 h-auto max-w-full hover:scale-110 transition-transform duration-200'
+                  />
+                </div>
+                {/*titulos */}
+                <h3 className='font-semibold text-base sm:text-lg md:text-xl text-gray-700 mb-4 line-clamp-2'>
+                  {archivo.Titulo}
+                </h3>
+                {/*boton */}
+                <a
+                  href={archivo.Url_Archivo}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='mt-auto inline-block bg-blue-600 text-white px-4 py-2 sm:px-5 sm:py-2 rounded-2xl hover:bg-blue-700 shadow-sm hover:shadow-md transition text-sm sm:text-base'
+                >
+                  Ver PDF
+                </a>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+      </div>
+    </section>  )
 }
 
 export default CalidadDeAgua

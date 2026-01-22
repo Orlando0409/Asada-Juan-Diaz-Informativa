@@ -370,14 +370,16 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
           </form.Field>
         </div>
 
-        <div className="mt-6 flex justify-center">
-          <button
-            type="submit"
-            disabled={form.state.isSubmitting}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded disabled:opacity-50"
-          >
-            {form.state.isSubmitting ? 'Enviando...' : 'Enviar'}
-          </button>
+        <div className="flex justify-end items-end gap-4 mt-8">
+          <div className="flex justify-end items-end">
+            <button
+              type="submit"
+              disabled={form.state.isSubmitting}
+              className={`w-[120px] py-2 rounded transition ${form.state.isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
+            >
+              {form.state.isSubmitting ? 'Enviando...' : 'Enviar'}
+            </button>
+          </div>
         </div>
       </form>
     </div>

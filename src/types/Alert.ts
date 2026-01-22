@@ -14,6 +14,8 @@ export interface AlertProps {
     text: string;
     onClick: () => void;
   };
+  duration?: number;
+  showProgress?: boolean;
 }
 
 export interface AlertState {
@@ -31,31 +33,35 @@ export interface AlertState {
 
 export const alertConfig = {
   success: {
-    bgColor: 'bg-green-900/90',
-    borderColor: 'border-green-700',
-    textColor: 'text-green-100',
-    titleColor: 'text-green-50',
+    bgColor: 'bg-emerald-50/95',
+    borderColor: 'border-emerald-500',
+    textColor: 'text-emerald-700',
+    titleColor: 'text-emerald-900',
+    progressColor: 'bg-emerald-500',
     icon: FiCheckCircle,
   },
   error: {
-    bgColor: 'bg-red-900/90',
-    borderColor: 'border-red-700',
-    textColor: 'text-red-100',
-    titleColor: 'text-red-50',
+    bgColor: 'bg-red-50/95',
+    borderColor: 'border-red-500',
+    textColor: 'text-red-700',
+    titleColor: 'text-red-900',
+    progressColor: 'bg-red-500',
     icon: FiXCircle,
   },
   warning: {
-    bgColor: 'bg-yellow-900/90',
-    borderColor: 'border-yellow-700',
-    textColor: 'text-yellow-100',
-    titleColor: 'text-yellow-50',
+    bgColor: 'bg-amber-50/95',
+    borderColor: 'border-amber-500',
+    textColor: 'text-amber-700',
+    titleColor: 'text-amber-900',
+    progressColor: 'bg-amber-500',
     icon: HiExclamationTriangle,
   },
   info: {
-    bgColor: 'bg-blue-900/90',
-    borderColor: 'border-blue-700',
-    textColor: 'text-blue-100',
-    titleColor: 'text-blue-50',
+    bgColor: 'bg-blue-50/95',
+    borderColor: 'border-blue-500',
+    textColor: 'text-blue-700',
+    titleColor: 'text-blue-900',
+    progressColor: 'bg-blue-500',
     icon: HiInformationCircle,
   },
 };

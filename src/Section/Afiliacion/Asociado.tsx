@@ -8,14 +8,13 @@ const Asociado = () => {
   const [mostrarFormularioJuridico, setMostrarFormularioJuridico] = useState(false);
 
   const requisitosFisico = data.requisitosSolicitudes.asociado ?? {};
-  // CORREGIDO: Acceso correcto a los requisitos jurídicos
   const requisitosJuridico = data.juridica?.asociado ?? {};
 
   return (
     <section className="min-h-screen w-full bg-white flex flex-col items-center py-10 px-4 sm:px-6 lg:px-8">
 
       {/* Información general */}
-      <div className="max-w-3xl text-center mb-12">
+      <div className="p-12 max-w-3xl text-center mb-12">
         <h1 className="text-3xl font-bold text-blue-600 mb-4">
           Solicitud para Ser Asociado
         </h1>
@@ -82,8 +81,8 @@ const Asociado = () => {
             onClick={() => setMostrarFormularioJuridico(false)}
           ></div>
           {/* Contenedor del formulario */}
-          <div className="rounded relative w-[90%] max-w-5xl max-h-[550px] overflow-y-scroll [scroll-whit:none] [-ms-overflow-style:none]"
-            style={{ scrollbarWidth: "none" }}>
+         <div className="rounded relative w-[95dvw] h-[100dvh] sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] max-w-5xl overflow-y-scroll scrollbar-hide"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
             <FormularioAsociadoJuridico  onClose={() => setMostrarFormularioJuridico(false)} />
           </div>
         </div>
@@ -96,8 +95,8 @@ const Asociado = () => {
             className="absolute inset-0 bg-black/10 backdrop-blur-sm"
             onClick={() => setMostrarFormularioFisico(false)}
           ></div>
-          <div className="rounded relative w-[90%] max-w-5xl max-h-[550px] overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
-            style={{ scrollbarWidth: "none" }}>
+          <div className="rounded relative w-[95dvw] h-[100dvh] sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] max-w-5xl overflow-y-scroll scrollbar-hide"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
             <FormularioAsociado onClose={() => setMostrarFormularioFisico(false)} />
           </div>
         </div>
