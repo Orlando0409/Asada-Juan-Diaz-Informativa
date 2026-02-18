@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { motion } from 'framer-motion'
 import Data from '../../data/Data.json'
 import { useState } from 'react'
 
@@ -11,16 +12,46 @@ const MisionVision = () => {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
 
   return (
-    <div className="bg-white text-black px-6 py-10 sm:px-10 lg:px-20 lg:py-20 flex flex-col gap-10 lg:flex-row lg:gap-8 overflow-hidden">
+    <motion.div 
+      className="bg-white text-black px-6 py-10 sm:px-10 lg:px-20 lg:py-20 flex flex-col gap-10 lg:flex-row lg:gap-8 overflow-hidden"
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-100px" }}
+      variants={{
+        hidden: {},
+        visible: {
+          transition: {
+            staggerChildren: 0.15
+          }
+        }
+      }}
+    >
  
         {/* Misión */}
-        <article 
+        <motion.article 
           className="flex-1 shadow-lg rounded-xl flex flex-col items-center gap-4 p-6 
                      bg-gradient-to-br from-blue-50/70 via-white/80 to-cyan-50/50 backdrop-blur-sm
-                     transform transition-all duration-500 ease-out
-                     hover:shadow-2xl hover:scale-105 hover:-translate-y-2
-                     border border-gray-200 hover:border-blue-300
+                     border border-gray-200
                      group relative overflow-hidden"
+          variants={{
+            hidden: { opacity: 0, y: 30, scale: 0.95 },
+            visible: { 
+              opacity: 1, 
+              y: 0, 
+              scale: 1,
+              transition: {
+                duration: 0.6,
+                ease: "easeOut"
+              }
+            }
+          }}
+          whileHover={{ 
+            scale: 1.05,
+            y: -8,
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)",
+            borderColor: "rgb(147, 197, 253)",
+            transition: { type: "spring", stiffness: 300, damping: 20 }
+          }}
           onMouseEnter={() => setHoveredCard('mision')}
           onMouseLeave={() => setHoveredCard(null)}
           aria-label="Misión de la organización"
@@ -45,16 +76,33 @@ const MisionVision = () => {
               </p>
             </blockquote>
           </div>
-        </article>
+        </motion.article>
 
         {/* Visión */}
-        <article 
+        <motion.article 
           className="flex-1 shadow-lg rounded-xl flex flex-col items-center gap-4 p-6 
-                     bg-gradient-to-br from-blue-50/70 via-white/80 to-cyan-50/50 backdrop-blur-sm
-                     transform transition-all duration-500 ease-out
-                     hover:shadow-2xl hover:scale-105 hover:-translate-y-2
-                     border border-gray-200 hover:border-blue-300
+                     bg-gradient-to-br from-indigo-50/70 via-white/80 to-blue-50/50 backdrop-blur-sm
+                     border border-gray-200
                      group relative overflow-hidden"
+          variants={{
+            hidden: { opacity: 0, y: 30, scale: 0.95 },
+            visible: { 
+              opacity: 1, 
+              y: 0, 
+              scale: 1,
+              transition: {
+                duration: 0.6,
+                ease: "easeOut"
+              }
+            }
+          }}
+          whileHover={{ 
+            scale: 1.05,
+            y: -8,
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)",
+            borderColor: "rgb(147, 197, 253)",
+            transition: { type: "spring", stiffness: 300, damping: 20 }
+          }}
           onMouseEnter={() => setHoveredCard('vision')}
           onMouseLeave={() => setHoveredCard(null)}
           aria-label="Visión de la organización"
@@ -79,16 +127,33 @@ const MisionVision = () => {
               </p>
             </blockquote>
           </div>
-        </article>
+        </motion.article>
 
         {/* Historia */}
-        <article 
+        <motion.article 
           className="flex-1 shadow-lg rounded-xl flex flex-col items-center gap-4 p-6 
-                     bg-gradient-to-br from-blue-50/70 via-white/80 to-cyan-50/50 backdrop-blur-sm
-                     transform transition-all duration-500 ease-out
-                     hover:shadow-2xl hover:scale-105 hover:-translate-y-2
-                     border border-gray-200 hover:border-blue-300
+                     bg-gradient-to-br from-cyan-50/70 via-white/80 to-sky-50/50 backdrop-blur-sm
+                     border border-gray-200
                      group relative overflow-hidden"
+          variants={{
+            hidden: { opacity: 0, y: 30, scale: 0.95 },
+            visible: { 
+              opacity: 1, 
+              y: 0, 
+              scale: 1,
+              transition: {
+                duration: 0.6,
+                ease: "easeOut"
+              }
+            }
+          }}
+          whileHover={{ 
+            scale: 1.05,
+            y: -8,
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)",
+            borderColor: "rgb(147, 197, 253)",
+            transition: { type: "spring", stiffness: 300, damping: 20 }
+          }}
           onMouseEnter={() => setHoveredCard('historia')}
           onMouseLeave={() => setHoveredCard(null)}
           aria-label="Historia de la organización"
@@ -127,8 +192,8 @@ const MisionVision = () => {
               </Link>
             </div>
           </div>
-        </article>
-    </div>
+        </motion.article>
+    </motion.div>
   )
 }
 
