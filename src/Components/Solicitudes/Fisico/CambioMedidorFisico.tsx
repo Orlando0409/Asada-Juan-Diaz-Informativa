@@ -211,6 +211,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                     handleFieldChange("Nombre", e.target.value);
                   }}
                   placeholder={getPlaceholder("Nombre")}
+                  maxLength={50}
                   className={commonClasses}
                 />
                 {fieldErrors["Nombre"] && (
@@ -231,6 +232,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                     handleFieldChange("Apellido1", e.target.value);
                   }}
                   placeholder={getPlaceholder("Apellido1")}
+                  maxLength={50}
                   className={commonClasses}
                 />
                 {fieldErrors["Apellido1"] && (
@@ -253,6 +255,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                     handleFieldChange("Apellido2", e.target.value);
                   }}
                   placeholder={getPlaceholder("Apellido2")}
+                  maxLength={50}
                   className={commonClasses}
                 />
                 {fieldErrors["Apellido2"] && (
@@ -272,6 +275,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                     handleFieldChange("Direccion_Exacta", e.target.value);
                   }}
                   placeholder={getPlaceholder("Direccion_Exacta")}
+                  maxLength={100}
                   className={commonClasses}
                 />
                 {fieldErrors["Direccion_Exacta"] && (
@@ -294,6 +298,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                     handleFieldChange("Correo", e.target.value);
                   }}
                   placeholder={getPlaceholder("Correo")}
+                  maxLength={100}
                   className={commonClasses}
                 />
                 {fieldErrors["Correo"] && (
@@ -357,6 +362,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                     handleFieldChange("Motivo_Solicitud", e.target.value);
                   }}
                   placeholder="Escribe el motivo de tu solicitud"
+                  maxLength={250}
                   className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
                 />
                 {fieldErrors["Motivo_Solicitud"] && (

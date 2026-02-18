@@ -146,6 +146,7 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                                         validateField("Razon_Social", e.target.value);
                                     }}
                                     placeholder="Ejemplo S.A."
+                                    maxLength={50}
                                     className={commonClasses}
                                 />
                                 {fieldErrors["Razon_Social"] && (
@@ -198,6 +199,7 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                                         validateField("Correo", e.target.value);
                                     }}
                                     placeholder="empresa@email.com"
+                                    maxLength={100}
                                     className={commonClasses}
                                 />
                                 {fieldErrors["Correo"] && (
@@ -243,6 +245,7 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                                         validateField("Direccion_Exacta", e.target.value);
                                     }}
                                     placeholder="San José, del Banco Nacional 200m sur"
+                                    maxLength={100}
                                     className={commonClasses}
                                 />
                                 {fieldErrors["Direccion_Exacta"] && (

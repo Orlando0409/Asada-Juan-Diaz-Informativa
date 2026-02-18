@@ -243,6 +243,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
                   }}
                   onBlur={() => setTouched(prev => ({ ...prev, Nombre: true }))}
                   placeholder={getPlaceholder("Nombre")}
+                  maxLength={50}
                   className={commonClasses}
                 />
                 {touched["Nombre"] && fieldErrors["Nombre"] && (
@@ -267,6 +268,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
                   }}
                   onBlur={() => setTouched(prev => ({ ...prev, Apellido1: true }))}
                   placeholder={getPlaceholder("Apellido1")}
+                  maxLength={50}
                   className={commonClasses}
                 />
                 {touched["Apellido1"] && fieldErrors["Apellido1"] && (
@@ -291,6 +293,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
                   }}
                   onBlur={() => setTouched(prev => ({ ...prev, Apellido2: true }))}
                   placeholder={getPlaceholder("Apellido2")}
+                  maxLength={50}
                   className={commonClasses}
                 />
                 {touched["Apellido2"] && fieldErrors["Apellido2"] && (
@@ -315,6 +318,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
                   }}
                   onBlur={() => setTouched(prev => ({ ...prev, Correo: true }))}
                   placeholder={getPlaceholder("Correo")}
+                  maxLength={100}
                   className={commonClasses}
                 />
                 {touched["Correo"] && fieldErrors["Correo"] && (
@@ -359,6 +363,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
                   }}
                   onBlur={() => setTouched(prev => ({ ...prev, Motivo_Solicitud: true }))}
                   placeholder={getPlaceholder("Motivo_Solicitud")}
+                  maxLength={250}
                   className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
                 />
                 {touched["Motivo_Solicitud"] && fieldErrors["Motivo_Solicitud"] && (

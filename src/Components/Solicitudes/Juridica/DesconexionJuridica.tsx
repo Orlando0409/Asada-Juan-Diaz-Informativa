@@ -297,6 +297,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                                                     validateField(fieldName, e.target.value);
                                                 }}
                                                 placeholder={fieldLabels[fieldName]}
+                                                maxLength={250}
                                                 className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
                                                 style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                                             />
