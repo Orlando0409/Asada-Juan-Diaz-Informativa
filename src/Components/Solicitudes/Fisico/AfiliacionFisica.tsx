@@ -195,7 +195,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
       >
         <h2 className="text-center text-2xl font-semibold mb-10">Formulario de afiliación</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
           {/* Tipo de Identificación */}
           <div className="mb-3">
             <form.Field name="Tipo_Identificacion">
@@ -300,6 +300,8 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                 {formErrors["Nombre"] && !fieldErrors["Nombre"] && (
                   <span className="text-red-500 text-sm block mt-1">{formErrors["Nombre"]}</span>
                 )}
+              
+
               </div>
             )}
           </form.Field>

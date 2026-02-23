@@ -113,7 +113,7 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                 setMostrarFormulario(false);
                 onClose();
             } catch (error: any) {
-               console.log("Error al enviar formulario de afiliación jurídica:", error);
+                console.log("Error al enviar formulario de afiliación jurídica:", error);
             }
         },
     });
@@ -128,11 +128,11 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                     e.preventDefault();
                     form.handleSubmit();
                 }}
-                  className="bg-white shadow-lg  pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
+                className="bg-white shadow-lg  pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
             >
                 <h2 className="text-center text-2xl font-bold mb-8 text-blue-700">Formulario de Afiliación Jurídica</h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-">
                     {/* Razon Social */}
                     <form.Field name="Razon_Social">
                         {(field) => (
