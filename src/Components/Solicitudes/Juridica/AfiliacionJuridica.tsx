@@ -19,9 +19,6 @@ function formatCedulaJuridica(value: string) {
 //prueba
 const STORAGE_KEY = 'afiliacion_juridica_temp';
 
-
-
-
 const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
     const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -184,7 +181,7 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                                     onChange={(e) => {
                                         field.handleChange(e.target.value);
                                         validateField("Razon_Social", e.target.value);
-                                        saveToSessionStorage({ ...form.state.values, Razon_Social: e.target.value }); // ← NUEVO
+                                        saveToSessionStorage({ ...form.state.values, Razon_Social: e.target.value }); // 
                                     }}
                                     placeholder="Ejemplo S.A."
                                     maxLength={50}
