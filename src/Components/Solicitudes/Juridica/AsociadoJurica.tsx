@@ -125,7 +125,7 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                     Formulario para Cliente Jurídico
                 </h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
                     {/* Cédula Jurídica */}
                     <form.Field name="Cedula_Juridica">
                         {(field) => (

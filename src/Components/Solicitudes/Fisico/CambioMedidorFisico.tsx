@@ -144,7 +144,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
       >
         <h2 className="text-center text-2xl font-semibold mb-10">Formulario de cambio de medidor</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
           {/* Tipo de Identificación y Número de Identificación */}
           <form.Field name="Tipo_Identificacion">
             {(field) => (

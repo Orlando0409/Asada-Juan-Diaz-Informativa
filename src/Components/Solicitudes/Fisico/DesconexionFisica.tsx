@@ -187,7 +187,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
       >
         <h2 className="text-center text-2xl font-semibold mb-10">Formulario de desconexión de medidor</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
           {/* Tipo de Identificación */}
           <div className="mb-3">
             <form.Field name="Tipo_Identificacion">
@@ -245,7 +245,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                       </div>
                     )}
                   </div>
-                  {/* Solo muestra errores de identificación aquí */}
+                  {/* muestra errores de identificación */}
                   {fieldErrors['Identificacion'] && (
                     <span className="text-red-500 text-sm block mt-1">
                       {fieldErrors['Identificacion']}
@@ -277,7 +277,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                   maxLength={50}
                   className={commonClasses}
                 />
-                {/* Solo muestra errores de nombre aquí */}
+                {/*  muestra errores de nombre  */}
                 {fieldErrors["Nombre"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Nombre"]}</span>
                 )}
@@ -403,7 +403,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                   }}
                   className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
                 />
-                {/* Solo muestra errores de teléfono aquí */}
+                {/*  muestra errores de teléfono*/}
                 {fieldErrors["Numero_Telefono"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
                 )}
@@ -428,7 +428,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                   maxLength={250}
                   className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
                 />
-                {/* Solo muestra errores de motivo aquí */}
+                {/* muestra errores de motivo*/}
                 {fieldErrors["Motivo_Solicitud"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Solicitud"]}</span>
                 )}
@@ -491,7 +491,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                       </button>
                     </div>
                   )}
-                  {/* Solo muestra errores de planos aquí */}
+                  {/*muestra errores de planos*/}
                   {fieldErrors["Planos_Terreno"] && (
                     <span className="text-red-500 text-sm block mt-1">
                       {fieldErrors["Planos_Terreno"]}
@@ -555,7 +555,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                       </button>
                     </div>
                   )}
-                  {/* Solo muestra errores de escritura aquí */}
+                  {/* muestra errores de escritura*/}
                   {fieldErrors["Escritura_Terreno"] && (
                     <span className="text-red-500 text-sm block mt-1">
                       {fieldErrors["Escritura_Terreno"]}

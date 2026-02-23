@@ -29,23 +29,23 @@ export const DesconexionMedidorSchema = z.object({
 
   Nombre: z.string()
     .min(2, 'El nombre debe tener al menos 2 caracteres')
-    .max(50, 'El nombre no puede tener más de 50 caracteres')
+    .max(49, 'El nombre no puede tener más de 50 caracteres')
     .refine(val => val.trim().length > 0, 'El nombre no puede estar vacío')
     .refine(val => /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(val), 'El nombre solo puede contener letras y espacios'),
 
   Apellido1: z.string()
     .min(2, 'El primer apellido debe tener al menos 2 caracteres')
-    .max(50, 'El primer apellido no puede tener más de 50 caracteres')
+    .max(49, 'El primer apellido no puede tener más de 50 caracteres')
     .refine(val => val.trim().length > 0, 'El primer apellido no puede estar vacío')
     .refine(val => /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(val), 'El primer apellido solo puede contener letras y espacios'),
 
   Apellido2: z.string()
-    .max(50, 'El segundo apellido no puede tener más de 50 caracteres')
+    .max(49, 'El segundo apellido no puede tener más de 50 caracteres')
     .optional(),
 
   Correo: z.string()
     .min(1, 'El correo no puede estar vacío')
-    .max(100, 'El correo no puede tener más de 100 caracteres')
+    .max(99, 'El correo no puede tener más de 100 caracteres')
     .email('El correo electrónico debe tener un formato válido')
     .refine(val => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(val), 'El formato del correo electrónico no es válido'),
 
@@ -61,13 +61,13 @@ export const DesconexionMedidorSchema = z.object({
   // Campos específicos de CreateSolicitudDesconexionFisicaDto
   Direccion_Exacta: z.string()
     .min(10, 'La dirección debe tener al menos 10 caracteres')
-    .max(255, 'La dirección no puede tener más de 255 caracteres')
+    .max(254, 'La dirección no puede tener más de 255 caracteres')
     .refine(val => val.trim().length > 0, 'La dirección no puede estar vacía')
     .refine(val => /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s.,#-]+$/.test(val), 'La dirección solo puede contener letras, números, espacios y los caracteres .,-#'),
 
   Motivo_Solicitud: z.string()
     .min(10, 'El motivo de la solicitud debe tener al menos 10 caracteres')
-    .max(500, 'El motivo de la solicitud no puede tener más de 500 caracteres')
+    .max(499, 'El motivo de la solicitud no puede tener más de 500 caracteres')
     .refine(val => val.trim().length > 0, 'El motivo de la solicitud no puede estar vacío')
     .refine(val => /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s.,!?¿¡()-]+$/.test(val), 'El motivo de la solicitud solo puede contener letras, números, espacios y los caracteres .,!?¿¡()-'),
 

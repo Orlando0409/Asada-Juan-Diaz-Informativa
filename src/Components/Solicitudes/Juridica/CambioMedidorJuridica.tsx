@@ -105,7 +105,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                 setMostrarFormulario(false);
                 onClose();
             } catch (error: any) {
-                console.log("🔍 ERROR EN SOLICITUD DE CAMBIO DE MEDIDOR JURÍDICA:", error);
+                console.log(" ERROR EN SOLICITUD DE CAMBIO DE MEDIDOR JURÍDICA:", error);
             }
         },
     });
@@ -123,7 +123,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
             >
                 <h2 className="text-center text-2xl font-semibold mb-10">Formulario de cambio de medidor - Jurídica</h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
                     {/* Razón Social */}
                     <form.Field name="Razon_Social">
                         {(field) => (

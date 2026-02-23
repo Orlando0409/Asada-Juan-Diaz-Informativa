@@ -301,7 +301,6 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                   <span className="text-red-500 text-sm block mt-1">{formErrors["Nombre"]}</span>
                 )}
               
-
               </div>
             )}
           </form.Field>
