@@ -7,12 +7,13 @@ export const AfiliacionJuridicaSchema = z.object({
     .regex(/^3-\d{3}-\d{6}$/, 'La cédula jurídica debe tener el formato 3-XXX-XXXXXX'),
 
   Razon_Social: z.string()
+      
     .min(2, 'La razón social debe tener al menos 2 caracteres')
-    .max(100, 'La razón social no puede tener más de 100 caracteres'),
+    .max(99, 'La razón social no puede tener más de 100 caracteres'),
 
   Correo: z.string()
     .min(1, 'El correo electrónico es obligatorio')
-    .max(100, 'El correo no puede tener más de 100 caracteres')
+    .max(99, 'El correo no puede tener más de 100 caracteres')
     .email('El correo electrónico no es válido'),
 
   Numero_Telefono: z.string()
@@ -26,10 +27,10 @@ export const AfiliacionJuridicaSchema = z.object({
 
   Direccion_Exacta: z.string()
     .min(10, 'La dirección debe tener al menos 10 caracteres')
-    .max(255, 'La dirección no puede tener más de 255 caracteres'),
+    .max(254, 'La dirección no puede tener más de 255 caracteres'),
 
    Planos_Terreno: z.instanceof(File, { message: "Debe subir el plano del terreno" })
-    .refine(file => file.size <= 5 * 1024 * 1024, 'El plano del terreno no debe superar los 5MB')
+    
     .refine(
       file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
       'El plano del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
@@ -37,7 +38,7 @@ export const AfiliacionJuridicaSchema = z.object({
 
   
   Escritura_Terreno: z.instanceof(File, { message: "Debe subir la escritura del terreno" })
-    .refine(file => file.size <= 5 * 1024 * 1024, 'La escritura del terreno no debe superar los 5MB')
+   
     .refine(
       file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
       'La escritura del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'

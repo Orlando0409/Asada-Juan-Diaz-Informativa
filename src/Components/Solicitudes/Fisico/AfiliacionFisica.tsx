@@ -1,5 +1,5 @@
 import { useForm } from "@tanstack/react-form";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AfiliacionSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/Afiliacion";
 import { useAfiliacionFisica } from "../../../Hook/Solicitudes/HookFisicas";
 import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
@@ -15,6 +15,8 @@ const normalizePhoneNumber = (phone: string): string => {
   }
   return phone;
 };
+
+const STORAGE_KEY = 'afiliacion_fisica_temp';
 
 const FormularioAfiliacion = ({ onClose }: Props) => {
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
@@ -70,7 +72,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
         errorMessage = fieldError?.message || error.errors[0]?.message;
       } else if (error.message) {
         errorMessage = error.message;
-      } 
+      }
       setFieldErrors(prev => ({
         ...prev,
         [fieldName]: errorMessage,
@@ -122,6 +124,25 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
     }
     return placeholders[fieldName] || '';
   };
+   
+    const saveToSessionStorage = (values: any) => {
+        try {
+            // Guardamos todo excepto los archivos
+            const dataToSave = {
+                Nombre: values.Nombre,
+                Apellido1: values.Apellido1,
+                Apellido2: values.Apellido2,
+                Tipo_Identificacion: values.Tipo_Identificacion,
+                Identificacion: values.Identificacion,
+                Correo: values.Correo,
+                Numero_Telefono: values.Numero_Telefono,
+                Direccion_Exacta: values.Direccion_Exacta,
+            };
+            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+        } catch (error) {
+            console.error('Error al guardar en sessionStorage:', error);
+        }
+    };
 
   const form = useForm({
     defaultValues: {
@@ -167,6 +188,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
         });
 
         await mutation.createAfiliacion(formData);
+        sessionStorage.removeItem(STORAGE_KEY);
 
         form.reset();
         setFormErrors({});
@@ -180,8 +202,24 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
       }
     },
   });
+   useEffect(() => {
+          const savedData = sessionStorage.getItem(STORAGE_KEY);
+          if (savedData) {
+              try {
+                  const parsed = JSON.parse(savedData);
+                  // Cargar los valores en el formulario
+                  Object.entries(parsed).forEach(([key, value]) => {
+                      if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
+                          form.setFieldValue(key as any, value as any);
+                      }
+                  });
+              } catch (error) {
+                  console.error('Error al cargar datos guardados:', error);
+              }
+          }
+      }, []); //prueba 
 
- 
+
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
 
   return (
@@ -195,7 +233,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
       >
         <h2 className="text-center text-2xl font-semibold mb-10">Formulario de afiliación</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
           {/* Tipo de Identificación */}
           <div className="mb-3">
             <form.Field name="Tipo_Identificacion">
@@ -289,8 +327,10 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                   onChange={(e) => {
                     field.handleChange(e.target.value);
                     validateField("Nombre", e.target.value, form.state.values);
+                    saveToSessionStorage({ ...form.state.values, Nombre: e.target.value }); // ← NUEVO
                   }}
                   placeholder={getPlaceholder("Nombre")}
+                  maxLength={50}
                   className={commonClasses}
                 />
                 {fieldErrors["Nombre"] && (
@@ -299,6 +339,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                 {formErrors["Nombre"] && !fieldErrors["Nombre"] && (
                   <span className="text-red-500 text-sm block mt-1">{formErrors["Nombre"]}</span>
                 )}
+              
               </div>
             )}
           </form.Field>
@@ -313,8 +354,10 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                   onChange={(e) => {
                     field.handleChange(e.target.value);
                     validateField("Apellido1", e.target.value, form.state.values);
+                    saveToSessionStorage({ ...form.state.values, Apellido1: e.target.value }); // ← NUEVO
                   }}
                   placeholder={getPlaceholder("Apellido1")}
+                  maxLength={50}
                   className={commonClasses}
                 />
                 {fieldErrors["Apellido1"] && (
@@ -337,8 +380,10 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                   onChange={(e) => {
                     field.handleChange(e.target.value);
                     validateField("Apellido2", e.target.value, form.state.values);
+                    saveToSessionStorage({ ...form.state.values, Apellido2: e.target.value }); // ← NUEVO
                   }}
                   placeholder={getPlaceholder("Apellido2")}
+                  maxLength={50}
                   className={commonClasses}
                 />
                 {fieldErrors["Apellido2"] && (
@@ -360,8 +405,10 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                   onChange={(e) => {
                     field.handleChange(e.target.value);
                     validateField("Direccion_Exacta", e.target.value, form.state.values);
+                    saveToSessionStorage({ ...form.state.values, Direccion_Exacta: e.target.value }); // ← NUEVO
                   }}
                   placeholder={getPlaceholder("Direccion_Exacta")}
+                  maxLength={100}
                   className={commonClasses}
                 />
                 {fieldErrors["Direccion_Exacta"] && (
@@ -384,8 +431,10 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                   onChange={(e) => {
                     field.handleChange(e.target.value);
                     validateField("Correo", e.target.value, form.state.values);
+                    saveToSessionStorage({ ...form.state.values, Correo: e.target.value }); // ← NUEVO
                   }}
                   placeholder={getPlaceholder("Correo")}
+                  maxLength={100}
                   className={commonClasses}
                 />
                 {fieldErrors["Correo"] && (
@@ -407,6 +456,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                   onChange={(value) => {
                     field.handleChange(value || "");
                     validateField("Numero_Telefono", value || "", form.state.values);
+                    saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" }); // ← NUEVO
                   }}
                   className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
                 />
@@ -431,6 +481,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                   onChange={(e) => {
                     field.handleChange(Number(e.target.value));
                     validateField("Edad", Number(e.target.value), form.state.values);
+                    saveToSessionStorage({ ...form.state.values, Edad: Number(e.target.value) }); // ← NUEVO
                   }}
                   placeholder={getPlaceholder("Edad")}
                   className={commonClasses}

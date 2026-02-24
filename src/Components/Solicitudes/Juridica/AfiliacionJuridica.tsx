@@ -1,5 +1,5 @@
 import { useForm } from "@tanstack/react-form";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AfiliacionJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/AfiliacionJuridica";
 import { useAfiliacionJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
 import PhoneInputComponent from "../PhoneInputComponent";
@@ -16,6 +16,8 @@ function formatCedulaJuridica(value: string) {
     if (digits.length > 4) formatted += "-" + digits.slice(4, 10);
     return formatted;
 }
+//prueba
+const STORAGE_KEY = 'afiliacion_juridica_temp';
 
 const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
     const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
@@ -66,6 +68,22 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
         }
     };
 
+    const saveToSessionStorage = (values: any) => {
+        try {
+            // Guardamos todo excepto los archivos
+            const dataToSave = {
+                Razon_Social: values.Razon_Social,
+                Cedula_Juridica: values.Cedula_Juridica,
+                Correo: values.Correo,
+                Numero_Telefono: values.Numero_Telefono,
+                Direccion_Exacta: values.Direccion_Exacta,
+            };
+            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+        } catch (error) {
+            console.error('Error al guardar en sessionStorage:', error);
+        }
+    };
+
     const form = useForm({
         defaultValues: {
             Razon_Social: '',
@@ -106,6 +124,8 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
 
                 await mutation.createAfiliacion(formData);
 
+                sessionStorage.removeItem(STORAGE_KEY);
+
                 form.reset();
                 setArchivoSeleccionado({});
                 setFieldErrors({});
@@ -113,10 +133,27 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                 setMostrarFormulario(false);
                 onClose();
             } catch (error: any) {
-               console.log("Error al enviar formulario de afiliación jurídica:", error);
+                console.log("Error al enviar formulario de afiliación jurídica:", error);
             }
         },
     });
+     ///prueba 
+    useEffect(() => {
+        const savedData = sessionStorage.getItem(STORAGE_KEY);
+        if (savedData) {
+            try {
+                const parsed = JSON.parse(savedData);
+                // Cargar los valores en el formulario
+                Object.entries(parsed).forEach(([key, value]) => {
+                    if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
+                        form.setFieldValue(key as any, value as any);
+                    }
+                });
+            } catch (error) {
+                console.error('Error al cargar datos guardados:', error);
+            }
+        }
+    }, []); //prueba 
 
     if (!mostrarFormulario) return null;
     const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300 bg-white';
@@ -128,11 +165,11 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                     e.preventDefault();
                     form.handleSubmit();
                 }}
-                  className="bg-white shadow-lg  pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
+                className="bg-white shadow-lg  pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
             >
                 <h2 className="text-center text-2xl font-bold mb-8 text-blue-700">Formulario de Afiliación Jurídica</h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-2">
                     {/* Razon Social */}
                     <form.Field name="Razon_Social">
                         {(field) => (
@@ -144,8 +181,10 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                                     onChange={(e) => {
                                         field.handleChange(e.target.value);
                                         validateField("Razon_Social", e.target.value);
+                                        saveToSessionStorage({ ...form.state.values, Razon_Social: e.target.value }); // 
                                     }}
                                     placeholder="Ejemplo S.A."
+                                    maxLength={50}
                                     className={commonClasses}
                                 />
                                 {fieldErrors["Razon_Social"] && (
@@ -171,6 +210,8 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                                         const formatted = formatCedulaJuridica(e.target.value);
                                         field.handleChange(formatted);
                                         validateField("Cedula_Juridica", formatted);
+                                        saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted }); // ← NUEVO
+
                                     }}
                                     placeholder="3-XXX-XXXXXX"
                                     className={commonClasses}
@@ -196,8 +237,10 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                                     onChange={(e) => {
                                         field.handleChange(e.target.value);
                                         validateField("Correo", e.target.value);
+                                        saveToSessionStorage({ ...form.state.values, Correo: e.target.value }); // ← NUEVO
                                     }}
                                     placeholder="empresa@email.com"
+                                    maxLength={100}
                                     className={commonClasses}
                                 />
                                 {fieldErrors["Correo"] && (
@@ -219,6 +262,7 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                                     onChange={(value) => {
                                         field.handleChange(value || "");
                                         validateField("Numero_Telefono", value || "");
+                                        saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" }); // ← NUEVO
                                     }}
                                     className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
                                 />
@@ -241,8 +285,10 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                                     onChange={(e) => {
                                         field.handleChange(e.target.value);
                                         validateField("Direccion_Exacta", e.target.value);
+                                        saveToSessionStorage({ ...form.state.values, Direccion_Exacta: e.target.value }); // ← NUEVO
                                     }}
                                     placeholder="San José, del Banco Nacional 200m sur"
+                                    maxLength={100}
                                     className={commonClasses}
                                 />
                                 {fieldErrors["Direccion_Exacta"] && (
