@@ -1,5 +1,5 @@
 import { useForm } from "@tanstack/react-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AsociadoSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/Asociado";
 import { useAsociadoFisica } from "../../../Hook/Solicitudes/HookFisicas";
 import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
@@ -17,6 +17,10 @@ const normalizePhoneNumber = (phone: string): string => {
   }
   return phone;
 };
+
+const STORAGE_KEY = 'asociado_fisica_temp';
+
+
 
 const FormularioAsociado = ({ onClose }: Props) => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -58,7 +62,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
       setFieldErrors(errors);
     }
   };
-
+ 
   const getPlaceholder = (fieldName: string, tipoIdentificacion?: TipoIdentificacion) => {
     const placeholders: Record<string, string> = {
       Nombre: "Juan Carlos",
@@ -82,6 +86,23 @@ const FormularioAsociado = ({ onClose }: Props) => {
     }
     return placeholders[fieldName] || "";
   };
+
+  const saveToSessionStorage = (values: any) => {
+        try {
+            // Guardamos todo excepto los archivos
+            const dataToSave = {
+                Nombre: values.Nombre,
+                Apellido1: values.Apellido1,
+                Apellido2: values.Apellido2,
+                Correo: values.Correo,
+                Numero_Telefono: values.Numero_Telefono,
+                Direccion_Exacta: values.Direccion_Exacta,
+            };
+            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+        } catch (error) {
+            console.error('Error al guardar en sessionStorage:', error);
+        }
+    };
 
   const form = useForm({
     defaultValues: {
@@ -125,7 +146,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
           ...value,
           Tipo_Identificacion: value.Tipo_Identificacion
         });
-
+          sessionStorage.removeItem(STORAGE_KEY);
         form.reset();
         setMostrarFormulario(false);
         onClose();
@@ -152,20 +173,35 @@ const FormularioAsociado = ({ onClose }: Props) => {
     validateAllFields(newValues);
     form.setFieldValue(fieldName, value);
   };
-
+   useEffect(() => {
+          const savedData = sessionStorage.getItem(STORAGE_KEY);
+          if (savedData) {
+              try {
+                  const parsed = JSON.parse(savedData);
+                  // Cargar los valores en el formulario
+                  Object.entries(parsed).forEach(([key, value]) => {
+                      if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
+                          form.setFieldValue(key as any, value as any);
+                      }
+                  });
+              } catch (error) {
+                  console.error('Error al cargar datos guardados:', error);
+              }
+          }
+      }, []);
 
   const commonClasses =
     "w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300";
 
   return (
-   <div className="flex justify-center items-center min-h-screen text-gray-800 p-7 w-full">
+    <div className="flex justify-center items-center min-h-screen text-gray-800 p-7 w-full">
       <form
         onSubmit={handleSubmit}
-         className="bg-white shadow-lg  pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
+        className="bg-white shadow-lg  pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
       >
         <h2 className="text-center text-2xl font-semibold mb-10">Formulario para ser asociado</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
           {/* Tipo de Identificación */}
           <form.Field name="Tipo_Identificacion">
             {(field) => (
@@ -240,6 +276,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(e) => {
                     handleFieldChange("Nombre", e.target.value);
+                    saveToSessionStorage({ ...form.state.values, Nombre: e.target.value });
                   }}
                   onBlur={() => setTouched(prev => ({ ...prev, Nombre: true }))}
                   placeholder={getPlaceholder("Nombre")}
@@ -265,6 +302,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(e) => {
                     handleFieldChange("Apellido1", e.target.value);
+                    saveToSessionStorage({ ...form.state.values, Apellido1: e.target.value }); // ← NUEVO
                   }}
                   onBlur={() => setTouched(prev => ({ ...prev, Apellido1: true }))}
                   placeholder={getPlaceholder("Apellido1")}
@@ -290,6 +328,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(e) => {
                     handleFieldChange("Apellido2", e.target.value);
+                    saveToSessionStorage({ ...form.state.values, Apellido2: e.target.value }); // ← NUEVO
                   }}
                   onBlur={() => setTouched(prev => ({ ...prev, Apellido2: true }))}
                   placeholder={getPlaceholder("Apellido2")}
@@ -315,6 +354,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(e) => {
                     handleFieldChange("Correo", e.target.value);
+                    saveToSessionStorage({ ...form.state.values, Correo: e.target.value }); // ← NUEVO
                   }}
                   onBlur={() => setTouched(prev => ({ ...prev, Correo: true }))}
                   placeholder={getPlaceholder("Correo")}
@@ -339,6 +379,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(value) => {
                     handleFieldChange("Numero_Telefono", value || "");
+                    saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" }); // ← NUEVO
                   }}
                   className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
                 />
@@ -360,6 +401,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(e) => {
                     handleFieldChange("Motivo_Solicitud", e.target.value);
+                    saveToSessionStorage({ ...form.state.values, Motivo_Solicitud: e.target.value }); // ← NUEVO
                   }}
                   onBlur={() => setTouched(prev => ({ ...prev, Motivo_Solicitud: true }))}
                   placeholder={getPlaceholder("Motivo_Solicitud")}

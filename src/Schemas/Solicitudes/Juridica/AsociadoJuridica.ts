@@ -4,7 +4,7 @@ import { parsePhoneNumberFromString } from 'libphonenumber-js';
 export const AsociadoJuridicaSchema = z.object({
   Cedula_Juridica: z.string()
     .min(1, 'La cédula jurídica es obligatoria')
-    .max(15, 'La cédula jurídica no puede tener más de 15 caracteres'),
+    .max(14, 'La cédula jurídica no puede tener más de 15 caracteres'),
 
   Razon_Social: z.string()
     .min(2, 'La razón social debe tener al menos 2 caracteres'),

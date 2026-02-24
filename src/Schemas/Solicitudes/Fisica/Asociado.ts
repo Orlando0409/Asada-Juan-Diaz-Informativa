@@ -23,7 +23,7 @@ export const AsociadoSchema = z.object({
   Nombre: z.string()
     .min(1, 'El nombre no puede estar vacío')
     .min(2, 'El nombre debe tener al menos 2 caracteres')
-    .max(50, 'El nombre no puede tener más de 50 caracteres')
+    .max(49, 'El nombre no puede tener más de 50 caracteres')
     .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, { message: 'El nombre solo puede contener letras y espacios' })
     .refine(val => val.trim().length > 0, 'El nombre no puede estar vacío')
     .transform(val => val.trim()),
@@ -31,20 +31,20 @@ export const AsociadoSchema = z.object({
   Apellido1: z.string()
     .min(1, 'El primer apellido no puede estar vacío')
     .min(2, 'El primer apellido debe tener al menos 2 caracteres')
-    .max(50, 'El primer apellido no puede tener más de 50 caracteres')
+    .max(49, 'El primer apellido no puede tener más de 50 caracteres')
     .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, { message: 'El primer apellido solo puede contener letras y espacios' })
     .refine(val => val.trim().length > 0, 'El primer apellido no puede estar vacío')
     .transform(val => val.trim()),
 
   Apellido2: z.string()
-    .max(50, 'El segundo apellido no puede tener más de 50 caracteres')
+    .max(49, 'El segundo apellido no puede tener más de 50 caracteres')
     .optional()
     .or(z.literal(''))
     .transform(val => val === '' ? undefined : val),
 
   Correo: z.string()
     .min(1, 'El correo no puede estar vacío')
-    .max(100, 'El correo no puede tener más de 100 caracteres')
+    .max(99, 'El correo no puede tener más de 100 caracteres')
     .email('El correo electrónico debe tener un formato válido')
     .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, { message: 'El formato del correo electrónico no es válido' })
     .transform(val => val.trim().toLowerCase()),
@@ -58,7 +58,7 @@ export const AsociadoSchema = z.object({
   Motivo_Solicitud: z.string()
     .min(1, 'El motivo de la solicitud no puede estar vacío')
     .min(10, 'El motivo de la solicitud debe tener al menos 10 caracteres')
-    .max(500, 'El motivo de la solicitud no puede tener más de 500 caracteres')
+    .max(499, 'El motivo de la solicitud no puede tener más de 500 caracteres')
     .regex(/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s.,!?¿¡()-]+$/, { message: 'El motivo de la solicitud solo puede contener letras, números, espacios y los caracteres .,!?¿¡()-' })
     .refine(val => val.trim().length > 0, 'El motivo de la solicitud no puede estar vacío')
     .transform(val => val.trim()),

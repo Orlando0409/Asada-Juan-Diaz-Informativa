@@ -1,5 +1,5 @@
 import { useForm } from "@tanstack/react-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 import { CambioMedidorJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/CambioMedidorJuridico";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
@@ -20,6 +20,7 @@ function formatCedulaJuridica(value: string) {
 }
 
 const fieldSchemas: Record<string, z.ZodTypeAny> = CambioMedidorJuridicaSchema.shape;
+const STORAGE_KEY = 'afiliacion_juridica_temp';
 
 const CambioMedidorJuridica = ({ onClose }: Props) => {
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -63,7 +64,21 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
         };
         return placeholders[fieldName] || '';
     };
-
+    const saveToSessionStorage = (values: any) => {
+        try {
+            // Guardamos todo excepto los archivos
+            const dataToSave = {
+                Razon_Social: values.Razon_Social,
+                Cedula_Juridica: values.Cedula_Juridica,
+                Correo: values.Correo,
+                Numero_Telefono: values.Numero_Telefono,
+                Direccion_Exacta: values.Direccion_Exacta,
+            };
+            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+        } catch (error) {
+            console.error('Error al guardar en sessionStorage:', error);
+        }
+    };
     const form = useForm({
         defaultValues: {
             Razon_Social: "",
@@ -99,16 +114,36 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                 }
 
                 await mutation.createCambioMedidor(value);
+     sessionStorage.removeItem(STORAGE_KEY);
 
                 form.reset();
                 setFieldErrors({});
                 setMostrarFormulario(false);
                 onClose();
             } catch (error: any) {
-                console.log("🔍 ERROR EN SOLICITUD DE CAMBIO DE MEDIDOR JURÍDICA:", error);
+                console.log(" ERROR EN SOLICITUD DE CAMBIO DE MEDIDOR JURÍDICA:", error);
             }
         },
     });
+
+   useEffect(() => {
+        const savedData = sessionStorage.getItem(STORAGE_KEY);
+        if (savedData) {
+            try {
+                const parsed = JSON.parse(savedData);
+                // Cargar los valores en el formulario
+                Object.entries(parsed).forEach(([key, value]) => {
+                    if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
+                        form.setFieldValue(key as any, value as any);
+                    }
+                });
+            } catch (error) {
+                console.error('Error al cargar datos guardados:', error);
+            }
+        }
+    }, []); //prueba 
+
+
 
     if (!mostrarFormulario) return null;
 
@@ -116,14 +151,14 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
     const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
 
     return (
-       <div className="flex justify-center items-center min-h-screen text-gray-800 p-7 w-full">
+        <div className="flex justify-center items-center min-h-screen text-gray-800 p-7 w-full">
             <form
                 onSubmit={(e) => { e.preventDefault(); form.handleSubmit(); }}
-                  className="bg-white shadow-lg  pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
+                className="bg-white shadow-lg  pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
             >
                 <h2 className="text-center text-2xl font-semibold mb-10">Formulario de cambio de medidor - Jurídica</h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
                     {/* Razón Social */}
                     <form.Field name="Razon_Social">
                         {(field) => (
@@ -135,6 +170,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                     onChange={(e) => {
                                         field.handleChange(e.target.value);
                                         handleFieldChange("Razon_Social", e.target.value);
+                                          saveToSessionStorage({ ...form.state.values, Razon_Social: e.target.value });
                                     }}
                                     placeholder={getPlaceholder("Razon_Social")}
                                     maxLength={50}
@@ -161,6 +197,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                         const formatted = formatCedulaJuridica(e.target.value);
                                         field.handleChange(formatted);
                                         handleFieldChange("Cedula_Juridica", formatted);
+                                        saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted });
                                     }}
                                     placeholder={getPlaceholder("Cedula_Juridica")}
                                     className={commonClasses}
@@ -185,9 +222,10 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                     onChange={(e) => {
                                         field.handleChange(e.target.value);
                                         handleFieldChange("Correo", e.target.value);
+                                        saveToSessionStorage({ ...form.state.values, Correo: e.target.value });
                                     }}
                                     placeholder={getPlaceholder("Correo")}
-                                        maxLength={100}
+                                    maxLength={100}
                                     className={commonClasses}
                                 />
                                 {fieldErrors["Correo"] && (
@@ -209,6 +247,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                     onChange={(value) => {
                                         field.handleChange(value || "");
                                         handleFieldChange("Numero_Telefono", value || "");
+                                        saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" });
                                     }}
                                     className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
                                 />
@@ -231,6 +270,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                     onChange={(e) => {
                                         field.handleChange(e.target.value);
                                         handleFieldChange("Direccion_Exacta", e.target.value);
+                                        saveToSessionStorage({ ...form.state.values, Direccion_Exacta: e.target.value });
                                     }}
                                     placeholder={getPlaceholder("Direccion_Exacta")}
                                     maxLength={100}
@@ -255,6 +295,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                     onChange={(e) => {
                                         field.handleChange(e.target.value);
                                         handleFieldChange("Motivo_Solicitud", e.target.value);
+                                        saveToSessionStorage({ ...form.state.values, Motivo_Solicitud: e.target.value });
                                     }}
                                     placeholder="Escribe el motivo de tu solicitud"
                                     maxLength={250}
@@ -281,6 +322,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                     onChange={(e) => {
                                         field.handleChange(Number(e.target.value));
                                         handleFieldChange("Numero_Medidor_Anterior", Number(e.target.value));
+                                        saveToSessionStorage({ ...form.state.values, Numero_Medidor_Anterior: Number(e.target.value) });
                                     }}
                                     placeholder={getPlaceholder("Numero_Medidor_Anterior")}
                                     className={commonClasses}
