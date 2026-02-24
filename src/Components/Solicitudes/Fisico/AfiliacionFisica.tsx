@@ -124,25 +124,25 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
     }
     return placeholders[fieldName] || '';
   };
-   
-    const saveToSessionStorage = (values: any) => {
-        try {
-            // Guardamos todo excepto los archivos
-            const dataToSave = {
-                Nombre: values.Nombre,
-                Apellido1: values.Apellido1,
-                Apellido2: values.Apellido2,
-                Tipo_Identificacion: values.Tipo_Identificacion,
-                Identificacion: values.Identificacion,
-                Correo: values.Correo,
-                Numero_Telefono: values.Numero_Telefono,
-                Direccion_Exacta: values.Direccion_Exacta,
-            };
-            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
-        } catch (error) {
-            console.error('Error al guardar en sessionStorage:', error);
-        }
-    };
+
+  const saveToSessionStorage = (values: any) => {
+    try {
+      // Guardamos todo excepto los archivos
+      const dataToSave = {
+        Nombre: values.Nombre,
+        Apellido1: values.Apellido1,
+        Apellido2: values.Apellido2,
+        Tipo_Identificacion: values.Tipo_Identificacion,
+        Identificacion: values.Identificacion,
+        Correo: values.Correo,
+        Numero_Telefono: values.Numero_Telefono,
+        Direccion_Exacta: values.Direccion_Exacta,
+      };
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+    } catch (error) {
+      console.error('Error al guardar en sessionStorage:', error);
+    }
+  };
 
   const form = useForm({
     defaultValues: {
@@ -202,22 +202,22 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
       }
     },
   });
-   useEffect(() => {
-          const savedData = sessionStorage.getItem(STORAGE_KEY);
-          if (savedData) {
-              try {
-                  const parsed = JSON.parse(savedData);
-                  // Cargar los valores en el formulario
-                  Object.entries(parsed).forEach(([key, value]) => {
-                      if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
-                          form.setFieldValue(key as any, value as any);
-                      }
-                  });
-              } catch (error) {
-                  console.error('Error al cargar datos guardados:', error);
-              }
+  useEffect(() => {
+    const savedData = sessionStorage.getItem(STORAGE_KEY);
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
+        // Cargar los valores en el formulario
+        Object.entries(parsed).forEach(([key, value]) => {
+          if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
+            form.setFieldValue(key as any, value as any);
           }
-      }, []); //prueba 
+        });
+      } catch (error) {
+        console.error('Error al cargar datos guardados:', error);
+      }
+    }
+  }, []); //prueba 
 
 
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
@@ -339,7 +339,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                 {formErrors["Nombre"] && !fieldErrors["Nombre"] && (
                   <span className="text-red-500 text-sm block mt-1">{formErrors["Nombre"]}</span>
                 )}
-              
+
               </div>
             )}
           </form.Field>
@@ -475,13 +475,16 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
               <div className="mb-3 w-full">
                 <label htmlFor="Edad" className="block mb-1 font-medium">Edad <span className="text-red-500">*</span></label>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="numeric"
                   min={18}
                   value={field.state.value}
                   onChange={(e) => {
-                    field.handleChange(Number(e.target.value));
-                    validateField("Edad", Number(e.target.value), form.state.values);
-                    saveToSessionStorage({ ...form.state.values, Edad: Number(e.target.value) }); // ← NUEVO
+                    const soloNumeros = e.target.value.replace(/[^0-9]/g, '');
+                    const edadValue = soloNumeros === '' ? 0 : Number(soloNumeros);
+                    field.handleChange(edadValue);
+                    validateField("Edad", edadValue, form.state.values);
+                    saveToSessionStorage({ ...form.state.values, Edad: edadValue });
                   }}
                   placeholder={getPlaceholder("Edad")}
                   className={commonClasses}
