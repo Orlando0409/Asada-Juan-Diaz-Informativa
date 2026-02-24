@@ -1,5 +1,5 @@
 import { useForm } from "@tanstack/react-form";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import data from "../../../data/Data.json";
 import { DesconexionJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/DesconexionMedidorJuridica";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
@@ -9,6 +9,7 @@ import PhoneInputComponent from "../PhoneInputComponent";
 type Props = {
     onClose: () => void;
 };
+const STORAGE_KEY = 'desconexionmedidor_juridica_temp';
 
 const normalizePhoneNumber = (phone: string): string => {
     const phoneNumber = parsePhoneNumberFromString(phone);
@@ -20,12 +21,12 @@ const normalizePhoneNumber = (phone: string): string => {
 
 // Función para formatear la cédula jurídica con guiones
 function formatCedulaJuridica(value: string) {
-  const digits = value.replace(/\D/g, "");
-  let formatted = "";
-  if (digits.length > 0) formatted += digits[0];
-  if (digits.length > 1) formatted += "-" + digits.slice(1, 4);
-  if (digits.length > 4) formatted += "-" + digits.slice(4, 10);
-  return formatted;
+    const digits = value.replace(/\D/g, "");
+    let formatted = "";
+    if (digits.length > 0) formatted += digits[0];
+    if (digits.length > 1) formatted += "-" + digits.slice(1, 4);
+    if (digits.length > 4) formatted += "-" + digits.slice(4, 10);
+    return formatted;
 }
 
 const DesconexionMedidorJuridica = ({ onClose }: Props) => {
@@ -78,6 +79,22 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
         }
     };
 
+    const saveToSessionStorage = (values: any) => {
+        try {
+            // Guardamos todo excepto los archivos
+            const dataToSave = {
+                Razon_Social: values.Razon_Social,
+                Cedula_Juridica: values.Cedula_Juridica,
+                Correo: values.Correo,
+                Numero_Telefono: values.Numero_Telefono,
+                Direccion_Exacta: values.Direccion_Exacta,
+            };
+            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+        } catch (error) {
+            console.error('Error al guardar en sessionStorage:', error);
+        }
+    };
+
     const form = useForm({
         defaultValues: {
             Razon_Social: '',
@@ -116,6 +133,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                 });
 
                 await mutation.createDesconexion(formData);
+                sessionStorage.removeItem(STORAGE_KEY);
 
                 form.reset();
                 setArchivoSeleccionado({});
@@ -123,7 +141,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                 setMostrarFormulario(false);
                 onClose();
             } catch (error: any) {
-               console.log("🔍 ERROR EN SOLICITUD DE DESCONEXIÓN JURÍDICA:", error);
+                console.log("🔍 ERROR EN SOLICITUD DE DESCONEXIÓN JURÍDICA:", error);
             }
         },
     });
@@ -144,6 +162,24 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
         Planos_Terreno: "Planos del Terreno",
         Escritura_Terreno: "Escritura del Terreno"
     };
+
+
+    useEffect(() => {
+        const savedData = sessionStorage.getItem(STORAGE_KEY);
+        if (savedData) {
+            try {
+                const parsed = JSON.parse(savedData);
+                // Cargar los valores en el formulario
+                Object.entries(parsed).forEach(([key, value]) => {
+                    if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
+                        form.setFieldValue(key as any, value as any);
+                    }
+                });
+            } catch (error) {
+                console.error('Error al cargar datos guardados:', error);
+            }
+        }
+    }, []);
 
     return (
         <div className="flex justify-center items-center min-h-screen text-gray-800 p-7 w-full">
@@ -174,6 +210,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                                                 onChange={(value) => {
                                                     field.handleChange(value || "");
                                                     validateField(fieldName, value || "");
+                                                    saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" });
                                                 }}
                                                 className={`${fieldErrors[fieldName] ? 'border-red-500' : ''}`}
                                             />
@@ -189,32 +226,33 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
 
                                 // Cédula Jurídica con guiones
                                 if (fieldName === "Cedula_Juridica") {
-                                  return (
-                                    <div className="mb-3 w-full">
-                                      <label className="block mb-1 font-medium">
-                                        {fieldLabels[fieldName]}
-                                        {fieldProps.required && <span className="text-red-500">*</span>}
-                                      </label>
-                                      <input
-                                        type="text"
-                                        value={typeof field.state.value === "string" ? field.state.value : ""}
-                                        onChange={(e) => {
-                                          const formatted = formatCedulaJuridica(e.target.value);
-                                          field.handleChange(formatted);
-                                          validateField(fieldName, formatted);
-                                        }}
-                                        placeholder="3-XXX-XXXXXX"
-                                        className={commonClasses}
-                                        maxLength={12}
-                                      />
-                                      {fieldErrors[fieldName] && (
-                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors[fieldName]}</span>
-                                      )}
-                                      {formErrors[fieldName] && !fieldErrors[fieldName] && (
-                                        <span className="text-red-500 text-sm block mt-1">{formErrors[fieldName]}</span>
-                                      )}
-                                    </div>
-                                  );
+                                    return (
+                                        <div className="mb-3 w-full">
+                                            <label className="block mb-1 font-medium">
+                                                {fieldLabels[fieldName]}
+                                                {fieldProps.required && <span className="text-red-500">*</span>}
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={typeof field.state.value === "string" ? field.state.value : ""}
+                                                onChange={(e) => {
+                                                    const formatted = formatCedulaJuridica(e.target.value);
+                                                    field.handleChange(formatted);
+                                                    validateField(fieldName, formatted);
+                                                    saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted });
+                                                }}
+                                                placeholder="3-XXX-XXXXXX"
+                                                className={commonClasses}
+                                                maxLength={12}
+                                            />
+                                            {fieldErrors[fieldName] && (
+                                                <span className="text-red-500 text-sm block mt-1">{fieldErrors[fieldName]}</span>
+                                            )}
+                                            {formErrors[fieldName] && !fieldErrors[fieldName] && (
+                                                <span className="text-red-500 text-sm block mt-1">{formErrors[fieldName]}</span>
+                                            )}
+                                        </div>
+                                    );
                                 }
 
                                 // Archivos
@@ -283,7 +321,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                                 }
 
                                 // Motivo de Solicitud (textarea)
-                                if (fieldName === "Motivo_Solicitud"|| fieldName === "Direccion_Exacta") {
+                                if (fieldName === "Motivo_Solicitud" || fieldName === "Direccion_Exacta") {
                                     return (
                                         <div className="mb-3 w-full">
                                             <label className="block mb-1 font-medium">
@@ -295,8 +333,10 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                                                 onChange={(e) => {
                                                     field.handleChange(e.target.value);
                                                     validateField(fieldName, e.target.value);
+                                                    saveToSessionStorage({ ...form.state.values, Motivo_Solicitud: e.target.value });
                                                 }}
                                                 placeholder={fieldLabels[fieldName]}
+                                                maxLength={250}
                                                 className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
                                                 style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                                             />

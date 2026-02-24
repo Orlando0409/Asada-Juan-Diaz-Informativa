@@ -1,5 +1,5 @@
 import { useForm } from "@tanstack/react-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AsociadoJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/AsociadoJuridica";
 import { useAsociadoJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
 import PhoneInputComponent from "../PhoneInputComponent";
@@ -22,6 +22,7 @@ function formatCedulaJuridica(value: string) {
     if (digits.length > 4) formatted += "-" + digits.slice(4, 10);
     return formatted;
 }
+const STORAGE_KEY = 'asociado_juridica_temp';
 
 const FormularioAsociadoJuridico = ({ onClose }: Props) => {
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -47,6 +48,21 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
         }
     };
 
+        const saveToSessionStorage = (values: any) => {
+        try {
+            // Guardamos todo excepto los archivos
+            const dataToSave = {
+                Razon_Social: values.Razon_Social,
+                Cedula_Juridica: values.Cedula_Juridica,
+                Correo: values.Correo,
+                Numero_Telefono: values.Numero_Telefono,
+                Direccion_Exacta: values.Direccion_Exacta,
+            };
+            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+        } catch (error) {
+            console.error('Error al guardar en sessionStorage:', error);
+        }
+    };
     const form = useForm({
         defaultValues: {
             Cedula_Juridica: "",
@@ -82,13 +98,14 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                 }
 
                 await mutation.createAsociado(value);
+                 sessionStorage.removeItem(STORAGE_KEY);
 
                 form.reset();
                 setMostrarFormulario(false);
                 onClose();
                 alert("¡Formulario enviado con éxito!");
             } catch (error: any) {
-                console.log("🔍 ERROR EN SOLICITUD DE ASOCIADO JURÍDICO:", error);
+                console.log(" ERROR EN SOLICITUD DE ASOCIADO JURÍDICO:", error);
             }
         },
     });
@@ -111,6 +128,22 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
         form.setFieldValue(fieldName, value);
     };
 
+       useEffect(() => {
+            const savedData = sessionStorage.getItem(STORAGE_KEY);
+            if (savedData) {
+                try {
+                    const parsed = JSON.parse(savedData);
+                    // Cargar los valores en el formulario
+                    Object.entries(parsed).forEach(([key, value]) => {
+                        if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
+                            form.setFieldValue(key as any, value as any);
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error al cargar datos guardados:', error);
+                }
+            }
+        }, []); //prueba 
 
     const commonClasses =
         "w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300";
@@ -125,7 +158,7 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                     Formulario para Cliente Jurídico
                 </h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
                     {/* Cédula Jurídica */}
                     <form.Field name="Cedula_Juridica">
                         {(field) => (
@@ -165,9 +198,11 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                                     value={field.state.value}
                                     onChange={(e) => {
                                         handleFieldChange("Razon_Social", e.target.value);
+                                        saveToSessionStorage({ ...form.state.values, Razon_Social: e.target.value }); // ← NUEVO
                                     }}
                                     onBlur={() => setTouched(prev => ({ ...prev, Razon_Social: true }))}
                                     placeholder="Ejemplo S.A."
+                                    maxLength={50}
                                     className={commonClasses}
                                 />
                                 {touched["Razon_Social"] && fieldErrors["Razon_Social"] && (
@@ -191,9 +226,11 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                                     value={field.state.value}
                                     onChange={(e) => {
                                         handleFieldChange("Correo", e.target.value);
+                                        saveToSessionStorage({ ...form.state.values, Correo: e.target.value }); // ← NUEVO  
                                     }}
                                     onBlur={() => setTouched(prev => ({ ...prev, Correo: true }))}
                                     placeholder="empresa@email.com"
+                                    maxLength={100}
                                     className={commonClasses}
                                 />
                                 {touched["Correo"] && fieldErrors["Correo"] && (
@@ -216,6 +253,7 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                                     value={field.state.value}
                                     onChange={(value) => {
                                         handleFieldChange("Numero_Telefono", value || "");
+                                        saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" }); // ← NUEVO  
                                     }}
                                     className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
                                 />
@@ -239,9 +277,11 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                                     value={field.state.value}
                                     onChange={(e) => {
                                         handleFieldChange("Motivo_Solicitud", e.target.value);
+                                        saveToSessionStorage({ ...form.state.values, Motivo_Solicitud: e.target.value }); // ← NUEVO    
                                     }}
                                     onBlur={() => setTouched(prev => ({ ...prev, Motivo_Solicitud: true }))}
                                     placeholder="Escribe el motivo de tu solicitud"
+                                    maxLength={250}
                                     className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
                                 />
                                 {touched["Motivo_Solicitud"] && fieldErrors["Motivo_Solicitud"] && (
