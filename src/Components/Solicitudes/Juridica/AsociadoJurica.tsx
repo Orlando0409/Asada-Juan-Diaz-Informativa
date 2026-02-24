@@ -22,7 +22,7 @@ function formatCedulaJuridica(value: string) {
     if (digits.length > 4) formatted += "-" + digits.slice(4, 10);
     return formatted;
 }
-const STORAGE_KEY = 'asociacion_juridica_temp';
+const STORAGE_KEY = 'asociado_juridica_temp';
 
 const FormularioAsociadoJuridico = ({ onClose }: Props) => {
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});

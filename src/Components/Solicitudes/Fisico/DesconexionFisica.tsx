@@ -1,5 +1,5 @@
 import { useForm } from "@tanstack/react-form";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DesconexionMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/DesconexionMedidor";
 import { useDesconexionFisica } from "../../../Hook/Solicitudes/HookFisicas";
 import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
@@ -16,6 +16,7 @@ const normalizePhoneNumber = (phone: string): string => {
   }
   return phone;
 };
+const STORAGE_KEY = 'desconexion_fisica_temp';
 
 const FormularioDesconexionMedidor = ({ onClose }: Props) => {
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
@@ -115,7 +116,22 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
     }
     return placeholders[fieldName] || '';
   };
-
+   const saveToSessionStorage = (values: any) => {
+        try {
+            // Guardamos todo excepto los archivos
+            const dataToSave = {
+                Nombre: values.Nombre,
+                Apellido1: values.Apellido1,
+                Apellido2: values.Apellido2,
+                Tipo_Identificacion: values.Tipo_Identificacion,
+                Identificacion: values.Identificacion,
+                Direccion_Exacta: values.Direccion_Exacta,
+            };
+            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+        } catch (error) {
+            console.error('Error al guardar en sessionStorage:', error);
+        }
+    };
   const form = useForm({
     defaultValues: {
       Nombre: "",
@@ -159,6 +175,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
         });
 
         await mutation.createDesconexion(formData);
+        sessionStorage.removeItem(STORAGE_KEY);
 
         form.reset();
         setFieldErrors({});
@@ -172,6 +189,23 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
     },
   });
 
+
+    useEffect(() => {
+          const savedData = sessionStorage.getItem(STORAGE_KEY);
+          if (savedData) {
+              try {
+                  const parsed = JSON.parse(savedData);
+                  // Cargar los valores en el formulario
+                  Object.entries(parsed).forEach(([key, value]) => {
+                      if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
+                          form.setFieldValue(key as any, value as any);
+                      }
+                  });
+              } catch (error) {
+                  console.error('Error al cargar datos guardados:', error);
+              }
+          }
+      }, []);
   if (!mostrarFormulario) return null;
 
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
@@ -234,6 +268,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                       value={field.state.value}
                       onChange={(e) => {
                         handleCedulaChange(e.target.value);
+                        saveToSessionStorage({ ...form.state.values, Identificacion: e.target.value });
                       }}
                       placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion as TipoIdentificacion)}
                       disabled={!form.state.values.Tipo_Identificacion}
@@ -272,6 +307,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                   onChange={(e) => {
                     field.handleChange(e.target.value);
                     validateField("Nombre", e.target.value, form.state.values);
+                    saveToSessionStorage({ ...form.state.values, Nombre: e.target.value });
                   }}
                   placeholder={getPlaceholder("Nombre")}
                   maxLength={50}
@@ -298,6 +334,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                   onChange={(e) => {
                     field.handleChange(e.target.value);
                     validateField("Apellido1", e.target.value, form.state.values);
+                    saveToSessionStorage({ ...form.state.values, Apellido1: e.target.value });
                   }}
                   placeholder={getPlaceholder("Apellido1")}
                   maxLength={50}
@@ -324,6 +361,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                   onChange={(e) => {
                     field.handleChange(e.target.value);
                     validateField("Apellido2", e.target.value, form.state.values);
+                    saveToSessionStorage({ ...form.state.values, Apellido2: e.target.value });
                   }}
                   placeholder={getPlaceholder("Apellido2")}
                   maxLength={50}
@@ -349,6 +387,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                   onChange={(e) => {
                     field.handleChange(e.target.value);
                     validateField("Direccion_Exacta", e.target.value, form.state.values);
+                    saveToSessionStorage({ ...form.state.values, Direccion_Exacta: e.target.value });
                   }}
                   placeholder={getPlaceholder("Direccion_Exacta")}
                   maxLength={100}
@@ -375,6 +414,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                   onChange={(e) => {
                     field.handleChange(e.target.value);
                     validateField("Correo", e.target.value, form.state.values);
+                    saveToSessionStorage({ ...form.state.values, Correo: e.target.value });
                   }}
                   placeholder={getPlaceholder("Correo")}
                   maxLength={100}
@@ -400,6 +440,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                   onChange={(value) => {
                     field.handleChange(value || "");
                     validateField("Numero_Telefono", value || "", form.state.values);
+                    saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" });
                   }}
                   className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
                 />
@@ -423,6 +464,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                   onChange={(e) => {
                     field.handleChange(e.target.value);
                     validateField("Motivo_Solicitud", e.target.value, form.state.values);
+                    saveToSessionStorage({ ...form.state.values, Motivo_Solicitud: e.target.value });
                   }}
                   placeholder={getPlaceholder("Motivo_Solicitud")}
                   maxLength={250}

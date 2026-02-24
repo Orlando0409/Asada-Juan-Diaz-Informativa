@@ -18,7 +18,7 @@ const normalizePhoneNumber = (phone: string): string => {
   return phone;
 };
 
-const STORAGE_KEY = 'asociacion_fisica_temp';
+const STORAGE_KEY = 'asociado_fisica_temp';
 
 
 
@@ -91,8 +91,9 @@ const FormularioAsociado = ({ onClose }: Props) => {
         try {
             // Guardamos todo excepto los archivos
             const dataToSave = {
-                Razon_Social: values.Razon_Social,
-                Cedula_Juridica: values.Cedula_Juridica,
+                Nombre: values.Nombre,
+                Apellido1: values.Apellido1,
+                Apellido2: values.Apellido2,
                 Correo: values.Correo,
                 Numero_Telefono: values.Numero_Telefono,
                 Direccion_Exacta: values.Direccion_Exacta,
