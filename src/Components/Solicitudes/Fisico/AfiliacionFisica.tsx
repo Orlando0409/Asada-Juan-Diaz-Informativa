@@ -154,7 +154,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
       Correo: '',
       Direccion_Exacta: '',
       Numero_Telefono: '',
-      Edad: 0,
+      Edad: undefined as number | undefined,
       Planos_Terreno: undefined as File | undefined,
       Escritura_Terreno: undefined as File | undefined,
       Motivo_Solicitud: '',
@@ -475,13 +475,13 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
               <div className="mb-3 w-full">
                 <label htmlFor="Edad" className="block mb-1 font-medium">Edad <span className="text-red-500">*</span></label>
                 <input
-                  type="text"
+                  type="number"
                   inputMode="numeric"
                   min={18}
-                  value={field.state.value}
+                  value={field.state.value || ''}
                   onChange={(e) => {
                     const soloNumeros = e.target.value.replace(/[^0-9]/g, '');
-                    const edadValue = soloNumeros === '' ? 0 : Number(soloNumeros);
+                    const edadValue = soloNumeros === '' ? undefined : Number(soloNumeros);
                     field.handleChange(edadValue);
                     validateField("Edad", edadValue, form.state.values);
                     saveToSessionStorage({ ...form.state.values, Edad: edadValue });

@@ -3,7 +3,7 @@ import { z } from 'zod';
 // Tipo para TipoIdentificacion - Debe coincidir con el backend
 export const TipoIdentificacionValues = [
   'Cedula Nacional',
-  'Dimex', 
+  'Dimex',
   'Pasaporte',
 ] as const;
 export type TipoIdentificacion = typeof TipoIdentificacionValues[number];
@@ -63,7 +63,9 @@ export const AfiliacionSchema = z.object({
     .refine(val => val.trim().length > 0, 'La dirección no puede estar vacía')
     .transform(val => val.trim()),
 
-  Edad: z.coerce.number()
+  Edad: z.coerce.number({
+    invalid_type_error: 'La edad debe ser un número entero',
+  })
     .int('La edad debe ser un numero entero')
     .min(18, 'La edad mínima para realizar la solicitud es 18 años')
     .max(119, 'La edad máxima permitida es 120 años')

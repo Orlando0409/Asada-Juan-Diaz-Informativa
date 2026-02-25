@@ -68,7 +68,7 @@ export const CambioMedidorSchema = z.object({
     .transform(val => val.trim()),
 
   Numero_Medidor_Anterior: z.coerce.number({
-    invalid_type_error: 'El numero de medidor anterior debe ser un numero entero',
+    invalid_type_error: 'El numero de medidor debe ser un numero entero',
   })
     .int('El numero de medidor anterior debe ser un numero entero')
     .min(1, { message: 'El número de medidor anterior debe ser mayor a 0' })

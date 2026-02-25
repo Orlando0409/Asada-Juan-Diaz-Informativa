@@ -378,11 +378,13 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                 <input
                   type="number"
                   min={0}
-                  value={field.state.value}
+                  value={field.state.value || ''}
                   onChange={(e) => {
-                    field.handleChange(Number(e.target.value));
-                    handleFieldChange("Numero_Medidor_Anterior", Number(e.target.value));
-                    saveToSessionStorage({ ...form.state.values, Numero_Medidor_Anterior: Number(e.target.value) });
+                    const soloNumeros = e.target.value.replace(/[^0-9]/g, '');
+                    const numValue = soloNumeros === '' ? 0 : Number(soloNumeros);
+                    field.handleChange(numValue);
+                    handleFieldChange("Numero_Medidor_Anterior", numValue);
+                    saveToSessionStorage({ ...form.state.values, Numero_Medidor_Anterior: numValue });
                   }}
                   placeholder={getPlaceholder("Numero_Medidor_Anterior")}
                   className={commonClasses}
