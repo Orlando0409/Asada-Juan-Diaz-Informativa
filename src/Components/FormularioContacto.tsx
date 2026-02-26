@@ -94,20 +94,20 @@ const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps
           fieldErrors[field] = err.message
         })
         setFormErrors(fieldErrors)
-        setIsSubmitting(false) // Resetear el estado manualmente
+        setIsSubmitting(false) 
         return
       }
 
       // Si llegamos aquí, la validación pasó
       try {
          await mutation.mutateAsync({ data: value, tipo })
-         setFormKey((prev) => prev + 1) // Reinicia el formulario
+         setFormKey((prev) => prev + 1) 
          setArchivoSeleccionado(null)
-         setFormErrors({}) // Limpia errores después de envío exitoso
+         setFormErrors({}) 
       } catch (error: any) {
         console.error('Error al enviar formulario:', error)
       } finally {
-        setIsSubmitting(false) // Siempre resetear al final
+        setIsSubmitting(false) 
       }
     },
   })
@@ -159,9 +159,6 @@ const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps
                           </span>
                         )}
                       </div>
-                      <span className="text-xs text-gray-500">
-                        {(field.state.value as string)?.length || 0}/{maxLength}
-                      </span>
                     </div>
                   </div>
                 )
@@ -247,9 +244,6 @@ const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps
                         </span>
                       )}
                     </div>
-                    <span className="text-xs text-gray-500">
-                      {(field.state.value as string)?.length || 0}/{maxLength}
-                    </span>
                   </div>
                 </div>
               )

@@ -400,7 +400,7 @@
 "RequisitosContacto": {
   "requisitosReportes": {
     "Nombre": {
-      "label": "Nombre completo",
+      "label": "Nombre",
       "type": "text",
       "required": true
     },
@@ -437,7 +437,7 @@
   },
   "requisitosQuejas": {
     "Nombre": {
-      "label": "Nombre completo",
+      "label": "Nombre",
       "type": "text",
       "required": true
     },
