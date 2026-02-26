@@ -577,7 +577,7 @@
         "id": 5,
         "tipo": "PreguntasFrecuentes",
         "texto": "Preguntas Frecuentes",
-        "ruta": "/PreguntasFrecuentes"
+        "ruta": "#FAQ"
       }
     ]
   }
@@ -585,7 +585,7 @@
 "footer": {
   "contacto": {
     "telefono": "+506 1234-5678",
-    "correo": "asadajuandiaz@gmail.com"
+    "correo": "juandiazasada@gmail.com"
   },
   "horarioAtencion": "Lunes a Viernes, 7:00 AM - 5:00 PM",
   "redesSociales": {

@@ -14,6 +14,7 @@ const FormularioContacto = ({ tipo }: Props) => {
   const [formkey, setFormKey] = useState<number>(0); // Estado para forzar el reinicio del formulario
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<File | null>(null)
   const [formErrors, setFormErrors] = useState<Record<string, string>>({}) // Agrega un arreglo para manejo de errores
+  const [isSubmitting, setIsSubmitting] = useState(false) // Control manual del estado de envío
 
   const mutation = useCreateContacto()
 
@@ -22,6 +23,48 @@ const FormularioContacto = ({ tipo }: Props) => {
   const campos = requisitos[clave]
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300'
   const DynamicContactoSchema = getDynamicContactoSchema(campos);
+
+  // Función para obtener el límite de caracteres según el tipo de campo
+  const getMaxLength = (fieldName: string, fieldType: string): number => {
+    if (fieldType === 'textarea') return 50
+    if (fieldName === 'Correo') return 50
+    if (fieldName === 'Ubicacion') return 50
+    if (fieldName.includes('Nombre') || fieldName.includes('Apellido')) return 20
+    return 10 // Límite por defecto
+  }
+
+  // Función para validar un campo individual en tiempo real
+  const validateField = (fieldName: string, value: any) => {
+    try {
+      // Validar el campo específico usando safeParse en el schema completo
+      const partialData = Object.entries(campos).reduce((acc, [key]) => {
+        acc[key] = key === fieldName ? value : ''
+        return acc
+      }, {} as Record<string, any>)
+      
+      const validation = DynamicContactoSchema.safeParse(partialData)
+      
+      if (validation.success) {
+        // Si pasa la validación, limpia el error de ese campo
+        setFormErrors(prev => {
+          const newErrors = { ...prev }
+          delete newErrors[fieldName]
+          return newErrors
+        })
+      } else {
+        // Si falla la validación, establece el error para este campo
+        const fieldError = validation.error.errors.find(err => err.path[0] === fieldName)
+        if (fieldError) {
+          setFormErrors(prev => ({
+            ...prev,
+            [fieldName]: fieldError.message
+          }))
+        }
+      }
+    } catch (error: any) {
+      console.error('Validation error:', error)
+    }
+  }
 
 
 const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps]) => {
@@ -39,6 +82,7 @@ const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps
     defaultValues,
   
     onSubmit: async ({ value }) => {
+      setIsSubmitting(true)
       setFormErrors({}) // Limpia errores previos
 
       // Valida con Zod al hacer submit
@@ -50,6 +94,7 @@ const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps
           fieldErrors[field] = err.message
         })
         setFormErrors(fieldErrors)
+        setIsSubmitting(false) // Resetear el estado manualmente
         return
       }
 
@@ -58,8 +103,11 @@ const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps
          await mutation.mutateAsync({ data: value, tipo })
          setFormKey((prev) => prev + 1) // Reinicia el formulario
          setArchivoSeleccionado(null)
+         setFormErrors({}) // Limpia errores después de envío exitoso
       } catch (error: any) {
         console.error('Error al enviar formulario:', error)
+      } finally {
+        setIsSubmitting(false) // Siempre resetear al final
       }
     },
   })
@@ -72,7 +120,7 @@ const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps
           e.preventDefault() 
           form.handleSubmit()
         }}
-        className="bg-white gap-2 shadow-lg pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-md max-h-auto overflow-y-auto"
+        className="bg-white gap-2 shadow-lg pl-8 pr-8 pt-12 pb-4 rounded-lg w-[95%] max-w-md max-h-auto overflow-y-auto"
       >
         <h2 className="text-center text-xl font-semibold mb-6">
           Escribe tu {tipo}
@@ -82,6 +130,7 @@ const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps
           <form.Field key={fieldName} name={fieldName}>
             {(field) => {
               if (fieldProps.type === 'textarea') {
+                const maxLength = getMaxLength(fieldName, 'textarea')
                 return (
                   <div className="mb-4">
                     <div className='flex gap-2'>
@@ -92,16 +141,28 @@ const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps
                       id={field.name}
                       value={field.state.value as string}
                       onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
+                      onChange={(e) => {
+                        const newValue = e.target.value
+                        field.handleChange(newValue)
+                        validateField(fieldName, newValue)
+                      }}
                       placeholder={`${fieldProps.label}`}
+                      maxLength={maxLength}
                       className={`${commonClasses} h-28 resize-none`}
                     />
-                    {/* Mostrar errores de validación */}
-                    {formErrors[fieldName] && (
-                      <span className="text-red-500 text-sm">
-                        {formErrors[fieldName]}
+                    <div className="flex justify-between items-center mt-1">
+                      <div>
+                        {/* Mostrar errores de validación */}
+                        {formErrors[fieldName] && (
+                          <span className="text-red-500 text-sm">
+                            {formErrors[fieldName]}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-xs text-gray-500">
+                        {(field.state.value as string)?.length || 0}/{maxLength}
                       </span>
-                    )}
+                    </div>
                   </div>
                 )
               }
@@ -156,6 +217,7 @@ const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps
               }
 
               // Input tipo texto por defecto
+              const maxLength = getMaxLength(fieldName, fieldProps.type)
               return (
                 <div className="mb-4">
                   <div className='flex gap-2'>
@@ -167,17 +229,28 @@ const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps
                     type="text"
                     value={field.state.value as string}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => {
+                      const newValue = e.target.value
+                      field.handleChange(newValue)
+                      validateField(fieldName, newValue)
+                    }}
                     placeholder={`${fieldProps.label}`}
+                    maxLength={maxLength}
                     className={commonClasses}
                   />
-       
-                  {/* Mostrar errores de validación */}
-                  {formErrors[fieldName] && (
-                    <span className="text-red-500 text-sm">
-                      {formErrors[fieldName]}
+                  <div className="flex justify-between items-center mt-1">
+                    <div>
+                      {/* Mostrar errores de validación */}
+                      {formErrors[fieldName] && (
+                        <span className="text-red-500 text-sm">
+                          {formErrors[fieldName]}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-xs text-gray-500">
+                      {(field.state.value as string)?.length || 0}/{maxLength}
                     </span>
-                  )}
+                  </div>
                 </div>
               )
             }}
@@ -187,16 +260,16 @@ const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps
         <div className="flex justify-end items-end mt-6">
           <button
             type="submit"
-            disabled={form.state.isSubmitting} // Deshabilitar durante envío
+            disabled={isSubmitting} // Deshabilitar durante envío
             className={`
               w-[120px] py-2 rounded transition
-              ${form.state.isSubmitting 
+              ${isSubmitting 
                 ? 'bg-gray-400 cursor-not-allowed' 
                 : 'bg-blue-900 hover:bg-blue-800'
               } text-white
             `}
           >
-            {form.state.isSubmitting ? 'Enviando...' : 'Enviar'}
+            {isSubmitting ? 'Enviando...' : 'Enviar'}
           </button>
         </div>
       </form>

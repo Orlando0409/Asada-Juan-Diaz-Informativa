@@ -31,35 +31,48 @@ const Faq: React.FC = () => {
 
   if (isLoading)
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      <section
+        id="FAQ"
+        aria-label="Preguntas frecuentes"
+        className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-blue-50 to-white"
+      >
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
         <p className="text-gray-700 text-lg font-medium">
           Cargando preguntas frecuentes...
         </p>
-      </div>
+      </section>
     );
 
   if (isError)
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-red-50 to-white">
+      <section
+        id="FAQ"
+        aria-label="Preguntas frecuentes"
+        className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-red-50 to-white"
+      >
         <p className="text-red-600 text-lg font-semibold">
           Error al cargar las preguntas frecuentes. <br />
           Por favor, inténtalo de nuevo más tarde.
         </p>
-      </div>
+      </section>
     );
 
   if (!faqs?.length)
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-blue-50 to-white">
+      <section
+        id="FAQ"
+        aria-label="Preguntas frecuentes"
+        className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-blue-50 to-white"
+      >
         <p className="text-gray-600 text-lg">
           No hay preguntas frecuentes disponibles por el momento.
         </p>
-      </div>
+      </section>
     );
 
   return (
     <section
+      id="FAQ"
       aria-label="Preguntas frecuentes"
       className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-gray-50 py-12 px-4 sm:px-6 lg:px-8"
     >
