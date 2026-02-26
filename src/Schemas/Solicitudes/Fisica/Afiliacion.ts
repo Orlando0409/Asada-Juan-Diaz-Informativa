@@ -83,7 +83,47 @@ export const AfiliacionSchema = z.object({
       file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
       'La escritura del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
     ),
-});
+}).refine(
+  (data) => {
+    // Validación específica según tipo de identificación
+    const identificacion = data.Identificacion.trim();
+
+    switch (data.Tipo_Identificacion) {
+      case "Cedula Nacional":
+        // Exactamente 9 dígitos, solo números
+        return /^\d{9}$/.test(identificacion);
+      case "Dimex":
+        // Máximo 12 dígitos, solo números
+        return /^\d{1,12}$/.test(identificacion);
+      case "Pasaporte":
+        // Máximo 9 caracteres alfanuméricos (letras y números)
+        return /^[A-Z0-9]{1,9}$/i.test(identificacion);
+      default:
+        return false;
+    }
+  },
+  (data) => {
+    // Mensaje de error específico según el tipo
+    let message = 'Formato de identificación inválido';
+
+    switch (data.Tipo_Identificacion) {
+      case "Cedula Nacional":
+        message = 'La cédula debe tener exactamente 9 dígitos numéricos';
+        break;
+      case "Dimex":
+        message = 'El DIMEX debe tener entre 1 y 12 dígitos numéricos';
+        break;
+      case "Pasaporte":
+        message = 'El pasaporte debe tener entre 1 y 9 caracteres alfanuméricos';
+        break;
+    }
+
+    return {
+      message,
+      path: ["Identificacion"],
+    };
+  }
+);
 
 export type FormularioAfiliacionData = z.infer<typeof AfiliacionSchema>;
 export type Afiliacion = z.infer<typeof AfiliacionSchema>;

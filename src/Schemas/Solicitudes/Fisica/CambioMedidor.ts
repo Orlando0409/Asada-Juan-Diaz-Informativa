@@ -74,7 +74,42 @@ export const CambioMedidorSchema = z.object({
     .min(1, { message: 'El número de medidor anterior debe ser mayor a 0' })
     .max(9999999, { message: 'El número de medidor anterior no puede ser mayor a 9,999,999' })
     .positive('El número de medidor anterior debe ser positivo'),
-});
+}).refine(
+  (data) => {
+    const identificacion = data.Identificacion.trim();
+
+    switch (data.Tipo_Identificacion) {
+      case "Cedula Nacional":
+        return /^\d{9}$/.test(identificacion);
+      case "Dimex":
+        return /^\d{1,12}$/.test(identificacion);
+      case "Pasaporte":
+        return /^[A-Z0-9]{1,9}$/i.test(identificacion);
+      default:
+        return false;
+    }
+  },
+  (data) => {
+    let message = 'Formato de identificación inválido';
+
+    switch (data.Tipo_Identificacion) {
+      case "Cedula Nacional":
+        message = 'La cédula debe tener exactamente 9 dígitos numéricos';
+        break;
+      case "Dimex":
+        message = 'El DIMEX debe tener entre 1 y 12 dígitos numéricos';
+        break;
+      case "Pasaporte":
+        message = 'El pasaporte debe tener entre 1 y 9 caracteres alfanuméricos';
+        break;
+    }
+
+    return {
+      message,
+      path: ["Identificacion"],
+    };
+  }
+);
 
 export type FormularioCambioMedidorData = z.infer<typeof CambioMedidorSchema>;
 export type CambioMedidor = z.infer<typeof CambioMedidorSchema>;

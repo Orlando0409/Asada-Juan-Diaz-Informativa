@@ -80,29 +80,51 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
     }
   };
 
-  // Función para manejar el cambio de cédula con búsqueda automática
-  const handleCedulaChange = async (cedula: string) => {
-    form.setFieldValue('Identificacion', cedula);
-    validateField('Identificacion', cedula, form.state.values);
 
-    // Limpiar errores
-    setFormErrors(prev => {
-      const newErrors = { ...prev };
-      delete newErrors['Identificacion'];
-      return newErrors;
-    });
+const handleIdentificacionInput = (value: string, tipoId: string): string => {
+  switch (tipoId) {
+    case "Cedula Nacional":
+      // Solo números, máximo 9 dígitos
+      return value.replace(/[^0-9]/g, '').slice(0, 9);
+    case "Dimex":
+      // Solo números, máximo 12 dígitos
+      return value.replace(/[^0-9]/g, '').slice(0, 12);
+    case "Pasaporte":
+      // Alfanumérico, máximo 9 caracteres, convertir a mayúsculas
+      return value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 9).toUpperCase();
+    default:
+      return value;
+  }
+};
 
-    // Buscar datos solo si es cédula nacional y tiene 9 dígitos
-    if (form.state.values.Tipo_Identificacion === 'Cedula Nacional' && /^\d{9}$/.test(cedula)) {
-      const resultado = await lookup(cedula);
-      if (resultado) {
-        // Autocompletar campos con los datos de la API
-        form.setFieldValue('Nombre', resultado.firstname || '');
-        form.setFieldValue('Apellido1', resultado.lastname1 || '');
-        form.setFieldValue('Apellido2', resultado.lastname2 || '');
-      }
+// Función para cambio de Identificacion 
+const handleCedulaChange = async (cedula: string) => {
+  const tipoId = form.state.values.Tipo_Identificacion;
+  const identificacion = handleIdentificacionInput(cedula, tipoId);
+
+  form.setFieldValue('Identificacion', identificacion);
+  validateField('Identificacion', identificacion, form.state.values);
+
+  // Limpiar errores
+  setFormErrors(prev => {
+    const newErrors = { ...prev };
+    delete newErrors['Identificacion'];
+    return newErrors;
+  });
+
+  // Buscar datos solo si es cédula nacional y tiene 9 dígitos
+  if (tipoId === 'Cedula Nacional' && /^\d{9}$/.test(identificacion)) {
+    const resultado = await lookup(identificacion);
+    if (resultado) {
+      // Autocompletar campos con los datos de la API
+      form.setFieldValue('Nombre', resultado.firstname || '');
+      form.setFieldValue('Apellido1', resultado.lastname1 || '');
+      form.setFieldValue('Apellido2', resultado.lastname2 || '');
     }
-  };
+  }
+};
+
+
 
   const getPlaceholder = (fieldName: string, tipoIdentificacion?: TipoIdentificacion) => {
     const placeholders: Record<string, string> = {
@@ -288,6 +310,11 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                       placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion as TipoIdentificacion)}
                       disabled={!form.state.values.Tipo_Identificacion || loadingCedula}
                       className={`${commonClasses} ${(fieldErrors['Identificacion'] || formErrors['Identificacion']) ? 'border-red-500 focus:ring-red-300' : ''} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                      maxLength={
+                        form.state.values.Tipo_Identificacion === 'Cedula Nacional' ? 9 :
+                          form.state.values.Tipo_Identificacion === 'Dimex' ? 12 :
+                            form.state.values.Tipo_Identificacion === 'Pasaporte' ? 9 : 20
+                      }
                     />
                     {loadingCedula && (
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
