@@ -8,23 +8,25 @@ export const CambioMedidorJuridicaSchema = z.object({
   Razon_Social: z.string()
     .min(2, 'La razón social debe tener al menos 2 caracteres')
     .max(99, 'La razón social no puede tener más de 100 caracteres'),
-  
+
   Correo: z.string()
     .min(1, 'El correo electrónico es obligatorio')
     .max(99, 'El correo no puede tener más de 100 caracteres')
     .email('El correo electrónico no es válido'),
- Numero_Telefono: z.string()
+  Numero_Telefono: z.string()
     .min(8, 'El número de teléfono debe tener al menos 8 dígitos')
     .regex(/^\+?[0-9]{8,15}$/, 'El número de teléfono debe estar en formato internacional, ej. +50688887777'),
   Direccion_Exacta: z.string()
     .min(10, 'La dirección debe tener al menos 10 caracteres')
     .max(254, 'La dirección no puede tener más de 255 caracteres'),
-   
+
   Motivo_Solicitud: z.string()
     .min(10, 'El motivo de la solicitud debe tener al menos 10 caracteres')
     .max(499, 'El motivo de la solicitud no puede tener más de 500 caracteres'),
-   
-  Numero_Medidor_Anterior: z.number()
+
+  Numero_Medidor_Anterior: z.number({
+    invalid_type_error: 'El numero de medidor debe ser un numero entero',
+  })
     .min(1, 'El número de medidor anterior debe ser mayor a 0')
     .max(9999999, 'El número de medidor anterior no puede ser mayor a 9,999,999'),
 });

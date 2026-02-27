@@ -6,7 +6,7 @@ const CalidadDeAgua = () => {
 
   return (
     <section className='bg-white text-gray-800 p-6 sm:p-10 md:-16 flex flex-col gap-12'>
-      <div className="max-w-4xl mx-auto text-center">
+      <div className="pt-12 max-w-4xl mx-auto text-center">
         <h1 className='font-bold text-2xl sm:text-3xl md:text-4xl text-blue-900 mb-4'>Calidad de Agua</h1>
         <blockquote className='border-l-4 border-blue-400 pl-4 sm:pl-6'>
           <p className='text-base sm:text-lg md:text-xl leading-relaxed'>            <span className='font-semibold text-blue-700'>

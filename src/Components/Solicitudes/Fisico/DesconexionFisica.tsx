@@ -28,23 +28,6 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
   const [mostrarFormulario, setMostrarFormulario] = useState(true);
   const { lookup, isLoading } = useCedulaLookup();
 
-  // Función para manejar el cambio de cédula con búsqueda automática
-  const handleCedulaChange = async (cedula: string) => {
-    form.setFieldValue('Identificacion', cedula);
-    validateField('Identificacion', cedula, form.state.values);
-
-    // Buscar datos solo si es cédula nacional y tiene 9 dígitos
-    if (form.state.values.Tipo_Identificacion === 'Cedula Nacional' && /^\d{9}$/.test(cedula)) {
-      const resultado = await lookup(cedula);
-      if (resultado) {
-        // Autocompletar campos con los datos de la API
-        form.setFieldValue('Nombre', resultado.firstname || '');
-        form.setFieldValue('Apellido1', resultado.lastname1 || '');
-        form.setFieldValue('Apellido2', resultado.lastname2 || '');
-      }
-    }
-  };
-
   // Validación en tiempo real usando el schema
   const validateField = (fieldName: string, value: any, allValues?: any) => {
     try {
@@ -96,6 +79,43 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
     }
   };
 
+  const handleIdentificacionInput = (value: string, tipoId: string): string => {
+    switch (tipoId) {
+      case "Cedula Nacional":
+        return value.replace(/[^0-9]/g, '').slice(0, 9);
+      case "Dimex":
+        return value.replace(/[^0-9]/g, '').slice(0, 12);
+      case "Pasaporte":
+        return value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 9).toUpperCase();
+      default:
+        return value;
+    }
+  };
+
+  const handleCedulaChange = async (cedula: string) => {
+    const tipoId = form.state.values.Tipo_Identificacion;
+    const identificacion = handleIdentificacionInput(cedula, tipoId);
+
+    form.setFieldValue('Identificacion', identificacion);
+    validateField('Identificacion', identificacion, form.state.values);
+
+    setFormErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors['Identificacion'];
+      return newErrors;
+    });
+
+    if (tipoId === 'Cedula Nacional' && /^\d{9}$/.test(identificacion)) {
+      const resultado = await lookup(identificacion);
+      if (resultado) {
+        form.setFieldValue('Nombre', resultado.firstname || '');
+        form.setFieldValue('Apellido1', resultado.lastname1 || '');
+        form.setFieldValue('Apellido2', resultado.lastname2 || '');
+      }
+    }
+  };
+
+
   const getPlaceholder = (fieldName: string, tipoIdentificacion?: TipoIdentificacion) => {
     const placeholders: Record<string, string> = {
       Nombre: 'Juan Carlos',
@@ -116,22 +136,22 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
     }
     return placeholders[fieldName] || '';
   };
-   const saveToSessionStorage = (values: any) => {
-        try {
-            // Guardamos todo excepto los archivos
-            const dataToSave = {
-                Nombre: values.Nombre,
-                Apellido1: values.Apellido1,
-                Apellido2: values.Apellido2,
-                Tipo_Identificacion: values.Tipo_Identificacion,
-                Identificacion: values.Identificacion,
-                Direccion_Exacta: values.Direccion_Exacta,
-            };
-            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
-        } catch (error) {
-            console.error('Error al guardar en sessionStorage:', error);
-        }
-    };
+  const saveToSessionStorage = (values: any) => {
+    try {
+      // Guardamos todo excepto los archivos
+      const dataToSave = {
+        Nombre: values.Nombre,
+        Apellido1: values.Apellido1,
+        Apellido2: values.Apellido2,
+        Tipo_Identificacion: values.Tipo_Identificacion,
+        Identificacion: values.Identificacion,
+        Direccion_Exacta: values.Direccion_Exacta,
+      };
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+    } catch (error) {
+      console.error('Error al guardar en sessionStorage:', error);
+    }
+  };
   const form = useForm({
     defaultValues: {
       Nombre: "",
@@ -184,28 +204,28 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
         onClose();
       } catch (error: any) {
         console.log("ERROR EN SOLICITUD DE DESCONEXIÓN:", error);
-      
+
       }
     },
   });
 
 
-    useEffect(() => {
-          const savedData = sessionStorage.getItem(STORAGE_KEY);
-          if (savedData) {
-              try {
-                  const parsed = JSON.parse(savedData);
-                  // Cargar los valores en el formulario
-                  Object.entries(parsed).forEach(([key, value]) => {
-                      if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
-                          form.setFieldValue(key as any, value as any);
-                      }
-                  });
-              } catch (error) {
-                  console.error('Error al cargar datos guardados:', error);
-              }
+  useEffect(() => {
+    const savedData = sessionStorage.getItem(STORAGE_KEY);
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
+        // Cargar los valores en el formulario
+        Object.entries(parsed).forEach(([key, value]) => {
+          if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
+            form.setFieldValue(key as any, value as any);
           }
-      }, []);
+        });
+      } catch (error) {
+        console.error('Error al cargar datos guardados:', error);
+      }
+    }
+  }, []);
   if (!mostrarFormulario) return null;
 
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
@@ -217,7 +237,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
           e.preventDefault();
           form.handleSubmit();
         }}
-         className="bg-white shadow-lg  pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
+        className="bg-white shadow-lg  pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
       >
         <h2 className="text-center text-2xl font-semibold mb-10">Formulario de desconexión de medidor</h2>
 
@@ -273,6 +293,11 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                       placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion as TipoIdentificacion)}
                       disabled={!form.state.values.Tipo_Identificacion}
                       className={`${commonClasses} ${fieldErrors['Identificacion'] ? 'border-red-500 focus:ring-red-300' : ''} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                      maxLength={
+                        form.state.values.Tipo_Identificacion === 'Cedula Nacional' ? 9 :
+                          form.state.values.Tipo_Identificacion === 'Dimex' ? 12 :
+                            form.state.values.Tipo_Identificacion === 'Pasaporte' ? 9 : 20
+                      }
                     />
                     {isLoading && (
                       <div className="absolute right-3 top-1/2 -translate-y-1/2">

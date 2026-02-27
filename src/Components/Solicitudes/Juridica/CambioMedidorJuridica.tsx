@@ -114,7 +114,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                 }
 
                 await mutation.createCambioMedidor(value);
-     sessionStorage.removeItem(STORAGE_KEY);
+                sessionStorage.removeItem(STORAGE_KEY);
 
                 form.reset();
                 setFieldErrors({});
@@ -126,7 +126,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
         },
     });
 
-   useEffect(() => {
+    useEffect(() => {
         const savedData = sessionStorage.getItem(STORAGE_KEY);
         if (savedData) {
             try {
@@ -170,7 +170,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                     onChange={(e) => {
                                         field.handleChange(e.target.value);
                                         handleFieldChange("Razon_Social", e.target.value);
-                                          saveToSessionStorage({ ...form.state.values, Razon_Social: e.target.value });
+                                        saveToSessionStorage({ ...form.state.values, Razon_Social: e.target.value });
                                     }}
                                     placeholder={getPlaceholder("Razon_Social")}
                                     maxLength={50}
@@ -320,9 +320,11 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                     min={0}
                                     value={field.state.value}
                                     onChange={(e) => {
-                                        field.handleChange(Number(e.target.value));
-                                        handleFieldChange("Numero_Medidor_Anterior", Number(e.target.value));
-                                        saveToSessionStorage({ ...form.state.values, Numero_Medidor_Anterior: Number(e.target.value) });
+                                        const soloNumeros = e.target.value.replace(/[^0-9]/g, '');
+                                        const numValue = soloNumeros === '' ? 0 : Number(soloNumeros);
+                                        field.handleChange(numValue);
+                                        handleFieldChange("Numero_Medidor_Anterior", numValue);
+                                        saveToSessionStorage({ ...form.state.values, Numero_Medidor_Anterior: numValue });
                                     }}
                                     placeholder={getPlaceholder("Numero_Medidor_Anterior")}
                                     className={commonClasses}
