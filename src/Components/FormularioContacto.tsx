@@ -1,6 +1,6 @@
 import { useForm } from '@tanstack/react-form'
 import data from '../data/Data.json'
-import {type ContactoTipo,getRequisitosKey,type RequisitosContacto} from '../types/ContactoForms'
+import { type ContactoTipo, getRequisitosKey, type RequisitosContacto } from '../types/ContactoForms'
 import { useState } from 'react'
 import { useCreateContacto } from '../Hook/Contacto/ContactoForms'
 import { getDynamicContactoSchema } from '../Schemas/ContactoData';
@@ -67,20 +67,20 @@ const FormularioContacto = ({ tipo }: Props) => {
   }
 
 
-const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps]) => {
-  if (fieldProps.type === 'file') {
-    acc[fieldName] = undefined;
-  } else {
-    acc[fieldName] = '';
-  }
-  return acc;
-}, {} as Record<string, any>);
+  const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps]) => {
+    if (fieldProps.type === 'file') {
+      acc[fieldName] = undefined;
+    } else {
+      acc[fieldName] = '';
+    }
+    return acc;
+  }, {} as Record<string, any>);
 
 
 
   const form = useForm({
     defaultValues,
-  
+
     onSubmit: async ({ value }) => {
       setIsSubmitting(true)
       setFormErrors({}) // Limpia errores previos
@@ -113,11 +113,11 @@ const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps
   })
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 text-gray-800 p-7">
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 text-gray-800 p-7 pt-20">
       <form
         key={formkey}
         onSubmit={(e) => {
-          e.preventDefault() 
+          e.preventDefault()
           form.handleSubmit()
         }}
         className="bg-white gap-2 shadow-lg pl-8 pr-8 pt-12 pb-4 rounded-lg w-[95%] max-w-md max-h-auto overflow-y-auto"

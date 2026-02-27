@@ -3,7 +3,7 @@ import { z } from 'zod';
 // Tipo para TipoIdentificacion - Debe coincidir con el backend
 export const TipoIdentificacionValues = [
   'Cedula Nacional',
-  'Dimex', 
+  'Dimex',
   'Pasaporte',
 ] as const;
 export type TipoIdentificacion = typeof TipoIdentificacionValues[number];
@@ -63,7 +63,9 @@ export const AfiliacionSchema = z.object({
     .refine(val => val.trim().length > 0, 'La dirección no puede estar vacía')
     .transform(val => val.trim()),
 
-  Edad: z.coerce.number()
+  Edad: z.coerce.number({
+    invalid_type_error: 'La edad debe ser un número entero',
+  })
     .int('La edad debe ser un numero entero')
     .min(18, 'La edad mínima para realizar la solicitud es 18 años')
     .max(119, 'La edad máxima permitida es 120 años')
@@ -81,7 +83,47 @@ export const AfiliacionSchema = z.object({
       file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
       'La escritura del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
     ),
-});
+}).refine(
+  (data) => {
+    // Validación específica según tipo de identificación
+    const identificacion = data.Identificacion.trim();
+
+    switch (data.Tipo_Identificacion) {
+      case "Cedula Nacional":
+        // Exactamente 9 dígitos, solo números
+        return /^\d{9}$/.test(identificacion);
+      case "Dimex":
+        // Máximo 12 dígitos, solo números
+        return /^\d{1,12}$/.test(identificacion);
+      case "Pasaporte":
+        // Máximo 9 caracteres alfanuméricos (letras y números)
+        return /^[A-Z0-9]{1,9}$/i.test(identificacion);
+      default:
+        return false;
+    }
+  },
+  (data) => {
+    // Mensaje de error específico según el tipo
+    let message = 'Formato de identificación inválido';
+
+    switch (data.Tipo_Identificacion) {
+      case "Cedula Nacional":
+        message = 'La cédula debe tener exactamente 9 dígitos numéricos';
+        break;
+      case "Dimex":
+        message = 'El DIMEX debe tener entre 1 y 12 dígitos numéricos';
+        break;
+      case "Pasaporte":
+        message = 'El pasaporte debe tener entre 1 y 9 caracteres alfanuméricos';
+        break;
+    }
+
+    return {
+      message,
+      path: ["Identificacion"],
+    };
+  }
+);
 
 export type FormularioAfiliacionData = z.infer<typeof AfiliacionSchema>;
 export type Afiliacion = z.infer<typeof AfiliacionSchema>;

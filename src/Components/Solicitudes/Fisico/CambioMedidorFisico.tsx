@@ -1,6 +1,5 @@
 import { useForm } from "@tanstack/react-form";
 import { useEffect, useState } from "react";
-import { z } from "zod";
 import { CambioMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/CambioMedidor";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { useCambioMedidorFisica } from "../../../Hook/Solicitudes/HookFisicas";
@@ -20,8 +19,6 @@ const normalizePhoneNumber = (phone: string): string => {
   return phoneNumber.format('E.164');
 };
 
-// Extrae los esquemas individuales de Zod
-const fieldSchemas: Record<string, z.ZodTypeAny> = CambioMedidorSchema.shape;
 const STORAGE_KEY = 'cambiomedidor_fisico_temp';
 
 const FormularioCambioMedidor = ({ onClose }: Props) => {
@@ -31,43 +28,86 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
   const [mostrarFormulario, setMostrarFormulario] = useState(true);
   const { lookup, isLoading } = useCedulaLookup();
 
-  // Función para manejar el cambio de cédula con búsqueda automática
-  const handleCedulaChange = async (cedula: string) => {
-    form.setFieldValue('Identificacion', cedula);
-    handleFieldChange('Identificacion', cedula);
+  // Validación en tiempo real usando el schema
+  const validateField = (fieldName: string, value: any, allValues?: any) => {
+    try {
+      const dummy: any = {
+        Nombre: "Test",
+        Apellido1: "Test",
+        Apellido2: "",
+        Tipo_Identificacion: "Cedula Nacional",
+        Identificacion: "123456789",
+        Direccion_Exacta: "1234567890",
+        Numero_Telefono: "+50688887777",
+        Correo: "test@test.com",
+        Motivo_Solicitud: "1234567890",
+        Numero_Medidor_Anterior: 1,
+      };
 
-    // Buscar datos solo si es cédula nacional y tiene 9 dígitos
-    if (form.state.values.Tipo_Identificacion === 'Cedula Nacional' && /^\d{9}$/.test(cedula)) {
-      const resultado = await lookup(cedula);
-      if (resultado) {
-        // Autocompletar campos con los datos de la API
-        form.setFieldValue('Nombre', resultado.firstname || '');
-        form.setFieldValue('Apellido1', resultado.lastname1 || '');
-        form.setFieldValue('Apellido2', resultado.lastname2 || '');
+      if (fieldName === "Identificacion" && allValues?.Tipo_Identificacion) {
+        dummy.Tipo_Identificacion = allValues.Tipo_Identificacion;
+        dummy.Identificacion = value;
+      } else if (fieldName === "Tipo_Identificacion" && allValues?.Identificacion) {
+        dummy.Tipo_Identificacion = value;
+        dummy.Identificacion = allValues.Identificacion;
+      } else {
+        dummy[fieldName] = value;
       }
+
+      CambioMedidorSchema.parse(dummy);
+
+      setFieldErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[fieldName];
+        return newErrors;
+      });
+    } catch (error: any) {
+      let errorMessage = '';
+      if (error.errors && Array.isArray(error.errors)) {
+        const fieldError = error.errors.find((err: any) => err.path.includes(fieldName));
+        errorMessage = fieldError?.message || error.errors[0]?.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      setFieldErrors(prev => ({
+        ...prev,
+        [fieldName]: errorMessage,
+      }));
     }
   };
 
-  // Validación en tiempo real SOLO del campo editado
-  const handleFieldChange = (fieldName: string, value: any) => {
-    if (fieldSchemas[fieldName]) {
-      try {
-        fieldSchemas[fieldName].parse(value);
-        setFieldErrors(prev => {
-          const newErrors = { ...prev };
-          delete newErrors[fieldName];
-          return newErrors;
-        });
-      } catch (error: any) {
-        let errorMessage = '';
-        if (error.errors && Array.isArray(error.errors)) {
-          errorMessage = error.errors[0]?.message || 'Error de validación';
-        } else if (error.message) {
-          errorMessage = error.message;
-        } else {
-          errorMessage = 'Error de validación';
-        }
-        setFieldErrors(prev => ({ ...prev, [fieldName]: errorMessage }));
+  const handleIdentificacionInput = (value: string, tipoId: string): string => {
+    switch (tipoId) {
+      case "Cedula Nacional":
+        return value.replace(/[^0-9]/g, '').slice(0, 9);
+      case "Dimex":
+        return value.replace(/[^0-9]/g, '').slice(0, 12);
+      case "Pasaporte":
+        return value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 9).toUpperCase();
+      default:
+        return value;
+    }
+  };
+
+  const handleCedulaChange = async (cedula: string) => {
+    const tipoId = form.state.values.Tipo_Identificacion;
+    const identificacion = handleIdentificacionInput(cedula, tipoId);
+
+    form.setFieldValue('Identificacion', identificacion);
+    validateField('Identificacion', identificacion, form.state.values);
+
+    setFormErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors['Identificacion'];
+      return newErrors;
+    });
+
+    if (tipoId === 'Cedula Nacional' && /^\d{9}$/.test(identificacion)) {
+      const resultado = await lookup(identificacion);
+      if (resultado) {
+        form.setFieldValue('Nombre', resultado.firstname || '');
+        form.setFieldValue('Apellido1', resultado.lastname1 || '');
+        form.setFieldValue('Apellido2', resultado.lastname2 || '');
       }
     }
   };
@@ -192,7 +232,6 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(e) => {
                     field.handleChange(e.target.value as TipoIdentificacion);
-                    handleFieldChange('Tipo_Identificacion', e.target.value as TipoIdentificacion);
                     form.setFieldValue('Identificacion', '');
                     setFieldErrors(prev => { const newErrors = { ...prev }; delete newErrors['Identificacion']; return newErrors; });
                   }}
@@ -223,6 +262,11 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                     placeholder={getPlaceholder("Identificacion", form.state.values.Tipo_Identificacion)}
                     disabled={!form.state.values.Tipo_Identificacion}
                     className={`${commonClasses} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                    maxLength={
+                      form.state.values.Tipo_Identificacion === 'Cedula Nacional' ? 9 :
+                        form.state.values.Tipo_Identificacion === 'Dimex' ? 12 :
+                          form.state.values.Tipo_Identificacion === 'Pasaporte' ? 9 : 20
+                    }
                   />
                   {isLoading && (
                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -246,7 +290,6 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(e) => {
                     field.handleChange(e.target.value);
-                    handleFieldChange("Nombre", e.target.value);
                     saveToSessionStorage({ ...form.state.values, Nombre: e.target.value });
                   }}
                   placeholder={getPlaceholder("Nombre")}
@@ -268,7 +311,6 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(e) => {
                     field.handleChange(e.target.value);
-                    handleFieldChange("Apellido1", e.target.value);
                     saveToSessionStorage({ ...form.state.values, Apellido1: e.target.value });
                   }}
                   placeholder={getPlaceholder("Apellido1")}
@@ -292,7 +334,6 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(e) => {
                     field.handleChange(e.target.value);
-                    handleFieldChange("Apellido2", e.target.value);
                     saveToSessionStorage({ ...form.state.values, Apellido2: e.target.value });
                   }}
                   placeholder={getPlaceholder("Apellido2")}
@@ -313,7 +354,6 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(e) => {
                     field.handleChange(e.target.value);
-                    handleFieldChange("Direccion_Exacta", e.target.value);
                     saveToSessionStorage({ ...form.state.values, Direccion_Exacta: e.target.value });
                   }}
                   placeholder={getPlaceholder("Direccion_Exacta")}
@@ -337,7 +377,6 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(e) => {
                     field.handleChange(e.target.value);
-                    handleFieldChange("Correo", e.target.value);
                     saveToSessionStorage({ ...form.state.values, Correo: e.target.value });
                   }}
                   placeholder={getPlaceholder("Correo")}
@@ -358,7 +397,6 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(value) => {
                     field.handleChange(value || "");
-                    handleFieldChange("Numero_Telefono", value || "");
                     saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" });
                   }}
                   className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
@@ -378,11 +416,12 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                 <input
                   type="number"
                   min={0}
-                  value={field.state.value}
+                  value={field.state.value || ''}
                   onChange={(e) => {
-                    field.handleChange(Number(e.target.value));
-                    handleFieldChange("Numero_Medidor_Anterior", Number(e.target.value));
-                    saveToSessionStorage({ ...form.state.values, Numero_Medidor_Anterior: Number(e.target.value) });
+                    const soloNumeros = e.target.value.replace(/[^0-9]/g, '');
+                    const numValue = soloNumeros === '' ? 0 : Number(soloNumeros);
+                    field.handleChange(numValue);
+                    saveToSessionStorage({ ...form.state.values, Numero_Medidor_Anterior: numValue });
                   }}
                   placeholder={getPlaceholder("Numero_Medidor_Anterior")}
                   className={commonClasses}
@@ -404,7 +443,6 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(e) => {
                     field.handleChange(e.target.value);
-                    handleFieldChange("Motivo_Solicitud", e.target.value);
                     saveToSessionStorage({ ...form.state.values, Motivo_Solicitud: e.target.value });
                   }}
                   placeholder="Escribe el motivo de tu solicitud"
