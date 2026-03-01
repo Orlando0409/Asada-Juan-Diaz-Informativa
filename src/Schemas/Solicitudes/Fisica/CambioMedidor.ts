@@ -67,13 +67,13 @@ export const CambioMedidorSchema = z.object({
     .refine(val => val.trim().length > 0, 'El motivo de la solicitud no puede estar vacío')
     .transform(val => val.trim()),
 
-  Numero_Medidor_Anterior: z.coerce.number({
-    invalid_type_error: 'El numero de medidor debe ser un numero entero',
+  Id_Medidor: z.coerce.number({
+    invalid_type_error: 'El Id del medidor debe ser un número entero',
   })
-    .int('El numero de medidor anterior debe ser un numero entero')
-    .min(1, { message: 'El número de medidor anterior debe ser mayor a 0' })
-    .max(9999999, { message: 'El número de medidor anterior no puede ser mayor a 9,999,999' })
-    .positive('El número de medidor anterior debe ser positivo'),
+    .int('El Id del medidor debe ser un número entero')
+    .min(1, { message: 'El Id del medidor debe ser mayor a 0' })
+    .max(9999999, { message: 'El Id del medidor no puede ser mayor a 9,999,999' })
+    .positive('El Id del medidor debe ser positivo'),
 }).refine(
   (data) => {
     const identificacion = data.Identificacion.trim();
