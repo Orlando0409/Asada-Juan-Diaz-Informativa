@@ -1,6 +1,6 @@
 import { useForm } from '@tanstack/react-form'
 import data from '../data/Data.json'
-import {type ContactoTipo,getRequisitosKey,type RequisitosContacto} from '../types/ContactoForms'
+import { type ContactoTipo, getRequisitosKey, type RequisitosContacto } from '../types/ContactoForms'
 import { useState } from 'react'
 import { useCreateContacto } from '../Hook/Contacto/ContactoForms'
 import { getDynamicContactoSchema } from '../Schemas/ContactoData';
@@ -24,20 +24,20 @@ const FormularioContacto = ({ tipo }: Props) => {
   const DynamicContactoSchema = getDynamicContactoSchema(campos);
 
 
-const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps]) => {
-  if (fieldProps.type === 'file') {
-    acc[fieldName] = undefined;
-  } else {
-    acc[fieldName] = '';
-  }
-  return acc;
-}, {} as Record<string, any>);
+  const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps]) => {
+    if (fieldProps.type === 'file') {
+      acc[fieldName] = undefined;
+    } else {
+      acc[fieldName] = '';
+    }
+    return acc;
+  }, {} as Record<string, any>);
 
 
 
   const form = useForm({
     defaultValues,
-  
+
     onSubmit: async ({ value }) => {
       setFormErrors({}) // Limpia errores previos
 
@@ -55,9 +55,9 @@ const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps
 
       // Si llegamos aquí, la validación pasó
       try {
-         await mutation.mutateAsync({ data: value, tipo })
-         setFormKey((prev) => prev + 1) // Reinicia el formulario
-         setArchivoSeleccionado(null)
+        await mutation.mutateAsync({ data: value, tipo })
+        setFormKey((prev) => prev + 1) // Reinicia el formulario
+        setArchivoSeleccionado(null)
       } catch (error: any) {
         console.error('Error al enviar formulario:', error)
       }
@@ -65,11 +65,11 @@ const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps
   })
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 text-gray-800 p-7">
+    <div className="flex justify-center items-center min-h-screen bg-gray-100 text-gray-800 p-7 pt-20">
       <form
         key={formkey}
         onSubmit={(e) => {
-          e.preventDefault() 
+          e.preventDefault()
           form.handleSubmit()
         }}
         className="bg-white gap-2 shadow-lg pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-md max-h-auto overflow-y-auto"
@@ -171,7 +171,7 @@ const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps
                     placeholder={`${fieldProps.label}`}
                     className={commonClasses}
                   />
-       
+
                   {/* Mostrar errores de validación */}
                   {formErrors[fieldName] && (
                     <span className="text-red-500 text-sm">
@@ -190,8 +190,8 @@ const defaultValues = Object.entries(campos).reduce((acc, [fieldName, fieldProps
             disabled={form.state.isSubmitting} // Deshabilitar durante envío
             className={`
               w-[120px] py-2 rounded transition
-              ${form.state.isSubmitting 
-                ? 'bg-gray-400 cursor-not-allowed' 
+              ${form.state.isSubmitting
+                ? 'bg-gray-400 cursor-not-allowed'
                 : 'bg-blue-900 hover:bg-blue-800'
               } text-white
             `}
