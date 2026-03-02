@@ -78,7 +78,7 @@ export const useAsociadoJuridica = () => {
 
     const createAsociadoJuridicoMutation = useMutation({
         mutationFn: (data: AsociadoJuridico) => createAsociadoJuridica(data),
-        
+
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["asociado"] });
             showSuccess("¡Solicitud creada!", "La solicitud de asociado ha sido creada con éxito.");
@@ -109,8 +109,6 @@ export const useMedidoresJuridica = (cedulaJuridica: string) => {
             responseData?.Medidores ? (Array.isArray(responseData.Medidores) ? responseData.Medidores : [responseData.Medidores]) :
                 responseData?.data ? (Array.isArray(responseData.data) ? responseData.data : [responseData.data]) :
                     [];
-
-    console.log('useMedidoresJuridica - cedulaJuridica:', cedulaJuridica, 'responseData:', responseData, 'medidores:', medidores, 'error:', error);
 
     return {
         medidores: medidores as Medidor[],

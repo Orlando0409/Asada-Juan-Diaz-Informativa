@@ -1,9 +1,11 @@
 import { useForm } from "@tanstack/react-form";
 import { useEffect, useRef, useState } from "react";
 import data from "../../../data/Data.json";
+import { z } from "zod";
 import { DesconexionJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/DesconexionMedidorJuridica";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
-import { useDesconexionJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
+import { useDesconexionJuridica, useMedidoresJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
+import { Loader2 } from "lucide-react";
 import PhoneInputComponent from "../PhoneInputComponent";
 
 type Props = {
@@ -29,6 +31,8 @@ function formatCedulaJuridica(value: string) {
     return formatted;
 }
 
+const fieldSchemas: Record<string, z.ZodTypeAny> = DesconexionJuridicaSchema.shape;
+
 const DesconexionMedidorJuridica = ({ onClose }: Props) => {
     const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -38,44 +42,30 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
     const escrituraInputRef = useRef<HTMLInputElement>(null);
 
     const [mostrarFormulario, setMostrarFormulario] = useState(true);
+    const [cedulaJuridica, setCedulaJuridica] = useState('');
+    const { medidores, isLoading: isMedidoresLoading } = useMedidoresJuridica(cedulaJuridica);
 
-    // Validación en tiempo real usando el schema
-    const validateField = (fieldName: string, value: any) => {
-        try {
-            // Crea un objeto dummy con valores válidos para todos los campos
-            const dummy: any = {
-                Razon_Social: "Empresa S.A.",
-                Cedula_Juridica: "3-123-123456",
-                Direccion_Exacta: "San José, Costa Rica",
-                Correo: "empresa@email.com",
-                Numero_Telefono: "+50688887777",
-                Motivo_Solicitud: "Motivo válido",
-                Planos_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
-                Escritura_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
-            };
-            dummy[fieldName] = value;
-
-            DesconexionJuridicaSchema.parse(dummy);
-
-            setFieldErrors(prev => {
-                const newErrors = { ...prev };
-                delete newErrors[fieldName];
-                return newErrors;
-            });
-        } catch (error: any) {
-            let errorMessage = '';
-            if (error.errors && Array.isArray(error.errors)) {
-                const fieldError = error.errors.find((err: any) => err.path.includes(fieldName));
-                errorMessage = fieldError?.message || error.errors[0]?.message || 'Error de validación';
-            } else if (error.message) {
-                errorMessage = error.message;
-            } else {
-                errorMessage = 'Error de validación';
+    // Validación en tiempo real SOLO del campo editado
+    const handleFieldChange = (fieldName: string, value: any) => {
+        if (fieldSchemas[fieldName]) {
+            try {
+                fieldSchemas[fieldName].parse(value);
+                setFieldErrors(prev => {
+                    const newErrors = { ...prev };
+                    delete newErrors[fieldName];
+                    return newErrors;
+                });
+            } catch (error: any) {
+                let errorMessage = '';
+                if (error.errors && Array.isArray(error.errors)) {
+                    errorMessage = error.errors[0]?.message || 'Error de validación';
+                } else if (error.message) {
+                    errorMessage = error.message;
+                } else {
+                    errorMessage = 'Error de validación';
+                }
+                setFieldErrors(prev => ({ ...prev, [fieldName]: errorMessage }));
             }
-            setFieldErrors(prev => ({
-                ...prev,
-                [fieldName]: errorMessage,
-            }));
         }
     };
 
@@ -103,6 +93,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
             Correo: '',
             Numero_Telefono: '',
             Motivo_Solicitud: '',
+            Id_Medidor: 0,
             Planos_Terreno: undefined as File | undefined,
             Escritura_Terreno: undefined as File | undefined,
         },
@@ -173,6 +164,10 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                 Object.entries(parsed).forEach(([key, value]) => {
                     if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
                         form.setFieldValue(key as any, value as any);
+                        // Si es la cédula jurídica, también actualizar el estado
+                        if (key === 'Cedula_Juridica' && typeof value === 'string') {
+                            setCedulaJuridica(value.replace(/-/g, ''));
+                        }
                     }
                 });
             } catch (error) {
@@ -180,6 +175,11 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
             }
         }
     }, []);
+
+    // Debug: Monitor cambios en cedulaJuridica
+    useEffect(() => {
+        console.log('🔍 Estado cedulaJuridica actualizado:', cedulaJuridica, 'Longitud:', cedulaJuridica.length);
+    }, [cedulaJuridica]);
 
     return (
         <div className="flex justify-center items-center min-h-screen text-gray-800 p-7 w-full">
@@ -193,39 +193,106 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                 <h2 className="text-center text-2xl font-semibold mb-10">Formulario de desconexión de medidor - Jurídica</h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                    {/* Campos dinámicos */}
-                    {Object.entries(campos).map(([fieldName, fieldProps]) => (
-                        <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
-                            {(field) => {
-                                // Teléfono internacional
-                                if (fieldName === "Numero_Telefono") {
-                                    return (
-                                        <div className="mb-3 w-full">
-                                            <label className="block mb-1 font-medium">
-                                                {fieldLabels[fieldName]}
-                                                {fieldProps.required && <span className="text-red-500">*</span>}
-                                            </label>
-                                            <PhoneInputComponent
-                                                value={typeof field.state.value === "string" ? field.state.value : ""}
-                                                onChange={(value) => {
-                                                    field.handleChange(value || "");
-                                                    validateField(fieldName, value || "");
-                                                    saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" });
-                                                }}
-                                                className={`${fieldErrors[fieldName] ? 'border-red-500' : ''}`}
-                                            />
-                                            {fieldErrors[fieldName] && (
-                                                <span className="text-red-500 text-sm block mt-1">{fieldErrors[fieldName]}</span>
-                                            )}
-                                            {formErrors[fieldName] && !fieldErrors[fieldName] && (
-                                                <span className="text-red-500 text-sm block mt-1">{formErrors[fieldName]}</span>
-                                            )}
-                                        </div>
-                                    );
-                                }
+                    {/* Campos dinámicos - Primero los campos normales (sin archivos) */}
+                    {Object.entries(campos)
+                        .filter(([fieldName]) => fieldName !== "Planos_Terreno" && fieldName !== "Escritura_Terreno")
+                        .map(([fieldName, fieldProps]) => (
+                            <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
+                                {(field) => {
+                                    // Teléfono internacional
+                                    if (fieldName === "Numero_Telefono") {
+                                        return (
+                                            <div className="mb-3 w-full">
+                                                <label className="block mb-1 font-medium">
+                                                    {fieldLabels[fieldName]}
+                                                    {fieldProps.required && <span className="text-red-500">*</span>}
+                                                </label>
+                                                <PhoneInputComponent
+                                                    value={typeof field.state.value === "string" ? field.state.value : ""}
+                                                    onChange={(value) => {
+                                                        field.handleChange(value || "");
+                                                        handleFieldChange(fieldName, value || "");
+                                                        saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" });
+                                                    }}
+                                                    className={`${fieldErrors[fieldName] ? 'border-red-500' : ''}`}
+                                                />
+                                                {fieldErrors[fieldName] && (
+                                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors[fieldName]}</span>
+                                                )}
+                                                {formErrors[fieldName] && !fieldErrors[fieldName] && (
+                                                    <span className="text-red-500 text-sm block mt-1">{formErrors[fieldName]}</span>
+                                                )}
+                                            </div>
+                                        );
+                                    }
 
-                                // Cédula Jurídica con guiones
-                                if (fieldName === "Cedula_Juridica") {
+                                    // Cédula Jurídica con guiones
+                                    if (fieldName === "Cedula_Juridica") {
+                                        return (
+                                            <div className="mb-3 w-full">
+                                                <label className="block mb-1 font-medium">
+                                                    {fieldLabels[fieldName]}
+                                                    {fieldProps.required && <span className="text-red-500">*</span>}
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={typeof field.state.value === "string" ? field.state.value : ""}
+                                                    onChange={(e) => {
+                                                        const formatted = formatCedulaJuridica(e.target.value);
+                                                        const cedula = formatted.replace(/-/g, '');
+                                                        console.log('📝 Cédula formateada:', formatted, 'Sin guiones:', cedula);
+
+                                                        field.handleChange(formatted);
+                                                        handleFieldChange(fieldName, formatted);
+                                                        setCedulaJuridica(cedula);
+                                                        form.setFieldValue('Id_Medidor', 0);
+                                                        saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted });
+                                                    }}
+                                                    placeholder="3-XXX-XXXXXX"
+                                                    className={commonClasses}
+                                                    maxLength={12}
+                                                />
+                                                {fieldErrors[fieldName] && (
+                                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors[fieldName]}</span>
+                                                )}
+                                                {formErrors[fieldName] && !fieldErrors[fieldName] && (
+                                                    <span className="text-red-500 text-sm block mt-1">{formErrors[fieldName]}</span>
+                                                )}
+                                            </div>
+                                        );
+                                    }
+
+                                    // Motivo de Solicitud (textarea)
+                                    if (fieldName === "Motivo_Solicitud" || fieldName === "Direccion_Exacta") {
+                                        return (
+                                            <div className="mb-3 w-full">
+                                                <label className="block mb-1 font-medium">
+                                                    {fieldLabels[fieldName]}
+                                                    {fieldProps.required && <span className="text-red-500">*</span>}
+                                                </label>
+                                                <textarea
+                                                    value={field.state.value as string}
+                                                    onChange={(e) => {
+                                                        field.handleChange(e.target.value);
+                                                        handleFieldChange(fieldName, e.target.value);
+                                                        saveToSessionStorage({ ...form.state.values, Motivo_Solicitud: e.target.value });
+                                                    }}
+                                                    placeholder={fieldLabels[fieldName]}
+                                                    maxLength={250}
+                                                    className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
+                                                    style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                                                />
+                                                {fieldErrors[fieldName] && (
+                                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors[fieldName]}</span>
+                                                )}
+                                                {formErrors[fieldName] && !fieldErrors[fieldName] && (
+                                                    <span className="text-red-500 text-sm block mt-1">{formErrors[fieldName]}</span>
+                                                )}
+                                            </div>
+                                        );
+                                    }
+
+                                    // Otros campos
                                     return (
                                         <div className="mb-3 w-full">
                                             <label className="block mb-1 font-medium">
@@ -233,17 +300,14 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                                                 {fieldProps.required && <span className="text-red-500">*</span>}
                                             </label>
                                             <input
-                                                type="text"
-                                                value={typeof field.state.value === "string" ? field.state.value : ""}
+                                                type={fieldName === "Correo" ? "email" : "text"}
+                                                value={(field.state.value as string | number) ?? ""}
                                                 onChange={(e) => {
-                                                    const formatted = formatCedulaJuridica(e.target.value);
-                                                    field.handleChange(formatted);
-                                                    validateField(fieldName, formatted);
-                                                    saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted });
+                                                    field.handleChange(e.target.value);
+                                                    handleFieldChange(fieldName, e.target.value);
                                                 }}
-                                                placeholder="3-XXX-XXXXXX"
+                                                placeholder={fieldLabels[fieldName]}
                                                 className={commonClasses}
-                                                maxLength={12}
                                             />
                                             {fieldErrors[fieldName] && (
                                                 <span className="text-red-500 text-sm block mt-1">{fieldErrors[fieldName]}</span>
@@ -253,10 +317,63 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                                             )}
                                         </div>
                                     );
-                                }
+                                }}
+                            </form.Field>
+                        ))}
 
-                                // Archivos
-                                if (fieldName === "Planos_Terreno" || fieldName === "Escritura_Terreno") {
+                    {/* Campo Id_Medidor */}
+                    <form.Field name="Id_Medidor">
+                        {(field) => (
+                            <div className="mb-3 w-full">
+                                <label className="block mb-1 font-medium">
+                                    Medidor <span className="text-red-500">*</span>
+                                </label>
+                                <div className="relative">
+                                    <select
+                                        value={typeof field.state.value === "number" ? field.state.value || "" : ""}
+                                        onChange={(e) => {
+                                            const value = e.target.value ? Number(e.target.value) : 0;
+                                            field.handleChange(value);
+                                            handleFieldChange("Id_Medidor", value);
+                                        }}
+                                        disabled={!cedulaJuridica || isMedidoresLoading}
+                                        className={`${commonClasses} ${fieldErrors["Id_Medidor"] ? 'border-red-500 focus:ring-red-300' : ''} ${!cedulaJuridica ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                                    >
+                                        <option value="">Selecciona un medidor</option>
+                                        {medidores && medidores.length > 0 ? (
+                                            medidores.map((medidor) => (
+                                                <option key={medidor.Id_Medidor} value={medidor.Id_Medidor || ""}>
+                                                    {medidor.Numero_Medidor} {medidor.Estado ? `(${medidor.Estado})` : ""}
+                                                </option>
+                                            ))
+                                        ) : (
+                                            !isMedidoresLoading && cedulaJuridica && (
+                                                <option disabled>No se encontraron medidores</option>
+                                            )
+                                        )}
+                                    </select>
+                                    {isMedidoresLoading && (
+                                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                            <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+                                        </div>
+                                    )}
+                                </div>
+                                {fieldErrors["Id_Medidor"] && (
+                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Id_Medidor"]}</span>
+                                )}
+                                {formErrors["Id_Medidor"] && !fieldErrors["Id_Medidor"] && (
+                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Id_Medidor"]}</span>
+                                )}
+                            </div>
+                        )}
+                    </form.Field>
+
+                    {/* Campos de archivos*/}
+                    {Object.entries(campos)
+                        .filter(([fieldName]) => fieldName === "Planos_Terreno" || fieldName === "Escritura_Terreno")
+                        .map(([fieldName, fieldProps]) => (
+                            <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
+                                {(field) => {
                                     const archivoActual = archivoSeleccionado[fieldName] ?? null;
                                     return (
                                         <div className="mb-3 w-full">
@@ -272,7 +389,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                                                     const file = e.target.files?.[0] ?? undefined;
                                                     field.handleChange(file);
                                                     setArchivoSeleccionado(prev => ({ ...prev, [fieldName]: file ?? null }));
-                                                    validateField(fieldName, file);
+                                                    handleFieldChange(fieldName, file);
                                                 }}
                                                 className="hidden"
                                                 id={fieldName}
@@ -318,66 +435,9 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                                             )}
                                         </div>
                                     );
-                                }
-
-                                // Motivo de Solicitud (textarea)
-                                if (fieldName === "Motivo_Solicitud" || fieldName === "Direccion_Exacta") {
-                                    return (
-                                        <div className="mb-3 w-full">
-                                            <label className="block mb-1 font-medium">
-                                                {fieldLabels[fieldName]}
-                                                {fieldProps.required && <span className="text-red-500">*</span>}
-                                            </label>
-                                            <textarea
-                                                value={field.state.value as string}
-                                                onChange={(e) => {
-                                                    field.handleChange(e.target.value);
-                                                    validateField(fieldName, e.target.value);
-                                                    saveToSessionStorage({ ...form.state.values, Motivo_Solicitud: e.target.value });
-                                                }}
-                                                placeholder={fieldLabels[fieldName]}
-                                                maxLength={250}
-                                                className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
-                                                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-                                            />
-                                            {fieldErrors[fieldName] && (
-                                                <span className="text-red-500 text-sm block mt-1">{fieldErrors[fieldName]}</span>
-                                            )}
-                                            {formErrors[fieldName] && !fieldErrors[fieldName] && (
-                                                <span className="text-red-500 text-sm block mt-1">{formErrors[fieldName]}</span>
-                                            )}
-                                        </div>
-                                    );
-                                }
-
-                                // Otros campos
-                                return (
-                                    <div className="mb-3 w-full">
-                                        <label className="block mb-1 font-medium">
-                                            {fieldLabels[fieldName]}
-                                            {fieldProps.required && <span className="text-red-500">*</span>}
-                                        </label>
-                                        <input
-                                            type={fieldName === "Correo" ? "email" : "text"}
-                                            value={(field.state.value as string | number) ?? ""}
-                                            onChange={(e) => {
-                                                field.handleChange(e.target.value);
-                                                validateField(fieldName, e.target.value);
-                                            }}
-                                            placeholder={fieldLabels[fieldName]}
-                                            className={commonClasses}
-                                        />
-                                        {fieldErrors[fieldName] && (
-                                            <span className="text-red-500 text-sm block mt-1">{fieldErrors[fieldName]}</span>
-                                        )}
-                                        {formErrors[fieldName] && !fieldErrors[fieldName] && (
-                                            <span className="text-red-500 text-sm block mt-1">{formErrors[fieldName]}</span>
-                                        )}
-                                    </div>
-                                );
-                            }}
-                        </form.Field>
-                    ))}
+                                }}
+                            </form.Field>
+                        ))}
                 </div>
 
                 <div className="flex justify-end items-end gap-4 mt-8">

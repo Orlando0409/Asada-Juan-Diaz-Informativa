@@ -108,8 +108,6 @@ export const useMedidores = (identificacion: string) => {
                 responseData?.data ? (Array.isArray(responseData.data) ? responseData.data : [responseData.data]) :
                     [];
 
-    console.log('useMedidores - identificacion:', identificacion, 'responseData:', responseData, 'medidores:', medidores, 'error:', error);
-
     return {
         medidores: medidores as Medidor[],
         isLoading,
