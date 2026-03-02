@@ -2,6 +2,7 @@ import { useForm } from "@tanstack/react-form";
 import { useEffect, useRef, useState } from "react";
 import { AfiliacionJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/AfiliacionJuridica";
 import { useAfiliacionJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
+import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import PhoneInputComponent from "../PhoneInputComponent";
 
 type Props = {
@@ -26,6 +27,7 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
     const mutation = useAfiliacionJuridica();
     const planosInputRef = useRef<HTMLInputElement>(null);
     const escrituraInputRef = useRef<HTMLInputElement>(null);
+    const { lookupJuridica, isLoading: loadingCedula } = useCedulaLookup();
 
     const [mostrarFormulario, setMostrarFormulario] = useState(true);
 
@@ -203,20 +205,37 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                                 <label className="block mb-1 font-semibold text-gray-700">
                                     Cédula Jurídica <span className="text-red-500">*</span>
                                 </label>
-                                <input
-                                    type="text"
-                                    value={field.state.value}
-                                    onChange={(e) => {
-                                        const formatted = formatCedulaJuridica(e.target.value);
-                                        field.handleChange(formatted);
-                                        validateField("Cedula_Juridica", formatted);
-                                        saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted }); // ← NUEVO
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        value={field.state.value}
+                                        onChange={async (e) => {
+                                            const formatted = formatCedulaJuridica(e.target.value);
+                                            field.handleChange(formatted);
+                                            validateField("Cedula_Juridica", formatted);
+                                            saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted });
 
-                                    }}
-                                    placeholder="3-XXX-XXXXXX"
-                                    className={commonClasses}
-                                    maxLength={12}
-                                />
+                                            // Buscar razón social si tiene 10 dígitos (formato: X-XXX-XXXXXX)
+                                            const digits = formatted.replaceAll(/\D/g, "");
+                                            if (digits.length === 10) {
+                                                const razonSocial = await lookupJuridica(formatted);
+                                                if (razonSocial) {
+                                                    form.setFieldValue('Razon_Social', razonSocial);
+                                                    saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted, Razon_Social: razonSocial });
+                                                }
+                                            }
+                                        }}
+                                        placeholder="3-XXX-XXXXXX"
+                                        className={commonClasses}
+                                        maxLength={12}
+                                        disabled={loadingCedula}
+                                    />
+                                    {loadingCedula && (
+                                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                            <div className="animate-spin h-5 w-5 border-2 border-blue-600 border-t-transparent rounded-full"></div>
+                                        </div>
+                                    )}
+                                </div>
                                 {fieldErrors["Cedula_Juridica"] && (
                                     <span className="text-red-500 text-sm block mt-1">{fieldErrors["Cedula_Juridica"]}</span>
                                 )}
