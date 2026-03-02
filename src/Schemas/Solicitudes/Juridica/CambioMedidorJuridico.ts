@@ -24,11 +24,12 @@ export const CambioMedidorJuridicaSchema = z.object({
     .min(10, 'El motivo de la solicitud debe tener al menos 10 caracteres')
     .max(499, 'El motivo de la solicitud no puede tener más de 500 caracteres'),
 
-  Numero_Medidor_Anterior: z.number({
-    invalid_type_error: 'El numero de medidor debe ser un numero entero',
+  Id_Medidor: z.coerce.number({
+    invalid_type_error: 'El Id del medidor debe ser un número entero',
   })
-    .min(1, 'El número de medidor anterior debe ser mayor a 0')
-    .max(9999999, 'El número de medidor anterior no puede ser mayor a 9,999,999'),
-});
+    .int('El Id del medidor debe ser un número entero')
+    .min(1, { message: 'El Id del medidor debe ser mayor a 0' })
+    .max(9999999, { message: 'El Id del medidor no puede ser mayor a 9,999,999' })
+    .positive('El Id del medidor debe ser positivo'),});
 
 export type CambioMedidorJuridica = z.infer<typeof CambioMedidorJuridicaSchema>;
