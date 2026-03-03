@@ -1,7 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import { useEffect, useRef, useState } from "react";
 import { DesconexionMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/DesconexionMedidor";
-import { useDesconexionFisica } from "../../../Hook/Solicitudes/HookFisicas";
+import { useDesconexionFisica, useMedidores } from "../../../Hook/Solicitudes/HookFisicas";
 import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import { Loader2 } from "lucide-react";
 import PhoneInputComponent from "../PhoneInputComponent";
@@ -22,11 +22,13 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [identificacion, setIdentificacion] = useState('');
   const mutation = useDesconexionFisica();
   const planosInputRef = useRef<HTMLInputElement>(null);
   const escrituraInputRef = useRef<HTMLInputElement>(null);
   const [mostrarFormulario, setMostrarFormulario] = useState(true);
   const { lookup, isLoading } = useCedulaLookup();
+  const { medidores, isLoading: isMedidoresLoading } = useMedidores(identificacion);
 
   // Validación en tiempo real usando el schema
   const validateField = (fieldName: string, value: any, allValues?: any) => {
@@ -41,6 +43,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
         Numero_Telefono: "+50688887777",
         Correo: "test@test.com",
         Motivo_Solicitud: "Motivo válido",
+        Id_Medidor: 1,
         Planos_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
         Escritura_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
       };
@@ -94,10 +97,11 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
 
   const handleCedulaChange = async (cedula: string) => {
     const tipoId = form.state.values.Tipo_Identificacion;
-    const identificacion = handleIdentificacionInput(cedula, tipoId);
+    const identificacionProcesada = handleIdentificacionInput(cedula, tipoId);
 
-    form.setFieldValue('Identificacion', identificacion);
-    validateField('Identificacion', identificacion, form.state.values);
+    form.setFieldValue('Identificacion', identificacionProcesada);
+    setIdentificacion(identificacionProcesada);
+    validateField('Identificacion', identificacionProcesada, form.state.values);
 
     setFormErrors(prev => {
       const newErrors = { ...prev };
@@ -105,8 +109,8 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
       return newErrors;
     });
 
-    if (tipoId === 'Cedula Nacional' && /^\d{9}$/.test(identificacion)) {
-      const resultado = await lookup(identificacion);
+    if (tipoId === 'Cedula Nacional' && /^\d{9}$/.test(identificacionProcesada)) {
+      const resultado = await lookup(identificacionProcesada);
       if (resultado) {
         form.setFieldValue('Nombre', resultado.firstname || '');
         form.setFieldValue('Apellido1', resultado.lastname1 || '');
@@ -163,6 +167,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
       Numero_Telefono: "",
       Correo: "",
       Motivo_Solicitud: "",
+      Id_Medidor: undefined as number | undefined,
       Planos_Terreno: undefined as File | undefined,
       Escritura_Terreno: undefined as File | undefined,
     },
@@ -203,8 +208,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
         setMostrarFormulario(false);
         onClose();
       } catch (error: any) {
-        console.log("ERROR EN SOLICITUD DE DESCONEXIÓN:", error);
-
+        // Error handling
       }
     },
   });
@@ -320,6 +324,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
               )}
             </form.Field>
           </div>
+
 
           {/* Nombre */}
           <form.Field name="Nombre">
@@ -479,6 +484,61 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
               </div>
             )}
           </form.Field>
+
+
+          {/* Id del Medidor */}
+          <div className="mb-3">
+            <form.Field name="Id_Medidor">
+              {(field) => (
+                <div>
+                  <label htmlFor="Id_Medidor" className="block mb-1 font-medium">
+                    Medidor <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <select
+                      value={field.state.value || ""}
+                      onChange={(e) => {
+                        const value = e.target.value ? Number(e.target.value) : undefined;
+                        field.handleChange(value);
+                        validateField("Id_Medidor", value, { ...form.state.values, Id_Medidor: value });
+                      }}
+                      disabled={!form.state.values.Identificacion || isMedidoresLoading}
+                      className={`${commonClasses} ${fieldErrors['Id_Medidor'] ? 'border-red-500 focus:ring-red-300' : ''} ${!form.state.values.Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                    >
+                      <option value="">Selecciona un medidor</option>
+                      {medidores && medidores.length > 0 ? (
+                        medidores.map((medidor) => (
+                          <option key={medidor.Id_Medidor} value={medidor.Id_Medidor || ""}>
+                            {medidor.Numero_Medidor} {medidor.Estado ? `(${medidor.Estado})` : ""}
+                          </option>
+                        ))
+                      ) : (
+                        !isMedidoresLoading && form.state.values.Identificacion && (
+                          <option disabled>No se encontraron medidores</option>
+                        )
+                      )}
+                    </select>
+                    {isMedidoresLoading && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+                      </div>
+                    )}
+                  </div>
+                  {fieldErrors['Id_Medidor'] && (
+                    <span className="text-red-500 text-sm block mt-1">
+                      {fieldErrors['Id_Medidor']}
+                    </span>
+                  )}
+                  {formErrors['Id_Medidor'] && !fieldErrors['Id_Medidor'] && (
+                    <span className="text-red-500 text-sm block mt-1">
+                      {formErrors['Id_Medidor']}
+                    </span>
+                  )}
+                </div>
+              )}
+            </form.Field>
+          </div>
+
           {/* Motivo de Solicitud */}
           <form.Field name="Motivo_Solicitud">
             {(field) => (

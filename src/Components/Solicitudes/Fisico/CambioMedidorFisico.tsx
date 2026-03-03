@@ -2,7 +2,7 @@ import { useForm } from "@tanstack/react-form";
 import { useEffect, useState } from "react";
 import { CambioMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/CambioMedidor";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
-import { useCambioMedidorFisica } from "../../../Hook/Solicitudes/HookFisicas";
+import { useCambioMedidorFisica, useMedidores } from "../../../Hook/Solicitudes/HookFisicas";
 import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import { Loader2 } from "lucide-react";
 import PhoneInputComponent from "../PhoneInputComponent";
@@ -27,8 +27,10 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
   const mutation = useCambioMedidorFisica();
   const [mostrarFormulario, setMostrarFormulario] = useState(true);
   const { lookup, isLoading } = useCedulaLookup();
+  const [identificacion, setIdentificacion] = useState('');
+  const { medidores, isLoading: isMedidoresLoading } = useMedidores(identificacion);
 
-  // Validación en tiempo real usando el schema
+
   const validateField = (fieldName: string, value: any, allValues?: any) => {
     try {
       const dummy: any = {
@@ -41,7 +43,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
         Numero_Telefono: "+50688887777",
         Correo: "test@test.com",
         Motivo_Solicitud: "1234567890",
-        Numero_Medidor_Anterior: 1,
+        Id_Medidor: 1,
       };
 
       if (fieldName === "Identificacion" && allValues?.Tipo_Identificacion) {
@@ -91,10 +93,11 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
 
   const handleCedulaChange = async (cedula: string) => {
     const tipoId = form.state.values.Tipo_Identificacion;
-    const identificacion = handleIdentificacionInput(cedula, tipoId);
+    const identificacionProcesada = handleIdentificacionInput(cedula, tipoId);
 
-    form.setFieldValue('Identificacion', identificacion);
-    validateField('Identificacion', identificacion, form.state.values);
+    form.setFieldValue('Identificacion', identificacionProcesada);
+    setIdentificacion(identificacionProcesada);
+    validateField('Identificacion', identificacionProcesada, form.state.values);
 
     setFormErrors(prev => {
       const newErrors = { ...prev };
@@ -102,8 +105,8 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
       return newErrors;
     });
 
-    if (tipoId === 'Cedula Nacional' && /^\d{9}$/.test(identificacion)) {
-      const resultado = await lookup(identificacion);
+    if (tipoId === 'Cedula Nacional' && /^\d{9}$/.test(identificacionProcesada)) {
+      const resultado = await lookup(identificacionProcesada);
       if (resultado) {
         form.setFieldValue('Nombre', resultado.firstname || '');
         form.setFieldValue('Apellido1', resultado.lastname1 || '');
@@ -121,7 +124,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
       Numero_Telefono: '+50688887777',
       Direccion_Exacta: 'San José, del Banco Nacional 200m sur',
       Motivo_Solicitud: 'Cambio por daño',
-      Numero_Medidor_Anterior: '1234567',
+      Id_Medidor: '1',
     };
     if (fieldName === 'Identificacion') {
       switch (tipoIdentificacion) {
@@ -161,7 +164,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
       Numero_Telefono: '',
       Correo: '',
       Motivo_Solicitud: '',
-      Numero_Medidor_Anterior: 0,
+      Id_Medidor: 0,
     },
     onSubmit: async ({ value }) => {
       setFormErrors({});
@@ -177,6 +180,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
           setFormErrors(validationErrors);
           return;
         }
+        console.log('Payload enviado:', value);
         await mutation.createCambioMedidor(value);
         sessionStorage.removeItem(STORAGE_KEY);
 
@@ -185,7 +189,12 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
         setMostrarFormulario(false);
         onClose();
       } catch (error: any) {
-        console.log('Error al enviar formulario de cambio de medidor:', error);
+        console.error('Error al enviar formulario de cambio de medidor:', {
+          status: error?.response?.status,
+          data: error?.response?.data,
+          message: error?.message,
+        });
+        throw error;
       }
     },
   });
@@ -233,6 +242,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   onChange={(e) => {
                     field.handleChange(e.target.value as TipoIdentificacion);
                     form.setFieldValue('Identificacion', '');
+                    setIdentificacion('');
                     setFieldErrors(prev => { const newErrors = { ...prev }; delete newErrors['Identificacion']; return newErrors; });
                   }}
                   className={commonClasses}
@@ -409,28 +419,53 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
           </form.Field>
 
           {/* Número de Medidor y Motivo */}
-          <form.Field name="Numero_Medidor_Anterior">
-            {(field) => (
-              <div className="mb-3 w-full">
-                <label htmlFor="Numero_Medidor_Anterior" className="block mb-1 font-medium">Número de Medidor <span className="text-red-500">*</span></label>
-                <input
-                  type="number"
-                  min={0}
-                  value={field.state.value || ''}
-                  onChange={(e) => {
-                    const soloNumeros = e.target.value.replace(/[^0-9]/g, '');
-                    const numValue = soloNumeros === '' ? 0 : Number(soloNumeros);
-                    field.handleChange(numValue);
-                    saveToSessionStorage({ ...form.state.values, Numero_Medidor_Anterior: numValue });
-                  }}
-                  placeholder={getPlaceholder("Numero_Medidor_Anterior")}
-                  className={commonClasses}
-                />
-                {fieldErrors["Numero_Medidor_Anterior"] && (
-                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Medidor_Anterior"]}</span>
-                )}
-              </div>
-            )}
+          <form.Field name="Id_Medidor">
+            {(field) => {
+              return (
+                <div className="mb-3 w-full">
+                  <label htmlFor="Id_Medidor" className="block mb-1 font-medium">Número de Medidor <span className="text-red-500">*</span></label>
+
+                  <div className="relative">
+                    <select
+                      id="Id_Medidor"
+                      value={field.state.value || ''}
+                      onChange={(e) => {
+                        const idMedidor = Number(e.target.value);
+                        field.handleChange(idMedidor);
+                      }}
+                      onBlur={field.handleBlur}
+                      className={commonClasses}
+                      disabled={!identificacion || isMedidoresLoading}
+                    >
+                      <option value="">Seleccione un medidor</option>
+                      {medidores.map((med) => (
+                        <option key={med.Id_Medidor} value={med.Id_Medidor}>
+                          Medidor #{med.Numero_Medidor} {med.Estado ? `(${med.Estado})` : ''}
+                        </option>
+                      ))}
+                    </select>
+
+                    {isMedidoresLoading && (
+                      <div className="absolute right-10 top-1/2 -translate-y-1/2">
+                        <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+                      </div>
+                    )}
+                  </div>
+
+                  {fieldErrors["Id_Medidor"] && (
+                    <span className="text-red-500 text-sm block mt-1">
+                      {fieldErrors["Id_Medidor"]}
+                    </span>
+                  )}
+
+                  {medidores.length === 0 && identificacion && !isMedidoresLoading && (
+                    <span className="text-red-500 text-sm block mt-1">
+                      No se encontraron medidores para esta identificación
+                    </span>
+                  )}
+                </div>
+              );
+            }}
           </form.Field>
 
           {/* Motivo de Solicitud */}

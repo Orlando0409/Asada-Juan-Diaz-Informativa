@@ -21,3 +21,8 @@ export async function createAsociadoJuridica(data: AsociadoJuridico) {
     const response = await apiAuth.post("/solicitudes-juridicas/create/asociado", data);
     return response.data;
 }
+
+export async function getMedidoresByIdentificacionJuridica(cedulaJuridica: string) {
+    const response = await apiAuth.get(`/afiliados/juridico/medidores/${cedulaJuridica}`);
+    return response.data;
+}

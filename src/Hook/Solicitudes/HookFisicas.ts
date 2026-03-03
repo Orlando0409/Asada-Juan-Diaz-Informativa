@@ -1,7 +1,8 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createAfiliacionFisica, createAsociadoFisica, createCambioMedidorFisica, createDesconexionFisica } from "../../Services/Solicitudes/SolicitudesFisicas";
-import type { CambioMedidorFisico } from "../../models/Forms/Solicitudes/Fisico/CambioMedidor";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createAfiliacionFisica, createAsociadoFisica, createCambioMedidorFisica, createDesconexionFisica, getMedidoresByIdentificacion } from "../../Services/Solicitudes/SolicitudesFisicas";
+import type { CambioMedidorFisico, MedidoresResponse } from "../../models/Forms/Solicitudes/Fisico/CambioMedidor";
 import type { AsociadoFisico } from "../../Schemas/Solicitudes/Fisica/Asociado";
+import type { Medidor } from "../../models/Medidor";
 import { useAlerts } from "../../context/AlertContext";
 
 export const useAfiliacionFisica = () => {
@@ -91,3 +92,25 @@ export const useAsociadoFisica = () => {
         createAsociado: createAsociadoFisicoMutation.mutateAsync,
     }
 }
+
+export const useMedidores = (identificacion: string) => {
+    const { data: responseData, isLoading, error } = useQuery<MedidoresResponse>({
+        queryKey: ["medidores", identificacion],
+        queryFn: (): Promise<MedidoresResponse> => getMedidoresByIdentificacion(identificacion) as Promise<MedidoresResponse>,
+        enabled: !!identificacion && identificacion.length >= 9,
+        staleTime: 5 * 60 * 1000,
+    });
+
+    // Asegurar que siempre retornemos un array
+    const medidores = Array.isArray(responseData) ? responseData :
+        responseData?.medidores ? (Array.isArray(responseData.medidores) ? responseData.medidores : [responseData.medidores]) :
+            responseData?.Medidores ? (Array.isArray(responseData.Medidores) ? responseData.Medidores : [responseData.Medidores]) :
+                responseData?.data ? (Array.isArray(responseData.data) ? responseData.data : [responseData.data]) :
+                    [];
+
+    return {
+        medidores: medidores as Medidor[],
+        isLoading,
+        error,
+    };
+};

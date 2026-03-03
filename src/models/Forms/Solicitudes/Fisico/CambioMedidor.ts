@@ -1,4 +1,14 @@
+import type { Medidor } from "../../../Medidor";
+
 export type TipoIdentificacion = 'Cedula Nacional' | 'Dimex' | 'Pasaporte';
+
+export interface MedidoresResponse {
+  Nombre?: string;
+  Identificación?: string;
+  Medidores?: Medidor[];
+  medidores?: Medidor[];
+  data?: Medidor[];
+}
 
 export interface CambioMedidor {
   Tipo_Identificacion: TipoIdentificacion;
@@ -10,7 +20,7 @@ export interface CambioMedidor {
   Numero_Telefono: string;
   Direccion_Exacta: string;
   Motivo_Solicitud: string;
-  Numero_Medidor_Anterior: number;
+  Id_Medidor: number;
 }
 
 export const CambioMedidorInicialState: CambioMedidorFisico = {
@@ -23,7 +33,7 @@ export const CambioMedidorInicialState: CambioMedidorFisico = {
   Direccion_Exacta: "",
   Numero_Telefono: "",
   Motivo_Solicitud: "",
-  Numero_Medidor_Anterior: 0,
+  Id_Medidor: 0,
 };
 
 export interface CambioMedidorFisico {
@@ -36,5 +46,5 @@ export interface CambioMedidorFisico {
   Direccion_Exacta: string;
   Numero_Telefono: string;
   Motivo_Solicitud: string;
-  Numero_Medidor_Anterior: number;
+  Id_Medidor: number;
 }
