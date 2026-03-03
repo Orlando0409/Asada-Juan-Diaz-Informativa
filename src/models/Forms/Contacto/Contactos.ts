@@ -17,3 +17,9 @@ export interface SugerenciaFormFields {
     Mensaje: string
     Adjunto: File
 }
+
+
+
+
+
+//HOLAAAAAAAAAAAAAAA
