@@ -1,7 +1,9 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createAfiliacionJuridica, createAsociadoJuridica, createCambioMedidorJuridica, createDesconexionJuridica } from "../../Services/Solicitudes/SolicitudesJuridicas";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createAfiliacionJuridica, createAsociadoJuridica, createCambioMedidorJuridica, createDesconexionJuridica, getMedidoresByIdentificacionJuridica } from "../../Services/Solicitudes/SolicitudesJuridicas";
 import type { CambioMedidorJuridica } from "../../Schemas/Solicitudes/Juridica/CambioMedidorJuridico";
 import type { AsociadoJuridico } from "../../models/Forms/Solicitudes/Juridica/AsociadoJuridica";
+import type { Medidor } from "../../models/Medidor";
+import type { MedidoresResponse } from "../../models/Forms/Solicitudes/Fisico/CambioMedidor";
 import { useAlerts } from "../../context/AlertContext";
 
 export const useAfiliacionJuridica = () => {
@@ -76,7 +78,7 @@ export const useAsociadoJuridica = () => {
 
     const createAsociadoJuridicoMutation = useMutation({
         mutationFn: (data: AsociadoJuridico) => createAsociadoJuridica(data),
-        
+
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["asociado"] });
             showSuccess("¡Solicitud creada!", "La solicitud de asociado ha sido creada con éxito.");
@@ -92,3 +94,25 @@ export const useAsociadoJuridica = () => {
         createAsociado: createAsociadoJuridicoMutation.mutateAsync,
     }
 }
+
+export const useMedidoresJuridica = (cedulaJuridica: string) => {
+    const { data: responseData, isLoading, error } = useQuery<MedidoresResponse>({
+        queryKey: ["medidores-juridica", cedulaJuridica],
+        queryFn: (): Promise<MedidoresResponse> => getMedidoresByIdentificacionJuridica(cedulaJuridica) as Promise<MedidoresResponse>,
+        enabled: !!cedulaJuridica && cedulaJuridica.length >= 9,
+        staleTime: 5 * 60 * 1000,
+    });
+
+    // Asegurar que siempre retornemos un array
+    const medidores = Array.isArray(responseData) ? responseData :
+        responseData?.medidores ? (Array.isArray(responseData.medidores) ? responseData.medidores : [responseData.medidores]) :
+            responseData?.Medidores ? (Array.isArray(responseData.Medidores) ? responseData.Medidores : [responseData.Medidores]) :
+                responseData?.data ? (Array.isArray(responseData.data) ? responseData.data : [responseData.data]) :
+                    [];
+
+    return {
+        medidores: medidores as Medidor[],
+        isLoading,
+        error,
+    };
+};

@@ -76,6 +76,12 @@ export const DesconexionMedidorSchema = z.object({
       file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
       'La escritura del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
     ),
+
+  Id_Medidor: z.number()
+    .min(1, 'El Id del medidor no puede estar vacío')
+    .gt(0, 'El Id del medidor debe ser mayor a 0')
+    .positive('El Id del medidor debe ser positivo')
+    .int('El Id del medidor debe ser un número entero'),
 }).refine(
   (data) => {
     const identificacion = data.Identificacion.trim();
