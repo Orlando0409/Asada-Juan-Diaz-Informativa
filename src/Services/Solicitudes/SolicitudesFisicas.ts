@@ -21,3 +21,8 @@ export async function createAsociadoFisica(data: AsociadoFisico) {
   const response = await apiAuth.post("/solicitudes-fisicas/create/asociado", data);
   return response.data;
 }
+
+export async function getMedidoresByIdentificacion(identificacion: string) {
+  const response = await apiAuth.get(`/afiliados/fisico/medidores/${identificacion}`);
+  return response.data;
+}

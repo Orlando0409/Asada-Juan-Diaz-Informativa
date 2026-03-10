@@ -10,7 +10,6 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
-import { Route as PreguntasFrecuentesRouteImport } from './routes/PreguntasFrecuentes'
 import { Route as ConsultaRouteImport } from './routes/Consulta'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SolicitudesDesconexionMedidorRouteImport } from './routes/(Solicitudes)/DesconexionMedidor'
@@ -26,11 +25,6 @@ import { Route as AboutUsCalidadAguaRouteImport } from './routes/(AboutUs)/Calid
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PreguntasFrecuentesRoute = PreguntasFrecuentesRouteImport.update({
-  id: '/PreguntasFrecuentes',
-  path: '/PreguntasFrecuentes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ConsultaRoute = ConsultaRouteImport.update({
@@ -94,7 +88,6 @@ const AboutUsCalidadAguaRoute = AboutUsCalidadAguaRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/Consulta': typeof ConsultaRoute
-  '/PreguntasFrecuentes': typeof PreguntasFrecuentesRoute
   '/auth': typeof AuthRoute
   '/CalidadAgua': typeof AboutUsCalidadAguaRoute
   '/Historia': typeof AboutUsHistoriaRoute
@@ -109,7 +102,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/Consulta': typeof ConsultaRoute
-  '/PreguntasFrecuentes': typeof PreguntasFrecuentesRoute
   '/auth': typeof AuthRoute
   '/CalidadAgua': typeof AboutUsCalidadAguaRoute
   '/Historia': typeof AboutUsHistoriaRoute
@@ -125,7 +117,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/Consulta': typeof ConsultaRoute
-  '/PreguntasFrecuentes': typeof PreguntasFrecuentesRoute
   '/auth': typeof AuthRoute
   '/(AboutUs)/CalidadAgua': typeof AboutUsCalidadAguaRoute
   '/(AboutUs)/Historia': typeof AboutUsHistoriaRoute
@@ -142,7 +133,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/Consulta'
-    | '/PreguntasFrecuentes'
     | '/auth'
     | '/CalidadAgua'
     | '/Historia'
@@ -157,7 +147,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/Consulta'
-    | '/PreguntasFrecuentes'
     | '/auth'
     | '/CalidadAgua'
     | '/Historia'
@@ -172,7 +161,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/Consulta'
-    | '/PreguntasFrecuentes'
     | '/auth'
     | '/(AboutUs)/CalidadAgua'
     | '/(AboutUs)/Historia'
@@ -188,7 +176,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConsultaRoute: typeof ConsultaRoute
-  PreguntasFrecuentesRoute: typeof PreguntasFrecuentesRoute
   AuthRoute: typeof AuthRoute
   AboutUsCalidadAguaRoute: typeof AboutUsCalidadAguaRoute
   AboutUsHistoriaRoute: typeof AboutUsHistoriaRoute
@@ -208,13 +195,6 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/PreguntasFrecuentes': {
-      id: '/PreguntasFrecuentes'
-      path: '/PreguntasFrecuentes'
-      fullPath: '/PreguntasFrecuentes'
-      preLoaderRoute: typeof PreguntasFrecuentesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/Consulta': {
@@ -300,7 +280,6 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConsultaRoute: ConsultaRoute,
-  PreguntasFrecuentesRoute: PreguntasFrecuentesRoute,
   AuthRoute: AuthRoute,
   AboutUsCalidadAguaRoute: AboutUsCalidadAguaRoute,
   AboutUsHistoriaRoute: AboutUsHistoriaRoute,

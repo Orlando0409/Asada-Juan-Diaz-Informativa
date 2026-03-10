@@ -9,14 +9,6 @@ export const TipoIdentificacionValues = [
 ] as const;
 export type TipoIdentificacion = typeof TipoIdentificacionValues[number];
 
-// Patrones y mensajes de error para identificación
-const IDENTITY_PATTERNS: Record<TipoIdentificacion, RegExp> = {
-  'Cedula Nacional': /^\d{9}$/,
-  'Dimex': /^\d{11,12}$/,
-  'Pasaporte': /^[A-Za-z0-9]{6,9}$/,
-};
-
-
 export const DesconexionMedidorSchema = z.object({
   // Campos comunes de CreateSolicitudFisicaDto
   Tipo_Identificacion: z.enum(TipoIdentificacionValues, {
@@ -84,16 +76,46 @@ export const DesconexionMedidorSchema = z.object({
       file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
       'La escritura del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
     ),
+
+  Id_Medidor: z.number()
+    .min(1, 'El Id del medidor no puede estar vacío')
+    .gt(0, 'El Id del medidor debe ser mayor a 0')
+    .positive('El Id del medidor debe ser positivo')
+    .int('El Id del medidor debe ser un número entero'),
 }).refine(
   (data) => {
-    // Validación de identidad usando patrones
-    const { Tipo_Identificacion, Identificacion } = data;
-    const pattern = IDENTITY_PATTERNS[Tipo_Identificacion];
-    return pattern ? pattern.test(Identificacion) : false;
+    const identificacion = data.Identificacion.trim();
+
+    switch (data.Tipo_Identificacion) {
+      case "Cedula Nacional":
+        return /^\d{9}$/.test(identificacion);
+      case "Dimex":
+        return /^\d{1,12}$/.test(identificacion);
+      case "Pasaporte":
+        return /^[A-Z0-9]{1,9}$/i.test(identificacion);
+      default:
+        return false;
+    }
   },
-  {
-    message: 'El número de identificación no es válido para el tipo seleccionado',
-    path: ["Identificacion"],
+  (data) => {
+    let message = 'Formato de identificación inválido';
+
+    switch (data.Tipo_Identificacion) {
+      case "Cedula Nacional":
+        message = 'La cédula debe tener exactamente 9 dígitos numéricos';
+        break;
+      case "Dimex":
+        message = 'El DIMEX debe tener entre 1 y 12 dígitos numéricos';
+        break;
+      case "Pasaporte":
+        message = 'El pasaporte debe tener entre 1 y 9 caracteres alfanuméricos';
+        break;
+    }
+
+    return {
+      message,
+      path: ["Identificacion"],
+    };
   }
 );
 

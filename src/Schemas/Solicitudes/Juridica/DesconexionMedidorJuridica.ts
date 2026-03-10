@@ -11,7 +11,7 @@ export const DesconexionJuridicaSchema = z.object({
 
   Cedula_Juridica: z.string()
     .min(10, 'La cédula jurídica debe tener al menos 10 caracteres')
-    .max(11, 'La cédula jurídica no puede tener más de 12 caracteres')
+    .max(12, 'La cédula jurídica no puede tener más de 12 caracteres')
     .regex(/^3-\d{3}-\d{6}$|^\d{10}$/, 'La cédula jurídica debe tener el formato 3-XXX-XXXXXX o 10 dígitos'),
 
   Direccion_Exacta: z.string()
@@ -49,6 +49,12 @@ export const DesconexionJuridicaSchema = z.object({
 
     .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), 'Solo se aceptan archivos .jpg, .jpeg, .png, .heic, .pdf')
     .optional(),
+
+  Id_Medidor: z.number()
+    .min(1, 'El Id del medidor no puede estar vacío')
+    .gt(0, 'El Id del medidor debe ser mayor a 0')
+    .positive('El Id del medidor debe ser positivo')
+    .int('El Id del medidor debe ser un número entero'),
 });
 
 export type DesconexionJuridica = z.infer<typeof DesconexionJuridicaSchema>;

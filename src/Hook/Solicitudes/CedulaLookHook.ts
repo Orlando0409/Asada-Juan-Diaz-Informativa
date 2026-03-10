@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { fetchCedulaData } from "../../Services/Solicitudes/CedulaApiService"
+import { fetchCedulaData, fetchCedulaJuridicaData } from "../../Services/Solicitudes/CedulaApiService"
 
 export function useCedulaLookup() {
   const [isLoading, setIsLoading] = useState(false)
@@ -19,5 +19,19 @@ export function useCedulaLookup() {
     }
   }
 
-  return { lookup, isLoading, error }
+  const lookupJuridica = async (cedulaJuridica: string) => {
+    setIsLoading(true)
+    setError(null)
+    try {
+      const razonSocial = await fetchCedulaJuridicaData(cedulaJuridica)
+      return razonSocial
+    } catch (err: any) {
+      setError(err.message || "Error desconocido")
+      return null
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return { lookup, lookupJuridica, isLoading, error }
 }

@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { z } from "zod";
 import { CambioMedidorJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/CambioMedidorJuridico";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
-import { useCambioMedidorJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
+import { useCambioMedidorJuridica, useMedidoresJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
+import { Loader2 } from "lucide-react";
 import PhoneInputComponent from "../PhoneInputComponent";
 
 type Props = {
@@ -27,6 +28,8 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const mutation = useCambioMedidorJuridica();
     const [mostrarFormulario, setMostrarFormulario] = useState(true);
+    const [cedulaJuridica, setCedulaJuridica] = useState('');
+    const { medidores, isLoading: isMedidoresLoading } = useMedidoresJuridica(cedulaJuridica);
 
     // Validación en tiempo real SOLO del campo editado
     const handleFieldChange = (fieldName: string, value: any) => {
@@ -60,7 +63,6 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
             Numero_Telefono: '+50688887777',
             Direccion_Exacta: 'San José, del Banco Nacional 200m sur',
             Motivo_Solicitud: 'Cambio por daño',
-            Numero_Medidor_Anterior: '1234567',
         };
         return placeholders[fieldName] || '';
     };
@@ -87,7 +89,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
             Numero_Telefono: "",
             Direccion_Exacta: "",
             Motivo_Solicitud: "",
-            Numero_Medidor_Anterior: 0,
+            Id_Medidor: 0,
         },
 
         onSubmit: async ({ value }) => {
@@ -114,7 +116,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                 }
 
                 await mutation.createCambioMedidor(value);
-     sessionStorage.removeItem(STORAGE_KEY);
+                sessionStorage.removeItem(STORAGE_KEY);
 
                 form.reset();
                 setFieldErrors({});
@@ -126,7 +128,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
         },
     });
 
-   useEffect(() => {
+    useEffect(() => {
         const savedData = sessionStorage.getItem(STORAGE_KEY);
         if (savedData) {
             try {
@@ -170,7 +172,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                     onChange={(e) => {
                                         field.handleChange(e.target.value);
                                         handleFieldChange("Razon_Social", e.target.value);
-                                          saveToSessionStorage({ ...form.state.values, Razon_Social: e.target.value });
+                                        saveToSessionStorage({ ...form.state.values, Razon_Social: e.target.value });
                                     }}
                                     placeholder={getPlaceholder("Razon_Social")}
                                     maxLength={50}
@@ -197,6 +199,9 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                         const formatted = formatCedulaJuridica(e.target.value);
                                         field.handleChange(formatted);
                                         handleFieldChange("Cedula_Juridica", formatted);
+                                        // Actualizar el estado de cedulaJuridica y limpiar medidor
+                                        setCedulaJuridica(formatted.replace(/-/g, ''));
+                                        form.setFieldValue('Id_Medidor', 0);
                                         saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted });
                                     }}
                                     placeholder={getPlaceholder("Cedula_Juridica")}
@@ -311,30 +316,53 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                         )}
                     </form.Field>
                     {/* Número de Medidor Anterior */}
-                    <form.Field name="Numero_Medidor_Anterior">
-                        {(field) => (
-                            <div className="mb-3 w-full">
-                                <label htmlFor="Numero_Medidor_Anterior" className="block mb-1 font-medium">Número de Medidor <span className="text-red-500">*</span></label>
-                                <input
-                                    type="number"
-                                    min={0}
-                                    value={field.state.value}
-                                    onChange={(e) => {
-                                        field.handleChange(Number(e.target.value));
-                                        handleFieldChange("Numero_Medidor_Anterior", Number(e.target.value));
-                                        saveToSessionStorage({ ...form.state.values, Numero_Medidor_Anterior: Number(e.target.value) });
-                                    }}
-                                    placeholder={getPlaceholder("Numero_Medidor_Anterior")}
-                                    className={commonClasses}
-                                />
-                                {fieldErrors["Numero_Medidor_Anterior"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Medidor_Anterior"]}</span>
-                                )}
-                                {formErrors["Numero_Medidor_Anterior"] && !fieldErrors["Numero_Medidor_Anterior"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Numero_Medidor_Anterior"]}</span>
-                                )}
-                            </div>
-                        )}
+                    <form.Field name="Id_Medidor">
+                        {(field) => {
+                            return (
+                                <div className="mb-3 w-full">
+                                    <label htmlFor="Id_Medidor" className="block mb-1 font-medium">Número de Medidor <span className="text-red-500">*</span></label>
+
+                                    <div className="relative">
+                                        <select
+                                            id="Id_Medidor"
+                                            value={field.state.value || ''}
+                                            onChange={(e) => {
+                                                const idMedidor = Number(e.target.value);
+                                                field.handleChange(idMedidor);
+                                            }}
+                                            onBlur={field.handleBlur}
+                                            className={commonClasses}
+                                            disabled={!cedulaJuridica || isMedidoresLoading}
+                                        >
+                                            <option value="">Seleccione un medidor</option>
+                                            {medidores.map((med) => (
+                                                <option key={med.Id_Medidor} value={med.Id_Medidor}>
+                                                    Medidor #{med.Numero_Medidor} {med.Estado ? `(${med.Estado})` : ''}
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        {isMedidoresLoading && (
+                                            <div className="absolute right-10 top-1/2 -translate-y-1/2">
+                                                <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {fieldErrors["Id_Medidor"] && (
+                                        <span className="text-red-500 text-sm block mt-1">
+                                            {fieldErrors["Id_Medidor"]}
+                                        </span>
+                                    )}
+
+                                    {medidores.length === 0 && cedulaJuridica && !isMedidoresLoading && (
+                                        <span className="text-red-500 text-sm block mt-1">
+                                            No se encontraron medidores para esta identificación
+                                        </span>
+                                    )}
+                                </div>
+                            );
+                        }}
                     </form.Field>
                 </div>
 

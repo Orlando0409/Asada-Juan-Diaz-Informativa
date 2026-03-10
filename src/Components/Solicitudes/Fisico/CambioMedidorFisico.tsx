@@ -1,9 +1,8 @@
 import { useForm } from "@tanstack/react-form";
 import { useEffect, useState } from "react";
-import { z } from "zod";
 import { CambioMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/CambioMedidor";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
-import { useCambioMedidorFisica } from "../../../Hook/Solicitudes/HookFisicas";
+import { useCambioMedidorFisica, useMedidores } from "../../../Hook/Solicitudes/HookFisicas";
 import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import { Loader2 } from "lucide-react";
 import PhoneInputComponent from "../PhoneInputComponent";
@@ -20,8 +19,6 @@ const normalizePhoneNumber = (phone: string): string => {
   return phoneNumber.format('E.164');
 };
 
-// Extrae los esquemas individuales de Zod
-const fieldSchemas: Record<string, z.ZodTypeAny> = CambioMedidorSchema.shape;
 const STORAGE_KEY = 'cambiomedidor_fisico_temp';
 
 const FormularioCambioMedidor = ({ onClose }: Props) => {
@@ -30,44 +27,90 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
   const mutation = useCambioMedidorFisica();
   const [mostrarFormulario, setMostrarFormulario] = useState(true);
   const { lookup, isLoading } = useCedulaLookup();
+  const [identificacion, setIdentificacion] = useState('');
+  const { medidores, isLoading: isMedidoresLoading } = useMedidores(identificacion);
 
-  // Función para manejar el cambio de cédula con búsqueda automática
-  const handleCedulaChange = async (cedula: string) => {
-    form.setFieldValue('Identificacion', cedula);
-    handleFieldChange('Identificacion', cedula);
 
-    // Buscar datos solo si es cédula nacional y tiene 9 dígitos
-    if (form.state.values.Tipo_Identificacion === 'Cedula Nacional' && /^\d{9}$/.test(cedula)) {
-      const resultado = await lookup(cedula);
-      if (resultado) {
-        // Autocompletar campos con los datos de la API
-        form.setFieldValue('Nombre', resultado.firstname || '');
-        form.setFieldValue('Apellido1', resultado.lastname1 || '');
-        form.setFieldValue('Apellido2', resultado.lastname2 || '');
+  const validateField = (fieldName: string, value: any, allValues?: any) => {
+    try {
+      const dummy: any = {
+        Nombre: "Test",
+        Apellido1: "Test",
+        Apellido2: "",
+        Tipo_Identificacion: "Cedula Nacional",
+        Identificacion: "123456789",
+        Direccion_Exacta: "1234567890",
+        Numero_Telefono: "+50688887777",
+        Correo: "test@test.com",
+        Motivo_Solicitud: "1234567890",
+        Id_Medidor: 1,
+      };
+
+      if (fieldName === "Identificacion" && allValues?.Tipo_Identificacion) {
+        dummy.Tipo_Identificacion = allValues.Tipo_Identificacion;
+        dummy.Identificacion = value;
+      } else if (fieldName === "Tipo_Identificacion" && allValues?.Identificacion) {
+        dummy.Tipo_Identificacion = value;
+        dummy.Identificacion = allValues.Identificacion;
+      } else {
+        dummy[fieldName] = value;
       }
+
+      CambioMedidorSchema.parse(dummy);
+
+      setFieldErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[fieldName];
+        return newErrors;
+      });
+    } catch (error: any) {
+      let errorMessage = '';
+      if (error.errors && Array.isArray(error.errors)) {
+        const fieldError = error.errors.find((err: any) => err.path.includes(fieldName));
+        errorMessage = fieldError?.message || error.errors[0]?.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      setFieldErrors(prev => ({
+        ...prev,
+        [fieldName]: errorMessage,
+      }));
     }
   };
 
-  // Validación en tiempo real SOLO del campo editado
-  const handleFieldChange = (fieldName: string, value: any) => {
-    if (fieldSchemas[fieldName]) {
-      try {
-        fieldSchemas[fieldName].parse(value);
-        setFieldErrors(prev => {
-          const newErrors = { ...prev };
-          delete newErrors[fieldName];
-          return newErrors;
-        });
-      } catch (error: any) {
-        let errorMessage = '';
-        if (error.errors && Array.isArray(error.errors)) {
-          errorMessage = error.errors[0]?.message || 'Error de validación';
-        } else if (error.message) {
-          errorMessage = error.message;
-        } else {
-          errorMessage = 'Error de validación';
-        }
-        setFieldErrors(prev => ({ ...prev, [fieldName]: errorMessage }));
+  const handleIdentificacionInput = (value: string, tipoId: string): string => {
+    switch (tipoId) {
+      case "Cedula Nacional":
+        return value.replace(/[^0-9]/g, '').slice(0, 9);
+      case "Dimex":
+        return value.replace(/[^0-9]/g, '').slice(0, 12);
+      case "Pasaporte":
+        return value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 9).toUpperCase();
+      default:
+        return value;
+    }
+  };
+
+  const handleCedulaChange = async (cedula: string) => {
+    const tipoId = form.state.values.Tipo_Identificacion;
+    const identificacionProcesada = handleIdentificacionInput(cedula, tipoId);
+
+    form.setFieldValue('Identificacion', identificacionProcesada);
+    setIdentificacion(identificacionProcesada);
+    validateField('Identificacion', identificacionProcesada, form.state.values);
+
+    setFormErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors['Identificacion'];
+      return newErrors;
+    });
+
+    if (tipoId === 'Cedula Nacional' && /^\d{9}$/.test(identificacionProcesada)) {
+      const resultado = await lookup(identificacionProcesada);
+      if (resultado) {
+        form.setFieldValue('Nombre', resultado.firstname || '');
+        form.setFieldValue('Apellido1', resultado.lastname1 || '');
+        form.setFieldValue('Apellido2', resultado.lastname2 || '');
       }
     }
   };
@@ -81,7 +124,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
       Numero_Telefono: '+50688887777',
       Direccion_Exacta: 'San José, del Banco Nacional 200m sur',
       Motivo_Solicitud: 'Cambio por daño',
-      Numero_Medidor_Anterior: '1234567',
+      Id_Medidor: '1',
     };
     if (fieldName === 'Identificacion') {
       switch (tipoIdentificacion) {
@@ -121,7 +164,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
       Numero_Telefono: '',
       Correo: '',
       Motivo_Solicitud: '',
-      Numero_Medidor_Anterior: 0,
+      Id_Medidor: 0,
     },
     onSubmit: async ({ value }) => {
       setFormErrors({});
@@ -137,6 +180,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
           setFormErrors(validationErrors);
           return;
         }
+        console.log('Payload enviado:', value);
         await mutation.createCambioMedidor(value);
         sessionStorage.removeItem(STORAGE_KEY);
 
@@ -145,7 +189,12 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
         setMostrarFormulario(false);
         onClose();
       } catch (error: any) {
-        console.log('Error al enviar formulario de cambio de medidor:', error);
+        console.error('Error al enviar formulario de cambio de medidor:', {
+          status: error?.response?.status,
+          data: error?.response?.data,
+          message: error?.message,
+        });
+        throw error;
       }
     },
   });
@@ -192,8 +241,8 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(e) => {
                     field.handleChange(e.target.value as TipoIdentificacion);
-                    handleFieldChange('Tipo_Identificacion', e.target.value as TipoIdentificacion);
                     form.setFieldValue('Identificacion', '');
+                    setIdentificacion('');
                     setFieldErrors(prev => { const newErrors = { ...prev }; delete newErrors['Identificacion']; return newErrors; });
                   }}
                   className={commonClasses}
@@ -223,6 +272,11 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                     placeholder={getPlaceholder("Identificacion", form.state.values.Tipo_Identificacion)}
                     disabled={!form.state.values.Tipo_Identificacion}
                     className={`${commonClasses} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                    maxLength={
+                      form.state.values.Tipo_Identificacion === 'Cedula Nacional' ? 9 :
+                        form.state.values.Tipo_Identificacion === 'Dimex' ? 12 :
+                          form.state.values.Tipo_Identificacion === 'Pasaporte' ? 9 : 20
+                    }
                   />
                   {isLoading && (
                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -246,7 +300,6 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(e) => {
                     field.handleChange(e.target.value);
-                    handleFieldChange("Nombre", e.target.value);
                     saveToSessionStorage({ ...form.state.values, Nombre: e.target.value });
                   }}
                   placeholder={getPlaceholder("Nombre")}
@@ -268,7 +321,6 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(e) => {
                     field.handleChange(e.target.value);
-                    handleFieldChange("Apellido1", e.target.value);
                     saveToSessionStorage({ ...form.state.values, Apellido1: e.target.value });
                   }}
                   placeholder={getPlaceholder("Apellido1")}
@@ -292,7 +344,6 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(e) => {
                     field.handleChange(e.target.value);
-                    handleFieldChange("Apellido2", e.target.value);
                     saveToSessionStorage({ ...form.state.values, Apellido2: e.target.value });
                   }}
                   placeholder={getPlaceholder("Apellido2")}
@@ -313,7 +364,6 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(e) => {
                     field.handleChange(e.target.value);
-                    handleFieldChange("Direccion_Exacta", e.target.value);
                     saveToSessionStorage({ ...form.state.values, Direccion_Exacta: e.target.value });
                   }}
                   placeholder={getPlaceholder("Direccion_Exacta")}
@@ -337,7 +387,6 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(e) => {
                     field.handleChange(e.target.value);
-                    handleFieldChange("Correo", e.target.value);
                     saveToSessionStorage({ ...form.state.values, Correo: e.target.value });
                   }}
                   placeholder={getPlaceholder("Correo")}
@@ -358,7 +407,6 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(value) => {
                     field.handleChange(value || "");
-                    handleFieldChange("Numero_Telefono", value || "");
                     saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" });
                   }}
                   className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
@@ -371,27 +419,53 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
           </form.Field>
 
           {/* Número de Medidor y Motivo */}
-          <form.Field name="Numero_Medidor_Anterior">
-            {(field) => (
-              <div className="mb-3 w-full">
-                <label htmlFor="Numero_Medidor_Anterior" className="block mb-1 font-medium">Número de Medidor <span className="text-red-500">*</span></label>
-                <input
-                  type="number"
-                  min={0}
-                  value={field.state.value}
-                  onChange={(e) => {
-                    field.handleChange(Number(e.target.value));
-                    handleFieldChange("Numero_Medidor_Anterior", Number(e.target.value));
-                    saveToSessionStorage({ ...form.state.values, Numero_Medidor_Anterior: Number(e.target.value) });
-                  }}
-                  placeholder={getPlaceholder("Numero_Medidor_Anterior")}
-                  className={commonClasses}
-                />
-                {fieldErrors["Numero_Medidor_Anterior"] && (
-                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Medidor_Anterior"]}</span>
-                )}
-              </div>
-            )}
+          <form.Field name="Id_Medidor">
+            {(field) => {
+              return (
+                <div className="mb-3 w-full">
+                  <label htmlFor="Id_Medidor" className="block mb-1 font-medium">Número de Medidor <span className="text-red-500">*</span></label>
+
+                  <div className="relative">
+                    <select
+                      id="Id_Medidor"
+                      value={field.state.value || ''}
+                      onChange={(e) => {
+                        const idMedidor = Number(e.target.value);
+                        field.handleChange(idMedidor);
+                      }}
+                      onBlur={field.handleBlur}
+                      className={commonClasses}
+                      disabled={!identificacion || isMedidoresLoading}
+                    >
+                      <option value="">Seleccione un medidor</option>
+                      {medidores.map((med) => (
+                        <option key={med.Id_Medidor} value={med.Id_Medidor}>
+                          Medidor #{med.Numero_Medidor} {med.Estado ? `(${med.Estado})` : ''}
+                        </option>
+                      ))}
+                    </select>
+
+                    {isMedidoresLoading && (
+                      <div className="absolute right-10 top-1/2 -translate-y-1/2">
+                        <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+                      </div>
+                    )}
+                  </div>
+
+                  {fieldErrors["Id_Medidor"] && (
+                    <span className="text-red-500 text-sm block mt-1">
+                      {fieldErrors["Id_Medidor"]}
+                    </span>
+                  )}
+
+                  {medidores.length === 0 && identificacion && !isMedidoresLoading && (
+                    <span className="text-red-500 text-sm block mt-1">
+                      No se encontraron medidores para esta identificación
+                    </span>
+                  )}
+                </div>
+              );
+            }}
           </form.Field>
 
           {/* Motivo de Solicitud */}
@@ -404,7 +478,6 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(e) => {
                     field.handleChange(e.target.value);
-                    handleFieldChange("Motivo_Solicitud", e.target.value);
                     saveToSessionStorage({ ...form.state.values, Motivo_Solicitud: e.target.value });
                   }}
                   placeholder="Escribe el motivo de tu solicitud"

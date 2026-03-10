@@ -4,6 +4,7 @@ import Proyectos from '../Section/Landing/Proyectos'
 import MisionVision from '../Section/Landing/MisionVision'
 import Servicio from '../Section/Landing/Servicio'
 import DatosGenerales from '../Section/Landing/DatosGenerales'
+import Faq from '../Section/Landing/FAQ'
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
@@ -17,6 +18,7 @@ export const Route = createFileRoute('/')({
       <Servicio/>
       <DatosGenerales/>
       <Proyectos/>
+      <Faq/>
     </div>
   )
 //

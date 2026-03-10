@@ -80,29 +80,51 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
     }
   };
 
-  // Función para manejar el cambio de cédula con búsqueda automática
-  const handleCedulaChange = async (cedula: string) => {
-    form.setFieldValue('Identificacion', cedula);
-    validateField('Identificacion', cedula, form.state.values);
 
-    // Limpiar errores
-    setFormErrors(prev => {
-      const newErrors = { ...prev };
-      delete newErrors['Identificacion'];
-      return newErrors;
-    });
+const handleIdentificacionInput = (value: string, tipoId: string): string => {
+  switch (tipoId) {
+    case "Cedula Nacional":
+      // Solo números, máximo 9 dígitos
+      return value.replace(/[^0-9]/g, '').slice(0, 9);
+    case "Dimex":
+      // Solo números, máximo 12 dígitos
+      return value.replace(/[^0-9]/g, '').slice(0, 12);
+    case "Pasaporte":
+      // Alfanumérico, máximo 9 caracteres, convertir a mayúsculas
+      return value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 9).toUpperCase();
+    default:
+      return value;
+  }
+};
 
-    // Buscar datos solo si es cédula nacional y tiene 9 dígitos
-    if (form.state.values.Tipo_Identificacion === 'Cedula Nacional' && /^\d{9}$/.test(cedula)) {
-      const resultado = await lookup(cedula);
-      if (resultado) {
-        // Autocompletar campos con los datos de la API
-        form.setFieldValue('Nombre', resultado.firstname || '');
-        form.setFieldValue('Apellido1', resultado.lastname1 || '');
-        form.setFieldValue('Apellido2', resultado.lastname2 || '');
-      }
+// Función para cambio de Identificacion 
+const handleCedulaChange = async (cedula: string) => {
+  const tipoId = form.state.values.Tipo_Identificacion;
+  const identificacion = handleIdentificacionInput(cedula, tipoId);
+
+  form.setFieldValue('Identificacion', identificacion);
+  validateField('Identificacion', identificacion, form.state.values);
+
+  // Limpiar errores
+  setFormErrors(prev => {
+    const newErrors = { ...prev };
+    delete newErrors['Identificacion'];
+    return newErrors;
+  });
+
+  // Buscar datos solo si es cédula nacional y tiene 9 dígitos
+  if (tipoId === 'Cedula Nacional' && /^\d{9}$/.test(identificacion)) {
+    const resultado = await lookup(identificacion);
+    if (resultado) {
+      // Autocompletar campos con los datos de la API
+      form.setFieldValue('Nombre', resultado.firstname || '');
+      form.setFieldValue('Apellido1', resultado.lastname1 || '');
+      form.setFieldValue('Apellido2', resultado.lastname2 || '');
     }
-  };
+  }
+};
+
+
 
   const getPlaceholder = (fieldName: string, tipoIdentificacion?: TipoIdentificacion) => {
     const placeholders: Record<string, string> = {
@@ -124,25 +146,25 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
     }
     return placeholders[fieldName] || '';
   };
-   
-    const saveToSessionStorage = (values: any) => {
-        try {
-            // Guardamos todo excepto los archivos
-            const dataToSave = {
-                Nombre: values.Nombre,
-                Apellido1: values.Apellido1,
-                Apellido2: values.Apellido2,
-                Tipo_Identificacion: values.Tipo_Identificacion,
-                Identificacion: values.Identificacion,
-                Correo: values.Correo,
-                Numero_Telefono: values.Numero_Telefono,
-                Direccion_Exacta: values.Direccion_Exacta,
-            };
-            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
-        } catch (error) {
-            console.error('Error al guardar en sessionStorage:', error);
-        }
-    };
+
+  const saveToSessionStorage = (values: any) => {
+    try {
+      // Guardamos todo excepto los archivos
+      const dataToSave = {
+        Nombre: values.Nombre,
+        Apellido1: values.Apellido1,
+        Apellido2: values.Apellido2,
+        Tipo_Identificacion: values.Tipo_Identificacion,
+        Identificacion: values.Identificacion,
+        Correo: values.Correo,
+        Numero_Telefono: values.Numero_Telefono,
+        Direccion_Exacta: values.Direccion_Exacta,
+      };
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+    } catch (error) {
+      console.error('Error al guardar en sessionStorage:', error);
+    }
+  };
 
   const form = useForm({
     defaultValues: {
@@ -154,7 +176,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
       Correo: '',
       Direccion_Exacta: '',
       Numero_Telefono: '',
-      Edad: 0,
+      Edad: undefined as number | undefined,
       Planos_Terreno: undefined as File | undefined,
       Escritura_Terreno: undefined as File | undefined,
       Motivo_Solicitud: '',
@@ -202,22 +224,22 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
       }
     },
   });
-   useEffect(() => {
-          const savedData = sessionStorage.getItem(STORAGE_KEY);
-          if (savedData) {
-              try {
-                  const parsed = JSON.parse(savedData);
-                  // Cargar los valores en el formulario
-                  Object.entries(parsed).forEach(([key, value]) => {
-                      if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
-                          form.setFieldValue(key as any, value as any);
-                      }
-                  });
-              } catch (error) {
-                  console.error('Error al cargar datos guardados:', error);
-              }
+  useEffect(() => {
+    const savedData = sessionStorage.getItem(STORAGE_KEY);
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
+        // Cargar los valores en el formulario
+        Object.entries(parsed).forEach(([key, value]) => {
+          if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
+            form.setFieldValue(key as any, value as any);
           }
-      }, []); //prueba 
+        });
+      } catch (error) {
+        console.error('Error al cargar datos guardados:', error);
+      }
+    }
+  }, []); //prueba 
 
 
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
@@ -288,6 +310,11 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                       placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion as TipoIdentificacion)}
                       disabled={!form.state.values.Tipo_Identificacion || loadingCedula}
                       className={`${commonClasses} ${(fieldErrors['Identificacion'] || formErrors['Identificacion']) ? 'border-red-500 focus:ring-red-300' : ''} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                      maxLength={
+                        form.state.values.Tipo_Identificacion === 'Cedula Nacional' ? 9 :
+                          form.state.values.Tipo_Identificacion === 'Dimex' ? 12 :
+                            form.state.values.Tipo_Identificacion === 'Pasaporte' ? 9 : 20
+                      }
                     />
                     {loadingCedula && (
                       <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -339,7 +366,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                 {formErrors["Nombre"] && !fieldErrors["Nombre"] && (
                   <span className="text-red-500 text-sm block mt-1">{formErrors["Nombre"]}</span>
                 )}
-              
+
               </div>
             )}
           </form.Field>
@@ -476,12 +503,15 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
                 <label htmlFor="Edad" className="block mb-1 font-medium">Edad <span className="text-red-500">*</span></label>
                 <input
                   type="number"
+                  inputMode="numeric"
                   min={18}
-                  value={field.state.value}
+                  value={field.state.value || ''}
                   onChange={(e) => {
-                    field.handleChange(Number(e.target.value));
-                    validateField("Edad", Number(e.target.value), form.state.values);
-                    saveToSessionStorage({ ...form.state.values, Edad: Number(e.target.value) }); // ← NUEVO
+                    const soloNumeros = e.target.value.replace(/[^0-9]/g, '');
+                    const edadValue = soloNumeros === '' ? undefined : Number(soloNumeros);
+                    field.handleChange(edadValue);
+                    validateField("Edad", edadValue, form.state.values);
+                    saveToSessionStorage({ ...form.state.values, Edad: edadValue });
                   }}
                   placeholder={getPlaceholder("Edad")}
                   className={commonClasses}
