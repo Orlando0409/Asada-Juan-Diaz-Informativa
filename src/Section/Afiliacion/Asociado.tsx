@@ -1,109 +1,189 @@
-import { useState } from "react";
-import data from '../../data/Data.json';
-import FormularioAsociadoJuridico from "../../Components/Solicitudes/Juridica/AsociadoJurica";
-import FormularioAsociado from "../../Components/Solicitudes/Fisico/AsociadoFisico";
+import { useState, useEffect } from "react"
+import type { IconType } from "react-icons"
+import {
+  FiArrowRight,
+  FiBriefcase,
+  FiCheckCircle,
+  FiUser,
+} from "react-icons/fi"
+import data from "../../data/Data.json"
+import FormularioAsociadoJuridico from "../../Components/Solicitudes/Juridica/AsociadoJurica"
+import FormularioAsociado from "../../Components/Solicitudes/Fisico/AsociadoFisico"
+import { useModal } from "../../context/ModalContext"
 
-const Asociado = () => {
-  const [mostrarFormularioFisico, setMostrarFormularioFisico] = useState(false);
-  const [mostrarFormularioJuridico, setMostrarFormularioJuridico] = useState(false);
+type RequisitoCampo = {
+  label: string
+  required?: boolean
+  type?: string
+}
 
-  const requisitosFisico = data.requisitosSolicitudes.asociado ?? {};
-  const requisitosJuridico = data.juridica?.asociado ?? {};
+type TarjetaClienteProps = {
+  badge: string
+  title: string
+  description: string
+  buttonLabel: string
+  requisitos: RequisitoCampo[]
+  icon: IconType
+  onOpen: () => void
+  buttonClassName: string
+  badgeClassName: string
+  iconClassName: string
+}
 
+const TarjetaCliente = ({
+  badge,
+  title,
+  description,
+  buttonLabel,
+  requisitos,
+  icon: Icon,
+  onOpen,
+  buttonClassName,
+  badgeClassName,
+  iconClassName,
+}: TarjetaClienteProps) => {
   return (
-    <section className="min-h-screen w-full bg-white flex flex-col items-center py-10 px-4 sm:px-6 lg:px-8">
+    <article className="group relative overflow-hidden rounded-[24px] border border-slate-200/70 bg-white/90 p-3.5 shadow-[0_24px_55px_-34px_rgba(15,23,42,0.24)] backdrop-blur-sm sm:p-4 lg:p-5">
+      <div className="absolute -right-12 top-6 h-24 w-24 rounded-full bg-sky-200/40 blur-2xl" />
 
-      {/* Información general */}
-      <div className="p-12 max-w-3xl text-center mb-12">
-        <h1 className="text-3xl font-bold text-blue-600 mb-4">
-          Solicitud para Ser Asociado
-        </h1>
-        <p className="text-gray-700 text-lg">
-          Ser Asociado en la ASADA es formar parte de la organización comunal.
-          <br />
-          Al ser Asociado no solo recibe el servicio de agua potable, sino que también tiene derecho a participar en la toma de decisiones.
-        </p>
+      <div className="rounded-[20px] border border-sky-200/80 bg-sky-100 p-4 text-slate-800 shadow-md">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1 pr-2">
+            <span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] ${badgeClassName}`}>
+              {badge}
+            </span>
+            <h2 className="mt-3 whitespace-nowrap text-[clamp(0.95rem,1.6vw,1.15rem)] font-semibold tracking-tight">{title}</h2>
+          </div>
+          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-sky-200/80 ${iconClassName}`}>
+            <Icon className="h-5 w-5" />
+          </div>
+        </div>
+        <p className="mt-3 max-w-xl text-xs leading-6 text-slate-600 sm:text-sm">{description}</p>
       </div>
 
-      {/* Cards con requisitos */}
-      <div className="flex flex-col lg:flex-row gap-8 w-full max-w-5xl">
+      <div className="mt-4">
+        <h3 className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-600 sm:text-xs">Lista de requisitos</h3>
 
-        {/* Card Jurídico */}
-        <div className="flex-1 bg-gray-50 shadow-lg rounded-lg p-6 flex flex-col">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center">
-            Cliente Jurídico
-          </h2>
-          <p className="text-sm text-gray-600 mb-4 text-center italic">
-            Para empresas, organizaciones o entidades legales
-          </p>
-          <ul className="list-disc pl-6 space-y-2 text-gray-700 flex-1 overflow-auto max-h-64">
-            {Object.entries(requisitosJuridico).map(([key, value]: any) => (
-              <li key={key}>{value.label}</li>
-            ))}
-          </ul>
-          <button
-            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500 transition"
-            onClick={() => setMostrarFormularioJuridico(true)}
-          >
-            Llenar Formulario Jurídico
-          </button>
+        <ul className="mt-3 flex max-h-[18rem] flex-col gap-2.5 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-sky-300 scrollbar-track-sky-100">
+          {requisitos.map((requisito) => (
+            <li
+              key={requisito.label}
+              className="rounded-xl border border-slate-200/80 bg-white/80 px-3 py-2.5 shadow-sm shadow-slate-200/30"
+            >
+              <div className="flex items-start gap-2.5">
+                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600">
+                  <FiCheckCircle className="h-3.5 w-3.5" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium leading-5 text-slate-800">{requisito.label}</p>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <button
+        className={`mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-lg transition duration-300 hover:-translate-y-0.5 hover:shadow-xl ${buttonClassName}`}
+        onClick={onOpen}
+      >
+        {buttonLabel}
+        <FiArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+      </button>
+    </article>
+  )
+}
+
+const Asociado = () => {
+  const [mostrarFormularioFisico, setMostrarFormularioFisico] = useState(false)
+  const [mostrarFormularioJuridico, setMostrarFormularioJuridico] = useState(false)
+  const { setModalOpen } = useModal()
+
+  useEffect(() => {
+    setModalOpen(mostrarFormularioFisico || mostrarFormularioJuridico)
+  }, [mostrarFormularioFisico, mostrarFormularioJuridico, setModalOpen])
+
+  const requisitosFisicos = Object.values(
+    data.requisitosSolicitudes.asociado ?? {},
+  ) as RequisitoCampo[]
+  const requisitosJuridicos = Object.values(
+    data.juridica?.asociado ?? {},
+  ) as RequisitoCampo[]
+
+  return (
+    <section className="relative isolate min-h-screen overflow-hidden bg-[linear-gradient(180deg,#f8fcff_0%,#eef7fb_48%,#f7fbfa_100%)] px-4 py-8 sm:px-6 md:py-12 lg:px-8">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+        <div className="overflow-hidden rounded-[32px] border border-white/70 bg-white/80 shadow-[0_35px_90px_-40px_rgba(15,23,42,0.32)] backdrop-blur-sm">
+          <div className="bg-slate-50/80 p-5 sm:p-6 lg:p-8">
+            <span className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
+              Solicitud de asociado
+            </span>
+
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="mt-4 text-2xl font-semibold tracking-tight text-slate-900 sm:text-[1.9rem]">Solicitud para ser asociado</h2>
+                <p className="mt-2 text-sm text-slate-600">Ser asociado en la ASADA es formar parte de la organización comunal con derecho a participar en la toma de decisiones.</p>
+              </div>
+            </div>
+
+            <div className="mt-6 grid gap-5 xl:grid-cols-2">
+              <TarjetaCliente
+                badge="Cliente jurídico"
+                title="Asociado para empresas"
+                description=""
+                buttonLabel="Llenar formulario jurídico"
+                requisitos={requisitosJuridicos}
+                icon={FiBriefcase}
+                onOpen={() => setMostrarFormularioJuridico(true)}
+                buttonClassName="bg-sky-500 hover:bg-sky-600"
+                badgeClassName="bg-sky-200 text-sky-800 ring-1 ring-inset ring-sky-300"
+                iconClassName="text-sky-700"
+              />
+
+              <TarjetaCliente
+                badge="Cliente físico"
+                title="Asociado para personas"
+                description=""
+                buttonLabel="Llenar formulario físico"
+                requisitos={requisitosFisicos}
+                icon={FiUser}
+                onOpen={() => setMostrarFormularioFisico(true)}
+                buttonClassName="bg-sky-500 hover:bg-sky-600"
+                badgeClassName="bg-sky-200 text-sky-800 ring-1 ring-inset ring-sky-300"
+                iconClassName="text-sky-700"
+              />
+            </div>
+          </div>
         </div>
-
-        {/* Card Físico */}
-        <div className="flex-1 bg-gray-50 shadow-lg rounded-lg p-6 flex flex-col">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4 text-center">
-            Cliente Físico
-          </h2>
-          <p className="text-sm text-gray-600 mb-4 text-center italic">
-            Para personas individuales
-          </p>
-          <ul className="list-disc pl-6 space-y-2 text-gray-700 flex-1 overflow-auto max-h-64">
-            {Object.entries(requisitosFisico).map(([key, value]: any) => (
-              <li key={key}>{value.label}</li>
-            ))}
-          </ul>
-          <button
-            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500 transition"
-            onClick={() => setMostrarFormularioFisico(true)}
-          >
-            Llenar Formulario Físico
-          </button>
-        </div>
-
       </div>
 
       {/* Modal Formulario Jurídico */}
       {mostrarFormularioJuridico && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Fondo borroso */}
+        <div className="fixed inset-0 z-[9999] flex items-start justify-center overflow-hidden px-5 pt-16 pb-10 sm:px-8 md:px-10">
           <div
-            className="absolute inset-0 bg-black/10 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setMostrarFormularioJuridico(false)}
           ></div>
-          {/* Contenedor del formulario */}
-         <div className="rounded relative w-[95dvw] h-[100dvh] sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] max-w-5xl overflow-y-scroll scrollbar-hide"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
-            <FormularioAsociadoJuridico  onClose={() => setMostrarFormularioJuridico(false)} />
+          <div className="scrollbar-hide relative w-[78dvw] max-w-lg sm:w-[66%] md:w-[54%] lg:w-[46%] xl:w-[38%] max-h-[78vh] overflow-y-auto">
+            <FormularioAsociadoJuridico onClose={() => setMostrarFormularioJuridico(false)} />
           </div>
         </div>
       )}
 
       {/* Modal Formulario Físico */}
       {mostrarFormularioFisico && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[9999] flex items-start justify-center overflow-hidden px-5 pt-16 pb-10 sm:px-8 md:px-10">
           <div
-            className="absolute inset-0 bg-black/10 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setMostrarFormularioFisico(false)}
           ></div>
-          <div className="rounded relative w-[95dvw] h-[100dvh] sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] max-w-5xl overflow-y-scroll scrollbar-hide"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+          <div className="scrollbar-hide relative w-[78dvw] max-w-lg sm:w-[66%] md:w-[54%] lg:w-[46%] xl:w-[38%] max-h-[78vh] overflow-y-auto">
             <FormularioAsociado onClose={() => setMostrarFormularioFisico(false)} />
           </div>
         </div>
       )}
-
     </section>
-  );
-};
+  )
+}
 
-export default Asociado;
+export default Asociado

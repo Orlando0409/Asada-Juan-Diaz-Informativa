@@ -163,20 +163,23 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
 
     if (!mostrarFormulario) return null;
 
-    const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300 bg-white';
+    const commonClasses = 'w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring focus:ring-blue-300 bg-white';
 
     return (
-        <div className="flex justify-center items-center min-h-screen text-gray-800 p-7 w-full">
-            <div className="bg-white shadow-lg  pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100">
+        <div className="w-full text-gray-800">
+            <div
+                className="scrollbar-hide w-full overflow-y-auto rounded-[24px] bg-white px-4 py-3 shadow-[0_30px_80px_-32px_rgba(15,23,42,0.55)] sm:px-6 sm:py-4"
+                style={{ maxHeight: "calc(100dvh - 3rem)" }}
+            >
                 <div className="mb-8">
-                    <h2 className="text-center text-2xl font-semibold mb-4">Formulario de Afiliación Jurídica</h2>
+                    <h2 className="text-center text-xl font-semibold mb-4">Formulario de Afiliación Jurídica</h2>
 
                     {/* Botones toggle */}
                     <div className="flex justify-center gap-4">
                         <button
                             type="button"
                             onClick={() => setShowMedidorExtra(false)}
-                            className={`px-6 py-2 rounded-lg font-medium transition-colors ${!showMedidorExtra
+                            className={`px-5 py-1.5 rounded-lg text-sm font-medium transition-colors ${!showMedidorExtra
                                 ? 'bg-blue-600 text-white shadow-md'
                                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                 }`}
@@ -186,7 +189,7 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                         <button
                             type="button"
                             onClick={() => setShowMedidorExtra(true)}
-                            className={`px-6 py-2 rounded-lg font-medium transition-colors ${showMedidorExtra
+                            className={`px-5 py-1.5 rounded-lg text-sm font-medium transition-colors ${showMedidorExtra
                                 ? 'bg-green-600 text-white shadow-md'
                                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                 }`}

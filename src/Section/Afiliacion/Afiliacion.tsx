@@ -1,143 +1,246 @@
-import { useState } from "react"
-import data from '../../data/Data.json'
+import { useState, useEffect } from "react"
+import type { IconType } from "react-icons"
+import {
+  FiArrowRight,
+  FiBriefcase,
+  FiCheckCircle,
+  FiDroplet,
+  FiFileText,
+  FiHome,
+  FiShield,
+  FiUser,
+  FiUsers,
+} from "react-icons/fi"
+import data from "../../data/Data.json"
 import FormularioAfiliacion from "../../Components/Solicitudes/Fisico/AfiliacionFisica"
 import FormularioAfiliacionJuridico from "../../Components/Solicitudes/Juridica/AfiliacionJuridica"
+import { useModal } from "../../context/ModalContext"
+
+type RequisitoCampo = {
+  label: string
+  required?: boolean
+  type?: string
+}
+
+type Beneficio = {
+  icon: IconType
+  title: string
+  description: string
+}
+
+type BeneficioData = {
+  icon: string
+  title: string
+  description: string
+}
+
+type TarjetaClienteProps = {
+  badge: string
+  title: string
+  description: string
+  buttonLabel: string
+  requisitos: RequisitoCampo[]
+  icon: IconType
+  onOpen: () => void
+  buttonClassName: string
+  badgeClassName: string
+  iconClassName: string
+}
+
+const iconMap: Record<string, IconType> = {
+  droplet: FiDroplet,
+  fileText: FiFileText,
+  users: FiUsers,
+  shield: FiShield,
+  home: FiHome,
+}
+
+const beneficiosData = (data.AfiliacionSeccion?.beneficios ?? []) as BeneficioData[]
+
+const beneficios: Beneficio[] = beneficiosData.map((beneficio) => ({
+  ...beneficio,
+  icon: iconMap[beneficio.icon] ?? FiDroplet,
+}))
+
+const TarjetaCliente = ({
+  badge,
+  title,
+  description,
+  buttonLabel,
+  requisitos,
+  icon: Icon,
+  onOpen,
+  buttonClassName,
+  badgeClassName,
+  iconClassName,
+}: TarjetaClienteProps) => {
+
+  return (
+    <article className="group relative overflow-hidden rounded-[24px] border border-slate-200/70 bg-white/90 p-3.5 shadow-[0_24px_55px_-34px_rgba(15,23,42,0.24)] backdrop-blur-sm sm:p-4 lg:p-5">
+      <div className="absolute -right-12 top-6 h-24 w-24 rounded-full bg-sky-200/40 blur-2xl" />
+
+      <div className="rounded-[20px] border border-sky-200/80 bg-sky-100 p-4 text-slate-800 shadow-md">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0 flex-1 pr-2">
+            <span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] ${badgeClassName}`}>
+              {badge}
+            </span>
+            <h2 className="mt-3 whitespace-nowrap text-[clamp(0.95rem,1.6vw,1.15rem)] font-semibold tracking-tight">{title}</h2>
+          </div>
+          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-sky-200/80 ${iconClassName}`}>
+            <Icon className="h-5 w-5" />
+          </div>
+        </div>
+        <p className="mt-3 max-w-xl text-xs leading-6 text-slate-600 sm:text-sm">{description}</p>
+      </div>
+
+
+
+      <div className="mt-4">
+        <div className="flex items-center justify-between gap-3">
+          <h3 className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-600 sm:text-xs">Lista de requisitos</h3>
+
+        </div>
+
+        <ul className="mt-3 flex max-h-[18rem] flex-col gap-2.5 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-sky-300 scrollbar-track-sky-100">
+          {requisitos.map((requisito) => (
+            <li
+              key={requisito.label}
+              className="rounded-xl border border-slate-200/80 bg-white/80 px-3 py-2.5 shadow-sm shadow-slate-200/30"
+            >
+              <div className="flex items-start gap-2.5">
+                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600">
+                  <FiCheckCircle className="h-3.5 w-3.5" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium leading-5 text-slate-800">{requisito.label}</p>
+
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <button
+        className={`mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white shadow-lg transition duration-300 hover:-translate-y-0.5 hover:shadow-xl ${buttonClassName}`}
+        onClick={onOpen}
+      >
+        {buttonLabel}
+        <FiArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+      </button>
+    </article>
+  )
+}
 
 const InformacionAfiliacion = () => {
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
   const [mostrarFormularioJuridico, setMostrarFormularioJuridico] = useState(false)
+  const { setModalOpen } = useModal()
 
-  const requisitos = data.requisitosSolicitudes.abonado
-  const requisitosJuridico = data.juridica?.afiliacion // ← CORREGIDO
+  const requisitosFisicos = Object.values(
+    data.requisitosSolicitudes.abonado ?? {},
+  ) as RequisitoCampo[]
+  const requisitosJuridicos = Object.values(
+    data.juridica?.afiliacion ?? {},
+  ) as RequisitoCampo[]
+
+  // Update modal state globally
+  useEffect(() => {
+    setModalOpen(mostrarFormulario || mostrarFormularioJuridico)
+  }, [mostrarFormulario, mostrarFormularioJuridico, setModalOpen])
 
   return (
-    <section className="min-h-screen w-full bg-white flex flex-col items-center py-6 sm:py-8 md:py-10 px-2 sm:px-4 md:px-6 lg:px-8">
+    <section className="relative isolate min-h-screen overflow-hidden bg-[linear-gradient(180deg,#f8fcff_0%,#eef7fb_48%,#f7fbfa_100%)] px-4 py-8 sm:px-6 md:py-12 lg:px-8">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+        <div className="overflow-hidden rounded-[32px] border border-white/70 bg-white/80 shadow-[0_35px_90px_-40px_rgba(15,23,42,0.32)] backdrop-blur-sm">
+          <div className="bg-slate-50/80 p-5 sm:p-6 lg:p-8">
+            <span className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
+              Solicitud de afiliación
+            </span>
 
-      {/* Información general */}
-      <div className="w-full max-w-xs sm:max-w-sm md:max-w-2xl lg:max-w-3xl xl:max-w-4xl bg-white shadow-lg rounded-lg p-4 sm:p-6 md:p-8 mb-8 sm:mb-10 md:mb-12">
-        <div className="text-center mb-4 sm:mb-6">
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-blue-600 mb-2 sm:mb-3 md:mb-4">
-            Información de Afiliación como Abonado
-          </h1>
-          <p className="text-sm sm:text-base md:text-lg text-gray-700 leading-relaxed">
-            Como abonado, tendrás acceso a todos los servicios de la ASADA de Juan Díaz.
-            <br className="hidden sm:block" />
-            <span className="block sm:inline"> Al ser abonado no solo recibes el servicio de agua potable, sino que también puedes participar en las decisiones de la comunidad.</span>
-          </p>
-        </div>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <h2 className="mt-4 text-2xl font-semibold tracking-tight text-slate-900 sm:text-[1.9rem]">Beneficios como abonado</h2>
 
-        {/* Línea divisoria */}
-        <hr className="border-gray-200 my-4 sm:my-5 md:my-6" />
+              </div>
 
-        {/* Beneficios */}
-        <div className="text-center">
-          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-800 mb-3 sm:mb-4">
-            Beneficios como Abonado
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4 text-gray-700">
-            <div className="flex items-center justify-center p-2 rounded-lg hover:bg-gray-50 transition-colors">
-              <span className="text-xs sm:text-sm md:text-base">• Servicio de Agua Potable</span>
             </div>
-            <div className="flex items-center justify-center p-2 rounded-lg hover:bg-gray-50 transition-colors">
-              <span className="text-xs sm:text-sm md:text-base">• Obtener Constancias de Cualquier Tipo</span>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {beneficios.map(({ icon: Icon, title, description }) => (
+                <article
+                  key={title}
+                  className="rounded-[20px] border border-slate-200/80 bg-white/90 p-4 shadow-[0_18px_38px_-30px_rgba(15,23,42,0.32)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_44px_-28px_rgba(14,116,144,0.32)]"
+                >
+                  <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-100 text-sky-700 shadow-sm shadow-sky-100/60">
+                    <Icon className="h-4 w-4" />
+                  </span>
+                  <h3 className="mt-3 text-base font-semibold text-slate-900">{title}</h3>
+                  <p className="mt-1.5 text-sm leading-5 text-slate-600">{description}</p>
+                </article>
+              ))}
             </div>
-            <div className="flex items-center justify-center p-2 rounded-lg hover:bg-gray-50 transition-colors">
-              <span className="text-xs sm:text-sm md:text-base">• Participar en Asambleas</span>
-            </div>
-            <div className="flex items-center justify-center p-2 rounded-lg hover:bg-gray-50 transition-colors">
-              <span className="text-xs sm:text-sm md:text-base">• Derecho a voz y voto</span>
-            </div>
-            <div className="flex items-center justify-center p-2 rounded-lg hover:bg-gray-50 transition-colors">
-              <span className="text-xs sm:text-sm md:text-base">• Acceso a programas comunitarios</span>
-            </div>
-            <div className="flex items-center justify-center p-2 rounded-lg hover:bg-gray-50 transition-colors">
-              <span className="text-xs sm:text-sm md:text-base">• Tarifas preferenciales</span>
+            <div className="mt-6 grid gap-5 xl:grid-cols-2">
+              <TarjetaCliente
+                badge="Cliente jurídico"
+                title="Afiliación para empresas y organizaciones"
+                description=""
+                buttonLabel="Llenar formulario jurídico"
+                requisitos={requisitosJuridicos}
+                icon={FiBriefcase}
+                onOpen={() => setMostrarFormularioJuridico(true)}
+                buttonClassName="bg-sky-500 hover:bg-sky-600"
+                badgeClassName="bg-sky-200 text-sky-800 ring-1 ring-inset ring-sky-300"
+                iconClassName="text-sky-700"
+              />
+
+              <TarjetaCliente
+                badge="Cliente físico"
+                title="Afiliación para personas individuales"
+                description=""
+                buttonLabel="Llenar formulario físico"
+                requisitos={requisitosFisicos}
+                icon={FiUser}
+                onOpen={() => setMostrarFormulario(true)}
+                buttonClassName="bg-sky-500 hover:bg-sky-600"
+                badgeClassName="bg-sky-200 text-sky-800 ring-1 ring-inset ring-sky-300"
+                iconClassName="text-sky-700"
+              />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Cards con requisitos */}
-      <div className="flex flex-col xl:flex-row gap-4 sm:gap-6 md:gap-8 w-full max-w-xs sm:max-w-sm md:max-w-4xl lg:max-w-5xl xl:max-w-6xl px-2 sm:px-0">
-
-        {/* Card Jurídico */}
-        <div className="flex-1 bg-gray-50 shadow-lg rounded-lg p-4 sm:p-5 md:p-6 flex flex-col min-h-[320px] sm:min-h-[350px] md:min-h-[400px]">
-          <h2 className="text-lg sm:text-xl md:text-xl font-semibold text-gray-800 mb-3 sm:mb-4 text-center">
-            Cliente Jurídico
-          </h2>
-          <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 text-center italic leading-relaxed">
-            Para empresas, organizaciones o entidades legales
-          </p>
-          <ul className="list-disc pl-4 sm:pl-5 md:pl-6 space-y-1 sm:space-y-2 text-gray-700 flex-1 overflow-auto max-h-48 sm:max-h-56 md:max-h-64">
-            {requisitosJuridico && Object.entries(requisitosJuridico).map(([key, value]) => (
-              <li key={key} className="text-xs sm:text-sm md:text-base leading-relaxed">{value.label}</li>
-            ))}
-          </ul>
-          <button
-            className="mt-3 sm:mt-4 bg-blue-600 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded text-sm sm:text-base hover:bg-blue-500 transition-colors duration-200 w-full"
-            onClick={() => setMostrarFormularioJuridico(true)}
-          >
-            Llenar Formulario Jurídico
-          </button>
-        </div>
-
-        {/* Card Físico */}
-        <div className="flex-1 bg-gray-50 shadow-lg rounded-lg p-4 sm:p-5 md:p-6 flex flex-col min-h-[320px] sm:min-h-[350px] md:min-h-[400px]">
-          <h2 className="text-lg sm:text-xl md:text-xl font-semibold text-gray-800 mb-3 sm:mb-4 text-center">
-            Cliente Físico
-          </h2>
-          <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4 text-center italic leading-relaxed">
-            Para personas individuales
-          </p>
-          <ul className="list-disc pl-4 sm:pl-5 md:pl-6 space-y-1 sm:space-y-2 text-gray-700 flex-1 overflow-auto max-h-48 sm:max-h-56 md:max-h-64 scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100">
-            {Object.entries(requisitos).map(([key, value]) => (
-              <li key={key} className="text-xs sm:text-sm md:text-base leading-relaxed">{value.label}</li>
-            ))}
-          </ul>
-          <button
-            className="mt-3 sm:mt-4 bg-blue-600 text-white px-3 sm:px-4 py-2 sm:py-2.5 rounded text-sm sm:text-base hover:bg-blue-500 transition-colors duration-200 w-full"
-            onClick={() => setMostrarFormulario(true)}
-          >
-            Llenar Formulario Físico
-          </button>
-        </div>
-
-      </div>
-
-      {/* Modal Formulario Jurídico */}
       {mostrarFormularioJuridico && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
-          {/* Fondo borroso */}
+        <div className="fixed inset-0 z-[9999] flex items-start justify-center overflow-hidden px-5 pt-16 pb-10 sm:px-8 md:px-10">
           <div
-            className="absolute inset-0 bg-black/10 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setMostrarFormularioJuridico(false)}
           ></div>
-          {/* Contenedor del formulario */}
-          <div className="rounded relative w-[95dvw] h-[100dvh] sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] max-w-5xl overflow-y-scroll scrollbar-hide"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+          <div
+            className="scrollbar-hide relative w-[78dvw] max-w-lg sm:w-[66%] md:w-[54%] lg:w-[46%] xl:w-[38%] max-h-[78vh] overflow-y-auto"
+          >
             <FormularioAfiliacionJuridico onClose={() => setMostrarFormularioJuridico(false)} />
           </div>
         </div>
       )}
 
-      {/* Modal Formulario Físico */}
       {mostrarFormulario && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
-          {/* Fondo borroso */}
+        <div className="fixed inset-0 z-[9999] flex items-start justify-center overflow-hidden px-5 pt-16 pb-10 sm:px-8 md:px-10">
           <div
-            className="absolute inset-0 bg-black/10 backdrop-blur-sm"
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setMostrarFormulario(false)}
           ></div>
-          {/* Contenedor del formulario */}
-          <div className="rounded relative w-[95dvw] h-[90dvh] sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] max-w-5xl overflow-y-scroll scrollbar-hide"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+          <div
+            className="scrollbar-hide relative w-[78dvw] max-w-lg sm:w-[66%] md:w-[54%] lg:w-[46%] xl:w-[38%] max-h-[78vh] overflow-y-auto"
+          >
             <FormularioAfiliacion onClose={() => setMostrarFormulario(false)} />
           </div>
         </div>
       )}
-
     </section>
-  );
-};
+  )
+}
 
-export default InformacionAfiliacion;
+export default InformacionAfiliacion

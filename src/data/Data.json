@@ -393,207 +393,236 @@
       }
     }
   },
-"requisitosConsultaPagos": {
-  "Número de abonado": "string",
-  "Cédula del titular": "string"
-},
-"RequisitosContacto": {
-  "requisitosReportes": {
-    "Nombre": {
-      "label": "Nombre completo",
-      "type": "text",
-      "required": true
-    },
-    "Primer_Apellido": {
-      "label": "Primer apellido",
-      "type": "text",
-      "required": true
-    },
-    "Segundo_Apellido": {
-      "label": "Segundo apellido",
-      "type": "text",
-      "required": true
-    },
-    "Correo": {
-      "label": "Correo electrónico",
-      "type": "email",
-      "required": true
-    },
-    "Descripcion": {
-      "label": "Descripción de tu queja",
-      "type": "textarea",
-      "required": true
-    },
-    "Ubicacion": {
-      "label": "Ubicación del lugar afectado",
-      "type": "text",
-      "required": true
-    },
-    "Adjunto": {
-      "label": "Adjuntar imagen",
-      "type": "file",
-      "required": false
-    }
-  },
-  "requisitosQuejas": {
-    "Nombre": {
-      "label": "Nombre completo",
-      "type": "text",
-      "required": true
-    },
-    "Primer_Apellido": {
-      "label": "Primer apellido",
-      "type": "text",
-      "required": true
-    },
-    "Segundo_Apellido": {
-      "label": "Segundo apellido",
-      "type": "text",
-      "required": true
-    },
-    "Correo": {
-      "label": "Correo electrónico",
-      "type": "email",
-      "required": true
-    },
-    "Descripcion": {
-      "label": "Descripción de tu queja",
-      "type": "textarea",
-      "required": true
-    },
-    "Adjunto": {
-      "label": "Adjuntar imagen",
-      "type": "file",
-      "required": false
-    }
-  },
-  "requisitosSugerencias": {
-      "Mensaje": {
-      "label": "Descripción de tu sugerencia",
-      "type": "textarea",
-      "required": true
-    },
-    "Correo": {
-      "label": "Correo electrónico",
-      "type": "email",
-      "required": true
-    },
-    "Adjunto": {
-      "label": "Adjuntar imagen",
-      "type": "file",
-      "required": false
-    }
-  }
-},
-"header": {
-  "logo": {
-    "src": "/Logo_ASADA_Juan_Díaz.png",
-    "ruta": "/"
-  },
-  "hero": {
-    "imagen": "/Agua2.mp4",
-    "titulo1": "ASADA Juan Díaz",
-    "subtitulo": "Trabajamos juntos para que el agua llegue segura a cada hogar",
-    "ResumenHistoria": "La ASADA de Juan Díaz fue fundada en el año 2005. En un inicio, la idea principal era construir un acueducto para uso agrícola, pensando en beneficiar a los agricultores de la zona. Sin embargo..."
-  },
-  "Leermas": {
-    "texto": "Ver más"
-  },
-  "navbar": {
-    "menuItems": [
+  "AfiliacionSeccion": {
+    "beneficios": [
       {
-        "id": 1,
-        "texto": "Sobre Nosotros",
-        "tipo": "dropdown",
-        "subopciones": [
-          {
-            "id": 11,
-            "texto": "Historia",
-            "ruta": "/Historia"
-          },
-          {
-            "id": 13,
-            "texto": "Calidad del Agua",
-            "ruta": "/CalidadAgua"
-          }
-        ]
+        "icon": "droplet",
+        "title": "Servicio de agua potable",
+        "description": "Acceso formal al servicio administrado por la ASADA para su propiedad o proyecto."
       },
       {
-        "id": 2,
-        "texto": "Solicitudes",
-        "tipo": "dropdown",
-        "subopciones": [
-          {
-            "id": 1,
-            "texto": "Afiliación",
-            "ruta": "/Afiliacion"
-          },
-          {
-            "id": 2,
-            "texto": "Cambio de medidor",
-            "ruta": "CambioMedidor"
-          },
-          {
-            "id": 3,
-            "texto": "Desconexión de medidor",
-            "ruta": "/DesconexionMedidor"
-          },
-          {
-            "id": 4,
-            "texto": "Asociado",
-            "ruta": "/Asociado"
-          }
-        ]
+        "icon": "fileText",
+        "title": "Constancias y gestiones",
+        "description": "Solicitud de documentos y trámites relacionados con su condición de abonado."
       },
       {
-        "id": 3,
-        "texto": "Consulta de Pagos",
-        "tipo": "link",
-        "ruta": "/Consulta"
+        "icon": "users",
+        "title": "Participación comunitaria",
+        "description": "Integración en asambleas y espacios de decisión para fortalecer la gestión local."
       },
       {
-        "id": 4,
-        "texto": "Contáctanos",
-        "tipo": "dropdown",
-        "subopciones": [
-          {
-            "id": 20,
-            "texto": "Queja",
-            "ruta": "/Quejas"
-          },
-          {
-            "id": 21,
-            "texto": "Sugerencia",
-            "ruta": "/Sugerencias"
-          },
-          {
-            "id": 22,
-            "texto": "Reporte",
-            "ruta": "/Reportes"
-          }
-        ]
+        "icon": "shield",
+        "title": "Derecho a voz y voto",
+        "description": "Participación activa en decisiones institucionales conforme a la normativa interna."
       },
       {
-        "id": 5,
-        "tipo": "PreguntasFrecuentes",
-        "texto": "Preguntas Frecuentes",
-        "ruta": "/PreguntasFrecuentes"
+        "icon": "home",
+        "title": "Programas comunitarios",
+        "description": "Acceso a iniciativas, proyectos y actividades impulsadas por la ASADA."
       }
     ]
-  }
-},
-"footer": {
-  "contacto": {
-    "telefono": "+506 1234-5678",
-    "correo": "asadajuandiaz@gmail.com"
   },
-  "horarioAtencion": "Lunes a Viernes, 7:00 AM - 5:00 PM",
-  "redesSociales": {
-    "WhatsApp": "https://chat.whatsapp.com/IOTuJj4XCAU9S0FLzQFgTp?mode=ac_t"
+  "requisitosConsultaPagos": {
+    "Número de abonado": "string",
+    "Cédula del titular": "string"
+  },
+  "RequisitosContacto": {
+    "requisitosReportes": {
+      "Nombre": {
+        "label": "Nombre completo",
+        "type": "text",
+        "required": true
+      },
+      "Primer_Apellido": {
+        "label": "Primer apellido",
+        "type": "text",
+        "required": true
+      },
+      "Segundo_Apellido": {
+        "label": "Segundo apellido",
+        "type": "text",
+        "required": true
+      },
+      "Correo": {
+        "label": "Correo electrónico",
+        "type": "email",
+        "required": true
+      },
+      "Descripcion": {
+        "label": "Descripción de tu queja",
+        "type": "textarea",
+        "required": true
+      },
+      "Ubicacion": {
+        "label": "Ubicación del lugar afectado",
+        "type": "text",
+        "required": true
+      },
+      "Adjunto": {
+        "label": "Adjuntar imagen",
+        "type": "file",
+        "required": false
+      }
+    },
+    "requisitosQuejas": {
+      "Nombre": {
+        "label": "Nombre completo",
+        "type": "text",
+        "required": true
+      },
+      "Primer_Apellido": {
+        "label": "Primer apellido",
+        "type": "text",
+        "required": true
+      },
+      "Segundo_Apellido": {
+        "label": "Segundo apellido",
+        "type": "text",
+        "required": true
+      },
+      "Correo": {
+        "label": "Correo electrónico",
+        "type": "email",
+        "required": true
+      },
+      "Descripcion": {
+        "label": "Descripción de tu queja",
+        "type": "textarea",
+        "required": true
+      },
+      "Adjunto": {
+        "label": "Adjuntar imagen",
+        "type": "file",
+        "required": false
+      }
+    },
+    "requisitosSugerencias": {
+      "Mensaje": {
+        "label": "Descripción de tu sugerencia",
+        "type": "textarea",
+        "required": true
+      },
+      "Correo": {
+        "label": "Correo electrónico",
+        "type": "email",
+        "required": true
+      },
+      "Adjunto": {
+        "label": "Adjuntar imagen",
+        "type": "file",
+        "required": false
+      }
+    }
+  },
+  "header": {
+    "logo": {
+      "src": "/Logo_ASADA_Juan_Díaz.png",
+      "ruta": "/"
+    },
+    "hero": {
+      "imagen": "/Agua2.mp4",
+      "titulo1": "ASADA Juan Díaz",
+      "subtitulo": "Trabajamos juntos para que el agua llegue segura a cada hogar",
+      "ResumenHistoria": "La ASADA de Juan Díaz fue fundada en el año 2005. En un inicio, la idea principal era construir un acueducto para uso agrícola, pensando en beneficiar a los agricultores de la zona. Sin embargo..."
+    },
+    "Leermas": {
+      "texto": "Ver más"
+    },
+    "navbar": {
+      "menuItems": [
+        {
+          "id": 1,
+          "texto": "Sobre Nosotros",
+          "tipo": "dropdown",
+          "subopciones": [
+            {
+              "id": 11,
+              "texto": "Historia",
+              "ruta": "/Historia"
+            },
+            {
+              "id": 13,
+              "texto": "Calidad del Agua",
+              "ruta": "/CalidadAgua"
+            }
+          ]
+        },
+        {
+          "id": 2,
+          "texto": "Solicitudes",
+          "tipo": "dropdown",
+          "subopciones": [
+            {
+              "id": 1,
+              "texto": "Afiliación",
+              "ruta": "/Afiliacion"
+            },
+            {
+              "id": 2,
+              "texto": "Cambio de medidor",
+              "ruta": "CambioMedidor"
+            },
+            {
+              "id": 3,
+              "texto": "Desconexión de medidor",
+              "ruta": "/DesconexionMedidor"
+            },
+            {
+              "id": 4,
+              "texto": "Asociado",
+              "ruta": "/Asociado"
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "texto": "Consulta de Pagos",
+          "tipo": "link",
+          "ruta": "/Consulta"
+        },
+        {
+          "id": 4,
+          "texto": "Contáctanos",
+          "tipo": "dropdown",
+          "subopciones": [
+            {
+              "id": 20,
+              "texto": "Queja",
+              "ruta": "/Quejas"
+            },
+            {
+              "id": 21,
+              "texto": "Sugerencia",
+              "ruta": "/Sugerencias"
+            },
+            {
+              "id": 22,
+              "texto": "Reporte",
+              "ruta": "/Reportes"
+            }
+          ]
+        },
+        {
+          "id": 5,
+          "tipo": "PreguntasFrecuentes",
+          "texto": "Preguntas Frecuentes",
+          "ruta": "/PreguntasFrecuentes"
+        }
+      ]
+    }
+  },
+  "footer": {
+    "contacto": {
+      "telefono": "+506 1234-5678",
+      "correo": "asadajuandiaz@gmail.com"
+    },
+    "horarioAtencion": "Lunes a Viernes, 7:00 AM - 5:00 PM",
+    "redesSociales": {
+      "WhatsApp": "https://chat.whatsapp.com/IOTuJj4XCAU9S0FLzQFgTp?mode=ac_t"
+    }
+  },
+  "ProyectoSeccion": {
+    "titulo": "Proyectos",
+    "descripcion": "Descubre nuestros proyectos de desarrollo e infraestructura que transforman nuestra comunidad."
   }
-},
-"ProyectoSeccion": {
-  "titulo": "Proyectos",
-  "descripcion": "Descubre nuestros proyectos de desarrollo e infraestructura que transforman nuestra comunidad."
-}
 }

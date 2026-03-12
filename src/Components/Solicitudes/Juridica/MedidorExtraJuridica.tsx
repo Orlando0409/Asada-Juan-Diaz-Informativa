@@ -198,7 +198,7 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
 
     if (!mostrarFormulario) return null;
 
-    const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300 bg-white';
+    const commonClasses = 'w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring focus:ring-blue-300 bg-white';
 
     return (
         <form
@@ -207,7 +207,7 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                 form.handleSubmit();
             }}
         >
-            <h2 className="text-center text-2xl font-bold mb-6 text-blue-700">Solicitud de Medidor Extra - Persona Jurídica</h2>
+            <h2 className="text-center text-xl font-bold mb-5 text-blue-700">Solicitud de Medidor Extra - Persona Jurídica</h2>
 
             {formErrors.general && (
                 <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
