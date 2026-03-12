@@ -30,23 +30,12 @@ const CambioMedidor = () => {
         {/* Línea divisoria */}
         <hr className="border-gray-200 my-4 sm:my-5 md:my-6" />
 
-        {/* Información adicional */}
-        <div className="text-center">
-          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-800 mb-3 sm:mb-4">
-            Información Importante
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4 text-gray-700">
-            <div className="flex items-center justify-center p-2 rounded-lg hover:bg-gray-50 transition-colors">
-              <span className="text-xs sm:text-sm md:text-base">• Proceso rápido y eficiente</span>
-            </div>
-            <div className="flex items-center justify-center p-2 rounded-lg hover:bg-gray-50 transition-colors">
-              <span className="text-xs sm:text-sm md:text-base">• Atención personalizada</span>
-            </div>
-            <div className="flex items-center justify-center p-2 rounded-lg hover:bg-gray-50 transition-colors">
-              <span className="text-xs sm:text-sm md:text-base">• Seguimiento de solicitud</span>
-            </div>
-          </div>
-        </div>
+       
+         
+          
+          
+            
+        
       </div>
 
       {/* Cards con requisitos */}

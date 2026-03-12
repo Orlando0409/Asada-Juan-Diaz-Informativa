@@ -19,9 +19,11 @@ const normalizePhoneNumber = (phone: string): string => {
 const STORAGE_KEY = 'desconexion_fisica_temp';
 
 const FormularioDesconexionMedidor = ({ onClose }: Props) => {
+  const sanitizeNameInput = (value: string) => value.replace(/\d/g, "");
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [isSending, setIsSending] = useState(false);
   const [identificacion, setIdentificacion] = useState('');
   const mutation = useDesconexionFisica();
   const planosInputRef = useRef<HTMLInputElement>(null);
@@ -199,6 +201,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
           }
         });
 
+        setIsSending(true);
         await mutation.createDesconexion(formData);
         sessionStorage.removeItem(STORAGE_KEY);
 
@@ -209,6 +212,8 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
         onClose();
       } catch (error: any) {
         // Error handling
+      } finally {
+        setIsSending(false);
       }
     },
   });
@@ -335,9 +340,10 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                   type="text"
                   value={field.state.value}
                   onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    validateField("Nombre", e.target.value, form.state.values);
-                    saveToSessionStorage({ ...form.state.values, Nombre: e.target.value });
+                    const cleanValue = sanitizeNameInput(e.target.value);
+                    field.handleChange(cleanValue);
+                    validateField("Nombre", cleanValue, form.state.values);
+                    saveToSessionStorage({ ...form.state.values, Nombre: cleanValue });
                   }}
                   placeholder={getPlaceholder("Nombre")}
                   maxLength={50}
@@ -362,9 +368,10 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                   type="text"
                   value={field.state.value}
                   onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    validateField("Apellido1", e.target.value, form.state.values);
-                    saveToSessionStorage({ ...form.state.values, Apellido1: e.target.value });
+                    const cleanValue = sanitizeNameInput(e.target.value);
+                    field.handleChange(cleanValue);
+                    validateField("Apellido1", cleanValue, form.state.values);
+                    saveToSessionStorage({ ...form.state.values, Apellido1: cleanValue });
                   }}
                   placeholder={getPlaceholder("Apellido1")}
                   maxLength={50}
@@ -389,9 +396,10 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                   type="text"
                   value={field.state.value}
                   onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    validateField("Apellido2", e.target.value, form.state.values);
-                    saveToSessionStorage({ ...form.state.values, Apellido2: e.target.value });
+                    const cleanValue = sanitizeNameInput(e.target.value);
+                    field.handleChange(cleanValue);
+                    validateField("Apellido2", cleanValue, form.state.values);
+                    saveToSessionStorage({ ...form.state.values, Apellido2: cleanValue });
                   }}
                   placeholder={getPlaceholder("Apellido2")}
                   maxLength={50}
@@ -703,10 +711,10 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
           <div className="flex justify-end items-end">
             <button
               type="submit"
-              disabled={form.state.isSubmitting}
-              className={`w-[120px] py-2 rounded transition ${form.state.isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
+              disabled={isSending}
+              className={`w-[120px] py-2 rounded transition ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
             >
-              {form.state.isSubmitting ? 'Enviando...' : 'Enviar'}
+              {isSending ? 'Enviando...' : 'Enviar'}
             </button>
           </div>
         </div>

@@ -115,7 +115,7 @@ const InformacionAfiliacion = () => {
           {/* Contenedor del formulario */}
           <div className="rounded relative w-[95dvw] h-[100dvh] sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] max-w-5xl overflow-y-scroll scrollbar-hide"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
-            <FormularioAfiliacionJuridico  onClose={() => setMostrarFormularioJuridico(false)} />
+            <FormularioAfiliacionJuridico onClose={() => setMostrarFormularioJuridico(false)} />
           </div>
         </div>
       )}

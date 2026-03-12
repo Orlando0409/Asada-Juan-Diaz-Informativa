@@ -37,6 +37,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
     const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    const [isSending, setIsSending] = useState(false);
     const mutation = useDesconexionJuridica();
     const planosInputRef = useRef<HTMLInputElement>(null);
     const escrituraInputRef = useRef<HTMLInputElement>(null);
@@ -123,6 +124,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                     }
                 });
 
+                setIsSending(true);
                 await mutation.createDesconexion(formData);
                 sessionStorage.removeItem(STORAGE_KEY);
 
@@ -133,6 +135,8 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                 onClose();
             } catch (error: any) {
                 console.log("🔍 ERROR EN SOLICITUD DE DESCONEXIÓN JURÍDICA:", error);
+            } finally {
+                setIsSending(false);
             }
         },
     });
@@ -443,10 +447,10 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                 <div className="flex justify-end items-end gap-4 mt-8">
                     <button
                         type="submit"
-                        disabled={form.state.isSubmitting}
-                        className={`w-[120px] py-2 rounded transition ${form.state.isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
+                        disabled={isSending}
+                        className={`w-[120px] py-2 rounded transition ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
                     >
-                        {form.state.isSubmitting ? 'Enviando...' : 'Enviar'}
+                        {isSending ? 'Enviando...' : 'Enviar'}
                     </button>
                 </div>
             </form>

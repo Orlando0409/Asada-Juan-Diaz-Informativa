@@ -26,6 +26,7 @@ const STORAGE_KEY = 'afiliacion_juridica_temp';
 const CambioMedidorJuridica = ({ onClose }: Props) => {
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    const [isSending, setIsSending] = useState(false);
     const mutation = useCambioMedidorJuridica();
     const [mostrarFormulario, setMostrarFormulario] = useState(true);
     const [cedulaJuridica, setCedulaJuridica] = useState('');
@@ -115,6 +116,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                     return;
                 }
 
+                setIsSending(true);
                 await mutation.createCambioMedidor(value);
                 sessionStorage.removeItem(STORAGE_KEY);
 
@@ -124,6 +126,8 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                 onClose();
             } catch (error: any) {
                 console.log(" ERROR EN SOLICITUD DE CAMBIO DE MEDIDOR JURÍDICA:", error);
+            } finally {
+                setIsSending(false);
             }
         },
     });
@@ -372,10 +376,10 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                     <div className="flex justify-end items-end">
                         <button
                             type="submit"
-                            disabled={form.state.isSubmitting}
-                            className={`w-[120px] py-2 rounded transition ${form.state.isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
+                            disabled={isSending}
+                            className={`w-[120px] py-2 rounded transition ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
                         >
-                            {form.state.isSubmitting ? 'Enviando...' : 'Enviar'}
+                            {isSending ? 'Enviando...' : 'Enviar'}
                         </button>
                     </div>
                 </div>

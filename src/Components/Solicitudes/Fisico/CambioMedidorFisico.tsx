@@ -22,8 +22,10 @@ const normalizePhoneNumber = (phone: string): string => {
 const STORAGE_KEY = 'cambiomedidor_fisico_temp';
 
 const FormularioCambioMedidor = ({ onClose }: Props) => {
+  const sanitizeNameInput = (value: string) => value.replace(/\d/g, "");
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [isSending, setIsSending] = useState(false);
   const mutation = useCambioMedidorFisica();
   const [mostrarFormulario, setMostrarFormulario] = useState(true);
   const { lookup, isLoading } = useCedulaLookup();
@@ -181,6 +183,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
           return;
         }
         console.log('Payload enviado:', value);
+        setIsSending(true);
         await mutation.createCambioMedidor(value);
         sessionStorage.removeItem(STORAGE_KEY);
 
@@ -195,6 +198,8 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
           message: error?.message,
         });
         throw error;
+      } finally {
+        setIsSending(false);
       }
     },
   });
@@ -299,8 +304,9 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   type="text"
                   value={field.state.value}
                   onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    saveToSessionStorage({ ...form.state.values, Nombre: e.target.value });
+                    const cleanValue = sanitizeNameInput(e.target.value);
+                    field.handleChange(cleanValue);
+                    saveToSessionStorage({ ...form.state.values, Nombre: cleanValue });
                   }}
                   placeholder={getPlaceholder("Nombre")}
                   maxLength={50}
@@ -320,8 +326,9 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   type="text"
                   value={field.state.value}
                   onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    saveToSessionStorage({ ...form.state.values, Apellido1: e.target.value });
+                    const cleanValue = sanitizeNameInput(e.target.value);
+                    field.handleChange(cleanValue);
+                    saveToSessionStorage({ ...form.state.values, Apellido1: cleanValue });
                   }}
                   placeholder={getPlaceholder("Apellido1")}
                   maxLength={50}
@@ -343,8 +350,9 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   type="text"
                   value={field.state.value}
                   onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    saveToSessionStorage({ ...form.state.values, Apellido2: e.target.value });
+                    const cleanValue = sanitizeNameInput(e.target.value);
+                    field.handleChange(cleanValue);
+                    saveToSessionStorage({ ...form.state.values, Apellido2: cleanValue });
                   }}
                   placeholder={getPlaceholder("Apellido2")}
                   maxLength={50}
@@ -499,10 +507,10 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
           <div className="flex justify-end items-end">
             <button
               type="submit"
-              disabled={form.state.isSubmitting}
-              className={`w-[120px] py-2 rounded transition ${form.state.isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
+              disabled={isSending}
+              className={`w-[120px] py-2 rounded transition ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
             >
-              {form.state.isSubmitting ? 'Enviando...' : 'Enviar'}
+              {isSending ? 'Enviando...' : 'Enviar'}
             </button>
           </div>
         </div>

@@ -23,9 +23,11 @@ const STORAGE_KEY = 'asociado_fisica_temp';
 
 
 const FormularioAsociado = ({ onClose }: Props) => {
+  const sanitizeNameInput = (value: string) => value.replace(/\d/g, "");
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [isSending, setIsSending] = useState(false);
   const mutation = useAsociadoFisica();
   const [_mostrarFormulario, setMostrarFormulario] = useState(true);
   const { lookup, isLoading } = useCedulaLookup();
@@ -211,6 +213,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
           return;
         }
 
+        setIsSending(true);
         await mutation.createAsociado({
           ...value,
           Tipo_Identificacion: value.Tipo_Identificacion
@@ -221,6 +224,8 @@ const FormularioAsociado = ({ onClose }: Props) => {
         onClose();
       } catch (error: unknown) {
         console.log("🔍 ERROR EN SOLICITUD DE ASOCIADO:", error);
+      } finally {
+        setIsSending(false);
       }
     },
   });
@@ -237,10 +242,14 @@ const FormularioAsociado = ({ onClose }: Props) => {
     fieldName: "Nombre" | "Apellido1" | "Apellido2" | "Identificacion" | "Correo" | "Numero_Telefono" | "Motivo_Solicitud" | "Tipo_Identificacion",
     value: any
   ) => {
+    // Sanitizar campos de nombre
+    const cleanValue = ["Nombre", "Apellido1", "Apellido2"].includes(fieldName)
+      ? sanitizeNameInput(value)
+      : value;
     setTouched(prev => ({ ...prev, [fieldName]: true }));
-    const newValues = { ...form.state.values, [fieldName]: value };
+    const newValues = { ...form.state.values, [fieldName]: cleanValue };
     validateAllFields(newValues);
-    form.setFieldValue(fieldName, value);
+    form.setFieldValue(fieldName, cleanValue);
   };
   useEffect(() => {
     const savedData = sessionStorage.getItem(STORAGE_KEY);
@@ -499,10 +508,10 @@ const FormularioAsociado = ({ onClose }: Props) => {
           <div className="flex justify-end items-end">
             <button
               type="submit"
-              disabled={form.state.isSubmitting}
-              className={`w-[120px] py-2 rounded transition ${form.state.isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
+              disabled={isSending}
+              className={`w-[120px] py-2 rounded transition ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
             >
-              {form.state.isSubmitting ? 'Enviando...' : 'Enviar'}
+              {isSending ? 'Enviando...' : 'Enviar'}
             </button>
           </div>
         </div>
