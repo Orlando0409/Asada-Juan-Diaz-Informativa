@@ -14,7 +14,7 @@ const FormularioContacto = ({ tipo }: Props) => {
   const [formkey, setFormKey] = useState<number>(0); // Estado para forzar el reinicio del formulario
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<File | null>(null)
   const [formErrors, setFormErrors] = useState<Record<string, string>>({}) // Agrega un arreglo para manejo de errores
-  const [isSubmitting, setIsSubmitting] = useState(false) // Control manual del estado de envío
+  const [isLoading, setIsLoading] = useState<boolean>(false) // Estado para controlar el envío
 
   const mutation = useCreateContacto()
 
@@ -99,15 +99,16 @@ const FormularioContacto = ({ tipo }: Props) => {
       }
 
       // Si llegamos aquí, la validación pasó
+      setIsLoading(true)
       try {
-         await mutation.mutateAsync({ data: value, tipo })
-         setFormKey((prev) => prev + 1) 
-         setArchivoSeleccionado(null)
-         setFormErrors({}) 
+        await mutation.mutateAsync({ data: value, tipo })
+        setFormKey((prev) => prev + 1) // Reinicia el formulario
+        setArchivoSeleccionado(null)
+        setFormErrors({})
       } catch (error: any) {
         console.error('Error al enviar formulario:', error)
       } finally {
-        setIsSubmitting(false) 
+        setIsLoading(false)
       }
     },
   })
@@ -254,16 +255,16 @@ const FormularioContacto = ({ tipo }: Props) => {
         <div className="flex justify-end items-end mt-6">
           <button
             type="submit"
-            disabled={isSubmitting} // Deshabilitar durante envío
+            disabled={isLoading} // Deshabilitar durante envío
             className={`
               w-[120px] py-2 rounded transition
-              ${isSubmitting 
-                ? 'bg-gray-400 cursor-not-allowed' 
+              ${isLoading
+                ? 'bg-gray-400 cursor-not-allowed'
                 : 'bg-blue-900 hover:bg-blue-800'
               } text-white
             `}
           >
-            {isSubmitting ? 'Enviando...' : 'Enviar'}
+            {isLoading ? 'Enviando...' : 'Enviar'}
           </button>
         </div>
       </form>

@@ -1,10 +1,12 @@
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createAfiliacionJuridica, createAsociadoJuridica, createCambioMedidorJuridica, createDesconexionJuridica, getMedidoresByIdentificacionJuridica } from "../../Services/Solicitudes/SolicitudesJuridicas";
+import { createAfiliacionJuridica, createAgregarMedidorJuridica, createAsociadoJuridica, createCambioMedidorJuridica, createDesconexionJuridica, getMedidoresByIdentificacionJuridica } from "../../Services/Solicitudes/SolicitudesJuridicas";
 import type { CambioMedidorJuridica } from "../../Schemas/Solicitudes/Juridica/CambioMedidorJuridico";
 import type { AsociadoJuridico } from "../../models/Forms/Solicitudes/Juridica/AsociadoJuridica";
 import type { Medidor } from "../../models/Medidor";
 import type { MedidoresResponse } from "../../models/Forms/Solicitudes/Fisico/CambioMedidor";
 import { useAlerts } from "../../context/AlertContext";
+import type { MedidorExtraJuridica } from "../../models/Forms/Solicitudes/Juridica/MedidorExtraJuridico";
 
 export const useAfiliacionJuridica = () => {
     const queryClient = useQueryClient();
@@ -93,6 +95,27 @@ export const useAsociadoJuridica = () => {
     return {
         createAsociado: createAsociadoJuridicoMutation.mutateAsync,
     }
+}
+
+export const useAgregarMedidorJuridica = () => {
+    const queryClient = useQueryClient();
+    const { showSuccess, showError } = useAlerts();
+
+    const mutation = useMutation({
+        mutationFn: (data: MedidorExtraJuridica) => createAgregarMedidorJuridica(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["agregar-medidor"] });
+            queryClient.invalidateQueries({ queryKey: ["medidores-juridica"] });
+            showSuccess("¡Solicitud creada!", "La solicitud para agregar medidor extra ha sido creada con éxito.");
+        },
+        onError: (error: any) => {
+            const errorMessage = error?.response?.data?.message || error?.message || 'Error al enviar el formulario.';
+            console.log("Error al crear la solicitud:", error?.response?.data || error);
+            showError("Error", errorMessage);
+        },
+    });
+
+    return mutation;
 }
 
 export const useMedidoresJuridica = (cedulaJuridica: string) => {

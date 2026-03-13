@@ -26,6 +26,7 @@ const STORAGE_KEY = 'afiliacion_juridica_temp';
 const CambioMedidorJuridica = ({ onClose }: Props) => {
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    const [isSending, setIsSending] = useState(false);
     const mutation = useCambioMedidorJuridica();
     const [mostrarFormulario, setMostrarFormulario] = useState(true);
     const [cedulaJuridica, setCedulaJuridica] = useState('');
@@ -115,6 +116,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                     return;
                 }
 
+                setIsSending(true);
                 await mutation.createCambioMedidor(value);
                 sessionStorage.removeItem(STORAGE_KEY);
 
@@ -124,6 +126,8 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                 onClose();
             } catch (error: any) {
                 console.log(" ERROR EN SOLICITUD DE CAMBIO DE MEDIDOR JURÍDICA:", error);
+            } finally {
+                setIsSending(false);
             }
         },
     });
@@ -150,15 +154,16 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
     if (!mostrarFormulario) return null;
 
 
-    const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
+    const commonClasses = 'w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring focus:ring-blue-300';
 
     return (
-        <div className="flex justify-center items-center min-h-screen text-gray-800 p-7 w-full">
+        <div className="w-full text-gray-800">
             <form
                 onSubmit={(e) => { e.preventDefault(); form.handleSubmit(); }}
-                className="bg-white shadow-lg  pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
+                className="scrollbar-hide w-full overflow-y-auto rounded-[24px] bg-white px-4 py-3 shadow-[0_30px_80px_-32px_rgba(15,23,42,0.55)] sm:px-6 sm:py-4"
+                style={{ maxHeight: "calc(100dvh - 3rem)" }}
             >
-                <h2 className="text-center text-2xl font-semibold mb-10">Formulario de cambio de medidor - Jurídica</h2>
+                <h2 className="text-center text-xl font-semibold mb-6">Formulario de cambio de medidor - Jurídica</h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
                     {/* Razón Social */}
@@ -372,10 +377,10 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                     <div className="flex justify-end items-end">
                         <button
                             type="submit"
-                            disabled={form.state.isSubmitting}
-                            className={`w-[120px] py-2 rounded transition ${form.state.isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
+                            disabled={isSending}
+                            className={`w-[120px] py-2 rounded transition ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
                         >
-                            {form.state.isSubmitting ? 'Enviando...' : 'Enviar'}
+                            {isSending ? 'Enviando...' : 'Enviar'}
                         </button>
                     </div>
                 </div>
