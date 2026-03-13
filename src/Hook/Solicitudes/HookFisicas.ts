@@ -4,7 +4,6 @@ import type { CambioMedidorFisico, MedidoresResponse } from "../../models/Forms/
 import type { AsociadoFisico } from "../../Schemas/Solicitudes/Fisica/Asociado";
 import type { Medidor } from "../../models/Medidor";
 import { useAlerts } from "../../context/AlertContext";
-import type { MedidorExtraFisico } from "../../models/Forms/Solicitudes/Fisico/MedidorExtra";
 
 export const useAfiliacionFisica = () => {
     const queryClient = useQueryClient();
@@ -99,7 +98,7 @@ export const useAgregarMedidorFisica = () => {
     const { showSuccess, showError } = useAlerts();
 
     const mutation = useMutation({
-        mutationFn: (data: MedidorExtraFisico) => createAgregarMedidorFisica(data),
+        mutationFn: (data: FormData) => createAgregarMedidorFisica(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["agregar-medidor"] });
             showSuccess("¡Solicitud creada!", "La solicitud de agregar medidor ha sido creada con éxito.");
