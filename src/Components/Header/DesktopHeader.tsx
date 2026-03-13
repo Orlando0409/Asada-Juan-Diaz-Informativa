@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
 import { MdExpandMore } from 'react-icons/md'
 import type { DesktopHeaderProps } from '../../types/header/MenuItem'
 import { useRef, useState } from 'react'
@@ -6,6 +6,9 @@ import { useRef, useState } from 'react'
 const DesktopHeader = ({ menuItems }: DesktopHeaderProps) => {
   const [expandedItem, setExpandedItem] = useState<number | null>(null)
   const dropdownRef = useRef<number | null>(null)
+  const navigate = useNavigate()
+  const routerState = useRouterState()
+  const currentPath = routerState.location.pathname
 
   const handleMouseEnter = (itemId: number) => {
     setExpandedItem(itemId)
@@ -26,6 +29,38 @@ const DesktopHeader = ({ menuItems }: DesktopHeaderProps) => {
       {/* Menú principal */}
       <ul className='hidden md:flex gap-6 items-center font-medium text-gray-700'>
         {menuItems.map((item) => {
+          // Primero verificar si es un enlace a ancla (comienza con #)
+          if (item.ruta?.startsWith('#')) {
+            return (
+              <li key={item.id}>
+                <button 
+                  onClick={() => {
+                    
+                    if (currentPath === '/') {
+            
+                      const element = document.querySelector(item.ruta!)
+                      if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                      }
+                    } else {
+                      navigate({ to: '/' })
+              
+                      setTimeout(() => {
+                        const element = document.querySelector(item.ruta!)
+                        if (element) {
+                          element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                        }
+                      }, 300)
+                    }
+                  }}
+                  className='hover:text-[#6FCAF1] transition-colors duration-200 flex items-center gap-2 cursor-pointer bg-transparent border-none font-medium'
+                  type='button'
+                >
+                  {item.texto}
+                </button>
+              </li>
+            )
+          }
 
           if (item.tipo === 'dropdown') {
             return (
@@ -70,7 +105,7 @@ const DesktopHeader = ({ menuItems }: DesktopHeaderProps) => {
           return (
             <li key={item.id}>
               <Link 
-                to={item.ruta} 
+                to={item.ruta || '/'} 
                 className='hover:text-[#6FCAF1] transition-colors duration-200 flex items-center gap-2'
               >
                 {item.texto}

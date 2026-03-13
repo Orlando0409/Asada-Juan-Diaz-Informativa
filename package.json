@@ -20,7 +20,7 @@
     "autoprefixer": "^10.4.21",
     "axios": "^1.12.2",
     "date-fns": "^4.1.0",
-    "framer-motion": "^12.23.25",
+    "framer-motion": "^12.34.2",
     "leaflet": "^1.9.4",
     "libphonenumber-js": "^1.12.23",
     "lucide-react": "^0.542.0",
@@ -33,7 +33,7 @@
     "react-select": "^5.10.2",
     "react-slick": "^0.31.0",
     "slick-carousel": "^1.8.1",
-    "swiper": "^11.2.10",
+    "swiper": "^12.1.2",
     "zod": "^3.25.76"
   },
   "devDependencies": {

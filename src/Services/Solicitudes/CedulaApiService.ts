@@ -12,3 +12,45 @@ export async function fetchCedulaData(cedula: string) {
 
   return persona
 }
+
+async function tryFetch(url: string): Promise<any> {
+  try {
+    const res = await fetch(url)
+    if (!res.ok) return null
+    return await res.json()
+  } catch {
+    return null
+  }
+}
+
+export async function fetchCedulaJuridicaData(cedula: string): Promise<string | null> {
+  const digits = cedula.replaceAll(/\D/g, "")
+
+  // 1) GoMeta (proxy/cache de Hacienda)
+  try {
+    const d = await tryFetch(`https://apis.gometa.org/cedulas/${digits}`)
+    const nombre: string =
+      d?.razon_social ||
+      d?.razonsocial ||
+      d?.nombre_comercial ||
+      d?.nombreComercial ||
+      d?.nombre ||
+      ""
+    if (nombre?.trim()) return nombre.trim()
+  } catch {}
+
+  // 2) Hacienda directa
+  try {
+    const d = await tryFetch(`https://api.hacienda.go.cr/fe/ae?identificacion=${digits}`)
+    const nombre: string =
+      d?.razon_social ||
+      d?.razonsocial ||
+      d?.nombre_comercial ||
+      d?.nombreComercial ||
+      d?.nombre ||
+      ""
+    if (nombre?.trim()) return nombre.trim()
+  } catch {}
+
+  return null
+}

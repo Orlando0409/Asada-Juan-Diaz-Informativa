@@ -25,6 +25,7 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
     const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
     const [cedulaValidada, setCedulaValidada] = useState<string>('');
     const [mostrarFormulario, _setMostrarFormulario] = useState(true);
     const [alertShown, setAlertShown] = useState<string>('');
@@ -132,8 +133,6 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                 Correo: (value.Correo || '').trim(),
                 Numero_Telefono: (value.Numero_Telefono || '').trim().replace(/\s/g, ''),
                 Direccion_Exacta: (value.Direccion_Exacta || '').trim(),
-                Planos_Terreno: value.Planos_Terreno,
-                Escritura_Terreno: value.Escritura_Terreno,
             };
 
             // Validar con Zod
@@ -154,17 +153,13 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                     if (val instanceof File) {
                         formData.append(key, val);
                     } else {
-                        formData.append(key, String(val));
+                        formData.append(key, val.toString());
                     }
                 }
             });
 
-            return new Promise<void>((resolve) => {
-                mutation.mutate(formData, {
-                    onSuccess: () => resolve(),
-                    onError: () => resolve(),
-                });
-            });
+            // Usar mutate en lugar de mutateAsync para que React Query maneje el estado automáticamente
+            mutation.mutate(formData);
         },
     });
 
@@ -377,7 +372,10 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                     )}
                 </form.Field>
 
-                {/* Planos del Terreno */}
+            </div>
+
+            {/* Archivos */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 mt-2">
                 <form.Field name="Planos_Terreno">
                     {(field) => {
                         const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
@@ -395,26 +393,29 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                                         validateField("Planos_Terreno", file);
                                     }}
                                     className="hidden"
-                                    id="Planos_Terreno_Juridica"
+                                    id="planos_medidor_juridico"
                                     ref={planosInputRef}
                                     key={archivoActual ? archivoActual.name : 'planos'}
                                 />
                                 <label
-                                    htmlFor="Planos_Terreno_Juridica"
-                                    className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-blue-700 cursor-pointer'}`}
+                                    htmlFor="planos_medidor_juridico"
+                                    className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
                                 >
                                     {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
                                 </label>
                                 {archivoActual && (
                                     <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
-                                        <span className="text-sm text-gray-700">{archivoActual.name}</span>
+                                        <span>{archivoActual.name}</span>
                                         <button
                                             type="button"
                                             onClick={() => {
                                                 field.handleChange(undefined);
                                                 setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
-                                                setFieldErrors(prev => ({ ...prev, ["Planos_Terreno"]: 'Debe subir el plano del terreno' }));
-                                                if (planosInputRef.current) planosInputRef.current.value = '';
+                                                setFieldErrors(prev => ({
+                                                    ...prev,
+                                                    ["Planos_Terreno"]: `Debe subir el plano del terreno`,
+                                                }));
+                                                if (planosInputRef.current) planosInputRef.current.value = "";
                                             }}
                                             className="text-red-500 hover:underline text-xs"
                                         >
@@ -432,8 +433,6 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                         );
                     }}
                 </form.Field>
-
-                {/* Escritura del Terreno */}
                 <form.Field name="Escritura_Terreno">
                     {(field) => {
                         const archivoActual = archivoSeleccionado["Escritura_Terreno"] ?? null;
@@ -451,26 +450,29 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                                         validateField("Escritura_Terreno", file);
                                     }}
                                     className="hidden"
-                                    id="Escritura_Terreno_Juridica"
+                                    id="escritura_medidor_juridico"
                                     ref={escrituraInputRef}
                                     key={archivoActual ? archivoActual.name : 'escritura'}
                                 />
                                 <label
-                                    htmlFor="Escritura_Terreno_Juridica"
-                                    className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-blue-700 cursor-pointer'}`}
+                                    htmlFor="escritura_medidor_juridico"
+                                    className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
                                 >
                                     {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
                                 </label>
                                 {archivoActual && (
                                     <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
-                                        <span className="text-sm text-gray-700">{archivoActual.name}</span>
+                                        <span>{archivoActual.name}</span>
                                         <button
                                             type="button"
                                             onClick={() => {
                                                 field.handleChange(undefined);
                                                 setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: null }));
-                                                setFieldErrors(prev => ({ ...prev, ["Escritura_Terreno"]: 'Debe subir la escritura del terreno' }));
-                                                if (escrituraInputRef.current) escrituraInputRef.current.value = '';
+                                                setFieldErrors(prev => ({
+                                                    ...prev,
+                                                    ["Escritura_Terreno"]: `Debe subir la escritura del terreno`,
+                                                }));
+                                                if (escrituraInputRef.current) escrituraInputRef.current.value = "";
                                             }}
                                             className="text-red-500 hover:underline text-xs"
                                         >

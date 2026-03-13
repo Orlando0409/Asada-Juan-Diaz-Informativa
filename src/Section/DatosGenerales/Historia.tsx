@@ -8,7 +8,7 @@ const Historia = () => {
   return (
     <section className="w-screen bg-gray-200 text-black px-6 py-10 sm:px-10 lg:px-20 lg:py-10 flex flex-col gap-10">
       {/* Título y texto */}
-      <div className="flex flex-col gap-4 text-center lg:text-left">
+      <div className="pt-12 flex flex-col gap-4 text-center lg:text-left">
         <h3 className="font-bold text-lg sm:text-xl md:text-2xl lg:text-3xl text-sky-800">
           Historia de la ASADA de Juan Díaz
         </h3>

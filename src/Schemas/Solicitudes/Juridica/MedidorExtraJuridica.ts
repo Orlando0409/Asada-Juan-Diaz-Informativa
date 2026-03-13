@@ -34,16 +34,16 @@ export const MedidorExtraJuridicaSchema = z.object({
     .refine(val => val.trim().length > 0, 'La dirección no puede estar vacía')
     .transform(val => val.trim()),
 
-  Planos_Terreno: z.instanceof(File, { message: 'Debe subir el plano del terreno' })
+  Planos_Terreno: z.instanceof(File, { message: "Debe subir el plano del terreno" })
     .refine(
-      (file) => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
-      'El plano debe ser una imagen (JPG, PNG, HEIC) o PDF'
+      file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
+      'El plano del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
     ),
 
-  Escritura_Terreno: z.instanceof(File, { message: 'Debe subir la escritura del terreno' })
+  Escritura_Terreno: z.instanceof(File, { message: "Debe subir la escritura del terreno" })
     .refine(
-      (file) => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
-      'La escritura debe ser una imagen (JPG, PNG, HEIC) o PDF'
+      file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
+      'La escritura del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
     ),
 });
 

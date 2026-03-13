@@ -1,5 +1,6 @@
 import apiAuth from "../../api/apiAuth";
 import type { AsociadoFisico } from "../../Schemas/Solicitudes/Fisica/Asociado";
+import type { CambioMedidorFisico } from "../../models/Forms/Solicitudes/Fisico/CambioMedidor";
 
 export async function createAfiliacionFisica(data: FormData) {
   const response = await apiAuth.post("/solicitudes-fisicas/create/afiliacion", data);

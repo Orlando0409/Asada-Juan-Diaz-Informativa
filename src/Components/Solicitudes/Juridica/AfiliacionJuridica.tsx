@@ -29,6 +29,7 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
     const mutation = useAfiliacionJuridica();
     const planosInputRef = useRef<HTMLInputElement>(null);
     const escrituraInputRef = useRef<HTMLInputElement>(null);
+ 
 
     const [mostrarFormulario, setMostrarFormulario] = useState(true);
 
