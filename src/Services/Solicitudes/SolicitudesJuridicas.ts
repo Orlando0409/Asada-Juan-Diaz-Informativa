@@ -1,6 +1,7 @@
 import apiAuth from "../../api/apiAuth";
 import type { AsociadoJuridico } from "../../models/Forms/Solicitudes/Juridica/AsociadoJuridica";
 import type { CambioMedidorJuridica } from "../../Schemas/Solicitudes/Juridica/CambioMedidorJuridico";
+import type { MedidorExtraJuridica } from "../../models/Forms/Solicitudes/Juridica/MedidorExtraJuridico";
 
 export async function createAfiliacionJuridica(data: FormData) {
     const response = await apiAuth.post("/solicitudes-juridicas/create/afiliacion", data);
@@ -22,7 +23,13 @@ export async function createAsociadoJuridica(data: AsociadoJuridico) {
     return response.data;
 }
 
+
+export async function createAgregarMedidorJuridica(data: MedidorExtraJuridica) {
+    const response = await apiAuth.post("/solicitudes-juridicas/create/agregar-medidor", data);
+    return response.data;
+}
 export async function getMedidoresByIdentificacionJuridica(cedulaJuridica: string) {
     const response = await apiAuth.get(`/afiliados/juridico/medidores/${cedulaJuridica}`);
     return response.data;
 }
+

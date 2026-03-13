@@ -99,6 +99,7 @@ const FormularioContacto = ({ tipo }: Props) => {
       }
 
       // Si llegamos aquí, la validación pasó
+      setIsLoading(true)
       try {
          await mutation.mutateAsync({ data: value, tipo })
          setFormKey((prev) => prev + 1) 
