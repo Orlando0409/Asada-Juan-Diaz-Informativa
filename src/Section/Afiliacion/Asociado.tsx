@@ -159,26 +159,34 @@ const Asociado = () => {
 
       {/* Modal Formulario Jurídico */}
       {mostrarFormularioJuridico && (
-        <div className="fixed inset-0 z-[9999] flex items-start justify-center overflow-hidden px-5 pt-16 pb-10 sm:px-8 md:px-10">
-          <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={() => setMostrarFormularioJuridico(false)}
-          ></div>
-          <div className="scrollbar-hide relative w-[78dvw] max-w-lg sm:w-[66%] md:w-[54%] lg:w-[46%] xl:w-[38%] max-h-[78vh] overflow-y-auto">
-            <FormularioAsociadoJuridico onClose={() => setMostrarFormularioJuridico(false)} />
+        <div
+          className="fixed inset-0 z-[9999] overflow-y-auto scrollbar-hide bg-black/50 backdrop-blur-sm"
+          onClick={() => setMostrarFormularioJuridico(false)}
+        >
+          <div className="flex min-h-screen items-center justify-center px-6 py-32">
+            <div
+              className="relative w-[76dvw] max-w-xl sm:w-[68%] md:w-[50%] lg:w-[40%] xl:w-[38%] rounded-2xl bg-white shadow-2xl"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <FormularioAsociadoJuridico onClose={() => setMostrarFormularioJuridico(false)} />
+            </div>
           </div>
         </div>
       )}
 
       {/* Modal Formulario Físico */}
       {mostrarFormularioFisico && (
-        <div className="fixed inset-0 z-[9999] flex items-start justify-center overflow-hidden px-5 pt-16 pb-10 sm:px-8 md:px-10">
-          <div
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={() => setMostrarFormularioFisico(false)}
-          ></div>
-          <div className="scrollbar-hide relative w-[78dvw] max-w-lg sm:w-[66%] md:w-[54%] lg:w-[46%] xl:w-[38%] max-h-[78vh] overflow-y-auto">
-            <FormularioAsociado onClose={() => setMostrarFormularioFisico(false)} />
+        <div
+          className="fixed inset-0 z-[9999] overflow-y-auto scrollbar-hide bg-black/50 backdrop-blur-sm"
+          onClick={() => setMostrarFormularioFisico(false)}
+        >
+          <div className="flex min-h-screen items-center justify-center px-6 py-32">
+            <div
+              className="relative w-[76dvw] max-w-xl sm:w-[68%] md:w-[50%] lg:w-[40%] xl:w-[38%] rounded-2xl bg-white shadow-2xl"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <FormularioAsociado onClose={() => setMostrarFormularioFisico(false)} />
+            </div>
           </div>
         </div>
       )}
