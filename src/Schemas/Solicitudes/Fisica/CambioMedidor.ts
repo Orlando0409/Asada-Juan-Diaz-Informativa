@@ -75,10 +75,16 @@ export const CambioMedidorSchema = z.object({
     .max(9999999, { message: 'El Id del medidor no puede ser mayor a 9,999,999' })
     .positive('El Id del medidor debe ser positivo'),
 
-  Foto_Medidor: z.instanceof(File, { message: 'Debe subir una foto del medidor' })
+  Planos_Terreno: z.instanceof(File, { message: 'Debe subir el plano del terreno' })
     .refine(
       (file) => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
-      'La foto debe ser una imagen (JPG, PNG, HEIC) o PDF'
+      'El plano debe ser una imagen (JPG, PNG, HEIC) o PDF'
+    ),
+
+  Escritura_Terreno: z.instanceof(File, { message: 'Debe subir la escritura del terreno' })
+    .refine(
+      (file) => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
+      'La escritura debe ser una imagen (JPG, PNG, HEIC) o PDF'
     ),
 }).refine(
   (data) => {

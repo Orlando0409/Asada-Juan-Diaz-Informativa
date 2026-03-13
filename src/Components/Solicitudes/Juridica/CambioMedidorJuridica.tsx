@@ -1,5 +1,5 @@
 import { useForm } from "@tanstack/react-form";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { CambioMedidorJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/CambioMedidorJuridico";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
@@ -24,12 +24,15 @@ const fieldSchemas: Record<string, z.ZodTypeAny> = CambioMedidorJuridicaSchema.s
 const STORAGE_KEY = 'afiliacion_juridica_temp';
 
 const CambioMedidorJuridica = ({ onClose }: Props) => {
+    const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const [isSending, setIsSending] = useState(false);
     const mutation = useCambioMedidorJuridica();
     const [mostrarFormulario, setMostrarFormulario] = useState(true);
     const [cedulaJuridica, setCedulaJuridica] = useState('');
+    const planosInputRef = useRef<HTMLInputElement>(null);
+    const escrituraInputRef = useRef<HTMLInputElement>(null);
     const { medidores, isLoading: isMedidoresLoading } = useMedidoresJuridica(cedulaJuridica);
 
     // Validación en tiempo real SOLO del campo editado
@@ -91,10 +94,13 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
             Direccion_Exacta: "",
             Motivo_Solicitud: "",
             Id_Medidor: 0,
+            Planos_Terreno: undefined as File | undefined,
+            Escritura_Terreno: undefined as File | undefined,
         },
 
         onSubmit: async ({ value }) => {
             setFormErrors({});
+            setFieldErrors({});
             try {
                 // Validar y normalizar el teléfono internacional
                 const phoneNumber = parsePhoneNumberFromString(value.Numero_Telefono || "");
@@ -102,10 +108,20 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                     setFormErrors({ Numero_Telefono: "Número de teléfono inválido" });
                     return;
                 }
-                // Guarda el número en formato E.164 (+50688887777)
-                value.Numero_Telefono = phoneNumber.format("E.164");
 
-                const validation = CambioMedidorJuridicaSchema.safeParse(value);
+                const cleanedValue = {
+                    ...value,
+                    Razon_Social: (value.Razon_Social || '').trim(),
+                    Cedula_Juridica: (value.Cedula_Juridica || '').trim(),
+                    Correo: (value.Correo || '').trim(),
+                    Numero_Telefono: phoneNumber.format("E.164"),
+                    Direccion_Exacta: (value.Direccion_Exacta || '').trim(),
+                    Motivo_Solicitud: (value.Motivo_Solicitud || '').trim(),
+                    Planos_Terreno: value.Planos_Terreno,
+                    Escritura_Terreno: value.Escritura_Terreno,
+                };
+
+                const validation = CambioMedidorJuridicaSchema.safeParse(cleanedValue);
                 if (!validation.success) {
                     const validationErrors: Record<string, string> = {};
                     validation.error.errors.forEach((err) => {
@@ -116,12 +132,26 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                     return;
                 }
 
+                const formData = new FormData();
+                Object.entries(validation.data).forEach(([key, val]) => {
+                    if (val !== undefined && val !== null && val !== "") {
+                        if (val instanceof File) {
+                            formData.append(key, val);
+                        } else {
+                            formData.append(key, String(val));
+                        }
+                    }
+                });
+
                 setIsSending(true);
-                await mutation.createCambioMedidor(value);
+                await mutation.createCambioMedidor(formData);
                 sessionStorage.removeItem(STORAGE_KEY);
 
                 form.reset();
                 setFieldErrors({});
+                setArchivoSeleccionado({});
+                if (planosInputRef.current) planosInputRef.current.value = '';
+                if (escrituraInputRef.current) escrituraInputRef.current.value = '';
                 setMostrarFormulario(false);
                 onClose();
             } catch (error: any) {
@@ -364,6 +394,118 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                         <span className="text-red-500 text-sm block mt-1">
                                             No se encontraron medidores para esta identificación
                                         </span>
+                                    )}
+                                </div>
+                            );
+                        }}
+                    </form.Field>
+
+                    {/* Planos del Terreno */}
+                    <form.Field name="Planos_Terreno">
+                        {(field) => {
+                            const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
+                            return (
+                                <div className="mb-3 w-full">
+                                    <label className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
+                                    <input
+                                        type="file"
+                                        accept=".png,.jpg,.jpeg,.heic,.pdf"
+                                        disabled={!!archivoActual}
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0] ?? null;
+                                            field.handleChange(file ?? undefined);
+                                            setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: file }));
+                                            handleFieldChange("Planos_Terreno", file);
+                                        }}
+                                        className="hidden"
+                                        id="Planos_Terreno_CambioJuridica"
+                                        ref={planosInputRef}
+                                        key={archivoActual ? archivoActual.name : 'planos'}
+                                    />
+                                    <label
+                                        htmlFor="Planos_Terreno_CambioJuridica"
+                                        className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-blue-700 cursor-pointer'}`}
+                                    >
+                                        {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
+                                    </label>
+                                    {archivoActual && (
+                                        <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
+                                            <span className="text-sm text-gray-700">{archivoActual.name}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    field.handleChange(undefined);
+                                                    setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
+                                                    setFieldErrors(prev => ({ ...prev, ["Planos_Terreno"]: 'Debe subir el plano del terreno' }));
+                                                    if (planosInputRef.current) planosInputRef.current.value = '';
+                                                }}
+                                                className="text-red-500 hover:underline text-xs"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </div>
+                                    )}
+                                    {fieldErrors["Planos_Terreno"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors["Planos_Terreno"]}</span>
+                                    )}
+                                    {formErrors["Planos_Terreno"] && !fieldErrors["Planos_Terreno"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{formErrors["Planos_Terreno"]}</span>
+                                    )}
+                                </div>
+                            );
+                        }}
+                    </form.Field>
+
+                    {/* Escritura del Terreno */}
+                    <form.Field name="Escritura_Terreno">
+                        {(field) => {
+                            const archivoActual = archivoSeleccionado["Escritura_Terreno"] ?? null;
+                            return (
+                                <div className="mb-3 w-full">
+                                    <label className="block mb-1 font-medium">Escritura del terreno <span className="text-red-500">*</span></label>
+                                    <input
+                                        type="file"
+                                        accept=".png,.jpg,.jpeg,.heic,.pdf"
+                                        disabled={!!archivoActual}
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0] ?? null;
+                                            field.handleChange(file ?? undefined);
+                                            setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: file }));
+                                            handleFieldChange("Escritura_Terreno", file);
+                                        }}
+                                        className="hidden"
+                                        id="Escritura_Terreno_CambioJuridica"
+                                        ref={escrituraInputRef}
+                                        key={archivoActual ? archivoActual.name : 'escritura'}
+                                    />
+                                    <label
+                                        htmlFor="Escritura_Terreno_CambioJuridica"
+                                        className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-blue-700 cursor-pointer'}`}
+                                    >
+                                        {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
+                                    </label>
+                                    {archivoActual && (
+                                        <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
+                                            <span className="text-sm text-gray-700">{archivoActual.name}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    field.handleChange(undefined);
+                                                    setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: null }));
+                                                    setFieldErrors(prev => ({ ...prev, ["Escritura_Terreno"]: 'Debe subir la escritura del terreno' }));
+                                                    if (escrituraInputRef.current) escrituraInputRef.current.value = '';
+                                                }}
+                                                className="text-red-500 hover:underline text-xs"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </div>
+                                    )}
+                                    {fieldErrors["Escritura_Terreno"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors["Escritura_Terreno"]}</span>
+                                    )}
+                                    {formErrors["Escritura_Terreno"] && !fieldErrors["Escritura_Terreno"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{formErrors["Escritura_Terreno"]}</span>
                                     )}
                                 </div>
                             );

@@ -1,7 +1,6 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createAfiliacionJuridica, createAgregarMedidorJuridica, createAsociadoJuridica, createCambioMedidorJuridica, createDesconexionJuridica, getMedidoresByIdentificacionJuridica } from "../../Services/Solicitudes/SolicitudesJuridicas";
-import type { CambioMedidorJuridica } from "../../Schemas/Solicitudes/Juridica/CambioMedidorJuridico";
 import type { AsociadoJuridico } from "../../models/Forms/Solicitudes/Juridica/AsociadoJuridica";
 import type { Medidor } from "../../models/Medidor";
 import type { MedidoresResponse } from "../../models/Forms/Solicitudes/Fisico/CambioMedidor";
@@ -56,7 +55,7 @@ export const useCambioMedidorJuridica = () => {
     const { showSuccess, showError } = useAlerts();
 
     const createCambioMedidorJuridicaMutation = useMutation({
-        mutationFn: (data: CambioMedidorJuridica) => createCambioMedidorJuridica(data),
+        mutationFn: (data: FormData) => createCambioMedidorJuridica(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cambio-medidor"] });
             showSuccess("¡Solicitud creada!", "La solicitud de cambio de medidor ha sido creada con éxito.");

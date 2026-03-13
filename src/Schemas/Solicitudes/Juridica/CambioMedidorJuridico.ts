@@ -30,6 +30,19 @@ export const CambioMedidorJuridicaSchema = z.object({
     .int('El Id del medidor debe ser un número entero')
     .min(1, { message: 'El Id del medidor debe ser mayor a 0' })
     .max(9999999, { message: 'El Id del medidor no puede ser mayor a 9,999,999' })
-    .positive('El Id del medidor debe ser positivo'),});
+    .positive('El Id del medidor debe ser positivo'),
+
+  Planos_Terreno: z.instanceof(File, { message: 'Debe subir el plano del terreno' })
+    .refine(
+      (file) => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
+      'El plano debe ser una imagen (JPG, PNG, HEIC) o PDF'
+    ),
+
+  Escritura_Terreno: z.instanceof(File, { message: 'Debe subir la escritura del terreno' })
+    .refine(
+      (file) => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
+      'La escritura debe ser una imagen (JPG, PNG, HEIC) o PDF'
+    ),
+});
 
 export type CambioMedidorJuridica = z.infer<typeof CambioMedidorJuridicaSchema>;
