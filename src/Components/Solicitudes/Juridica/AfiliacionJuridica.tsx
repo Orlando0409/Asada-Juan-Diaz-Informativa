@@ -2,7 +2,6 @@ import { useForm } from "@tanstack/react-form";
 import { useEffect, useRef, useState } from "react";
 import { AfiliacionJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/AfiliacionJuridica";
 import { useAfiliacionJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
-import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import PhoneInputComponent from "../PhoneInputComponent";
 import MedidorExtraJuridica from "./MedidorExtraJuridica";
 
@@ -30,7 +29,7 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
     const mutation = useAfiliacionJuridica();
     const planosInputRef = useRef<HTMLInputElement>(null);
     const escrituraInputRef = useRef<HTMLInputElement>(null);
-    const { lookupJuridica, isLoading: loadingCedula } = useCedulaLookup();
+ 
 
     const [mostrarFormulario, setMostrarFormulario] = useState(true);
 
