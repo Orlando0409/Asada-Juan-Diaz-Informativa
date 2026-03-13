@@ -163,12 +163,12 @@ const CambioMedidor = () => {
       {/* Modal Formulario Jurídico */}
       {mostrarFormularioJuridico && (
         <div
-          className="fixed inset-0 z-[9999] overflow-y-auto scrollbar-hide bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 z-[9999] overflow-hidden bg-black/50 backdrop-blur-sm"
           onClick={() => setMostrarFormularioJuridico(false)}
         >
-          <div className="flex min-h-screen items-center justify-center px-6 py-32">
+          <div className="flex h-full items-center justify-center px-6 py-10">
             <div
-              className="relative w-[76dvw] max-w-xl sm:w-[68%] md:w-[50%] lg:w-[40%] xl:w-[38%] rounded-2xl bg-white shadow-2xl"
+              className="scrollbar-hide relative max-h-[84vh] w-[76dvw] max-w-xl sm:w-[68%] md:w-[50%] lg:w-[40%] xl:w-[38%] overflow-y-auto rounded-2xl bg-white shadow-2xl"
               onClick={(event) => event.stopPropagation()}
             >
               <CambioMedidorJuridica onClose={() => setMostrarFormularioJuridico(false)} />
@@ -180,12 +180,12 @@ const CambioMedidor = () => {
       {/* Modal Formulario Físico */}
       {mostrarFormularioFisico && (
         <div
-          className="fixed inset-0 z-[9999] overflow-y-auto scrollbar-hide bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 z-[9999] overflow-hidden bg-black/50 backdrop-blur-sm"
           onClick={() => setMostrarFormularioFisico(false)}
         >
-          <div className="flex min-h-screen items-center justify-center px-6 py-32">
+          <div className="flex h-full items-center justify-center px-6 py-10">
             <div
-              className="relative w-[76dvw] max-w-xl sm:w-[68%] md:w-[50%] lg:w-[40%] xl:w-[38%] rounded-2xl bg-white shadow-2xl"
+              className="scrollbar-hide relative max-h-[84vh] w-[76dvw] max-w-xl sm:w-[68%] md:w-[50%] lg:w-[40%] xl:w-[38%] overflow-y-auto rounded-2xl bg-white shadow-2xl"
               onClick={(event) => event.stopPropagation()}
             >
               <CambioMedidorFisico onClose={() => setMostrarFormularioFisico(false)} />

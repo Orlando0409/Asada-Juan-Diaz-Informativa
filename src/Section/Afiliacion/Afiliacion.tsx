@@ -214,12 +214,12 @@ const InformacionAfiliacion = () => {
 
 {mostrarFormularioJuridico && (
   <div
-    className="fixed inset-0 z-[9999] overflow-y-auto scrollbar-hide bg-black/50 backdrop-blur-sm"
+    className="fixed inset-0 z-[9999] overflow-hidden bg-black/50 backdrop-blur-sm"
     onClick={() => setMostrarFormularioJuridico(false)}
   >
-    <div className="flex min-h-screen items-center justify-center px-6 py-32">
+    <div className="flex h-full items-start justify-center px-6 pt-16 pb-8 sm:pt-20">
       <div
-        className="relative w-[76dvw] max-w-xl sm:w-[68%] md:w-[50%] lg:w-[40%] xl:w-[38%] rounded-2xl bg-white shadow-2xl"
+        className="scrollbar-hide relative max-h-[calc(100vh-7rem)] w-[76dvw] max-w-xl sm:w-[68%] md:w-[50%] lg:w-[40%] xl:w-[38%] overflow-y-auto rounded-2xl bg-white shadow-2xl"
         onClick={(event) => event.stopPropagation()}
       >
         <FormularioAfiliacionJuridico
@@ -232,12 +232,12 @@ const InformacionAfiliacion = () => {
 
       {mostrarFormulario && (
         <div
-          className="fixed inset-0 z-[9999] overflow-y-auto scrollbar-hide bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 z-[9999] overflow-hidden bg-black/50 backdrop-blur-sm"
           onClick={() => setMostrarFormulario(false)}
         >
-          <div className="flex min-h-screen items-center justify-center px-6 py-32">
+          <div className="flex h-full items-start justify-center px-6 pt-16 pb-8 sm:pt-20">
             <div
-              className="relative w-[76dvw] max-w-xl sm:w-[68%] md:w-[50%] lg:w-[40%] xl:w-[38%] rounded-2xl bg-white shadow-2xl"
+              className="scrollbar-hide relative max-h-[calc(100vh-7rem)] w-[76dvw] max-w-xl sm:w-[68%] md:w-[50%] lg:w-[40%] xl:w-[38%] overflow-y-auto rounded-2xl bg-white shadow-2xl"
               onClick={(event) => event.stopPropagation()}
             >
               <FormularioAfiliacion onClose={() => setMostrarFormulario(false)} />
