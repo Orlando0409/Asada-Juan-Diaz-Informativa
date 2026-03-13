@@ -166,9 +166,9 @@ const CambioMedidor = () => {
           className="fixed inset-0 z-[9999] overflow-hidden bg-black/50 backdrop-blur-sm"
           onClick={() => setMostrarFormularioJuridico(false)}
         >
-          <div className="flex h-full items-center justify-center px-6 py-10">
+          <div className="flex h-full items-start justify-center px-6 pt-16 pb-8 sm:pt-20">
             <div
-              className="scrollbar-hide relative max-h-[84vh] w-[76dvw] max-w-xl sm:w-[68%] md:w-[50%] lg:w-[40%] xl:w-[38%] overflow-y-auto rounded-2xl bg-white shadow-2xl"
+              className="scrollbar-hide relative max-h-[calc(100vh-7rem)] w-[76dvw] max-w-xl sm:w-[68%] md:w-[50%] lg:w-[40%] xl:w-[38%] overflow-y-auto rounded-2xl bg-white shadow-2xl"
               onClick={(event) => event.stopPropagation()}
             >
               <CambioMedidorJuridica onClose={() => setMostrarFormularioJuridico(false)} />
@@ -183,9 +183,9 @@ const CambioMedidor = () => {
           className="fixed inset-0 z-[9999] overflow-hidden bg-black/50 backdrop-blur-sm"
           onClick={() => setMostrarFormularioFisico(false)}
         >
-          <div className="flex h-full items-center justify-center px-6 py-10">
+          <div className="flex h-full items-start justify-center px-6 pt-16 pb-8 sm:pt-20">
             <div
-              className="scrollbar-hide relative max-h-[84vh] w-[76dvw] max-w-xl sm:w-[68%] md:w-[50%] lg:w-[40%] xl:w-[38%] overflow-y-auto rounded-2xl bg-white shadow-2xl"
+              className="scrollbar-hide relative max-h-[calc(100vh-7rem)] w-[76dvw] max-w-xl sm:w-[68%] md:w-[50%] lg:w-[40%] xl:w-[38%] overflow-y-auto rounded-2xl bg-white shadow-2xl"
               onClick={(event) => event.stopPropagation()}
             >
               <CambioMedidorFisico onClose={() => setMostrarFormularioFisico(false)} />
