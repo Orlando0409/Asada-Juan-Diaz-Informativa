@@ -6,7 +6,6 @@ import type { AsociadoJuridico } from "../../models/Forms/Solicitudes/Juridica/A
 import type { Medidor } from "../../models/Medidor";
 import type { MedidoresResponse } from "../../models/Forms/Solicitudes/Fisico/CambioMedidor";
 import { useAlerts } from "../../context/AlertContext";
-import type { MedidorExtraJuridica } from "../../models/Forms/Solicitudes/Juridica/MedidorExtraJuridico";
 
 export const useAfiliacionJuridica = () => {
     const queryClient = useQueryClient();
@@ -102,7 +101,7 @@ export const useAgregarMedidorJuridica = () => {
     const { showSuccess, showError } = useAlerts();
 
     const mutation = useMutation({
-        mutationFn: (data: MedidorExtraJuridica) => createAgregarMedidorJuridica(data),
+        mutationFn: (data: FormData) => createAgregarMedidorJuridica(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["agregar-medidor"] });
             queryClient.invalidateQueries({ queryKey: ["medidores-juridica"] });

@@ -1,5 +1,5 @@
 import { useForm } from "@tanstack/react-form";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CambioMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/CambioMedidor";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { useCambioMedidorFisica, useMedidores } from "../../../Hook/Solicitudes/HookFisicas";
@@ -23,6 +23,7 @@ const STORAGE_KEY = 'cambiomedidor_fisico_temp';
 
 const FormularioCambioMedidor = ({ onClose }: Props) => {
   const sanitizeNameInput = (value: string) => value.replace(/\d/g, "");
+  const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isSending, setIsSending] = useState(false);
@@ -30,6 +31,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
   const [mostrarFormulario, setMostrarFormulario] = useState(true);
   const { lookup, isLoading } = useCedulaLookup();
   const [identificacion, setIdentificacion] = useState('');
+  const fotoMedidorRef = useRef<HTMLInputElement>(null);
   const { medidores, isLoading: isMedidoresLoading } = useMedidores(identificacion);
 
 
@@ -46,6 +48,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
         Correo: "test@test.com",
         Motivo_Solicitud: "1234567890",
         Id_Medidor: 1,
+        Foto_Medidor: new File([''], 'test.jpg', { type: 'image/jpeg' }),
       };
 
       if (fieldName === "Identificacion" && allValues?.Tipo_Identificacion) {
@@ -167,6 +170,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
       Correo: '',
       Motivo_Solicitud: '',
       Id_Medidor: 0,
+      Foto_Medidor: undefined as File | undefined,
     },
     onSubmit: async ({ value }) => {
       setFormErrors({});
@@ -182,13 +186,24 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
           setFormErrors(validationErrors);
           return;
         }
-        console.log('Payload enviado:', value);
+        const formData = new FormData();
+        Object.entries(validation.data).forEach(([key, val]) => {
+          if (val !== undefined && val !== null && val !== "") {
+            if (val instanceof File) {
+              formData.append(key, val);
+            } else {
+              formData.append(key, String(val));
+            }
+          }
+        });
         setIsSending(true);
-        await mutation.createCambioMedidor(value);
+        await mutation.createCambioMedidor(formData);
         sessionStorage.removeItem(STORAGE_KEY);
 
         form.reset();
         setFieldErrors({});
+        setArchivoSeleccionado({});
+        if (fotoMedidorRef.current) fotoMedidorRef.current.value = '';
         setMostrarFormulario(false);
         onClose();
       } catch (error: any) {
@@ -501,6 +516,62 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                 )}
               </div>
             )}
+          </form.Field>
+
+          {/* Foto del Medidor */}
+          <form.Field name="Foto_Medidor">
+            {(field) => {
+              const archivoActual = archivoSeleccionado["Foto_Medidor"] ?? null;
+              return (
+                <div className="mb-3 w-full">
+                  <label className="block mb-1 font-medium">Foto del medidor <span className="text-red-500">*</span></label>
+                  <input
+                    type="file"
+                    accept=".png,.jpg,.jpeg,.heic,.pdf"
+                    disabled={!!archivoActual}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0] ?? null;
+                      field.handleChange(file ?? undefined);
+                      setArchivoSeleccionado(prev => ({ ...prev, ["Foto_Medidor"]: file }));
+                      validateField("Foto_Medidor", file);
+                    }}
+                    className="hidden"
+                    id="Foto_Medidor"
+                    ref={fotoMedidorRef}
+                    key={archivoActual ? archivoActual.name : 'foto-medidor'}
+                  />
+                  <label
+                    htmlFor="Foto_Medidor"
+                    className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-blue-700 cursor-pointer'}`}
+                  >
+                    {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
+                  </label>
+                  {archivoActual && (
+                    <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
+                      <span className="text-sm text-gray-700">{archivoActual.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          field.handleChange(undefined);
+                          setArchivoSeleccionado(prev => ({ ...prev, ["Foto_Medidor"]: null }));
+                          setFieldErrors(prev => ({ ...prev, ["Foto_Medidor"]: 'Debe subir una foto del medidor' }));
+                          if (fotoMedidorRef.current) fotoMedidorRef.current.value = '';
+                        }}
+                        className="text-red-500 hover:underline text-xs"
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  )}
+                  {fieldErrors["Foto_Medidor"] && (
+                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Foto_Medidor"]}</span>
+                  )}
+                  {formErrors["Foto_Medidor"] && !fieldErrors["Foto_Medidor"] && (
+                    <span className="text-red-500 text-sm block mt-1">{formErrors["Foto_Medidor"]}</span>
+                  )}
+                </div>
+              );
+            }}
           </form.Field>
         </div>
 

@@ -1,6 +1,6 @@
 
 import { useForm } from "@tanstack/react-form";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MedidorExtraFisicoSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/MedidorExtra";
 import { useAgregarMedidorFisica, useMedidores } from "../../../Hook/Solicitudes/HookFisicas";
 import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
@@ -22,11 +22,14 @@ const STORAGE_KEY = 'medidor_extra_fisica_temp';
 
 const MedidorExtraFisico = ({ onClose }: Props) => {
     const sanitizeNameInput = (value: string) => value.replace(/\d/g, "");
+    const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const [identificacionValidada, setIdentificacionValidada] = useState<string>('');
     const [mostrarFormulario, _setMostrarFormulario] = useState(true);
     const [alertShown, setAlertShown] = useState<string>('');
+    const planosInputRef = useRef<HTMLInputElement>(null);
+    const escrituraInputRef = useRef<HTMLInputElement>(null);
 
     const mutation = useAgregarMedidorFisica();
     const { lookup, isLoading: loadingCedula } = useCedulaLookup();
@@ -47,8 +50,8 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                 Direccion_Exacta: "1234567890",
                 Numero_Telefono: "+50688887777",
                 Correo: "test@test.com",
-                Motivo_Solicitud: "Necesito un medidor extra",
-                Id_Nuevo_Medidor: "",
+                Planos_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
+                Escritura_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
             };
 
             if (fieldName === "Identificacion" && allValues?.Tipo_Identificacion) {
@@ -133,8 +136,6 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
             Correo: 'ejemplo@gmail.com',
             Numero_Telefono: '+50688887777',
             Direccion_Exacta: 'San José, del Banco Nacional 200m sur',
-            Motivo_Solicitud: 'Explique brevemente por qué necesita un medidor adicional',
-            Id_Nuevo_Medidor: 'Opcional',
         };
         if (fieldName === 'Identificacion') {
             switch (tipoIdentificacion) {
@@ -158,8 +159,6 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                 Correo: values.Correo,
                 Numero_Telefono: values.Numero_Telefono,
                 Direccion_Exacta: values.Direccion_Exacta,
-                Motivo_Solicitud: values.Motivo_Solicitud,
-                Id_Nuevo_Medidor: values.Id_Nuevo_Medidor,
             };
             sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
         } catch (error) {
@@ -177,8 +176,8 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
             Correo: '',
             Direccion_Exacta: '',
             Numero_Telefono: '',
-            Motivo_Solicitud: '',
-            Id_Nuevo_Medidor: '',
+            Planos_Terreno: undefined as File | undefined,
+            Escritura_Terreno: undefined as File | undefined,
         },
 
         onSubmit: async ({ value }) => {
@@ -200,8 +199,8 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                 Correo: (value.Correo || '').trim(),
                 Numero_Telefono: (value.Numero_Telefono || '').trim().replace(/\s/g, ''),
                 Direccion_Exacta: (value.Direccion_Exacta || '').trim(),
-                Motivo_Solicitud: (value.Motivo_Solicitud || '').trim(),
-                Id_Nuevo_Medidor: (value.Id_Nuevo_Medidor || '').trim() || undefined,
+                Planos_Terreno: value.Planos_Terreno,
+                Escritura_Terreno: value.Escritura_Terreno,
             };
 
             try {
@@ -222,9 +221,20 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                 return;
             }
 
+            const formData = new FormData();
+            Object.entries(validation.data).forEach(([key, val]) => {
+                if (val !== undefined && val !== null && val !== "") {
+                    if (val instanceof File) {
+                        formData.append(key, val);
+                    } else {
+                        formData.append(key, String(val));
+                    }
+                }
+            });
+
             // Usar mutate en lugar de mutateAsync para que React Query maneje el estado automáticamente
             return new Promise<void>((resolve) => {
-                mutation.mutate(validation.data, {
+                mutation.mutate(formData, {
                     onSuccess: () => resolve(),
                     onError: () => resolve(),
                 });
@@ -237,8 +247,21 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
         if (savedData) {
             try {
                 const parsed = JSON.parse(savedData);
+                const allowedKeys = [
+                    'Nombre',
+                    'Apellido1',
+                    'Apellido2',
+                    'Tipo_Identificacion',
+                    'Identificacion',
+                    'Correo',
+                    'Numero_Telefono',
+                    'Direccion_Exacta',
+                ];
+
                 Object.entries(parsed).forEach(([key, value]) => {
-                    form.setFieldValue(key as any, value as any);
+                    if (allowedKeys.includes(key)) {
+                        form.setFieldValue(key as any, value as any);
+                    }
                 });
             } catch (error) {
                 console.error('Error al cargar datos guardados:', error);
@@ -253,6 +276,9 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
             form.reset();
             setFormErrors({});
             setFieldErrors({});
+            setArchivoSeleccionado({});
+            if (planosInputRef.current) planosInputRef.current.value = "";
+            if (escrituraInputRef.current) escrituraInputRef.current.value = "";
             setTimeout(() => onClose(), 1500); // con retraso para que el usuario vea el mensaje de éxito
         }
     }, [mutation.isSuccess]);
@@ -516,57 +542,135 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                         )}
                     </form.Field>
 
-                    {/* ID Nuevo Medidor (Opcional) */}
-                    <form.Field name="Id_Nuevo_Medidor">
-                        {(field) => (
-                            <div className="mb-3">
-                                <label className="block mb-1 font-medium">ID Nuevo Medidor (Opcional)</label>
-                                <input
-                                    type="text"
-                                    value={field.state.value}
-                                    onChange={(e) => {
-                                        field.handleChange(e.target.value);
-                                        saveToSessionStorage({ ...form.state.values, Id_Nuevo_Medidor: e.target.value });
-                                    }}
-                                    placeholder={getPlaceholder("Id_Nuevo_Medidor")}
-                                    className={commonClasses}
-                                />
-                            </div>
-                        )}
+                    {/* Planos del Terreno */}
+                    <form.Field name="Planos_Terreno">
+                        {(field) => {
+                            const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
+                            return (
+                                <div className="w-full mb-2">
+                                    <label htmlFor="Planos_Terreno" className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
+                                    <input
+                                        type="file"
+                                        accept=".png,.jpg,.jpeg,.heic,.pdf"
+                                        disabled={!!archivoActual}
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0] ?? null;
+                                            field.handleChange(file ?? undefined);
+                                            setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: file }));
+                                            validateField("Planos_Terreno", file ?? undefined, form.state.values);
+
+                                            setFormErrors(prev => {
+                                                const newErrors = { ...prev };
+                                                delete newErrors["Planos_Terreno"];
+                                                return newErrors;
+                                            });
+                                        }}
+                                        className="hidden"
+                                        id="Planos_Terreno"
+                                        ref={planosInputRef}
+                                        key={archivoActual ? archivoActual.name : 'planos'}
+                                    />
+                                    <label
+                                        htmlFor="Planos_Terreno"
+                                        className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
+                                    >
+                                        {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
+                                    </label>
+                                    {archivoActual && (
+                                        <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
+                                            <span>{archivoActual.name}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    field.handleChange(undefined);
+                                                    setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
+                                                    setFieldErrors(prev => ({
+                                                        ...prev,
+                                                        ["Planos_Terreno"]: `Debe subir el plano del terreno`,
+                                                    }));
+                                                    if (planosInputRef.current) planosInputRef.current.value = "";
+                                                }}
+                                                className="text-red-500 hover:underline text-xs"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </div>
+                                    )}
+                                    {fieldErrors["Planos_Terreno"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors["Planos_Terreno"]}</span>
+                                    )}
+                                    {formErrors["Planos_Terreno"] && !fieldErrors["Planos_Terreno"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{formErrors["Planos_Terreno"]}</span>
+                                    )}
+                                </div>
+                            );
+                        }}
                     </form.Field>
 
-                    {/* Motivo de Solicitud - Ocupa 2 columnas */}
-                    <div className="md:col-span-2">
-                        <form.Field name="Motivo_Solicitud">
-                            {(field) => (
-                                <div className="mb-3">
-                                    <label className="block mb-1 font-medium">Motivo de la Solicitud <span className="text-red-500">*</span></label>
-                                    <textarea
-                                        value={field.state.value}
+                    {/* Escritura del Terreno */}
+                    <form.Field name="Escritura_Terreno">
+                        {(field) => {
+                            const archivoActual = archivoSeleccionado["Escritura_Terreno"] ?? null;
+                            return (
+                                <div className="w-full mb-2">
+                                    <label htmlFor="Escritura_Terreno" className="block mb-1 font-medium">Escritura del terreno <span className="text-red-500">*</span></label>
+                                    <input
+                                        type="file"
+                                        accept=".png,.jpg,.jpeg,.heic,.pdf"
+                                        disabled={!!archivoActual}
                                         onChange={(e) => {
-                                            field.handleChange(e.target.value);
-                                            validateField("Motivo_Solicitud", e.target.value, form.state.values);
-                                            saveToSessionStorage({ ...form.state.values, Motivo_Solicitud: e.target.value });
+                                            const file = e.target.files?.[0] ?? null;
+                                            field.handleChange(file ?? undefined);
+                                            setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: file }));
+                                            validateField("Escritura_Terreno", file ?? undefined, form.state.values);
+
+                                            setFormErrors(prev => {
+                                                const newErrors = { ...prev };
+                                                delete newErrors["Escritura_Terreno"];
+                                                return newErrors;
+                                            });
                                         }}
-                                        placeholder={getPlaceholder("Motivo_Solicitud")}
-                                        maxLength={500}
-                                        rows={4}
-                                        className={commonClasses}
+                                        className="hidden"
+                                        id="Escritura_Terreno"
+                                        ref={escrituraInputRef}
+                                        key={archivoActual ? archivoActual.name : 'escritura'}
                                     />
-                                    <div className="flex justify-between items-center mt-1">
-                                        <div>
-                                            {fieldErrors["Motivo_Solicitud"] && (
-                                                <span className="text-red-500 text-sm">{fieldErrors["Motivo_Solicitud"]}</span>
-                                            )}
+                                    <label
+                                        htmlFor="Escritura_Terreno"
+                                        className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
+                                    >
+                                        {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
+                                    </label>
+                                    {archivoActual && (
+                                        <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
+                                            <span>{archivoActual.name}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    field.handleChange(undefined);
+                                                    setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: null }));
+                                                    setFieldErrors(prev => ({
+                                                        ...prev,
+                                                        ["Escritura_Terreno"]: `Debe subir la escritura del terreno`,
+                                                    }));
+                                                    if (escrituraInputRef.current) escrituraInputRef.current.value = "";
+                                                }}
+                                                className="text-red-500 hover:underline text-xs"
+                                            >
+                                                Eliminar
+                                            </button>
                                         </div>
-                                        <span className="text-xs text-gray-500">
-                                            {field.state.value.length}/500
-                                        </span>
-                                    </div>
+                                    )}
+                                    {fieldErrors["Escritura_Terreno"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors["Escritura_Terreno"]}</span>
+                                    )}
+                                    {formErrors["Escritura_Terreno"] && !fieldErrors["Escritura_Terreno"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{formErrors["Escritura_Terreno"]}</span>
+                                    )}
                                 </div>
-                            )}
-                        </form.Field>
-                    </div>
+                            );
+                        }}
+                    </form.Field>
                 </div>
 
                 {/* Botones */}
@@ -582,7 +686,7 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                     <button
                         type="submit"
                         className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-                        disabled={!identificacionValidada || medidores.length === 0 || mutation.isPending}
+                        disabled={!identificacionValidada || loadingMedidores || mutation.isPending}
                     >
                         {mutation.isPending ? 'Enviando...' : 'Enviar Solicitud'}
                     </button>

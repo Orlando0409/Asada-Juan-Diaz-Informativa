@@ -1,10 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createAfiliacionFisica, createAgregarMedidorFisica, createAsociadoFisica, createCambioMedidorFisica, createDesconexionFisica, getMedidoresByIdentificacion } from "../../Services/Solicitudes/SolicitudesFisicas";
-import type { CambioMedidorFisico, MedidoresResponse } from "../../models/Forms/Solicitudes/Fisico/CambioMedidor";
+import type { MedidoresResponse } from "../../models/Forms/Solicitudes/Fisico/CambioMedidor";
 import type { AsociadoFisico } from "../../Schemas/Solicitudes/Fisica/Asociado";
 import type { Medidor } from "../../models/Medidor";
 import { useAlerts } from "../../context/AlertContext";
-import type { MedidorExtraFisico } from "../../models/Forms/Solicitudes/Fisico/MedidorExtra";
 
 export const useAfiliacionFisica = () => {
     const queryClient = useQueryClient();
@@ -55,7 +54,7 @@ export const useCambioMedidorFisica = () => {
     const { showSuccess, showError } = useAlerts();
 
     const createCambioMedidorFisicoMutation = useMutation({
-        mutationFn: (data: CambioMedidorFisico) => createCambioMedidorFisica(data),
+        mutationFn: (data: FormData) => createCambioMedidorFisica(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cambio-medidor"] });
             showSuccess("¡Solicitud creada!", "La solicitud de cambio de medidor ha sido creada con éxito.");
@@ -99,7 +98,7 @@ export const useAgregarMedidorFisica = () => {
     const { showSuccess, showError } = useAlerts();
 
     const mutation = useMutation({
-        mutationFn: (data: MedidorExtraFisico) => createAgregarMedidorFisica(data),
+        mutationFn: (data: FormData) => createAgregarMedidorFisica(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["agregar-medidor"] });
             showSuccess("¡Solicitud creada!", "La solicitud de agregar medidor ha sido creada con éxito.");

@@ -58,16 +58,17 @@ export const MedidorExtraFisicoSchema = z.object({
         .refine(val => val.trim().length > 0, 'La dirección no puede estar vacía')
         .transform(val => val.trim()),
 
-    Motivo_Solicitud: z.string()
-        .min(1, 'El motivo de la solicitud no puede estar vacío')
-        .min(10, 'El motivo debe tener al menos 10 caracteres')
-        .max(499, 'El motivo no puede tener más de 500 caracteres')
-        .refine(val => val.trim().length > 0, 'El motivo de la solicitud no puede estar vacío')
-        .transform(val => val.trim()),
-    Id_Nuevo_Medidor: z.string()
-        .optional()
-        .or(z.literal(''))
-        .transform(val => val === '' ? undefined : val),
+    Planos_Terreno: z.instanceof(File, { message: "Debe subir el plano del terreno" })
+        .refine(
+            file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
+            'El plano del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
+        ),
+
+    Escritura_Terreno: z.instanceof(File, { message: "Debe subir la escritura del terreno" })
+        .refine(
+            file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
+            'La escritura del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
+        ),
 });
 
 export type MedidorExtraFisico = z.infer<typeof MedidorExtraFisicoSchema>;
