@@ -1,6 +1,5 @@
 User-agent: *
 Allow: /
-Disallow: /auth
 
 Sitemap: https://asadajuandiaz.com/sitemap.xml
 Host: asadajuandiaz.com
