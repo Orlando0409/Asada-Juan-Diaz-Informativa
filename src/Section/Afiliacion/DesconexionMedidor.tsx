@@ -185,7 +185,7 @@ const DesconexionMedidor = () => {
         >
           <div className="flex h-full items-start justify-center px-6 pt-16 pb-8 sm:pt-20">
             <div
-              className="scrollbar-hide relative max-h-[calc(100vh-7rem)] w-[76dvw] max-w-xl sm:w-[68%] md:w-[50%] lg:w-[40%] xl:w-[38%] overflow-y-auto rounded-2xl bg-white shadow-2xl"
+              className="scrollbar-hide relative max-h-[calc(100vh-7rem)] w-[76dvw] max-w-xl sm:w-[68%] md:w-[50%] lg:w-[40%] xl:w-[38%] overflow-y-auto "
               onClick={(event) => event.stopPropagation()}
             >
               <DesconexionMedidorFisica onClose={() => setMostrarFormularioFisico(false)} />

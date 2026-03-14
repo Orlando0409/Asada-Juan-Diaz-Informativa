@@ -737,8 +737,8 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
               </form.Field>
             </div>
 
-            <div className="flex justify-end items-end gap-4 mt-8">
-              <div className="flex justify-end items-end">
+            <div className="flex justify-center gap-4 mt-6 ml-50">
+            
                 <button
                   type="submit"
                   disabled={isSending}
@@ -746,9 +746,19 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
                 >
                   {isSending ? 'Enviando...' : 'Enviar'}
                 </button>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  disabled={isSending}
+                  className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  Cancelar
+                </button>
+
               </div>
-            </div>
+           
           </form>
+
         )}
       </div>
     </div>
