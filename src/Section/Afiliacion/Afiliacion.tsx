@@ -47,6 +47,8 @@ type TarjetaClienteProps = {
   iconClassName: string
 }
 
+type FormView = "afiliacion" | "medidor-extra"
+
 const iconMap: Record<string, IconType> = {
   droplet: FiDroplet,
   fileText: FiFileText,
@@ -136,6 +138,8 @@ const TarjetaCliente = ({
 const InformacionAfiliacion = () => {
   const [mostrarFormulario, setMostrarFormulario] = useState(false)
   const [mostrarFormularioJuridico, setMostrarFormularioJuridico] = useState(false)
+  const [vistaFormularioFisico, setVistaFormularioFisico] = useState<FormView>("afiliacion")
+  const [vistaFormularioJuridico, setVistaFormularioJuridico] = useState<FormView>("afiliacion")
   const { setModalOpen } = useModal()
 
   const requisitosFisicos = Object.values(
@@ -149,6 +153,24 @@ const InformacionAfiliacion = () => {
   useEffect(() => {
     setModalOpen(mostrarFormulario || mostrarFormularioJuridico)
   }, [mostrarFormulario, mostrarFormularioJuridico, setModalOpen])
+
+  useEffect(() => {
+    const openMedidorExtraFromHash = () => {
+      if (window.location.hash !== "#medidor-extra") {
+        return
+      }
+
+      setVistaFormularioFisico("medidor-extra")
+      setMostrarFormulario(true)
+    }
+
+    openMedidorExtraFromHash()
+    window.addEventListener("hashchange", openMedidorExtraFromHash)
+
+    return () => {
+      window.removeEventListener("hashchange", openMedidorExtraFromHash)
+    }
+  }, [])
 
   return (
     <section className="relative isolate min-h-screen overflow-hidden bg-[linear-gradient(180deg,#f8fcff_0%,#eef7fb_48%,#f7fbfa_100%)] px-4 py-8 sm:px-6 md:py-12 lg:px-8">
@@ -189,7 +211,10 @@ const InformacionAfiliacion = () => {
                 buttonLabel="Llenar formulario jurídico"
                 requisitos={requisitosJuridicos}
                 icon={FiBriefcase}
-                onOpen={() => setMostrarFormularioJuridico(true)}
+                onOpen={() => {
+                  setVistaFormularioJuridico("afiliacion")
+                  setMostrarFormularioJuridico(true)
+                }}
                 buttonClassName="bg-sky-500 hover:bg-sky-600"
                 badgeClassName="bg-sky-200 text-sky-800 ring-1 ring-inset ring-sky-300"
                 iconClassName="text-sky-700"
@@ -202,7 +227,10 @@ const InformacionAfiliacion = () => {
                 buttonLabel="Llenar formulario físico"
                 requisitos={requisitosFisicos}
                 icon={FiUser}
-                onOpen={() => setMostrarFormulario(true)}
+                onOpen={() => {
+                  setVistaFormularioFisico("afiliacion")
+                  setMostrarFormulario(true)
+                }}
                 buttonClassName="bg-sky-500 hover:bg-sky-600"
                 badgeClassName="bg-sky-200 text-sky-800 ring-1 ring-inset ring-sky-300"
                 iconClassName="text-sky-700"
@@ -212,23 +240,24 @@ const InformacionAfiliacion = () => {
         </div>
       </div>
 
-{mostrarFormularioJuridico && (
-  <div
-    className="fixed inset-0 z-[9999] overflow-hidden bg-black/50 backdrop-blur-sm"
-    onClick={() => setMostrarFormularioJuridico(false)}
-  >
-    <div className="flex h-full items-start justify-center px-6 pt-16 pb-8 sm:pt-20">
-      <div
-        className="scrollbar-hide relative max-h-[calc(100vh-7rem)] w-[76dvw] max-w-xl sm:w-[68%] md:w-[50%] lg:w-[40%] xl:w-[38%] overflow-y-auto rounded-2xl bg-white shadow-2xl"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <FormularioAfiliacionJuridico
-          onClose={() => setMostrarFormularioJuridico(false)}
-        />
-      </div>
-    </div>
-  </div>
-)}
+      {mostrarFormularioJuridico && (
+        <div
+          className="fixed inset-0 z-[9999] overflow-hidden bg-black/50 backdrop-blur-sm"
+          onClick={() => setMostrarFormularioJuridico(false)}
+        >
+          <div className="flex h-full items-start justify-center px-6 pt-16 pb-8 sm:pt-20">
+            <div
+              className="scrollbar-hide relative max-h-[calc(100vh-7rem)] w-[76dvw] max-w-xl sm:w-[68%] md:w-[50%] lg:w-[40%] xl:w-[38%] overflow-y-auto rounded-2xl bg-white shadow-2xl"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <FormularioAfiliacionJuridico
+                initialView={vistaFormularioJuridico}
+                onClose={() => setMostrarFormularioJuridico(false)}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {mostrarFormulario && (
         <div
@@ -240,7 +269,10 @@ const InformacionAfiliacion = () => {
               className="scrollbar-hide relative max-h-[calc(100vh-7rem)] w-[76dvw] max-w-xl sm:w-[68%] md:w-[50%] lg:w-[40%] xl:w-[38%] overflow-y-auto rounded-2xl bg-white shadow-2xl"
               onClick={(event) => event.stopPropagation()}
             >
-              <FormularioAfiliacion onClose={() => setMostrarFormulario(false)} />
+              <FormularioAfiliacion
+                initialView={vistaFormularioFisico}
+                onClose={() => setMostrarFormulario(false)}
+              />
             </div>
           </div>
         </div>

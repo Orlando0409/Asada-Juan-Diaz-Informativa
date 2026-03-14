@@ -571,7 +571,13 @@
               "id": 4,
               "texto": "Asociado",
               "ruta": "/Asociado"
+            },
+             {
+              "id": 5,
+              "texto": "Medidor Extra",
+              "ruta": "/MedidorExtra"
             }
+            
           ]
         },
         {

@@ -8,6 +8,7 @@ import MedidorExtraFisico from "./MedidorExtraFisico";
 
 type Props = {
   onClose: () => void;
+  initialView?: "afiliacion" | "medidor-extra";
 };
 
 const normalizePhoneNumber = (phone: string): string => {
@@ -19,7 +20,7 @@ const normalizePhoneNumber = (phone: string): string => {
 
 const STORAGE_KEY = 'afiliacion_fisica_temp';
 
-const FormularioAfiliacion = ({ onClose }: Props) => {
+const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) => {
   const sanitizeNameInput = (value: string) => value.replace(/\d/g, "");
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -27,7 +28,7 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
   const [isSending, setIsSending] = useState(false);
   const planosInputRef = useRef<HTMLInputElement>(null);
   const escrituraInputRef = useRef<HTMLInputElement>(null);
-  const [showMedidorExtra, setShowMedidorExtra] = useState(false);
+  const [showMedidorExtra, setShowMedidorExtra] = useState(initialView === "medidor-extra");
 
   const [_mostrarFormulario, setMostrarFormulario] = useState(true);
   const mutation = useAfiliacionFisica();
@@ -263,6 +264,11 @@ const FormularioAfiliacion = ({ onClose }: Props) => {
       }
     },
   });
+
+  useEffect(() => {
+    setShowMedidorExtra(initialView === "medidor-extra");
+  }, [initialView]);
+
   useEffect(() => {
     const savedData = sessionStorage.getItem(STORAGE_KEY);
     if (savedData) {

@@ -25,7 +25,7 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
     const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-    const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
+
     const [identificacionValidada, setIdentificacionValidada] = useState<string>('');
     const [mostrarFormulario, _setMostrarFormulario] = useState(true);
     const [alertShown, setAlertShown] = useState<string>('');

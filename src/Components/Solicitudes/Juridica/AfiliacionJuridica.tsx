@@ -7,6 +7,7 @@ import MedidorExtraJuridica from "./MedidorExtraJuridica";
 
 type Props = {
     onClose: () => void;
+    initialView?: "afiliacion" | "medidor-extra";
 };
 
 function formatCedulaJuridica(value: string) {
@@ -20,16 +21,16 @@ function formatCedulaJuridica(value: string) {
 //prueba
 const STORAGE_KEY = 'afiliacion_juridica_temp';
 
-const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
+const FormularioAfiliacionJuridico = ({ onClose, initialView = "afiliacion" }: Props) => {
     const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const [isSending, setIsSending] = useState(false);
-    const [showMedidorExtra, setShowMedidorExtra] = useState(false);
+    const [showMedidorExtra, setShowMedidorExtra] = useState(initialView === "medidor-extra");
     const mutation = useAfiliacionJuridica();
     const planosInputRef = useRef<HTMLInputElement>(null);
     const escrituraInputRef = useRef<HTMLInputElement>(null);
- 
+
 
     const [mostrarFormulario, setMostrarFormulario] = useState(true);
 
@@ -144,6 +145,11 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
             }
         },
     });
+
+    useEffect(() => {
+        setShowMedidorExtra(initialView === "medidor-extra");
+    }, [initialView]);
+
     ///prueba 
     useEffect(() => {
         const savedData = sessionStorage.getItem(STORAGE_KEY);

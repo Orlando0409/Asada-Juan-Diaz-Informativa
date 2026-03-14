@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ConsultaRouteImport } from './routes/Consulta'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SolicitudesMedidorExtraRouteImport } from './routes/(Solicitudes)/MedidorExtra'
 import { Route as SolicitudesDesconexionMedidorRouteImport } from './routes/(Solicitudes)/DesconexionMedidor'
 import { Route as SolicitudesCambiomedidorRouteImport } from './routes/(Solicitudes)/Cambiomedidor'
 import { Route as SolicitudesAsociadoRouteImport } from './routes/(Solicitudes)/Asociado'
@@ -35,6 +36,11 @@ const ConsultaRoute = ConsultaRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SolicitudesMedidorExtraRoute = SolicitudesMedidorExtraRouteImport.update({
+  id: '/(Solicitudes)/MedidorExtra',
+  path: '/MedidorExtra',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SolicitudesDesconexionMedidorRoute =
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/Asociado': typeof SolicitudesAsociadoRoute
   '/Cambiomedidor': typeof SolicitudesCambiomedidorRoute
   '/DesconexionMedidor': typeof SolicitudesDesconexionMedidorRoute
+  '/MedidorExtra': typeof SolicitudesMedidorExtraRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -112,6 +119,7 @@ export interface FileRoutesByTo {
   '/Asociado': typeof SolicitudesAsociadoRoute
   '/Cambiomedidor': typeof SolicitudesCambiomedidorRoute
   '/DesconexionMedidor': typeof SolicitudesDesconexionMedidorRoute
+  '/MedidorExtra': typeof SolicitudesMedidorExtraRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/(Solicitudes)/Asociado': typeof SolicitudesAsociadoRoute
   '/(Solicitudes)/Cambiomedidor': typeof SolicitudesCambiomedidorRoute
   '/(Solicitudes)/DesconexionMedidor': typeof SolicitudesDesconexionMedidorRoute
+  '/(Solicitudes)/MedidorExtra': typeof SolicitudesMedidorExtraRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -143,6 +152,7 @@ export interface FileRouteTypes {
     | '/Asociado'
     | '/Cambiomedidor'
     | '/DesconexionMedidor'
+    | '/MedidorExtra'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -157,6 +167,7 @@ export interface FileRouteTypes {
     | '/Asociado'
     | '/Cambiomedidor'
     | '/DesconexionMedidor'
+    | '/MedidorExtra'
   id:
     | '__root__'
     | '/'
@@ -171,6 +182,7 @@ export interface FileRouteTypes {
     | '/(Solicitudes)/Asociado'
     | '/(Solicitudes)/Cambiomedidor'
     | '/(Solicitudes)/DesconexionMedidor'
+    | '/(Solicitudes)/MedidorExtra'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -186,6 +198,7 @@ export interface RootRouteChildren {
   SolicitudesAsociadoRoute: typeof SolicitudesAsociadoRoute
   SolicitudesCambiomedidorRoute: typeof SolicitudesCambiomedidorRoute
   SolicitudesDesconexionMedidorRoute: typeof SolicitudesDesconexionMedidorRoute
+  SolicitudesMedidorExtraRoute: typeof SolicitudesMedidorExtraRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -209,6 +222,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(Solicitudes)/MedidorExtra': {
+      id: '/(Solicitudes)/MedidorExtra'
+      path: '/MedidorExtra'
+      fullPath: '/MedidorExtra'
+      preLoaderRoute: typeof SolicitudesMedidorExtraRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(Solicitudes)/DesconexionMedidor': {
@@ -290,6 +310,7 @@ const rootRouteChildren: RootRouteChildren = {
   SolicitudesAsociadoRoute: SolicitudesAsociadoRoute,
   SolicitudesCambiomedidorRoute: SolicitudesCambiomedidorRoute,
   SolicitudesDesconexionMedidorRoute: SolicitudesDesconexionMedidorRoute,
+  SolicitudesMedidorExtraRoute: SolicitudesMedidorExtraRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
