@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import InformacionAfiliacion from '../../Section/Afiliacion/InformacionAfiliacion'
+import InformacionAfiliacion from '../../Section/Afiliacion/Afiliacion'
 
 export const Route = createFileRoute('/(Solicitudes)/Afiliacion')({
   component: RouteComponent,

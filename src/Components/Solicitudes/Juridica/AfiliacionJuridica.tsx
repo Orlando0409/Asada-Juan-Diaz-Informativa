@@ -2,8 +2,8 @@ import { useForm } from "@tanstack/react-form";
 import { useEffect, useRef, useState } from "react";
 import { AfiliacionJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/AfiliacionJuridica";
 import { useAfiliacionJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
-import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import PhoneInputComponent from "../PhoneInputComponent";
+import MedidorExtraJuridica from "./MedidorExtraJuridica";
 
 type Props = {
     onClose: () => void;
@@ -24,10 +24,12 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
     const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    const [isSending, setIsSending] = useState(false);
+    const [showMedidorExtra, setShowMedidorExtra] = useState(false);
     const mutation = useAfiliacionJuridica();
     const planosInputRef = useRef<HTMLInputElement>(null);
     const escrituraInputRef = useRef<HTMLInputElement>(null);
-    const { lookupJuridica, isLoading: loadingCedula } = useCedulaLookup();
+ 
 
     const [mostrarFormulario, setMostrarFormulario] = useState(true);
 
@@ -124,6 +126,7 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                     }
                 });
 
+                setIsSending(true);
                 await mutation.createAfiliacion(formData);
 
                 sessionStorage.removeItem(STORAGE_KEY);
@@ -136,10 +139,12 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                 onClose();
             } catch (error: any) {
                 console.log("Error al enviar formulario de afiliación jurídica:", error);
+            } finally {
+                setIsSending(false);
             }
         },
     });
-     ///prueba 
+    ///prueba 
     useEffect(() => {
         const savedData = sessionStorage.getItem(STORAGE_KEY);
         if (savedData) {
@@ -158,304 +163,324 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
     }, []); //prueba 
 
     if (!mostrarFormulario) return null;
-    const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300 bg-white';
+
+    const commonClasses = 'w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring focus:ring-blue-300 bg-white';
 
     return (
-        <div className="flex justify-center items-center min-h-screen text-gray-800 p-7 w-full">
-            <form
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    form.handleSubmit();
-                }}
-                className="bg-white shadow-lg  pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
+        <div className="w-full text-gray-800">
+            <div
+                className="scrollbar-hide w-full overflow-y-auto rounded-[24px] bg-white px-4 py-3 shadow-[0_30px_80px_-32px_rgba(15,23,42,0.55)] sm:px-6 sm:py-4"
+                style={{ maxHeight: "calc(100dvh - 3rem)" }}
             >
-                <h2 className="text-center text-2xl font-bold mb-8 text-blue-700">Formulario de Afiliación Jurídica</h2>
+                <div className="mb-8">
+                    <h2 className="text-center text-xl font-semibold mb-4">Formulario de Afiliación Jurídica</h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-2">
-                    {/* Razon Social */}
-                    <form.Field name="Razon_Social">
-                        {(field) => (
-                            <div className="mb-3">
-                                <label className="block mb-1 font-semibold text-gray-700">Razón Social <span className="text-red-500">*</span></label>
-                                <input
-                                    type="text"
-                                    value={field.state.value}
-                                    onChange={(e) => {
-                                        field.handleChange(e.target.value);
-                                        validateField("Razon_Social", e.target.value);
-                                        saveToSessionStorage({ ...form.state.values, Razon_Social: e.target.value }); // 
-                                    }}
-                                    placeholder="Ejemplo S.A."
-                                    maxLength={50}
-                                    className={commonClasses}
-                                />
-                                {fieldErrors["Razon_Social"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Razon_Social"]}</span>
-                                )}
-                                {formErrors["Razon_Social"] && !fieldErrors["Razon_Social"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Razon_Social"]}</span>
-                                )}
-                            </div>
-                        )}
-                    </form.Field>
-                    {/* Cedula Juridica */}
-                    <form.Field name="Cedula_Juridica">
-                        {(field) => (
-                            <div className="mb-3">
-                                <label className="block mb-1 font-semibold text-gray-700">
-                                    Cédula Jurídica <span className="text-red-500">*</span>
-                                </label>
-                                <div className="relative">
-                                    <input
-                                        type="text"
-                                        value={field.state.value}
-                                        onChange={async (e) => {
-                                            const formatted = formatCedulaJuridica(e.target.value);
-                                            field.handleChange(formatted);
-                                            validateField("Cedula_Juridica", formatted);
-                                            saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted });
-
-                                            // Buscar razón social si tiene 10 dígitos (formato: X-XXX-XXXXXX)
-                                            const digits = formatted.replaceAll(/\D/g, "");
-                                            if (digits.length === 10) {
-                                                const razonSocial = await lookupJuridica(formatted);
-                                                if (razonSocial) {
-                                                    form.setFieldValue('Razon_Social', razonSocial);
-                                                    saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted, Razon_Social: razonSocial });
-                                                }
-                                            }
-                                        }}
-                                        placeholder="3-XXX-XXXXXX"
-                                        className={commonClasses}
-                                        maxLength={12}
-                                        disabled={loadingCedula}
-                                    />
-                                    {loadingCedula && (
-                                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                            <div className="animate-spin h-5 w-5 border-2 border-blue-600 border-t-transparent rounded-full"></div>
-                                        </div>
-                                    )}
-                                </div>
-                                {fieldErrors["Cedula_Juridica"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Cedula_Juridica"]}</span>
-                                )}
-                                {formErrors["Cedula_Juridica"] && !fieldErrors["Cedula_Juridica"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Cedula_Juridica"]}</span>
-                                )}
-                            </div>
-                        )}
-                    </form.Field>
-                    {/* Correo */}
-                    <form.Field name="Correo">
-                        {(field) => (
-                            <div className="mb-3">
-                                <label className="block mb-1 font-semibold text-gray-700">Correo electrónico <span className="text-red-500">*</span></label>
-                                <input
-                                    type="email"
-                                    value={field.state.value}
-                                    onChange={(e) => {
-                                        field.handleChange(e.target.value);
-                                        validateField("Correo", e.target.value);
-                                        saveToSessionStorage({ ...form.state.values, Correo: e.target.value }); // ← NUEVO
-                                    }}
-                                    placeholder="empresa@email.com"
-                                    maxLength={100}
-                                    className={commonClasses}
-                                />
-                                {fieldErrors["Correo"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Correo"]}</span>
-                                )}
-                                {formErrors["Correo"] && !fieldErrors["Correo"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Correo"]}</span>
-                                )}
-                            </div>
-                        )}
-                    </form.Field>
-                    {/* Teléfono internacional */}
-                    <form.Field name="Numero_Telefono">
-                        {(field) => (
-                            <div className="mb-3">
-                                <label className="block mb-1 font-semibold text-gray-700">Número de teléfono <span className="text-red-500">*</span></label>
-                                <PhoneInputComponent
-                                    value={field.state.value}
-                                    onChange={(value) => {
-                                        field.handleChange(value || "");
-                                        validateField("Numero_Telefono", value || "");
-                                        saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" }); // ← NUEVO
-                                    }}
-                                    className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
-                                />
-                                {fieldErrors["Numero_Telefono"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
-                                )}
-                                {formErrors["Numero_Telefono"] && !fieldErrors["Numero_Telefono"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Numero_Telefono"]}</span>
-                                )}
-                            </div>
-                        )}
-                    </form.Field>
-                    {/* Dirección Exacta */}
-                    <form.Field name="Direccion_Exacta">
-                        {(field) => (
-                            <div className="mb-3">
-                                <label className="block mb-1 font-semibold text-gray-700">Dirección exacta <span className="text-red-500">*</span></label>
-                                <textarea
-                                    value={field.state.value}
-                                    onChange={(e) => {
-                                        field.handleChange(e.target.value);
-                                        validateField("Direccion_Exacta", e.target.value);
-                                        saveToSessionStorage({ ...form.state.values, Direccion_Exacta: e.target.value }); // ← NUEVO
-                                    }}
-                                    placeholder="San José, del Banco Nacional 200m sur"
-                                    maxLength={100}
-                                    className={commonClasses}
-                                />
-                                {fieldErrors["Direccion_Exacta"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Direccion_Exacta"]}</span>
-                                )}
-                                {formErrors["Direccion_Exacta"] && !fieldErrors["Direccion_Exacta"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Direccion_Exacta"]}</span>
-                                )}
-                            </div>
-                        )}
-                    </form.Field>
+                    {/* Botones toggle */}
+                    <div className="flex justify-center gap-4">
+                        <button
+                            type="button"
+                            onClick={() => setShowMedidorExtra(false)}
+                            className={`px-5 py-1.5 rounded-lg text-sm font-medium transition-colors ${!showMedidorExtra
+                                ? 'bg-blue-600 text-white shadow-md'
+                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                }`}
+                        >
+                            Afiliación
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setShowMedidorExtra(true)}
+                            className={`px-5 py-1.5 rounded-lg text-sm font-medium transition-colors ${showMedidorExtra
+                                ? 'bg-green-600 text-white shadow-md'
+                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                }`}
+                        >
+                            Medidor Extra
+                        </button>
+                    </div>
                 </div>
 
-                {/* Archivos */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 mt-4">
-                    <form.Field name="Planos_Terreno">
-                        {(field) => {
-                            const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
-                            return (
-                                <div className="mb-3">
-                                    <label className="block mb-1 font-semibold text-gray-700">Planos del terreno <span className="text-red-500">*</span></label>
-                                    <input
-                                        type="file"
-                                        accept=".png,.jpg,.jpeg,.heic,.pdf"
-                                        disabled={!!archivoActual}
-                                        onChange={(e) => {
-                                            const file = e.target.files?.[0] ?? null;
-                                            field.handleChange(file ?? undefined);
-                                            setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: file }));
-                                            validateField("Planos_Terreno", file);
-                                        }}
-                                        className="hidden"
-                                        id="Planos_Terreno"
-                                        ref={planosInputRef}
-                                        key={archivoActual ? archivoActual.name : 'planos'}
-                                    />
-                                    <label
-                                        htmlFor="Planos_Terreno"
-                                        className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-blue-700 cursor-pointer'}`}
-                                    >
-                                        {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
-                                    </label>
-                                    {archivoActual && (
-                                        <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
-                                            <span className="text-sm text-gray-700">{archivoActual.name}</span>
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    field.handleChange(undefined);
-                                                    setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
-                                                    setFieldErrors(prev => ({
-                                                        ...prev,
-                                                        ["Planos_Terreno"]: `Debe subir el plano del terreno`,
-                                                    }));
-                                                    if (planosInputRef.current) {
-                                                        planosInputRef.current.value = '';
-                                                    }
-                                                }}
-                                                className="text-red-500 hover:underline text-xs"
-                                            >
-                                                Eliminar
-                                            </button>
-                                        </div>
-                                    )}
-                                    {fieldErrors["Planos_Terreno"] && (
-                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors["Planos_Terreno"]}</span>
-                                    )}
-                                    {formErrors["Planos_Terreno"] && !fieldErrors["Planos_Terreno"] && (
-                                        <span className="text-red-500 text-sm block mt-1">{formErrors["Planos_Terreno"]}</span>
-                                    )}
-                                </div>
-                            );
+                {/* Mostrar formulario de Medidor Extra */}
+                {showMedidorExtra ? (
+                    <MedidorExtraJuridica onClose={onClose} />
+                ) : (
+                    <form
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            form.handleSubmit();
                         }}
-                    </form.Field>
-                    <form.Field name="Escritura_Terreno">
-                        {(field) => {
-                            const archivoActual = archivoSeleccionado["Escritura_Terreno"] ?? null;
-                            return (
-                                <div className="mb-3">
-                                    <label className="block mb-1 font-semibold text-gray-700">Escritura del terreno <span className="text-red-500">*</span></label>
-                                    <input
-                                        type="file"
-                                        accept=".png,.jpg,.jpeg,.heic,.pdf"
-                                        disabled={!!archivoActual}
-                                        onChange={(e) => {
-                                            const file = e.target.files?.[0] ?? null;
-                                            field.handleChange(file ?? undefined);
-                                            setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: file }));
-                                            validateField("Escritura_Terreno", file);
-                                        }}
-                                        className="hidden"
-                                        id="Escritura_Terreno"
-                                        ref={escrituraInputRef}
-                                        key={archivoActual ? archivoActual.name : 'escritura'}
-                                    />
-                                    <label
-                                        htmlFor="Escritura_Terreno"
-                                        className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-blue-700 cursor-pointer'}`}
-                                    >
-                                        {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
-                                    </label>
-                                    {archivoActual && (
-                                        <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
-                                            <span className="text-sm text-gray-700">{archivoActual.name}</span>
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    field.handleChange(undefined);
-                                                    setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: null }));
-                                                    setFieldErrors(prev => ({
-                                                        ...prev,
-                                                        ["Escritura_Terreno"]: `Debe subir la escritura del terreno`,
-                                                    }));
-                                                    if (escrituraInputRef.current) {
-                                                        escrituraInputRef.current.value = '';
-                                                    }
-                                                }}
-                                                className="text-red-500 hover:underline text-xs"
-                                            >
-                                                Eliminar
-                                            </button>
-                                        </div>
-                                    )}
-                                    {fieldErrors["Escritura_Terreno"] && (
-                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors["Escritura_Terreno"]}</span>
-                                    )}
-                                    {formErrors["Escritura_Terreno"] && !fieldErrors["Escritura_Terreno"] && (
-                                        <span className="text-red-500 text-sm block mt-1">{formErrors["Escritura_Terreno"]}</span>
-                                    )}
-                                </div>
-                            );
-                        }}
-                    </form.Field>
-                </div>
 
-                <div className="flex justify-end items-end gap-4 mt-8">
-
-                    <button
-                        type="submit"
-                        disabled={form.state.isSubmitting}
-                        className={`w-[120px] py-2 rounded transition-colors ${form.state.isSubmitting
-                            ? 'bg-gray-400 cursor-not-allowed'
-                            : 'bg-blue-600 hover:bg-blue-700'} text-white`}
                     >
-                        {form.state.isSubmitting ? 'Enviando...' : 'Enviar'}
-                    </button>
-                </div>
-            </form>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-2">
+                            {/* Razon Social */}
+                            <form.Field name="Razon_Social">
+                                {(field) => (
+                                    <div className="mb-3">
+                                        <label className="block mb-1 font-semibold text-gray-700">Razón Social <span className="text-red-500">*</span></label>
+                                        <input
+                                            type="text"
+                                            value={field.state.value}
+                                            onChange={(e) => {
+                                                field.handleChange(e.target.value);
+                                                validateField("Razon_Social", e.target.value);
+                                                saveToSessionStorage({ ...form.state.values, Razon_Social: e.target.value }); // 
+                                            }}
+                                            placeholder="Ejemplo S.A."
+                                            maxLength={50}
+                                            className={commonClasses}
+                                        />
+                                        {fieldErrors["Razon_Social"] && (
+                                            <span className="text-red-500 text-sm block mt-1">{fieldErrors["Razon_Social"]}</span>
+                                        )}
+                                        {formErrors["Razon_Social"] && !fieldErrors["Razon_Social"] && (
+                                            <span className="text-red-500 text-sm block mt-1">{formErrors["Razon_Social"]}</span>
+                                        )}
+                                    </div>
+                                )}
+                            </form.Field>
+                            {/* Cedula Juridica */}
+                            <form.Field name="Cedula_Juridica">
+                                {(field) => (
+                                    <div className="mb-3">
+                                        <label className="block mb-1 font-semibold text-gray-700">
+                                            Cédula Jurídica <span className="text-red-500">*</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={field.state.value}
+                                            onChange={(e) => {
+                                                const formatted = formatCedulaJuridica(e.target.value);
+                                                field.handleChange(formatted);
+                                                validateField("Cedula_Juridica", formatted);
+                                                saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted }); // ← NUEVO
+
+                                            }}
+                                            placeholder="3-XXX-XXXXXX"
+                                            className={commonClasses}
+                                            maxLength={12}
+                                        />
+                                        {fieldErrors["Cedula_Juridica"] && (
+                                            <span className="text-red-500 text-sm block mt-1">{fieldErrors["Cedula_Juridica"]}</span>
+                                        )}
+                                        {formErrors["Cedula_Juridica"] && !fieldErrors["Cedula_Juridica"] && (
+                                            <span className="text-red-500 text-sm block mt-1">{formErrors["Cedula_Juridica"]}</span>
+                                        )}
+                                    </div>
+                                )}
+                            </form.Field>
+                            {/* Correo */}
+                            <form.Field name="Correo">
+                                {(field) => (
+                                    <div className="mb-3">
+                                        <label className="block mb-1 font-semibold text-gray-700">Correo electrónico <span className="text-red-500">*</span></label>
+                                        <input
+                                            type="email"
+                                            value={field.state.value}
+                                            onChange={(e) => {
+                                                field.handleChange(e.target.value);
+                                                validateField("Correo", e.target.value);
+                                                saveToSessionStorage({ ...form.state.values, Correo: e.target.value }); // ← NUEVO
+                                            }}
+                                            placeholder="empresa@email.com"
+                                            maxLength={100}
+                                            className={commonClasses}
+                                        />
+                                        {fieldErrors["Correo"] && (
+                                            <span className="text-red-500 text-sm block mt-1">{fieldErrors["Correo"]}</span>
+                                        )}
+                                        {formErrors["Correo"] && !fieldErrors["Correo"] && (
+                                            <span className="text-red-500 text-sm block mt-1">{formErrors["Correo"]}</span>
+                                        )}
+                                    </div>
+                                )}
+                            </form.Field>
+                            {/* Teléfono internacional */}
+                            <form.Field name="Numero_Telefono">
+                                {(field) => (
+                                    <div className="mb-3">
+                                        <label className="block mb-1 font-semibold text-gray-700">Número de teléfono <span className="text-red-500">*</span></label>
+                                        <PhoneInputComponent
+                                            value={field.state.value}
+                                            onChange={(value) => {
+                                                field.handleChange(value || "");
+                                                validateField("Numero_Telefono", value || "");
+                                                saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" }); // ← NUEVO
+                                            }}
+                                            className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
+                                        />
+                                        {fieldErrors["Numero_Telefono"] && (
+                                            <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
+                                        )}
+                                        {formErrors["Numero_Telefono"] && !fieldErrors["Numero_Telefono"] && (
+                                            <span className="text-red-500 text-sm block mt-1">{formErrors["Numero_Telefono"]}</span>
+                                        )}
+                                    </div>
+                                )}
+                            </form.Field>
+                            {/* Dirección Exacta */}
+                            <form.Field name="Direccion_Exacta">
+                                {(field) => (
+                                    <div className="mb-3">
+                                        <label className="block mb-1 font-semibold text-gray-700">Dirección exacta <span className="text-red-500">*</span></label>
+                                        <textarea
+                                            value={field.state.value}
+                                            onChange={(e) => {
+                                                field.handleChange(e.target.value);
+                                                validateField("Direccion_Exacta", e.target.value);
+                                                saveToSessionStorage({ ...form.state.values, Direccion_Exacta: e.target.value }); // ← NUEVO
+                                            }}
+                                            placeholder="San José, del Banco Nacional 200m sur"
+                                            maxLength={100}
+                                            className={commonClasses}
+                                        />
+                                        {fieldErrors["Direccion_Exacta"] && (
+                                            <span className="text-red-500 text-sm block mt-1">{fieldErrors["Direccion_Exacta"]}</span>
+                                        )}
+                                        {formErrors["Direccion_Exacta"] && !fieldErrors["Direccion_Exacta"] && (
+                                            <span className="text-red-500 text-sm block mt-1">{formErrors["Direccion_Exacta"]}</span>
+                                        )}
+                                    </div>
+                                )}
+                            </form.Field>
+                        </div>
+
+                        {/* Archivos */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 mt-4">
+                            <form.Field name="Planos_Terreno">
+                                {(field) => {
+                                    const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
+                                    return (
+                                        <div className="mb-3">
+                                            <label className="block mb-1 font-semibold text-gray-700">Planos del terreno <span className="text-red-500">*</span></label>
+                                            <input
+                                                type="file"
+                                                accept=".png,.jpg,.jpeg,.heic,.pdf"
+                                                disabled={!!archivoActual}
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0] ?? null;
+                                                    field.handleChange(file ?? undefined);
+                                                    setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: file }));
+                                                    validateField("Planos_Terreno", file);
+                                                }}
+                                                className="hidden"
+                                                id="Planos_Terreno"
+                                                ref={planosInputRef}
+                                                key={archivoActual ? archivoActual.name : 'planos'}
+                                            />
+                                            <label
+                                                htmlFor="Planos_Terreno"
+                                                className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-blue-700 cursor-pointer'}`}
+                                            >
+                                                {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
+                                            </label>
+                                            {archivoActual && (
+                                                <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
+                                                    <span className="text-sm text-gray-700">{archivoActual.name}</span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            field.handleChange(undefined);
+                                                            setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
+                                                            setFieldErrors(prev => ({
+                                                                ...prev,
+                                                                ["Planos_Terreno"]: `Debe subir el plano del terreno`,
+                                                            }));
+                                                            if (planosInputRef.current) {
+                                                                planosInputRef.current.value = '';
+                                                            }
+                                                        }}
+                                                        className="text-red-500 hover:underline text-xs"
+                                                    >
+                                                        Eliminar
+                                                    </button>
+                                                </div>
+                                            )}
+                                            {fieldErrors["Planos_Terreno"] && (
+                                                <span className="text-red-500 text-sm block mt-1">{fieldErrors["Planos_Terreno"]}</span>
+                                            )}
+                                            {formErrors["Planos_Terreno"] && !fieldErrors["Planos_Terreno"] && (
+                                                <span className="text-red-500 text-sm block mt-1">{formErrors["Planos_Terreno"]}</span>
+                                            )}
+                                        </div>
+                                    );
+                                }}
+                            </form.Field>
+                            <form.Field name="Escritura_Terreno">
+                                {(field) => {
+                                    const archivoActual = archivoSeleccionado["Escritura_Terreno"] ?? null;
+                                    return (
+                                        <div className="mb-3">
+                                            <label className="block mb-1 font-semibold text-gray-700">Escritura del terreno <span className="text-red-500">*</span></label>
+                                            <input
+                                                type="file"
+                                                accept=".png,.jpg,.jpeg,.heic,.pdf"
+                                                disabled={!!archivoActual}
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0] ?? null;
+                                                    field.handleChange(file ?? undefined);
+                                                    setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: file }));
+                                                    validateField("Escritura_Terreno", file);
+                                                }}
+                                                className="hidden"
+                                                id="Escritura_Terreno"
+                                                ref={escrituraInputRef}
+                                                key={archivoActual ? archivoActual.name : 'escritura'}
+                                            />
+                                            <label
+                                                htmlFor="Escritura_Terreno"
+                                                className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-blue-700 cursor-pointer'}`}
+                                            >
+                                                {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
+                                            </label>
+                                            {archivoActual && (
+                                                <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
+                                                    <span className="text-sm text-gray-700">{archivoActual.name}</span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => {
+                                                            field.handleChange(undefined);
+                                                            setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: null }));
+                                                            setFieldErrors(prev => ({
+                                                                ...prev,
+                                                                ["Escritura_Terreno"]: `Debe subir la escritura del terreno`,
+                                                            }));
+                                                            if (escrituraInputRef.current) {
+                                                                escrituraInputRef.current.value = '';
+                                                            }
+                                                        }}
+                                                        className="text-red-500 hover:underline text-xs"
+                                                    >
+                                                        Eliminar
+                                                    </button>
+                                                </div>
+                                            )}
+                                            {fieldErrors["Escritura_Terreno"] && (
+                                                <span className="text-red-500 text-sm block mt-1">{fieldErrors["Escritura_Terreno"]}</span>
+                                            )}
+                                            {formErrors["Escritura_Terreno"] && !fieldErrors["Escritura_Terreno"] && (
+                                                <span className="text-red-500 text-sm block mt-1">{formErrors["Escritura_Terreno"]}</span>
+                                            )}
+                                        </div>
+                                    );
+                                }}
+                            </form.Field>
+                        </div>
+
+                        <div className="flex justify-end items-end gap-4 mt-8">
+
+                            <button
+                                type="submit"
+                                disabled={isSending}
+                                className={`w-[120px] py-2 rounded transition-colors ${isSending
+                                    ? 'bg-gray-400 cursor-not-allowed'
+                                    : 'bg-blue-600 hover:bg-blue-700'} text-white`}
+                            >
+                                {isSending ? 'Enviando...' : 'Enviar'}
+                            </button>
+                        </div>
+                    </form>
+                )}
+            </div>
         </div>
     );
 };

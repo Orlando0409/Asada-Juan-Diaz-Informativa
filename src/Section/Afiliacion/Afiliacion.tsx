@@ -4,17 +4,34 @@ import {
   FiArrowRight,
   FiBriefcase,
   FiCheckCircle,
+  FiDroplet,
+  FiFileText,
+  FiHome,
+  FiShield,
   FiUser,
+  FiUsers,
 } from "react-icons/fi"
 import data from "../../data/Data.json"
-import CambioMedidorJuridica from "../../Components/Solicitudes/Juridica/CambioMedidorJuridica"
-import CambioMedidorFisico from "../../Components/Solicitudes/Fisico/CambioMedidorFisico"
+import FormularioAfiliacion from "../../Components/Solicitudes/Fisico/AfiliacionFisica"
+import FormularioAfiliacionJuridico from "../../Components/Solicitudes/Juridica/AfiliacionJuridica"
 import { useModal } from "../../context/ModalContext"
 
 type RequisitoCampo = {
   label: string
   required?: boolean
   type?: string
+}
+
+type Beneficio = {
+  icon: IconType
+  title: string
+  description: string
+}
+
+type BeneficioData = {
+  icon: string
+  title: string
+  description: string
 }
 
 type TarjetaClienteProps = {
@@ -30,6 +47,21 @@ type TarjetaClienteProps = {
   iconClassName: string
 }
 
+const iconMap: Record<string, IconType> = {
+  droplet: FiDroplet,
+  fileText: FiFileText,
+  users: FiUsers,
+  shield: FiShield,
+  home: FiHome,
+}
+
+const beneficiosData = (data.AfiliacionSeccion?.beneficios ?? []) as BeneficioData[]
+
+const beneficios: Beneficio[] = beneficiosData.map((beneficio) => ({
+  ...beneficio,
+  icon: iconMap[beneficio.icon] ?? FiDroplet,
+}))
+
 const TarjetaCliente = ({
   badge,
   title,
@@ -42,6 +74,7 @@ const TarjetaCliente = ({
   badgeClassName,
   iconClassName,
 }: TarjetaClienteProps) => {
+
   return (
     <article className="group relative overflow-hidden rounded-[24px] border border-slate-200/70 bg-white/90 p-3.5 shadow-[0_24px_55px_-34px_rgba(15,23,42,0.24)] backdrop-blur-sm sm:p-4 lg:p-5">
       <div className="absolute -right-12 top-6 h-24 w-24 rounded-full bg-sky-200/40 blur-2xl" />
@@ -61,9 +94,12 @@ const TarjetaCliente = ({
         <p className="mt-3 max-w-xl text-xs leading-6 text-slate-600 sm:text-sm">{description}</p>
       </div>
 
+
+
       <div className="mt-4">
         <div className="flex items-center justify-between gap-3">
           <h3 className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-600 sm:text-xs">Lista de requisitos</h3>
+
         </div>
 
         <ul className="mt-3 flex max-h-[18rem] flex-col gap-2.5 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-sky-300 scrollbar-track-sky-100">
@@ -78,6 +114,7 @@ const TarjetaCliente = ({
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium leading-5 text-slate-800">{requisito.label}</p>
+
                 </div>
               </div>
             </li>
@@ -96,22 +133,22 @@ const TarjetaCliente = ({
   )
 }
 
-const CambioMedidor = () => {
-  const [mostrarFormularioFisico, setMostrarFormularioFisico] = useState(false)
+const InformacionAfiliacion = () => {
+  const [mostrarFormulario, setMostrarFormulario] = useState(false)
   const [mostrarFormularioJuridico, setMostrarFormularioJuridico] = useState(false)
   const { setModalOpen } = useModal()
 
-  useEffect(() => {
-    setModalOpen(mostrarFormularioFisico || mostrarFormularioJuridico)
-  }, [mostrarFormularioFisico, mostrarFormularioJuridico, setModalOpen])
-
   const requisitosFisicos = Object.values(
-    data.requisitosSolicitudes.cambioMedidor ?? {},
+    data.requisitosSolicitudes.abonado ?? {},
   ) as RequisitoCampo[]
   const requisitosJuridicos = Object.values(
-    data.juridica?.cambioMedidor ?? {},
+    data.juridica?.afiliacion ?? {},
   ) as RequisitoCampo[]
 
+  // Update modal state globally
+  useEffect(() => {
+    setModalOpen(mostrarFormulario || mostrarFormularioJuridico)
+  }, [mostrarFormulario, mostrarFormularioJuridico, setModalOpen])
 
   return (
     <section className="relative isolate min-h-screen overflow-hidden bg-[linear-gradient(180deg,#f8fcff_0%,#eef7fb_48%,#f7fbfa_100%)] px-4 py-8 sm:px-6 md:py-12 lg:px-8">
@@ -119,20 +156,35 @@ const CambioMedidor = () => {
         <div className="overflow-hidden rounded-[32px] border border-white/70 bg-white/80 shadow-[0_35px_90px_-40px_rgba(15,23,42,0.32)] backdrop-blur-sm">
           <div className="bg-slate-50/80 p-5 sm:p-6 lg:p-8">
             <span className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.24em] text-sky-700">
-              Solicitud de cambio de medidor
+              Solicitud de afiliación
             </span>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <h2 className="mt-4 text-2xl font-semibold tracking-tight text-slate-900 sm:text-[1.9rem]">Cambio de medidor</h2>
-                <p className="mt-2 text-sm text-slate-600">Si necesitas cambiar tu medidor por daño o mal funcionamiento, selecciona tu tipo de cliente y completa el formulario.</p>
+                <h2 className="mt-4 text-2xl font-semibold tracking-tight text-slate-900 sm:text-[1.9rem]">Beneficios como abonado</h2>
+
               </div>
+
             </div>
 
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+              {beneficios.map(({ icon: Icon, title, description }) => (
+                <article
+                  key={title}
+                  className="rounded-[20px] border border-slate-200/80 bg-white/90 p-4 shadow-[0_18px_38px_-30px_rgba(15,23,42,0.32)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_44px_-28px_rgba(14,116,144,0.32)]"
+                >
+                  <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-100 text-sky-700 shadow-sm shadow-sky-100/60">
+                    <Icon className="h-4 w-4" />
+                  </span>
+                  <h3 className="mt-3 text-base font-semibold text-slate-900">{title}</h3>
+                  <p className="mt-1.5 text-sm leading-5 text-slate-600">{description}</p>
+                </article>
+              ))}
+            </div>
             <div className="mt-6 grid gap-5 xl:grid-cols-2">
               <TarjetaCliente
                 badge="Cliente jurídico"
-                title="Cambio de medidor para empresas"
+                title="Afiliación para empresas y organizaciones"
                 description=""
                 buttonLabel="Llenar formulario jurídico"
                 requisitos={requisitosJuridicos}
@@ -145,12 +197,12 @@ const CambioMedidor = () => {
 
               <TarjetaCliente
                 badge="Cliente físico"
-                title="Cambio de medidor para personas"
+                title="Afiliación para personas individuales"
                 description=""
                 buttonLabel="Llenar formulario físico"
                 requisitos={requisitosFisicos}
                 icon={FiUser}
-                onOpen={() => setMostrarFormularioFisico(true)}
+                onOpen={() => setMostrarFormulario(true)}
                 buttonClassName="bg-sky-500 hover:bg-sky-600"
                 badgeClassName="bg-sky-200 text-sky-800 ring-1 ring-inset ring-sky-300"
                 iconClassName="text-sky-700"
@@ -160,35 +212,35 @@ const CambioMedidor = () => {
         </div>
       </div>
 
-      {/* Modal Formulario Jurídico */}
-      {mostrarFormularioJuridico && (
-        <div
-          className="fixed inset-0 z-[9999] overflow-hidden bg-black/50 backdrop-blur-sm"
-          onClick={() => setMostrarFormularioJuridico(false)}
-        >
-          <div className="flex h-full items-start justify-center px-6 pt-16 pb-8 sm:pt-20">
-            <div
-              className="scrollbar-hide relative max-h-[calc(100vh-7rem)] w-[76dvw] max-w-xl sm:w-[68%] md:w-[50%] lg:w-[40%] xl:w-[38%] overflow-y-auto rounded-2xl bg-white shadow-2xl"
-              onClick={(event) => event.stopPropagation()}
-            >
-              <CambioMedidorJuridica onClose={() => setMostrarFormularioJuridico(false)} />
-            </div>
-          </div>
-        </div>
-      )}
+{mostrarFormularioJuridico && (
+  <div
+    className="fixed inset-0 z-[9999] overflow-hidden bg-black/50 backdrop-blur-sm"
+    onClick={() => setMostrarFormularioJuridico(false)}
+  >
+    <div className="flex h-full items-start justify-center px-6 pt-16 pb-8 sm:pt-20">
+      <div
+        className="scrollbar-hide relative max-h-[calc(100vh-7rem)] w-[76dvw] max-w-xl sm:w-[68%] md:w-[50%] lg:w-[40%] xl:w-[38%] overflow-y-auto rounded-2xl bg-white shadow-2xl"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <FormularioAfiliacionJuridico
+          onClose={() => setMostrarFormularioJuridico(false)}
+        />
+      </div>
+    </div>
+  </div>
+)}
 
-      {/* Modal Formulario Físico */}
-      {mostrarFormularioFisico && (
+      {mostrarFormulario && (
         <div
           className="fixed inset-0 z-[9999] overflow-hidden bg-black/50 backdrop-blur-sm"
-          onClick={() => setMostrarFormularioFisico(false)}
+          onClick={() => setMostrarFormulario(false)}
         >
           <div className="flex h-full items-start justify-center px-6 pt-16 pb-8 sm:pt-20">
             <div
               className="scrollbar-hide relative max-h-[calc(100vh-7rem)] w-[76dvw] max-w-xl sm:w-[68%] md:w-[50%] lg:w-[40%] xl:w-[38%] overflow-y-auto rounded-2xl bg-white shadow-2xl"
               onClick={(event) => event.stopPropagation()}
             >
-              <CambioMedidorFisico onClose={() => setMostrarFormularioFisico(false)} />
+              <FormularioAfiliacion onClose={() => setMostrarFormulario(false)} />
             </div>
           </div>
         </div>
@@ -196,4 +248,5 @@ const CambioMedidor = () => {
     </section>
   )
 }
-export default CambioMedidor
+
+export default InformacionAfiliacion
