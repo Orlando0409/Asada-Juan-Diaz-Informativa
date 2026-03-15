@@ -305,14 +305,14 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
     const commonClasses = 'w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring focus:ring-blue-300';
 
     return (
-        <div className="flex justify-center text-gray-800 p-3 sm:p-4 w-full">
-            <form
-                onSubmit={(e) => {
-                    e.preventDefault();
-                    form.handleSubmit();
-                }}
-            >
-                <h2 className="text-center text-xl font-bold mb-5 text-blue-700">Solicitud de Medidor Extra - Persona Física</h2>
+        <form
+            className="w-full text-gray-800"
+            onSubmit={(e) => {
+                e.preventDefault();
+                form.handleSubmit();
+            }}
+        >
+            <h2 className="text-center text-xl font-semibold mb-4">Solicitud de Medidor Extra - Persona Física</h2>
 
                 {formErrors.general && (
                     <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -661,25 +661,16 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                 </div>
 
                 {/* Botones */}
-                <div className="flex justify-center gap-4 mt-6">
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        disabled={mutation.isPending}
-                        className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                    >
-                        Cancelar
-                    </button>
+                <div className="flex justify-end items-center gap-3 mt-8">
                     <button
                         type="submit"
-                        className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                        className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
                         disabled={!identificacionValidada || loadingMedidores || mutation.isPending}
                     >
                         {mutation.isPending ? 'Enviando...' : 'Enviar Solicitud'}
                     </button>
                 </div>
             </form>
-        </div>
     );
 };
 

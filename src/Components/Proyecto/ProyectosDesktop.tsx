@@ -133,7 +133,7 @@ function ProyectosDesktop({
                       </div>
                       {/* Contenido tarjeta desktop */}
                       <div className="p-6 space-y-4">
-                        <h3 className="text-xl font-bold text-blue-600 mb-2">
+                        <h3 className="text-xl font-bold text-blue-600 mb-2 line-clamp-2 break-words">
                           {proyecto.Titulo}
                         </h3>
                         <div className="flex items-center space-x-2 text-sm text-gray-700 mb-4">

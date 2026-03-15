@@ -58,9 +58,9 @@ function Proyectos() {
   // Loading
   if (isLoading) {
     return (
-      <section className="py-8 md:py-16 bg-gradient-to-br from-slate-50 to-blue-100 text-center">
+      <section className="py-8 md:py-16 bg-sky-50 text-center">
         <div className="container mx-auto px-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600 text-lg">Cargando proyectos...</p>
         </div>
       </section>
@@ -69,9 +69,8 @@ function Proyectos() {
 
   if (!proyectos) {
     return (
-      <section className="py-8 md:py-16 bg-gradient-to-br from-slate-50 to-blue-100 text-center">
+      <section className="py-8 md:py-16 bg-sky-50 text-center">
         <div className="container mx-auto px-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
           <p className="text-gray-600 text-lg">No hay proyectos disponibles.</p>
         </div>
       </section>
