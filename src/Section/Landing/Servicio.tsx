@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import Data from '../../data/Data.json'
 
 const Servicio = () => {
@@ -6,7 +7,6 @@ const Servicio = () => {
 
   return (
     <div className="relative w-full h-[50vh] sm:h-[60vh] lg:h-[70vh]">
-   
       <video
         src={imagen}
         className="w-full h-full object-cover"
@@ -15,17 +15,22 @@ const Servicio = () => {
         muted
       />
 
-   
       <div className="absolute inset-0 bg-black/40"></div>
 
-      <div className="absolute inset-0 flex flex-col justify-center items-center text-center px-6">
-        <h1 className="text-white text-3xl sm:text-4xl lg:text-5xl font-extrabold">
+      <motion.div
+        className="absolute inset-0 flex flex-col justify-center items-center text-center px-6"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-60px' }}
+        transition={{ duration: 0.7, ease: 'easeOut' }}
+      >
+        <h1 className="text-white text-3xl sm:text-4xl lg:text-5xl font-extrabold drop-shadow-lg">
           Desde {añoFundacion}
         </h1>
-        <p className="text-white text-lg sm:text-xl lg:text-2xl mt-4 max-w-2xl">
+        <p className="text-white text-lg sm:text-xl lg:text-2xl mt-4 max-w-2xl drop-shadow-md">
           {descripcion}
         </p>
-      </div>
+      </motion.div>
     </div>
   )
 }

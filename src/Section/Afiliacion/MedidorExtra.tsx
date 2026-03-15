@@ -3,8 +3,8 @@ import type { IconType } from "react-icons"
 import { FiArrowRight, FiBriefcase, FiCheckCircle, FiUser, FiX } from "react-icons/fi"
 import { motion, AnimatePresence } from "framer-motion"
 import data from "../../data/Data.json"
-import CambioMedidorJuridica from "../../Components/Solicitudes/Juridica/CambioMedidorJuridica"
-import CambioMedidorFisico from "../../Components/Solicitudes/Fisico/CambioMedidorFisico"
+import MedidorExtraJuridica from "../../Components/Solicitudes/Juridica/MedidorExtraJuridica"
+import MedidorExtraFisico from "../../Components/Solicitudes/Fisico/MedidorExtraFisico"
 
 type RequisitoCampo = {
   label: string
@@ -81,12 +81,12 @@ const TarjetaCliente = ({
   )
 }
 
-const CambioMedidor = () => {
+const MedidorExtra = () => {
   const [formularioSeleccionado, setFormularioSeleccionado] = useState<'fisico' | 'juridico' | null>(null)
   const formRef = useRef<HTMLDivElement>(null)
 
-  const requisitosFisicos = Object.values(data.requisitosSolicitudes.cambioMedidor ?? {}) as RequisitoCampo[]
-  const requisitosJuridicos = Object.values(data.juridica?.cambioMedidor ?? {}) as RequisitoCampo[]
+  const requisitosFisicos = Object.values(data.requisitosSolicitudes.medidorExtra ?? {}) as RequisitoCampo[]
+  const requisitosJuridicos = Object.values(data.juridica?.medidorExtra ?? {}) as RequisitoCampo[]
 
   const abrirFormulario = (tipo: 'fisico' | 'juridico') => {
     setFormularioSeleccionado(prev => prev === tipo ? null : tipo)
@@ -107,11 +107,11 @@ const CambioMedidor = () => {
         >
           <div className="bg-sky-50 p-5 sm:p-6 lg:p-8 pt-12">
             <span className="inline-flex rounded-full border border-sky-200 bg-sky-100 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.24em] text-blue-700">
-              Solicitud de cambio de medidor
+              Solicitud de medidor extra
             </span>
             <div>
-              <h2 className="mt-4 text-2xl font-semibold tracking-tight text-slate-900 sm:text-[1.9rem]">Cambio de medidor</h2>
-              <p className="mt-2 text-sm text-slate-600">Si necesitas cambiar tu medidor por daño o mal funcionamiento, selecciona tu tipo de cliente y completa el formulario.</p>
+              <h2 className="mt-4 text-2xl font-semibold tracking-tight text-slate-900 sm:text-[1.9rem]">Medidor Extra</h2>
+              <p className="mt-2 text-sm text-slate-600">Si necesitas instalar un medidor adicional en tu propiedad, selecciona tu tipo de cliente y completa el formulario.</p>
             </div>
 
             <motion.div
@@ -127,7 +127,7 @@ const CambioMedidor = () => {
               <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35 } } }}>
                 <TarjetaCliente
                   badge="Cliente jurídico"
-                  title="Cambio de medidor para empresas"
+                  title="Medidor extra para empresas"
                   buttonLabel="Llenar formulario jurídico"
                   requisitos={requisitosJuridicos}
                   icon={FiBriefcase}
@@ -141,7 +141,7 @@ const CambioMedidor = () => {
               <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35 } } }}>
                 <TarjetaCliente
                   badge="Cliente físico"
-                  title="Cambio de medidor para personas"
+                  title="Medidor extra para personas"
                   buttonLabel="Llenar formulario físico"
                   requisitos={requisitosFisicos}
                   icon={FiUser}
@@ -168,23 +168,11 @@ const CambioMedidor = () => {
               transition={{ duration: 0.35, ease: 'easeOut' }}
               className="scroll-mt-8 overflow-hidden rounded-[32px] border border-sky-200 bg-white shadow-md"
             >
-              <div className="flex items-center justify-between border-b border-sky-100 bg-sky-50 px-6 py-4">
-                <span className="text-sm font-semibold text-blue-700 uppercase tracking-wider">
-                  {formularioSeleccionado === 'fisico' ? 'Formulario — Cliente Físico' : 'Formulario — Cliente Jurídico'}
-                </span>
-                <button
-                  onClick={() => setFormularioSeleccionado(null)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-sky-100 text-slate-500 hover:bg-red-100 hover:text-red-600 transition-colors duration-200"
-                  aria-label="Cerrar formulario"
-                >
-                  <FiX className="h-4 w-4" />
-                </button>
-              </div>
               <div className="p-4 sm:p-6">
                 {formularioSeleccionado === 'juridico' ? (
-                  <CambioMedidorJuridica onClose={() => setFormularioSeleccionado(null)} />
+                  <MedidorExtraJuridica onClose={() => setFormularioSeleccionado(null)} />
                 ) : (
-                  <CambioMedidorFisico onClose={() => setFormularioSeleccionado(null)} />
+                  <MedidorExtraFisico onClose={() => setFormularioSeleccionado(null)} />
                 )}
               </div>
             </motion.div>
@@ -195,4 +183,4 @@ const CambioMedidor = () => {
   )
 }
 
-export default CambioMedidor
+export default MedidorExtra

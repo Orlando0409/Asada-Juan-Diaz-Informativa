@@ -1,4 +1,5 @@
 import { useForm } from '@tanstack/react-form'
+import { motion } from 'framer-motion'
 import data from '../data/Data.json'
 import { type ContactoTipo, getRequisitosKey, type RequisitosContacto } from '../types/ContactoForms'
 import { useState } from 'react'
@@ -114,13 +115,20 @@ const FormularioContacto = ({ tipo }: Props) => {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 text-gray-800 p-7 pt-20">
+      <motion.div
+        className="w-[95%] max-w-md"
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+      >
       <form
         key={formkey}
         onSubmit={(e) => {
           e.preventDefault()
           form.handleSubmit()
         }}
-        className="bg-white gap-2 shadow-lg pl-8 pr-8 pt-12 pb-4 rounded-lg w-[95%] max-w-md max-h-auto overflow-y-auto"
+        className="bg-white gap-2 shadow-lg pl-8 pr-8 pt-12 pb-4 rounded-lg w-full max-h-auto overflow-y-auto"
       >
         <h2 className="text-center text-xl font-semibold mb-6">
           Escribe tu {tipo}
@@ -267,6 +275,7 @@ const FormularioContacto = ({ tipo }: Props) => {
           </button>
         </div>
       </form>
+      </motion.div>
     </div>
   )
 }

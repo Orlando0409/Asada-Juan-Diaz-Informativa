@@ -6,7 +6,13 @@ const CalidadDeAgua = () => {
 
   return (
     <section className='bg-white text-gray-800 p-6 sm:p-10 md:-16 flex flex-col gap-12'>
-      <div className="pt-12 max-w-4xl mx-auto text-center">
+      <motion.div
+        className="pt-12 max-w-4xl mx-auto text-center"
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+      >
         <h1 className='font-bold text-2xl sm:text-3xl md:text-4xl text-blue-900 mb-4'>Calidad de Agua</h1>
         <blockquote className='border-l-4 border-blue-400 pl-4 sm:pl-6'>
           <p className='text-base sm:text-lg md:text-xl leading-relaxed'>            <span className='font-semibold text-blue-700'>
@@ -15,13 +21,19 @@ const CalidadDeAgua = () => {
           </p>
 
         </blockquote>
-      </div>
+      </motion.div>
 
       {/*grid */}
       <div className="max-w-6xl mx-auto w-full">
-        <h2 className=' font-bold text-blue-900 mb-8 text-center text-xl sm:text-2xl md:text-3xl '>
+        <motion.h2
+          className=' font-bold text-blue-900 mb-8 text-center text-xl sm:text-2xl md:text-3xl '
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.45, ease: 'easeOut', delay: 0.1 }}
+        >
           Documentos disponibles
-        </h2>
+        </motion.h2>
 
         {isLoading ? (
           <div className="flex justify-center items-center py-12">
@@ -67,7 +79,7 @@ const CalidadDeAgua = () => {
                   />
                 </div>
                 {/*titulos */}
-                <h3 className='font-semibold text-base sm:text-lg md:text-xl text-gray-700 mb-4 line-clamp-2'>
+                <h3 className='w-full font-semibold text-sm sm:text-base text-gray-700 mb-4 line-clamp-3 break-words'>
                   {archivo.Titulo}
                 </h3>
                 {/*boton */}

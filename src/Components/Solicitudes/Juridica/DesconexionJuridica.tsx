@@ -5,6 +5,7 @@ import { z } from "zod";
 import { DesconexionJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/DesconexionMedidorJuridica";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { useDesconexionJuridica, useMedidoresJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
+import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import { Loader2 } from "lucide-react";
 import PhoneInputComponent from "../PhoneInputComponent";
 
@@ -37,7 +38,9 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
     const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    const [isSending, setIsSending] = useState(false);
     const mutation = useDesconexionJuridica();
+    const { lookupJuridica, isLoading: loadingCedula } = useCedulaLookup();
     const planosInputRef = useRef<HTMLInputElement>(null);
     const escrituraInputRef = useRef<HTMLInputElement>(null);
 
@@ -123,6 +126,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                     }
                 });
 
+                setIsSending(true);
                 await mutation.createDesconexion(formData);
                 sessionStorage.removeItem(STORAGE_KEY);
 
@@ -133,6 +137,8 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                 onClose();
             } catch (error: any) {
                 console.log("🔍 ERROR EN SOLICITUD DE DESCONEXIÓN JURÍDICA:", error);
+            } finally {
+                setIsSending(false);
             }
         },
     });
@@ -140,7 +146,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
     if (!mostrarFormulario) return null;
 
     const campos = data.juridica.desconexion;
-    const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
+    const commonClasses = 'w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring focus:ring-blue-300';
 
     // Labels para los campos jurídicos
     const fieldLabels: { [key: string]: string } = {
@@ -182,15 +188,15 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
     }, [cedulaJuridica]);
 
     return (
-        <div className="flex justify-center items-center min-h-screen text-gray-800 p-7 w-full">
+        <div className="flex justify-center text-gray-800 p-3 sm:p-4 w-full">
             <form
                 onSubmit={(e) => {
                     e.preventDefault();
                     form.handleSubmit();
                 }}
-                className="bg-white gap-2 shadow-lg pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
+                className="bg-white gap-2 shadow-lg px-5 py-3 sm:px-6 sm:py-4 rounded-[24px] w-[95%] max-w-7xl mx-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
             >
-                <h2 className="text-center text-2xl font-semibold mb-10">Formulario de desconexión de medidor - Jurídica</h2>
+                <h2 className="text-center text-xl font-semibold mb-6">Formulario de desconexión de medidor - Jurídica</h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
                     {/* Campos dinámicos - Primero los campos normales (sin archivos) */}
@@ -234,24 +240,37 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                                                     {fieldLabels[fieldName]}
                                                     {fieldProps.required && <span className="text-red-500">*</span>}
                                                 </label>
-                                                <input
-                                                    type="text"
-                                                    value={typeof field.state.value === "string" ? field.state.value : ""}
-                                                    onChange={(e) => {
-                                                        const formatted = formatCedulaJuridica(e.target.value);
-                                                        const cedula = formatted.replace(/-/g, '');
-                                                        console.log('📝 Cédula formateada:', formatted, 'Sin guiones:', cedula);
-
-                                                        field.handleChange(formatted);
-                                                        handleFieldChange(fieldName, formatted);
-                                                        setCedulaJuridica(cedula);
-                                                        form.setFieldValue('Id_Medidor', 0);
-                                                        saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted });
-                                                    }}
-                                                    placeholder="3-XXX-XXXXXX"
-                                                    className={commonClasses}
-                                                    maxLength={12}
-                                                />
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                value={typeof field.state.value === "string" ? field.state.value : ""}
+                                                onChange={(e) => {
+                                                    const formatted = formatCedulaJuridica(e.target.value);
+                                                    const cedula = formatted.replace(/-/g, '');
+                                                    field.handleChange(formatted);
+                                                    handleFieldChange(fieldName, formatted);
+                                                    setCedulaJuridica(cedula);
+                                                    form.setFieldValue('Id_Medidor', 0);
+                                                    saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted });
+                                                    if (/^\d-\d{3}-\d{6}$/.test(formatted)) {
+                                                        lookupJuridica(formatted).then(razonSocial => {
+                                                            if (razonSocial) form.setFieldValue('Razon_Social', razonSocial);
+                                                        });
+                                                    }
+                                                }}
+                                                placeholder="3-XXX-XXXXXX"
+                                                className={commonClasses}
+                                                maxLength={12}
+                                            />
+                                            {loadingCedula && (
+                                                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                                    <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                    </svg>
+                                                </div>
+                                            )}
+                                        </div>
                                                 {fieldErrors[fieldName] && (
                                                     <span className="text-red-500 text-sm block mt-1">{fieldErrors[fieldName]}</span>
                                                 )}
@@ -279,7 +298,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                                                     }}
                                                     placeholder={fieldLabels[fieldName]}
                                                     maxLength={250}
-                                                    className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
+                                                    className={`${commonClasses} resize-none h-24 overflow-y-auto scrollbar-thumb-blue-600 scrollbar-thin scrollbar-track-blue-100`}
                                                     style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
                                                 />
                                                 {fieldErrors[fieldName] && (
@@ -443,10 +462,10 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                 <div className="flex justify-end items-end gap-4 mt-8">
                     <button
                         type="submit"
-                        disabled={form.state.isSubmitting}
-                        className={`w-[120px] py-2 rounded transition ${form.state.isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
+                        disabled={isSending}
+                        className={`w-[120px] py-2 rounded transition ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
                     >
-                        {form.state.isSubmitting ? 'Enviando...' : 'Enviar'}
+                        {isSending ? 'Enviando...' : 'Enviar'}
                     </button>
                 </div>
             </form>

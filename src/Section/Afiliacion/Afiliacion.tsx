@@ -1,15 +1,38 @@
 import { useState, useRef } from "react"
 import type { IconType } from "react-icons"
-import { FiArrowRight, FiBriefcase, FiCheckCircle, FiUser, FiX } from "react-icons/fi"
+import {
+  FiArrowRight,
+  FiBriefcase,
+  FiCheckCircle,
+  FiDroplet,
+  FiFileText,
+  FiHome,
+  FiShield,
+  FiUser,
+  FiUsers,
+  FiX,
+} from "react-icons/fi"
 import { motion, AnimatePresence } from "framer-motion"
 import data from "../../data/Data.json"
-import CambioMedidorJuridica from "../../Components/Solicitudes/Juridica/CambioMedidorJuridica"
-import CambioMedidorFisico from "../../Components/Solicitudes/Fisico/CambioMedidorFisico"
+import FormularioAfiliacion from "../../Components/Solicitudes/Fisico/AfiliacionFisica"
+import FormularioAfiliacionJuridico from "../../Components/Solicitudes/Juridica/AfiliacionJuridica"
 
 type RequisitoCampo = {
   label: string
   required?: boolean
   type?: string
+}
+
+type Beneficio = {
+  icon: IconType
+  title: string
+  description: string
+}
+
+type BeneficioData = {
+  icon: string
+  title: string
+  description: string
 }
 
 type TarjetaClienteProps = {
@@ -24,6 +47,21 @@ type TarjetaClienteProps = {
   badgeClassName: string
   iconClassName: string
 }
+
+const iconMap: Record<string, IconType> = {
+  droplet: FiDroplet,
+  fileText: FiFileText,
+  users: FiUsers,
+  shield: FiShield,
+  home: FiHome,
+}
+
+const beneficiosData = (data.AfiliacionSeccion?.beneficios ?? []) as BeneficioData[]
+
+const beneficios: Beneficio[] = beneficiosData.map((beneficio) => ({
+  ...beneficio,
+  icon: iconMap[beneficio.icon] ?? FiDroplet,
+}))
 
 const TarjetaCliente = ({
   badge,
@@ -42,11 +80,11 @@ const TarjetaCliente = ({
       ${isSelected ? 'border-blue-400 shadow-lg ring-2 ring-blue-200' : 'border-sky-200 hover:-translate-y-1 hover:shadow-lg hover:border-blue-300'}`}>
       <div className="rounded-[20px] border border-sky-200 bg-sky-50 p-4 text-slate-800">
         <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 flex-1 pr-2">
-            <span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] ${badgeClassName}`}>
+          <div className="min-w-0 flex-1 pr-2 ">
+            <span className={`inline-flex rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] break-words ${badgeClassName}`}>
               {badge}
             </span>
-            <h2 className="mt-3 whitespace-nowrap text-[clamp(0.95rem,1.6vw,1.15rem)] font-semibold tracking-tight">{title}</h2>
+            <h2 className="mt-3 text-[clamp(0.95rem,1.6vw,1.15rem)] font-semibold tracking-tight break-words">{title}</h2>
           </div>
           <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-sky-100 ${iconClassName}`}>
             <Icon className="h-5 w-5" />
@@ -58,7 +96,10 @@ const TarjetaCliente = ({
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-600 sm:text-xs">Lista de requisitos</h3>
         <ul className="mt-3 flex max-h-[18rem] flex-col gap-2.5 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-sky-100">
           {requisitos.map((requisito) => (
-            <li key={requisito.label} className="rounded-xl border border-sky-100 bg-sky-50 px-3 py-2.5">
+            <li
+              key={requisito.label}
+              className="rounded-xl border border-sky-100 bg-sky-50 px-3 py-2.5"
+            >
               <div className="flex items-start gap-2.5">
                 <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600">
                   <FiCheckCircle className="h-3.5 w-3.5" />
@@ -81,12 +122,12 @@ const TarjetaCliente = ({
   )
 }
 
-const CambioMedidor = () => {
+const InformacionAfiliacion = () => {
   const [formularioSeleccionado, setFormularioSeleccionado] = useState<'fisico' | 'juridico' | null>(null)
   const formRef = useRef<HTMLDivElement>(null)
 
-  const requisitosFisicos = Object.values(data.requisitosSolicitudes.cambioMedidor ?? {}) as RequisitoCampo[]
-  const requisitosJuridicos = Object.values(data.juridica?.cambioMedidor ?? {}) as RequisitoCampo[]
+  const requisitosFisicos = Object.values(data.requisitosSolicitudes.abonado ?? {}) as RequisitoCampo[]
+  const requisitosJuridicos = Object.values(data.juridica?.afiliacion ?? {}) as RequisitoCampo[]
 
   const abrirFormulario = (tipo: 'fisico' | 'juridico') => {
     setFormularioSeleccionado(prev => prev === tipo ? null : tipo)
@@ -107,12 +148,29 @@ const CambioMedidor = () => {
         >
           <div className="bg-sky-50 p-5 sm:p-6 lg:p-8 pt-12">
             <span className="inline-flex rounded-full border border-sky-200 bg-sky-100 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.24em] text-blue-700">
-              Solicitud de cambio de medidor
+              Solicitud de afiliación
             </span>
+
             <div>
-              <h2 className="mt-4 text-2xl font-semibold tracking-tight text-slate-900 sm:text-[1.9rem]">Cambio de medidor</h2>
-              <p className="mt-2 text-sm text-slate-600">Si necesitas cambiar tu medidor por daño o mal funcionamiento, selecciona tu tipo de cliente y completa el formulario.</p>
+              <h2 className="mt-4 text-2xl font-semibold tracking-tight text-slate-900 sm:text-[1.9rem]">Beneficios como abonado</h2>
             </div>
+
+            {beneficios.length > 0 && (
+              <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                {beneficios.map(({ icon: Icon, title, description }) => (
+                  <article
+                    key={title}
+                    className="rounded-[20px] border border-sky-200 bg-white p-4 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md hover:border-blue-300"
+                  >
+                    <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-100 text-blue-600 shadow-sm">
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <h3 className="mt-3 text-base font-semibold text-slate-900">{title}</h3>
+                    <p className="mt-1.5 text-sm leading-5 text-slate-600">{description}</p>
+                  </article>
+                ))}
+              </div>
+            )}
 
             <motion.div
               className="mt-6 grid gap-5 xl:grid-cols-2"
@@ -127,7 +185,7 @@ const CambioMedidor = () => {
               <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35 } } }}>
                 <TarjetaCliente
                   badge="Cliente jurídico"
-                  title="Cambio de medidor para empresas"
+                  title="Afiliación para empresas y organizaciones"
                   buttonLabel="Llenar formulario jurídico"
                   requisitos={requisitosJuridicos}
                   icon={FiBriefcase}
@@ -138,10 +196,11 @@ const CambioMedidor = () => {
                   iconClassName="text-blue-700"
                 />
               </motion.div>
+
               <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35 } } }}>
                 <TarjetaCliente
                   badge="Cliente físico"
-                  title="Cambio de medidor para personas"
+                  title="Afiliación para personas individuales"
                   buttonLabel="Llenar formulario físico"
                   requisitos={requisitosFisicos}
                   icon={FiUser}
@@ -182,9 +241,9 @@ const CambioMedidor = () => {
               </div>
               <div className="p-4 sm:p-6">
                 {formularioSeleccionado === 'juridico' ? (
-                  <CambioMedidorJuridica onClose={() => setFormularioSeleccionado(null)} />
+                  <FormularioAfiliacionJuridico onClose={() => setFormularioSeleccionado(null)} />
                 ) : (
-                  <CambioMedidorFisico onClose={() => setFormularioSeleccionado(null)} />
+                  <FormularioAfiliacion onClose={() => setFormularioSeleccionado(null)} />
                 )}
               </div>
             </motion.div>
@@ -195,4 +254,4 @@ const CambioMedidor = () => {
   )
 }
 
-export default CambioMedidor
+export default InformacionAfiliacion

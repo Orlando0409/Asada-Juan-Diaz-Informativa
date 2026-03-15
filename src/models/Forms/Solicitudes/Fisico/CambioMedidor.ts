@@ -21,6 +21,8 @@ export interface CambioMedidor {
   Direccion_Exacta: string;
   Motivo_Solicitud: string;
   Id_Medidor: number;
+  Planos_Terreno?: File | string;
+  Escritura_Terreno?: File | string;
 }
 
 export const CambioMedidorInicialState: CambioMedidorFisico = {
@@ -47,4 +49,6 @@ export interface CambioMedidorFisico {
   Numero_Telefono: string;
   Motivo_Solicitud: string;
   Id_Medidor: number;
+  Planos_Terreno?: File | string;
+  Escritura_Terreno?: File | string;
 }

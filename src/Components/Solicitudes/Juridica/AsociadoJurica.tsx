@@ -2,6 +2,7 @@ import { useForm } from "@tanstack/react-form";
 import { useEffect, useState } from "react";
 import { AsociadoJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/AsociadoJuridica";
 import { useAsociadoJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
+import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import PhoneInputComponent from "../PhoneInputComponent";
 
 type Props = {
@@ -28,7 +29,9 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const [touched, setTouched] = useState<Record<string, boolean>>({});
+    const [isSending, setIsSending] = useState(false);
     const mutation = useAsociadoJuridica();
+    const { lookupJuridica, isLoading: loadingCedula } = useCedulaLookup();
     const [_mostrarFormulario, setMostrarFormulario] = useState(true);
 
     // Validación en tiempo real de todo el formulario
@@ -48,7 +51,7 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
         }
     };
 
-        const saveToSessionStorage = (values: any) => {
+    const saveToSessionStorage = (values: any) => {
         try {
             // Guardamos todo excepto los archivos
             const dataToSave = {
@@ -97,8 +100,9 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                     return;
                 }
 
+                setIsSending(true);
                 await mutation.createAsociado(value);
-                 sessionStorage.removeItem(STORAGE_KEY);
+                sessionStorage.removeItem(STORAGE_KEY);
 
                 form.reset();
                 setMostrarFormulario(false);
@@ -106,6 +110,8 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                 alert("¡Formulario enviado con éxito!");
             } catch (error: any) {
                 console.log(" ERROR EN SOLICITUD DE ASOCIADO JURÍDICO:", error);
+            } finally {
+                setIsSending(false);
             }
         },
     });
@@ -128,33 +134,33 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
         form.setFieldValue(fieldName, value);
     };
 
-       useEffect(() => {
-            const savedData = sessionStorage.getItem(STORAGE_KEY);
-            if (savedData) {
-                try {
-                    const parsed = JSON.parse(savedData);
-                    // Cargar los valores en el formulario
-                    Object.entries(parsed).forEach(([key, value]) => {
-                        if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
-                            form.setFieldValue(key as any, value as any);
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error al cargar datos guardados:', error);
-                }
+    useEffect(() => {
+        const savedData = sessionStorage.getItem(STORAGE_KEY);
+        if (savedData) {
+            try {
+                const parsed = JSON.parse(savedData);
+                // Cargar los valores en el formulario
+                Object.entries(parsed).forEach(([key, value]) => {
+                    if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
+                        form.setFieldValue(key as any, value as any);
+                    }
+                });
+            } catch (error) {
+                console.error('Error al cargar datos guardados:', error);
             }
-        }, []); //prueba 
+        }
+    }, []); //prueba 
 
     const commonClasses =
-        "w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300";
+        "w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring focus:ring-blue-300";
 
     return (
-        <div className="flex justify-center items-center min-h-screen text-gray-800 p-7 w-full">
+        <div className="flex justify-center text-gray-800 p-3 sm:p-4 w-full">
             <form
                 onSubmit={handleSubmit}
-                className="bg-white shadow-lg  pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
+                className="bg-white shadow-lg px-5 py-3 sm:px-6 sm:py-4 rounded-[24px] w-[95%] max-w-7xl mx-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
             >
-                <h2 className="text-center text-2xl font-semibold mb-10">
+                <h2 className="text-center text-xl font-semibold mb-6">
                     Formulario para Cliente Jurídico
                 </h2>
 
@@ -166,17 +172,32 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                                 <label className="block mb-1 font-medium">
                                     Cédula Jurídica <span className="text-red-500">*</span>
                                 </label>
-                                <input
-                                    type="text"
-                                    value={field.state.value}
-                                    onChange={(e) => {
-                                        const formatted = formatCedulaJuridica(e.target.value);
-                                        handleFieldChange("Cedula_Juridica", formatted);
-                                    }}
-                                    onBlur={() => setTouched(prev => ({ ...prev, Cedula_Juridica: true }))}
-                                    placeholder="3-XXX-XXXXXX"
-                                    className={commonClasses}
-                                />
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        value={field.state.value}
+                                        onChange={(e) => {
+                                            const formatted = formatCedulaJuridica(e.target.value);
+                                            handleFieldChange("Cedula_Juridica", formatted);
+                                            if (/^\d-\d{3}-\d{6}$/.test(formatted)) {
+                                                lookupJuridica(formatted).then(razonSocial => {
+                                                    if (razonSocial) form.setFieldValue('Razon_Social', razonSocial);
+                                                });
+                                            }
+                                        }}
+                                        onBlur={() => setTouched(prev => ({ ...prev, Cedula_Juridica: true }))}
+                                        placeholder="3-XXX-XXXXXX"
+                                        className={commonClasses}
+                                    />
+                                    {loadingCedula && (
+                                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                            <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                        </div>
+                                    )}
+                                </div>
                                 {touched["Cedula_Juridica"] && fieldErrors["Cedula_Juridica"] && (
                                     <span className="text-red-500 text-sm block mt-1">{fieldErrors["Cedula_Juridica"]}</span>
                                 )}
@@ -282,7 +303,7 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                                     onBlur={() => setTouched(prev => ({ ...prev, Motivo_Solicitud: true }))}
                                     placeholder="Escribe el motivo de tu solicitud"
                                     maxLength={250}
-                                    className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
+                                    className={`${commonClasses} resize-none h-24 overflow-y-auto scrollbar-thumb-blue-600 scrollbar-thin scrollbar-track-blue-100`}
                                 />
                                 {touched["Motivo_Solicitud"] && fieldErrors["Motivo_Solicitud"] && (
                                     <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Solicitud"]}</span>
@@ -301,10 +322,10 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                     <div className="flex justify-end items-end">
                         <button
                             type="submit"
-                            disabled={form.state.isSubmitting}
-                            className={`w-[120px] py-2 rounded transition ${form.state.isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
+                            disabled={isSending}
+                            className={`w-[120px] py-2 rounded transition ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
                         >
-                            {form.state.isSubmitting ? 'Enviando...' : 'Enviar'}
+                            {isSending ? 'Enviando...' : 'Enviar'}
                         </button>
                     </div>
                 </div>

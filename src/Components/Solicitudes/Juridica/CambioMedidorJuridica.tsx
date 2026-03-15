@@ -1,9 +1,10 @@
 import { useForm } from "@tanstack/react-form";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { CambioMedidorJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/CambioMedidorJuridico";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { useCambioMedidorJuridica, useMedidoresJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
+import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import { Loader2 } from "lucide-react";
 import PhoneInputComponent from "../PhoneInputComponent";
 
@@ -24,11 +25,16 @@ const fieldSchemas: Record<string, z.ZodTypeAny> = CambioMedidorJuridicaSchema.s
 const STORAGE_KEY = 'afiliacion_juridica_temp';
 
 const CambioMedidorJuridica = ({ onClose }: Props) => {
+    const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+    const [isSending, setIsSending] = useState(false);
     const mutation = useCambioMedidorJuridica();
+    const { lookupJuridica, isLoading: loadingCedula } = useCedulaLookup();
     const [mostrarFormulario, setMostrarFormulario] = useState(true);
     const [cedulaJuridica, setCedulaJuridica] = useState('');
+    const planosInputRef = useRef<HTMLInputElement>(null);
+    const escrituraInputRef = useRef<HTMLInputElement>(null);
     const { medidores, isLoading: isMedidoresLoading } = useMedidoresJuridica(cedulaJuridica);
 
     // Validación en tiempo real SOLO del campo editado
@@ -90,10 +96,13 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
             Direccion_Exacta: "",
             Motivo_Solicitud: "",
             Id_Medidor: 0,
+            Planos_Terreno: undefined as File | undefined,
+            Escritura_Terreno: undefined as File | undefined,
         },
 
         onSubmit: async ({ value }) => {
             setFormErrors({});
+            setFieldErrors({});
             try {
                 // Validar y normalizar el teléfono internacional
                 const phoneNumber = parsePhoneNumberFromString(value.Numero_Telefono || "");
@@ -101,10 +110,20 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                     setFormErrors({ Numero_Telefono: "Número de teléfono inválido" });
                     return;
                 }
-                // Guarda el número en formato E.164 (+50688887777)
-                value.Numero_Telefono = phoneNumber.format("E.164");
 
-                const validation = CambioMedidorJuridicaSchema.safeParse(value);
+                const cleanedValue = {
+                    ...value,
+                    Razon_Social: (value.Razon_Social || '').trim(),
+                    Cedula_Juridica: (value.Cedula_Juridica || '').trim(),
+                    Correo: (value.Correo || '').trim(),
+                    Numero_Telefono: phoneNumber.format("E.164"),
+                    Direccion_Exacta: (value.Direccion_Exacta || '').trim(),
+                    Motivo_Solicitud: (value.Motivo_Solicitud || '').trim(),
+                    Planos_Terreno: value.Planos_Terreno,
+                    Escritura_Terreno: value.Escritura_Terreno,
+                };
+
+                const validation = CambioMedidorJuridicaSchema.safeParse(cleanedValue);
                 if (!validation.success) {
                     const validationErrors: Record<string, string> = {};
                     validation.error.errors.forEach((err) => {
@@ -115,15 +134,32 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                     return;
                 }
 
-                await mutation.createCambioMedidor(value);
+                const formData = new FormData();
+                Object.entries(validation.data).forEach(([key, val]) => {
+                    if (val !== undefined && val !== null && val !== "") {
+                        if (val instanceof File) {
+                            formData.append(key, val);
+                        } else {
+                            formData.append(key, String(val));
+                        }
+                    }
+                });
+
+                setIsSending(true);
+                await mutation.createCambioMedidor(formData);
                 sessionStorage.removeItem(STORAGE_KEY);
 
                 form.reset();
                 setFieldErrors({});
+                setArchivoSeleccionado({});
+                if (planosInputRef.current) planosInputRef.current.value = '';
+                if (escrituraInputRef.current) escrituraInputRef.current.value = '';
                 setMostrarFormulario(false);
                 onClose();
             } catch (error: any) {
                 console.log(" ERROR EN SOLICITUD DE CAMBIO DE MEDIDOR JURÍDICA:", error);
+            } finally {
+                setIsSending(false);
             }
         },
     });
@@ -150,15 +186,15 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
     if (!mostrarFormulario) return null;
 
 
-    const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300';
+    const commonClasses = 'w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring focus:ring-blue-300';
 
     return (
-        <div className="flex justify-center items-center min-h-screen text-gray-800 p-7 w-full">
+        <div className="w-full text-gray-800">
             <form
                 onSubmit={(e) => { e.preventDefault(); form.handleSubmit(); }}
-                className="bg-white shadow-lg  pl-8 pr-8 pt-4 pb-4 rounded-lg w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
+                className="scrollbar-hide w-full rounded-[24px] bg-white px-4 py-3 sm:px-6 sm:py-4"
             >
-                <h2 className="text-center text-2xl font-semibold mb-10">Formulario de cambio de medidor - Jurídica</h2>
+                <h2 className="text-center text-xl font-semibold mb-6">Formulario de cambio de medidor - Jurídica</h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
                     {/* Razón Social */}
@@ -192,21 +228,35 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                         {(field) => (
                             <div className="mb-3 w-full">
                                 <label htmlFor="CedulaJuridica" className="block mb-1 font-medium">Cédula Jurídica <span className="text-red-500">*</span></label>
-                                <input
-                                    type="text"
-                                    value={field.state.value}
-                                    onChange={(e) => {
-                                        const formatted = formatCedulaJuridica(e.target.value);
-                                        field.handleChange(formatted);
-                                        handleFieldChange("Cedula_Juridica", formatted);
-                                        // Actualizar el estado de cedulaJuridica y limpiar medidor
-                                        setCedulaJuridica(formatted.replace(/-/g, ''));
-                                        form.setFieldValue('Id_Medidor', 0);
-                                        saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted });
-                                    }}
-                                    placeholder={getPlaceholder("Cedula_Juridica")}
-                                    className={commonClasses}
-                                />
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        value={field.state.value}
+                                        onChange={(e) => {
+                                            const formatted = formatCedulaJuridica(e.target.value);
+                                            field.handleChange(formatted);
+                                            handleFieldChange("Cedula_Juridica", formatted);
+                                            setCedulaJuridica(formatted.replace(/-/g, ''));
+                                            form.setFieldValue('Id_Medidor', 0);
+                                            saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted });
+                                            if (/^\d-\d{3}-\d{6}$/.test(formatted)) {
+                                                lookupJuridica(formatted).then(razonSocial => {
+                                                    if (razonSocial) form.setFieldValue('Razon_Social', razonSocial);
+                                                });
+                                            }
+                                        }}
+                                        placeholder={getPlaceholder("Cedula_Juridica")}
+                                        className={commonClasses}
+                                    />
+                                    {loadingCedula && (
+                                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                            <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                        </div>
+                                    )}
+                                </div>
                                 {fieldErrors["Cedula_Juridica"] && (
                                     <span className="text-red-500 text-sm block mt-1">{fieldErrors["Cedula_Juridica"]}</span>
                                 )}
@@ -304,7 +354,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                     }}
                                     placeholder="Escribe el motivo de tu solicitud"
                                     maxLength={250}
-                                    className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
+                                    className={`${commonClasses} resize-none h-24 overflow-y-auto scrollbar-thumb-blue-600 scrollbar-thin scrollbar-track-blue-100`}
                                 />
                                 {fieldErrors["Motivo_Solicitud"] && (
                                     <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Solicitud"]}</span>
@@ -364,6 +414,118 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                             );
                         }}
                     </form.Field>
+
+                    {/* Planos del Terreno */}
+                    <form.Field name="Planos_Terreno">
+                        {(field) => {
+                            const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
+                            return (
+                                <div className="mb-3 w-full">
+                                    <label className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
+                                    <input
+                                        type="file"
+                                        accept=".png,.jpg,.jpeg,.heic,.pdf"
+                                        disabled={!!archivoActual}
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0] ?? null;
+                                            field.handleChange(file ?? undefined);
+                                            setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: file }));
+                                            handleFieldChange("Planos_Terreno", file);
+                                        }}
+                                        className="hidden"
+                                        id="Planos_Terreno_CambioJuridica"
+                                        ref={planosInputRef}
+                                        key={archivoActual ? archivoActual.name : 'planos'}
+                                    />
+                                    <label
+                                        htmlFor="Planos_Terreno_CambioJuridica"
+                                        className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-blue-700 cursor-pointer'}`}
+                                    >
+                                        {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
+                                    </label>
+                                    {archivoActual && (
+                                        <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
+                                            <span className="text-sm text-gray-700">{archivoActual.name}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    field.handleChange(undefined);
+                                                    setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
+                                                    setFieldErrors(prev => ({ ...prev, ["Planos_Terreno"]: 'Debe subir el plano del terreno' }));
+                                                    if (planosInputRef.current) planosInputRef.current.value = '';
+                                                }}
+                                                className="text-red-500 hover:underline text-xs"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </div>
+                                    )}
+                                    {fieldErrors["Planos_Terreno"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors["Planos_Terreno"]}</span>
+                                    )}
+                                    {formErrors["Planos_Terreno"] && !fieldErrors["Planos_Terreno"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{formErrors["Planos_Terreno"]}</span>
+                                    )}
+                                </div>
+                            );
+                        }}
+                    </form.Field>
+
+                    {/* Escritura del Terreno */}
+                    <form.Field name="Escritura_Terreno">
+                        {(field) => {
+                            const archivoActual = archivoSeleccionado["Escritura_Terreno"] ?? null;
+                            return (
+                                <div className="mb-3 w-full">
+                                    <label className="block mb-1 font-medium">Escritura del terreno <span className="text-red-500">*</span></label>
+                                    <input
+                                        type="file"
+                                        accept=".png,.jpg,.jpeg,.heic,.pdf"
+                                        disabled={!!archivoActual}
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0] ?? null;
+                                            field.handleChange(file ?? undefined);
+                                            setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: file }));
+                                            handleFieldChange("Escritura_Terreno", file);
+                                        }}
+                                        className="hidden"
+                                        id="Escritura_Terreno_CambioJuridica"
+                                        ref={escrituraInputRef}
+                                        key={archivoActual ? archivoActual.name : 'escritura'}
+                                    />
+                                    <label
+                                        htmlFor="Escritura_Terreno_CambioJuridica"
+                                        className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-blue-700 cursor-pointer'}`}
+                                    >
+                                        {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
+                                    </label>
+                                    {archivoActual && (
+                                        <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
+                                            <span className="text-sm text-gray-700">{archivoActual.name}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    field.handleChange(undefined);
+                                                    setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: null }));
+                                                    setFieldErrors(prev => ({ ...prev, ["Escritura_Terreno"]: 'Debe subir la escritura del terreno' }));
+                                                    if (escrituraInputRef.current) escrituraInputRef.current.value = '';
+                                                }}
+                                                className="text-red-500 hover:underline text-xs"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </div>
+                                    )}
+                                    {fieldErrors["Escritura_Terreno"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors["Escritura_Terreno"]}</span>
+                                    )}
+                                    {formErrors["Escritura_Terreno"] && !fieldErrors["Escritura_Terreno"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{formErrors["Escritura_Terreno"]}</span>
+                                    )}
+                                </div>
+                            );
+                        }}
+                    </form.Field>
                 </div>
 
 
@@ -372,10 +534,10 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                     <div className="flex justify-end items-end">
                         <button
                             type="submit"
-                            disabled={form.state.isSubmitting}
-                            className={`w-[120px] py-2 rounded transition ${form.state.isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
+                            disabled={isSending}
+                            className={`w-[120px] py-2 rounded transition ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
                         >
-                            {form.state.isSubmitting ? 'Enviando...' : 'Enviar'}
+                            {isSending ? 'Enviando...' : 'Enviar'}
                         </button>
                     </div>
                 </div>
