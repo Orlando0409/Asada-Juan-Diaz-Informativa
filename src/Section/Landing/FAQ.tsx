@@ -34,9 +34,9 @@ const Faq: React.FC = () => {
       <section
         id="FAQ"
         aria-label="Preguntas frecuentes"
-        className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-blue-50 to-white"
+        className="flex flex-col items-center justify-center min-h-screen bg-white"
       >
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
         <p className="text-gray-700 text-lg font-medium">
           Cargando preguntas frecuentes...
         </p>
@@ -48,7 +48,7 @@ const Faq: React.FC = () => {
       <section
         id="FAQ"
         aria-label="Preguntas frecuentes"
-        className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-red-50 to-white"
+        className="flex flex-col items-center justify-center min-h-screen bg-white"
       >
         <p className="text-red-600 text-lg font-semibold">
           Error al cargar las preguntas frecuentes. <br />
@@ -62,7 +62,7 @@ const Faq: React.FC = () => {
       <section
         id="FAQ"
         aria-label="Preguntas frecuentes"
-        className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-blue-50 to-white"
+        className="flex flex-col items-center justify-center min-h-screen bg-white"
       >
         <p className="text-gray-600 text-lg">
           No hay preguntas frecuentes disponibles por el momento.
@@ -74,13 +74,14 @@ const Faq: React.FC = () => {
     <section
       id="FAQ"
       aria-label="Preguntas frecuentes"
-      className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-gray-50 py-12 px-4 sm:px-6 lg:px-8"
+      className="bg-white py-12 px-4 sm:px-6 lg:px-8"
     >
-      <div className="p-12 max-w-4xl mx-auto">
-        <motion.div 
+      <div className="py-8 max-w-4xl mx-auto">
+        <motion.div
           className="text-center mb-10"
           initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
           transition={{ duration: 0.5 }}
         >
           <h1 className="text-4xl font-bold text-blue-600 mb-2">
@@ -130,17 +131,17 @@ const Faq: React.FC = () => {
             >
               <MTAccordionHeader
                 onClick={() => handleOpen(idx)}
-                className={`px-6 py-4 text-lg font-semibold border border-transparent transition-all duration-300 ${
+                className={`px-6 py-4 text-base sm:text-lg font-semibold border border-transparent transition-all duration-300 break-words ${
                   open === idx
                     ? "text-blue-700 bg-blue-50 rounded-t-2xl"
                     : "text-gray-900 hover:bg-gray-50 border-b-0 rounded-2xl"
                 }`}
               >
-                {faq.Pregunta}
+                <span className="break-words">{faq.Pregunta}</span>
               </MTAccordionHeader>
 
               <MTAccordionBody className="px-6 pb-5 text-base text-gray-700 bg-white rounded-b-2xl transition-all duration-300 ease-in-out">
-                <p className="mt-2 border-t pt-4 border-gray-100 leading-relaxed">
+                <p className="mt-2 border-t pt-4 border-gray-100 leading-relaxed break-words">
                   {faq.Respuesta}
                 </p>
               </MTAccordionBody>

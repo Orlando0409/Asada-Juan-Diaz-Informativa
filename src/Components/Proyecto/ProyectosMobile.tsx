@@ -114,7 +114,7 @@ function ProyectosMobile({
 
                       {/* Contenido tarjeta móvil */}
                       <div className="p-4 space-y-3">
-                        <h3 className="text-lg md:text-xl font-bold text-blue-600">
+                        <h3 className="text-lg md:text-xl font-bold text-blue-600 line-clamp-2 break-words">
                           {proyecto.Titulo}
                         </h3>
                         

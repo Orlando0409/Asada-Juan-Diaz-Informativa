@@ -6,29 +6,37 @@ type Props = {
   onToggle: () => void;        
 };
 
+const CHAR_LIMIT = 100;
+const WORD_LIMIT = 5;
+
 function BotonLeerMas({ descripcion, mostrarTodo, onToggle }: Readonly<Props>) {
   // proteger contra undefined/null
   const safeDescripcion = (descripcion ?? '').toString();
   const palabras = safeDescripcion.trim().split(/\s+/).filter(Boolean);
-  const textoCorto = palabras.slice(0, 5).join(" ");
-  const textoTruncado = textoCorto + (palabras.length > 5 ? "..." : "");
+
+  const necesitaTruncar = palabras.length > WORD_LIMIT || safeDescripcion.length > CHAR_LIMIT;
+
+  const textoCorto = safeDescripcion.length > CHAR_LIMIT
+    ? safeDescripcion.slice(0, CHAR_LIMIT).trimEnd()
+    : palabras.slice(0, WORD_LIMIT).join(" ");
+  const textoTruncado = necesitaTruncar ? textoCorto + "..." : safeDescripcion;
 
   return (
     <div className="space-y-3">
       {/* Texto de la descripción */}
       <div className="relative">
-        <p className="text-gray-700 leading-relaxed transition-all duration-300 text-sm">
+        <p className="text-gray-700 leading-relaxed transition-all duration-300 text-sm break-words">
           {mostrarTodo ? safeDescripcion : textoTruncado}
         </p>
-        
-        {/* Gradiente de fade para el texto truncado */}
-        {!mostrarTodo && palabras.length > 5 && (
+
+        {/* Fade para el texto truncado */}
+        {!mostrarTodo && necesitaTruncar && (
           <div className="absolute bottom-0 right-0 w-12 h-6 bg-gradient-to-l from-white to-transparent pointer-events-none"></div>
         )}
       </div>
 
       {/* Botón mejorado */}
-      {palabras.length > 5 && (
+      {necesitaTruncar && (
         <div className="flex items-center justify-between">
           {/* Línea decorativa */}
           <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent mr-3"></div>
@@ -41,9 +49,9 @@ function BotonLeerMas({ descripcion, mostrarTodo, onToggle }: Readonly<Props>) {
             className={`
               group flex items-center space-x-2 px-4 py-2 rounded-full text-sm font-medium
               transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2
-              ${mostrarTodo 
-                ? 'bg-gradient-to-r from-red-50 to-pink-50 text-red-600 hover:from-red-100 hover:to-pink-100 focus:ring-red-500 border border-red-200 hover:border-red-300' 
-                : 'bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-600 hover:from-blue-100 hover:to-indigo-100 focus:ring-blue-500 border border-blue-200 hover:border-blue-300'
+              ${mostrarTodo
+                ? 'bg-red-50 text-red-600 hover:bg-red-100 focus:ring-red-500 border border-red-200 hover:border-red-300'
+                : 'bg-sky-50 text-blue-600 hover:bg-sky-100 focus:ring-blue-500 border border-sky-200 hover:border-sky-300'
               }
               hover:shadow-md active:scale-95
             `}

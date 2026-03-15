@@ -4,6 +4,7 @@ import { z } from "zod";
 import { CambioMedidorJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/CambioMedidorJuridico";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { useCambioMedidorJuridica, useMedidoresJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
+import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import { Loader2 } from "lucide-react";
 import PhoneInputComponent from "../PhoneInputComponent";
 
@@ -29,6 +30,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const [isSending, setIsSending] = useState(false);
     const mutation = useCambioMedidorJuridica();
+    const { lookupJuridica, isLoading: loadingCedula } = useCedulaLookup();
     const [mostrarFormulario, setMostrarFormulario] = useState(true);
     const [cedulaJuridica, setCedulaJuridica] = useState('');
     const planosInputRef = useRef<HTMLInputElement>(null);
@@ -190,8 +192,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
         <div className="w-full text-gray-800">
             <form
                 onSubmit={(e) => { e.preventDefault(); form.handleSubmit(); }}
-                className="scrollbar-hide w-full overflow-y-auto rounded-[24px] bg-white px-4 py-3 shadow-[0_30px_80px_-32px_rgba(15,23,42,0.55)] sm:px-6 sm:py-4"
-                style={{ maxHeight: "calc(100dvh - 3rem)" }}
+                className="scrollbar-hide w-full rounded-[24px] bg-white px-4 py-3 sm:px-6 sm:py-4"
             >
                 <h2 className="text-center text-xl font-semibold mb-6">Formulario de cambio de medidor - Jurídica</h2>
 
@@ -227,21 +228,35 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                         {(field) => (
                             <div className="mb-3 w-full">
                                 <label htmlFor="CedulaJuridica" className="block mb-1 font-medium">Cédula Jurídica <span className="text-red-500">*</span></label>
-                                <input
-                                    type="text"
-                                    value={field.state.value}
-                                    onChange={(e) => {
-                                        const formatted = formatCedulaJuridica(e.target.value);
-                                        field.handleChange(formatted);
-                                        handleFieldChange("Cedula_Juridica", formatted);
-                                        // Actualizar el estado de cedulaJuridica y limpiar medidor
-                                        setCedulaJuridica(formatted.replace(/-/g, ''));
-                                        form.setFieldValue('Id_Medidor', 0);
-                                        saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted });
-                                    }}
-                                    placeholder={getPlaceholder("Cedula_Juridica")}
-                                    className={commonClasses}
-                                />
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        value={field.state.value}
+                                        onChange={(e) => {
+                                            const formatted = formatCedulaJuridica(e.target.value);
+                                            field.handleChange(formatted);
+                                            handleFieldChange("Cedula_Juridica", formatted);
+                                            setCedulaJuridica(formatted.replace(/-/g, ''));
+                                            form.setFieldValue('Id_Medidor', 0);
+                                            saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted });
+                                            if (/^\d-\d{3}-\d{6}$/.test(formatted)) {
+                                                lookupJuridica(formatted).then(razonSocial => {
+                                                    if (razonSocial) form.setFieldValue('Razon_Social', razonSocial);
+                                                });
+                                            }
+                                        }}
+                                        placeholder={getPlaceholder("Cedula_Juridica")}
+                                        className={commonClasses}
+                                    />
+                                    {loadingCedula && (
+                                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                            <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                        </div>
+                                    )}
+                                </div>
                                 {fieldErrors["Cedula_Juridica"] && (
                                     <span className="text-red-500 text-sm block mt-1">{fieldErrors["Cedula_Juridica"]}</span>
                                 )}
@@ -339,7 +354,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                     }}
                                     placeholder="Escribe el motivo de tu solicitud"
                                     maxLength={250}
-                                    className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
+                                    className={`${commonClasses} resize-none h-24 overflow-y-auto scrollbar-thumb-blue-600 scrollbar-thin scrollbar-track-blue-100`}
                                 />
                                 {fieldErrors["Motivo_Solicitud"] && (
                                     <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Solicitud"]}</span>
