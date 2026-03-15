@@ -1,5 +1,5 @@
 import { motion, type Variants } from 'framer-motion';
-import { FiCalendar, FiMapPin, FiUsers } from 'react-icons/fi';
+import { FiMapPin, FiUsers } from 'react-icons/fi';
 import { MdWaterDrop } from 'react-icons/md';
 import Data from '../../data/Data.json';
 import { useImagenesPublic } from '../../Hook/Historia/hookHistoria';
