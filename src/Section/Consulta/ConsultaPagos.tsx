@@ -3,15 +3,190 @@ import { useForm } from '@tanstack/react-form';
 import { Search, User, Landmark, CreditCard } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
 import ModalConsulta from './ModalConsulta';
+import { useConsultaPago } from '../../Hook/ConsultaPagoHook';
+import { useAlerts } from '../../context/AlertContext';
+import type { ConsultaResultado, TipoIdentificacion } from '../../types/Consulta/Pagos';
+
+type ConsultaFormValues = {
+    tipoCliente: string;
+    tipoIdentificacion: string;
+    numeroIdentificacion: string;
+    numeroMedidor: string;
+};
+
+const getBackendErrorMessage = (error: unknown): string => {
+    if (typeof error !== 'object' || error === null) {
+        return 'Hubo un error al consultar. Por favor intenta nuevamente.';
+    }
+
+    const errorWithResponse = error as {
+        message?: unknown;
+        response?: {
+            data?: {
+                message?: unknown;
+                error?: unknown;
+            };
+        };
+    };
+
+    const apiMessage = errorWithResponse.response?.data?.message;
+
+    if (typeof apiMessage === 'string' && apiMessage.trim()) {
+        return apiMessage;
+    }
+
+    if (Array.isArray(apiMessage)) {
+        const messages = apiMessage.filter(
+            (value): value is string => typeof value === 'string' && value.trim().length > 0
+        );
+
+        if (messages.length > 0) {
+            return messages.join(', ');
+        }
+    }
+
+    const apiError = errorWithResponse.response?.data?.error;
+    if (typeof apiError === 'string' && apiError.trim()) {
+        return apiError;
+    }
+
+    if (typeof errorWithResponse.message === 'string' && errorWithResponse.message.trim()) {
+        return errorWithResponse.message;
+    }
+
+    return 'Hubo un error al consultar. Por favor intenta nuevamente.';
+};
+
+const formatCedulaJuridica = (value: string): string => {
+    const digits = value.replaceAll(/\D/g, '');
+    let formatted = '';
+
+    if (digits.length > 0) {
+        formatted += digits[0];
+    }
+    if (digits.length > 1) {
+        formatted += `-${digits.slice(1, 4)}`;
+    }
+    if (digits.length > 4) {
+        formatted += `-${digits.slice(4, 10)}`;
+    }
+
+    return formatted;
+};
+
+const normalizeCedulaJuridica = (value: string): string => value.replaceAll(/\D/g, '');
 
 const ConsultaRecibos = () => {
-    const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-    const [successMessage, setSuccessMessage] = useState<string>('');
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [consultaResultado, setConsultaResultado] = useState<ConsultaResultado | null>(null);
     const navigate = useNavigate();
     const [clientType, setClientType] = useState('');
     const [idType, setIdType] = useState('');
-    
+    const { showSuccess, showError, showWarning } = useAlerts();
+    const { consultaPagosMedidor, consultaPagosAfiliadoFisico, consultaPagosAfiliadoJuridico } = useConsultaPago();
+
+    const parseNumeroMedidor = (numeroMedidor: string): number | undefined | null => {
+        if (!numeroMedidor.trim()) {
+            return undefined;
+        }
+
+        const soloDigitos = numeroMedidor.replaceAll(/\D/g, '');
+        if (!soloDigitos) {
+            return null;
+        }
+
+        const medidor = Number.parseInt(soloDigitos, 10);
+        return Number.isNaN(medidor) ? null : medidor;
+    };
+
+    const getTipoIdentificacion = (tipoIdentificacion: string): TipoIdentificacion | undefined => {
+        if (tipoIdentificacion === 'Cedula Nacional' || tipoIdentificacion === 'Dimex' || tipoIdentificacion === 'Pasaporte') {
+            return tipoIdentificacion;
+        }
+        return undefined;
+    };
+
+    const handleConsultaPorMedidor = async (value: ConsultaFormValues) => {
+        const numeroMedidor = parseNumeroMedidor(value.numeroMedidor);
+        if (numeroMedidor === null || numeroMedidor === undefined) {
+            showWarning(
+                'Número de medidor inválido',
+                'Ingrese un número de medidor válido para continuar.'
+            );
+            return false;
+        }
+
+        const response = await consultaPagosMedidor(numeroMedidor);
+
+        if (response) {
+            setConsultaResultado({ tipo: 'medidor', data: response });
+            showSuccess('¡Éxito!', 'Consulta por medidor completada correctamente');
+            setIsModalOpen(true);
+        }
+
+        return !!response;
+    };
+
+    // Funciones auxiliares para consulta
+    const handleConsultaFisica = async (value: ConsultaFormValues) => {
+        const numeroMedidor = parseNumeroMedidor(value.numeroMedidor);
+        if (numeroMedidor === null) {
+            showWarning(
+                'Número de medidor inválido',
+                'El número de medidor debe contener solo valores numéricos.'
+            );
+            return false;
+        }
+
+        if (value.numeroIdentificacion && !value.tipoIdentificacion) {
+            showWarning(
+                'Tipo de identificación requerido',
+                'Seleccione el tipo de identificación para consultar por persona física.'
+            );
+            return false;
+        }
+
+        const response = await consultaPagosAfiliadoFisico({
+            Tipo_Identificacion: getTipoIdentificacion(value.tipoIdentificacion),
+            Identificacion: value.numeroIdentificacion || undefined,
+            Numero_Medidor: numeroMedidor,
+        });
+
+        if (response) {
+            setConsultaResultado({ tipo: 'fisica', data: response });
+            showSuccess('¡Éxito!', 'Recibos encontrados correctamente');
+            setIsModalOpen(true);
+        }
+        return !!response;
+    };
+
+    const handleConsultaJuridica = async (value: ConsultaFormValues) => {
+        const numeroMedidor = parseNumeroMedidor(value.numeroMedidor);
+        if (numeroMedidor === null) {
+            showWarning(
+                'Número de medidor inválido',
+                'El número de medidor debe contener solo valores numéricos.'
+            );
+            return false;
+        }
+
+        const cedulaJuridica = value.numeroIdentificacion
+            ? normalizeCedulaJuridica(value.numeroIdentificacion)
+            : undefined;
+
+        const response = await consultaPagosAfiliadoJuridico({
+            Cedula_Juridica: cedulaJuridica,
+            Numero_Medidor: numeroMedidor,
+        });
+
+        if (response) {
+            setConsultaResultado({ tipo: 'juridica', data: response });
+            showSuccess('¡Éxito!', 'Recibos encontrados correctamente');
+            setIsModalOpen(true);
+        }
+        return !!response;
+    };
+
     const form = useForm({
         defaultValues: {
             tipoCliente: '',
@@ -20,26 +195,45 @@ const ConsultaRecibos = () => {
             numeroMedidor: '',
         },
         onSubmit: async ({ value }) => {
-            setFormErrors({});
-            setSuccessMessage('');
+            const hasIdentificacion = value.numeroIdentificacion.trim().length > 0;
+            const hasMedidor = value.numeroMedidor.trim().length > 0;
 
-            if (!value.numeroIdentificacion && !value.numeroMedidor) {
-                setFormErrors({
-                    general: 'Por favor ingrese al menos un campo: identificación o número de medidor.',
-                });
+            // Validar que al menos un campo esté completo
+            if (!hasIdentificacion && !hasMedidor) {
+                showWarning(
+                    'Campos incompletos',
+                    'Por favor ingrese al menos un campo: identificación o número de medidor.'
+                );
                 return;
             }
-            
+
             try {
-                await new Promise((resolve) => setTimeout(resolve, 1200));
-                setSuccessMessage('¡Recibos encontrados con éxito!');
-                setIsModalOpen(true);
-                setTimeout(() => setSuccessMessage(''), 5000);
+                // Si solo hay número de medidor, se usa endpoint dedicado
+                if (!hasIdentificacion && hasMedidor) {
+                    await handleConsultaPorMedidor(value);
+                    return;
+                }
+
+                // Si hay identificación (con o sin medidor), se usa físico o jurídico
+                if (!clientType) {
+                    showWarning(
+                        'Tipo de cliente requerido',
+                        'Seleccione persona física o jurídica para consultar con identificación.'
+                    );
+                    return;
+                }
+
+                if (clientType === 'fisica') {
+                    await handleConsultaFisica(value);
+                } else if (clientType === 'juridica') {
+                    await handleConsultaJuridica(value);
+                }
             } catch (error) {
-                console.error('Error:', error);
-                setFormErrors({
-                    general: 'Hubo un error al consultar. Por favor intenta nuevamente.',
-                });
+                console.error('Error al consultar pagos:', error);
+                showError(
+                    'Error en la consulta',
+                    getBackendErrorMessage(error)
+                );
             }
         },
     });
@@ -110,13 +304,8 @@ const ConsultaRecibos = () => {
 
                                                 form.setFieldValue('numeroIdentificacion', '');
                                                 
-                                                if (newValue === 'juridica') {
-                                                    form.setFieldValue('tipoIdentificacion', 'juridica');
-                                                    setIdType('juridica'); 
-                                                } else {
-                                                    form.setFieldValue('tipoIdentificacion', '');
-                                                    setIdType(''); 
-                                                }
+                                                form.setFieldValue('tipoIdentificacion', '');
+                                                setIdType('');
                                             }}
                                             className={commonInput}
                                         >
@@ -177,8 +366,18 @@ const ConsultaRecibos = () => {
                                             <input
                                                 type="text"
                                                 value={field.state.value as string}
-                                                onChange={(e) => field.handleChange(e.target.value)}
+                                                onChange={(e) => {
+                                                    const nextValue = e.target.value;
+
+                                                    if (isJuridica) {
+                                                        field.handleChange(formatCedulaJuridica(nextValue));
+                                                        return;
+                                                    }
+
+                                                    field.handleChange(nextValue);
+                                                }}
                                                 placeholder={getPlaceholderIdentificacion()}
+                                                maxLength={isJuridica ? 12 : undefined}
                                                 className={commonInput}
                                             />
                                         </div>
@@ -206,7 +405,7 @@ const ConsultaRecibos = () => {
                                         <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                                         <input
                                             type="text"
-                                            value={field.state.value as string}
+                                            value={String(field.state.value)}
                                             onChange={(e) => field.handleChange(e.target.value)}
                                             placeholder="MED-12345"
                                             className={commonInput}
@@ -237,23 +436,11 @@ const ConsultaRecibos = () => {
                                 </>
                             )}
                         </button>
-
-                        {successMessage && (
-                            <div className="p-3 bg-green-100 border border-green-400 text-green-700 rounded-lg text-center">
-                                {successMessage}
-                            </div>
-                        )}
-
-                        {formErrors.general && (
-                            <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded-lg text-center">
-                                {formErrors.general}
-                            </div>
-                        )}
                     </form>
                 </div>
 
-                <div className="hidden lg:flex w-1/3 items-start justify-center">
-                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-6 border-2 border-blue-100">
+                <div className="flex w-full lg:w-1/3 items-start justify-center">
+                    <div className="w-full bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-6 border-2 border-blue-100">
                         <h3 className="text-lg font-bold text-gray-800 mb-2">¿No estás afiliado?</h3>
                         <p className="text-sm text-gray-600 mb-4 leading-relaxed">
                             Si aún no estás afiliado, podés hacerlo dando clic en el botón “Afiliarse” y completando el formulario.
@@ -271,7 +458,11 @@ const ConsultaRecibos = () => {
             {/* Modal de Resultados */}
             <ModalConsulta 
                 isOpen={isModalOpen} 
-                onClose={() => setIsModalOpen(false)} 
+                onClose={() => {
+                    setIsModalOpen(false);
+                    setConsultaResultado(null);
+                }}
+                resultado={consultaResultado}
             />
         </div>
     );
