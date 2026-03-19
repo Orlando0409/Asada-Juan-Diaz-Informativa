@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { motion, type Variants } from 'framer-motion';
 import {
     AlertCircle,
     Building2,
@@ -33,6 +34,36 @@ const dateFormatter = new Intl.DateTimeFormat('es-CR', {
     dateStyle: 'medium',
     timeStyle: 'short',
 });
+
+const modalVariants: Variants = {
+    hidden: { opacity: 0, y: 24, scale: 0.98 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        transition: { duration: 0.35, ease: 'easeOut' },
+    },
+};
+
+const sectionContainerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            delayChildren: 0.12,
+            staggerChildren: 0.08,
+        },
+    },
+};
+
+const sectionItemVariants: Variants = {
+    hidden: { opacity: 0, y: 12 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.28, ease: 'easeOut' },
+    },
+};
 
 const isAfiliadoJuridico = (
     afiliado: LecturaConsulta['Afiliado']
@@ -412,7 +443,12 @@ const ModalConsulta = ({ isOpen, onClose, resultado }: Props) => {
             open
             className="w-full h-full fixed inset-0 z-50 m-0 flex items-center justify-center border-0 bg-black/25 p-4 backdrop-blur-sm"
         >
-            <div className="bg-white rounded-lg shadow-2xl border border-gray-200 w-full max-w-4xl flex flex-col overflow-hidden max-h-[90vh]">
+            <motion.div
+                className="bg-white rounded-lg shadow-2xl border border-gray-200 w-full max-w-4xl flex flex-col overflow-hidden max-h-[90vh]"
+                variants={modalVariants}
+                initial="hidden"
+                animate="visible"
+            >
                 <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 z-10">
                     <div className="flex items-center justify-between">
                         <div>
@@ -433,8 +469,11 @@ const ModalConsulta = ({ isOpen, onClose, resultado }: Props) => {
                 </div>
 
                 <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100 p-6">
-                    <div className="space-y-6">
-                        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+                    <motion.div className="space-y-6" variants={sectionContainerVariants}>
+                        <motion.div
+                            className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm"
+                            variants={sectionItemVariants}
+                        >
                             <div className="bg-gray-50 px-5 py-3 border-b border-gray-200">
                                 <h3 className="text-base font-bold text-gray-900">Resumen</h3>
                             </div>
@@ -485,17 +524,20 @@ const ModalConsulta = ({ isOpen, onClose, resultado }: Props) => {
                                     </p>
                                 )}
                             </div>
-                        </div>
+                        </motion.div>
 
-                        <div className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm">
+                        <motion.div
+                            className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm"
+                            variants={sectionItemVariants}
+                        >
                             <div className="bg-gray-50 px-5 py-3 border-b border-gray-200">
                                 <h3 className="text-base font-bold text-gray-900">Detalle de medidores</h3>
                             </div>
                             <div className="p-5 space-y-4">
                                 {medidores.map((medidor, index) => renderMedidor(medidor, index))}
                             </div>
-                        </div>
-                    </div>
+                        </motion.div>
+                    </motion.div>
                 </div>
 
                 <footer className="sticky bottom-0 flex justify-end gap-3 p-6 border-t bg-gray-50 z-10">
@@ -506,7 +548,7 @@ const ModalConsulta = ({ isOpen, onClose, resultado }: Props) => {
                         Cerrar
                     </button>
                 </footer>
-            </div>
+            </motion.div>
         </dialog>
     );
 };

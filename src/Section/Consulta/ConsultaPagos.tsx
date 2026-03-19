@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useForm } from '@tanstack/react-form';
 import { Search, User, Landmark, CreditCard } from 'lucide-react';
+import { motion, type Variants } from 'framer-motion';
 import { useNavigate } from '@tanstack/react-router';
 import ModalConsulta from './ModalConsulta';
 import { useConsultaPago } from '../../Hook/ConsultaPagoHook';
@@ -12,6 +13,28 @@ type ConsultaFormValues = {
     tipoIdentificacion: string;
     numeroIdentificacion: string;
     numeroMedidor: string;
+};
+
+const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.16,
+        },
+    },
+};
+
+const panelVariants: Variants = {
+    hidden: { opacity: 0, y: 24 },
+    visible: {
+        opacity: 1,
+        y: 0,
+        transition: {
+            duration: 0.45,
+            ease: 'easeOut',
+        },
+    },
 };
 
 const getBackendErrorMessage = (error: unknown): string => {
@@ -273,10 +296,19 @@ const ConsultaRecibos = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-gray-50 flex items-center justify-center p-4">
-            <div className="w-full max-w-6xl flex flex-col lg:flex-row items-stretch gap-6">
+            <motion.div
+                className="w-full max-w-6xl flex flex-col lg:flex-row items-stretch gap-6"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.15 }}
+                variants={containerVariants}
+            >
 
                 {/* Panel Izquierdo */}
-                <div className="flex-1 bg-white rounded-2xl shadow-xl p-6 space-y-6">     
+                <motion.div
+                    className="flex-1 bg-white rounded-2xl shadow-xl p-6 space-y-6"
+                    variants={panelVariants}
+                >
                     <form
                         onSubmit={(e) => {
                             e.preventDefault();
@@ -437,9 +469,12 @@ const ConsultaRecibos = () => {
                             )}
                         </button>
                     </form>
-                </div>
+                </motion.div>
 
-                <div className="flex w-full lg:w-1/3 items-start justify-center">
+                <motion.div
+                    className="flex w-full lg:w-1/3 items-start justify-center"
+                    variants={panelVariants}
+                >
                     <div className="w-full bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-6 border-2 border-blue-100">
                         <h3 className="text-lg font-bold text-gray-800 mb-2">¿No estás afiliado?</h3>
                         <p className="text-sm text-gray-600 mb-4 leading-relaxed">
@@ -452,8 +487,8 @@ const ConsultaRecibos = () => {
                             Afiliarse
                         </button>
                     </div>
-                </div>
-            </div>
+                </motion.div>
+            </motion.div>
 
             {/* Modal de Resultados */}
             <ModalConsulta 
