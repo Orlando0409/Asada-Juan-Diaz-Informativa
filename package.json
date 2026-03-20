@@ -37,6 +37,7 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
+    "@axelrindle/vite-plugin-sitemap": "^0.1.0",
     "@eslint/js": "^9.29.0",
     "@tanstack/router-vite-plugin": "^1.120.10",
     "@types/axios": "^0.9.36",
