@@ -21,6 +21,13 @@ export interface ConsultaJuridicaDTO {
   Numero_Medidor?: number;
 }
 
+export interface GenerarFacturaConsultaDTO {
+  Numero_Medidor?: number;
+  Tipo_Identificacion?: TipoIdentificacion;
+  Identificacion?: string;
+  Cedula_Juridica?: string;
+}
+
 export interface ReciboConsulta {
   numeroRecibo: string;
   fechaEmision: string;

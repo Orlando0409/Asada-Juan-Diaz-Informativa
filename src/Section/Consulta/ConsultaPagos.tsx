@@ -6,7 +6,11 @@ import { useNavigate } from '@tanstack/react-router';
 import ModalConsulta from './ModalConsulta';
 import { useConsultaPago } from '../../Hook/ConsultaPagoHook';
 import { useAlerts } from '../../context/AlertContext';
-import type { ConsultaResultado, TipoIdentificacion } from '../../types/Consulta/Pagos';
+import type {
+    GenerarFacturaConsultaDTO,
+    ConsultaResultado,
+    TipoIdentificacion,
+} from '../../types/Consulta/Pagos';
 
 type ConsultaFormValues = {
     tipoCliente: string;
@@ -99,14 +103,23 @@ const formatCedulaJuridica = (value: string): string => {
 
 const normalizeCedulaJuridica = (value: string): string => value.replaceAll(/\D/g, '');
 
+type ConsultaPDFPayload = GenerarFacturaConsultaDTO;
+
 const ConsultaRecibos = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [consultaResultado, setConsultaResultado] = useState<ConsultaResultado | null>(null);
+    const [ultimaConsultaPayload, setUltimaConsultaPayload] = useState<ConsultaPDFPayload | null>(null);
+    const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
     const navigate = useNavigate();
     const [clientType, setClientType] = useState('');
     const [idType, setIdType] = useState('');
     const { showSuccess, showError, showWarning } = useAlerts();
-    const { consultaPagosMedidor, consultaPagosAfiliadoFisico, consultaPagosAfiliadoJuridico } = useConsultaPago();
+    const {
+        consultaPagosMedidor,
+        consultaPagosAfiliadoFisico,
+        consultaPagosAfiliadoJuridico,
+        generarPDFConsultaPago,
+    } = useConsultaPago();
 
     const parseNumeroMedidor = (numeroMedidor: string): number | undefined | null => {
         if (!numeroMedidor.trim()) {
@@ -142,6 +155,7 @@ const ConsultaRecibos = () => {
         const response = await consultaPagosMedidor(numeroMedidor);
 
         if (response) {
+            setUltimaConsultaPayload({ Numero_Medidor: numeroMedidor });
             setConsultaResultado({ tipo: 'medidor', data: response });
             showSuccess('¡Éxito!', 'Consulta por medidor completada correctamente');
             setIsModalOpen(true);
@@ -176,6 +190,11 @@ const ConsultaRecibos = () => {
         });
 
         if (response) {
+            setUltimaConsultaPayload({
+                Tipo_Identificacion: getTipoIdentificacion(value.tipoIdentificacion),
+                Identificacion: value.numeroIdentificacion || undefined,
+                Numero_Medidor: numeroMedidor,
+            });
             setConsultaResultado({ tipo: 'fisica', data: response });
             showSuccess('¡Éxito!', 'Recibos encontrados correctamente');
             setIsModalOpen(true);
@@ -203,11 +222,44 @@ const ConsultaRecibos = () => {
         });
 
         if (response) {
+            setUltimaConsultaPayload({
+                Cedula_Juridica: cedulaJuridica,
+                Numero_Medidor: numeroMedidor,
+            });
             setConsultaResultado({ tipo: 'juridica', data: response });
             showSuccess('¡Éxito!', 'Recibos encontrados correctamente');
             setIsModalOpen(true);
         }
         return !!response;
+    };
+
+    const handleDescargarPDF = async () => {
+        if (!ultimaConsultaPayload) {
+            showWarning(
+                'Sin datos para descargar',
+                'Primero realice una consulta para generar el PDF.'
+            );
+            return;
+        }
+
+        try {
+            setIsGeneratingPdf(true);
+            const pdfBlob = await generarPDFConsultaPago(ultimaConsultaPayload);
+            const url = URL.createObjectURL(pdfBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `consulta-pagos-${Date.now()}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+
+            showSuccess('PDF generado', 'La descarga del comprobante inicio correctamente.');
+        } catch (error) {
+            showError('Error al generar PDF', getBackendErrorMessage(error));
+        } finally {
+            setIsGeneratingPdf(false);
+        }
     };
 
     const form = useForm({
@@ -498,6 +550,8 @@ const ConsultaRecibos = () => {
                     setConsultaResultado(null);
                 }}
                 resultado={consultaResultado}
+                onDownload={handleDescargarPDF}
+                isDownloading={isGeneratingPdf}
             />
         </div>
     );
