@@ -22,6 +22,8 @@ type Props = {
     isOpen: boolean;
     onClose: () => void;
     resultado: ConsultaResultado | null;
+    onDownload: () => void;
+    isDownloading: boolean;
 };
 
 const currencyFormatter = new Intl.NumberFormat('es-CR', {
@@ -420,7 +422,7 @@ const renderMedidor = (medidor: MedidorConsultaResultado, index: number) => {
     );
 };
 
-const ModalConsulta = ({ isOpen, onClose, resultado }: Props) => {
+const ModalConsulta = ({ isOpen, onClose, resultado, onDownload, isDownloading }: Props) => {
     const dialogRef = useRef<HTMLDialogElement>(null);
     const closeButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -541,6 +543,17 @@ const ModalConsulta = ({ isOpen, onClose, resultado }: Props) => {
                 </div>
 
                 <footer className="sticky bottom-0 flex justify-end gap-3 p-6 border-t bg-gray-50 z-10">
+                    <button
+                        onClick={onDownload}
+                        disabled={isDownloading}
+                        className={`px-6 py-2 rounded-lg font-medium transition-colors ${
+                            isDownloading
+                                ? 'bg-blue-300 text-white cursor-not-allowed'
+                                : 'bg-blue-600 hover:bg-blue-700 text-white'
+                        }`}
+                    >
+                        {isDownloading ? 'Generando PDF...' : 'Descargar PDF'}
+                    </button>
                     <button
                         onClick={onClose}
                         className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
