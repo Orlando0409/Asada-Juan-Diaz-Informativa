@@ -246,7 +246,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
           e.preventDefault();
           form.handleSubmit();
         }}
-        className="bg-white shadow-lg px-5 py-3 sm:px-6 sm:py-4 rounded-[24px] w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
+        className="bg-white shadow-lg px-5 py-3 sm:px-6 sm:py-4 rounded-[24px] w-[95%] max-w-7xl mx-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
       >
         <h2 className="text-center text-xl font-semibold mb-6">Formulario de desconexión de medidor</h2>
 
@@ -561,7 +561,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                   }}
                   placeholder={getPlaceholder("Motivo_Solicitud")}
                   maxLength={250}
-                  className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
+                  className={`${commonClasses} resize-none h-24 overflow-y-auto scrollbar-thumb-blue-600 scrollbar-thin scrollbar-track-blue-100`}
                 />
                 {/* muestra errores de motivo*/}
                 {fieldErrors["Motivo_Solicitud"] && (

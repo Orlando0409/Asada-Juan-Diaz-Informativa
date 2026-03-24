@@ -1,15 +1,32 @@
+import { motion } from 'framer-motion'
 import { FaPhone, FaWhatsapp, FaEnvelope } from 'react-icons/fa'
 import Data from '../../data/Data.json'
+
+const colVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, delay: i * 0.1, ease: 'easeOut' as const },
+  }),
+}
 
 const Redes = () => {
   const { contacto, horarioAtencion, redesSociales } = Data.footer
 
   return (
-    <div
-      className="max-h-[600px] grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 text-center sm:text-left p-4"
+    <motion.div
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 text-center sm:text-left p-4"
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: '-40px' }}
     >
       {/* Contacto */}
-      <div className="h-full flex flex-col gap-2 justify-center items-center sm:items-start">
+      <motion.div
+        custom={0}
+        variants={colVariants}
+        className="flex flex-col gap-2 justify-center items-center sm:items-start"
+      >
         <h4 className="font-semibold text-base sm:text-lg lg:text-xl">Contacto</h4>
         <p className="flex justify-start sm:justify-center items-center gap-2 text-sm sm:text-base lg:text-lg">
           <FaPhone className="text-green-500" /> {contacto.telefono}
@@ -17,18 +34,26 @@ const Redes = () => {
         <p className="flex justify-start sm:justify-center items-center gap-2 text-sm sm:text-base lg:text-lg">
           <FaEnvelope className="text-white-400" /> {contacto.correo}
         </p>
-      </div>
+      </motion.div>
 
       {/* Horario */}
-      <div className="h-full flex flex-col gap-2 justify-start items-center sm:items-start">
+      <motion.div
+        custom={1}
+        variants={colVariants}
+        className="flex flex-col gap-2 justify-start items-center sm:items-start"
+      >
         <h4 className="font-semibold text-base sm:text-lg lg:text-xl">
           Horario de Atención
         </h4>
         <p className="text-sm sm:text-base lg:text-lg">{horarioAtencion}</p>
-      </div>
+      </motion.div>
 
       {/* Redes Sociales */}
-      <div className="h-full flex flex-col gap-2 justify-start items-center sm:items-start">
+      <motion.div
+        custom={2}
+        variants={colVariants}
+        className="flex flex-col gap-2 justify-start items-center sm:items-start"
+      >
         <h4 className="font-semibold text-base sm:text-lg lg:text-xl">
           Redes Sociales
         </h4>
@@ -40,8 +65,8 @@ const Redes = () => {
         >
           <FaWhatsapp size={20} /> WhatsApp
         </a>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }
 

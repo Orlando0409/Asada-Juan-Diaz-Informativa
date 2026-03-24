@@ -4,8 +4,6 @@ import { AfiliacionSchema, TipoIdentificacionValues, type TipoIdentificacion } f
 import { useAfiliacionFisica } from "../../../Hook/Solicitudes/HookFisicas";
 import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import PhoneInputComponent from "../PhoneInputComponent";
-import MedidorExtraFisico from "./MedidorExtraFisico";
-
 type Props = {
   onClose: () => void;
   initialView?: "afiliacion" | "medidor-extra";
@@ -28,8 +26,6 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
   const [isSending, setIsSending] = useState(false);
   const planosInputRef = useRef<HTMLInputElement>(null);
   const escrituraInputRef = useRef<HTMLInputElement>(null);
-  const [showMedidorExtra, setShowMedidorExtra] = useState(initialView === "medidor-extra");
-
   const [_mostrarFormulario, setMostrarFormulario] = useState(true);
   const mutation = useAfiliacionFisica();
 
@@ -292,41 +288,10 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
   return (
     <div className="w-full text-gray-800">
       <div
-        className="scrollbar-hide w-full overflow-y-auto rounded-[24px] bg-white px-4 py-3 shadow-[0_30px_80px_-32px_rgba(15,23,42,0.55)] sm:px-6 sm:py-4"
-        style={{ maxHeight: "calc(100dvh - 3rem)" }}
+        className="scrollbar-hide w-full rounded-[24px] bg-white px-4 py-3 sm:px-6 sm:py-4"
       >
-        <div className="mb-8">
-          <h2 className="text-center text-xl font-semibold mb-4">Formulario de Afiliación</h2>
+        <h2 className="text-center text-xl font-semibold mb-4">Solicitud de Afiliación - Persona Física</h2>
 
-          {/* Botones toggle */}
-          <div className="flex justify-center gap-4">
-            <button
-              type="button"
-              onClick={() => setShowMedidorExtra(false)}
-              className={`px-5 py-1.5 rounded-lg text-sm font-medium transition-colors ${!showMedidorExtra
-                ? 'bg-blue-600 text-white shadow-md'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-            >
-              Afiliación
-            </button>
-            <button
-              type="button"
-              onClick={() => setShowMedidorExtra(true)}
-              className={`px-5 py-1.5 rounded-lg text-sm font-medium transition-colors ${showMedidorExtra
-                ? 'bg-green-600 text-white shadow-md'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-            >
-              Medidor Extra
-            </button>
-          </div>
-        </div>
-
-        {/* Mostrar formulario de Medidor Extra */}
-        {showMedidorExtra ? (
-          <MedidorExtraFisico onClose={onClose} />
-        ) : (
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -758,8 +723,6 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
               </div>
            
           </form>
-
-        )}
       </div>
     </div>
   );

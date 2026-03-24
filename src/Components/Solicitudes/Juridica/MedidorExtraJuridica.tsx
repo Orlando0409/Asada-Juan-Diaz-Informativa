@@ -3,6 +3,7 @@ import { useForm } from "@tanstack/react-form";
 import { useEffect, useRef, useState } from "react";
 import { MedidorExtraJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/MedidorExtraJuridica";
 import { useAgregarMedidorJuridica, useMedidoresJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
+import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import { useAlerts } from "../../../context/AlertContext";
 import PhoneInputComponent from "../PhoneInputComponent";
 
@@ -25,7 +26,6 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
     const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-
     const [cedulaValidada, setCedulaValidada] = useState<string>('');
     const [mostrarFormulario, _setMostrarFormulario] = useState(true);
     const [alertShown, setAlertShown] = useState<string>('');
@@ -33,6 +33,7 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
     const escrituraInputRef = useRef<HTMLInputElement>(null);
 
     const mutation = useAgregarMedidorJuridica();
+    const { lookupJuridica, isLoading: loadingCedula } = useCedulaLookup();
     const { showSuccess, showError } = useAlerts();
 
     // Hook para obtener medidores existentes
@@ -84,6 +85,9 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
         // Validar formato completo y buscar medidores
         if (/^3-\d{3}-\d{6}$/.test(formatted)) {
             setCedulaValidada(formatted);
+            lookupJuridica(formatted).then(razonSocial => {
+                if (razonSocial) form.setFieldValue('Razon_Social', razonSocial);
+            });
         } else {
             setCedulaValidada('');
         }
@@ -216,12 +220,13 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
 
     return (
         <form
+            className="w-full text-gray-800"
             onSubmit={(e) => {
                 e.preventDefault();
                 form.handleSubmit();
             }}
         >
-            <h2 className="text-center text-xl font-bold mb-5 text-blue-700">Solicitud de Medidor Extra - Persona Jurídica</h2>
+            <h2 className="text-center text-xl font-semibold mb-4">Solicitud de Medidor Extra - Persona Jurídica</h2>
 
             {formErrors.general && (
                 <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -237,17 +242,27 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                             <label className="block mb-1 font-semibold text-gray-700">
                                 Cédula Jurídica <span className="text-red-500">*</span>
                             </label>
-                            <input
-                                type="text"
-                                value={field.state.value}
-                                onChange={(e) => {
-                                    handleCedulaJuridicaChange(e.target.value);
-                                    saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatCedulaJuridica(e.target.value) });
-                                }}
-                                placeholder="3-101-123456"
-                                maxLength={12}
-                                className={`${commonClasses} ${(fieldErrors["Cedula_Juridica"] || formErrors["Cedula_Juridica"]) ? 'border-red-500' : ''}`}
-                            />
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value={field.state.value}
+                                    onChange={(e) => {
+                                        handleCedulaJuridicaChange(e.target.value);
+                                        saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatCedulaJuridica(e.target.value) });
+                                    }}
+                                    placeholder="3-101-123456"
+                                    maxLength={12}
+                                    className={`${commonClasses} ${(fieldErrors["Cedula_Juridica"] || formErrors["Cedula_Juridica"]) ? 'border-red-500' : ''}`}
+                                />
+                                {loadingCedula && (
+                                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                        <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                    </div>
+                                )}
+                            </div>
                             <p className="text-xs text-gray-500 mt-1">Formato: 3-XXX-XXXXXX</p>
                             {fieldErrors["Cedula_Juridica"] && (
                                 <span className="text-red-500 text-sm block mt-1">{fieldErrors["Cedula_Juridica"]}</span>
@@ -493,24 +508,14 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
             </div>
 
             {/* Botones */}
-            <div className="flex justify-center gap-4 mt-6 ml-50">
-
-                 <button
+            <div className="flex justify-end items-center gap-3 mt-8">
+                <button
                     type="submit"
-                    className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
                     disabled={!cedulaValidada || loadingMedidores || mutation.isPending}
                 >
                     {mutation.isPending ? 'Enviando...' : 'Enviar Solicitud'}
                 </button>
-                <button
-                    type="button"
-                    onClick={onClose}
-                    disabled={mutation.isPending}
-                    className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                    Cancelar
-                </button>
-               
             </div>
         </form>
     );

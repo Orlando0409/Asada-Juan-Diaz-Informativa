@@ -246,6 +246,58 @@
         "type": "textarea",
         "required": true
       }
+    },
+    "medidorExtra": {
+      "Tipo_Identificacion": {
+        "label": "Tipo de Identificación",
+        "type": "select",
+        "required": true
+      },
+      "Identificacion": {
+        "label": "Número de Identificación",
+        "type": "text",
+        "required": true
+      },
+      "Nombre": {
+        "label": "Nombre",
+        "type": "text",
+        "required": true
+      },
+      "Apellido1": {
+        "label": "Primer Apellido",
+        "type": "text",
+        "required": true
+      },
+      "Apellido2": {
+        "label": "Segundo Apellido",
+        "type": "text",
+        "required": false
+      },
+      "Correo": {
+        "label": "Correo electrónico",
+        "type": "email",
+        "required": true
+      },
+      "Numero_Telefono": {
+        "label": "Número de teléfono",
+        "type": "text",
+        "required": true
+      },
+      "Direccion_Exacta": {
+        "label": "Dirección exacta",
+        "type": "textarea",
+        "required": true
+      },
+      "Planos_Terreno": {
+        "label": "Planos del terreno",
+        "type": "file",
+        "required": true
+      },
+      "Escritura_Terreno": {
+        "label": "Escritura del terreno",
+        "type": "file",
+        "required": true
+      }
     }
   },
   "juridica": {
@@ -391,6 +443,43 @@
         "type": "textarea",
         "required": true
       }
+    },
+    "medidorExtra": {
+      "Cedula_Juridica": {
+        "label": "Cédula Jurídica",
+        "type": "text",
+        "required": true
+      },
+      "Razon_Social": {
+        "label": "Razón Social",
+        "type": "text",
+        "required": true
+      },
+      "Correo": {
+        "label": "Correo electrónico",
+        "type": "email",
+        "required": true
+      },
+      "Numero_Telefono": {
+        "label": "Número de teléfono",
+        "type": "text",
+        "required": true
+      },
+      "Direccion_Exacta": {
+        "label": "Dirección exacta",
+        "type": "textarea",
+        "required": true
+      },
+      "Planos_Terreno": {
+        "label": "Planos del terreno",
+        "type": "file",
+        "required": true
+      },
+      "Escritura_Terreno": {
+        "label": "Escritura del terreno",
+        "type": "file",
+        "required": true
+      }
     }
   },
   "AfiliacionSeccion": {
@@ -516,7 +605,7 @@
   },
   "header": {
     "logo": {
-      "src": "/Logo_ASADA_Juan_Díaz.png",
+      "src": "/logo-asada-juan-diaz.png",
       "ruta": "/"
     },
     "hero": {
@@ -572,7 +661,7 @@
               "texto": "Asociado",
               "ruta": "/Asociado"
             },
-             {
+            {
               "id": 5,
               "texto": "Medidor Extra",
               "ruta": "/MedidorExtra"
@@ -610,17 +699,17 @@
         },
         {
           "id": 5,
-          "tipo": "PreguntasFrecuentes",
+          "tipo": "anchor",
           "texto": "Preguntas Frecuentes",
-          "ruta": "/PreguntasFrecuentes"
+          "ruta": "#FAQ"
         }
       ]
     }
   },
   "footer": {
     "contacto": {
-      "telefono": "+506 1234-5678",
-      "correo": "asadajuandiaz@gmail.com"
+      "telefono": "+506 7249-5817",
+      "correo": "juandiazasada@gmail.com"
     },
     "horarioAtencion": "Lunes a Viernes, 7:00 AM - 5:00 PM",
     "redesSociales": {

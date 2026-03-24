@@ -1,11 +1,10 @@
-import { Navigate, createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
+import MedidorExtra from '../../Section/Afiliacion/MedidorExtra'
 
 export const Route = createFileRoute('/(Solicitudes)/MedidorExtra')({
-    component: RouteComponent,
+  component: RouteComponent,
 })
 
 function RouteComponent() {
-    return <Navigate to="/Afiliacion" hash="medidor-extra" replace />
+  return <MedidorExtra />
 }
-
-

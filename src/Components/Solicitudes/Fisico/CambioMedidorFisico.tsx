@@ -251,8 +251,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
     <div className="w-full text-gray-800">
       <form
         onSubmit={(e) => { e.preventDefault(); form.handleSubmit(); }}
-        className="scrollbar-hide w-full overflow-y-auto rounded-[24px] bg-white px-4 py-3 shadow-[0_30px_80px_-32px_rgba(15,23,42,0.55)] sm:px-6 sm:py-4"
-        style={{ maxHeight: "calc(100dvh - 3rem)" }}
+        className="scrollbar-hide w-full rounded-[24px] bg-white px-4 py-3 sm:px-6 sm:py-4"
       >
         <h2 className="text-center text-xl font-semibold mb-6">Formulario de cambio de medidor</h2>
 
@@ -510,7 +509,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   }}
                   placeholder="Escribe el motivo de tu solicitud"
                   maxLength={250}
-                  className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
+                  className={`${commonClasses} resize-none h-24 overflow-y-auto scrollbar-thumb-blue-600 scrollbar-thin scrollbar-track-blue-100`}
                 />
                 {fieldErrors["Motivo_Solicitud"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Solicitud"]}</span>

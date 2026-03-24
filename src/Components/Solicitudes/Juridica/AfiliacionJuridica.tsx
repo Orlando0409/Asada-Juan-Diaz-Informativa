@@ -2,9 +2,8 @@ import { useForm } from "@tanstack/react-form";
 import { useEffect, useRef, useState } from "react";
 import { AfiliacionJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/AfiliacionJuridica";
 import { useAfiliacionJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
+import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import PhoneInputComponent from "../PhoneInputComponent";
-import MedidorExtraJuridica from "./MedidorExtraJuridica";
-
 type Props = {
     onClose: () => void;
     initialView?: "afiliacion" | "medidor-extra";
@@ -26,8 +25,8 @@ const FormularioAfiliacionJuridico = ({ onClose, initialView = "afiliacion" }: P
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const [isSending, setIsSending] = useState(false);
-    const [showMedidorExtra, setShowMedidorExtra] = useState(initialView === "medidor-extra");
     const mutation = useAfiliacionJuridica();
+    const { lookupJuridica, isLoading: loadingCedula } = useCedulaLookup();
     const planosInputRef = useRef<HTMLInputElement>(null);
     const escrituraInputRef = useRef<HTMLInputElement>(null);
 
@@ -175,41 +174,10 @@ const FormularioAfiliacionJuridico = ({ onClose, initialView = "afiliacion" }: P
     return (
         <div className="w-full text-gray-800">
             <div
-                className="scrollbar-hide w-full overflow-y-auto rounded-[24px] bg-white px-4 py-3 shadow-[0_30px_80px_-32px_rgba(15,23,42,0.55)] sm:px-6 sm:py-4"
-                style={{ maxHeight: "calc(100dvh - 3rem)" }}
+                className="scrollbar-hide w-full rounded-[24px] bg-white px-4 py-3 sm:px-6 sm:py-4"
             >
-                <div className="mb-8">
-                    <h2 className="text-center text-xl font-semibold mb-4">Formulario de Afiliación Jurídica</h2>
+                <h2 className="text-center text-xl font-semibold mb-4">Solicitud de Afiliación - Persona Jurídica</h2>
 
-                    {/* Botones toggle */}
-                    <div className="flex justify-center gap-4">
-                        <button
-                            type="button"
-                            onClick={() => setShowMedidorExtra(false)}
-                            className={`px-5 py-1.5 rounded-lg text-sm font-medium transition-colors ${!showMedidorExtra
-                                ? 'bg-blue-600 text-white shadow-md'
-                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                                }`}
-                        >
-                            Afiliación
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setShowMedidorExtra(true)}
-                            className={`px-5 py-1.5 rounded-lg text-sm font-medium transition-colors ${showMedidorExtra
-                                ? 'bg-green-600 text-white shadow-md'
-                                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                                }`}
-                        >
-                            Medidor Extra
-                        </button>
-                    </div>
-                </div>
-
-                {/* Mostrar formulario de Medidor Extra */}
-                {showMedidorExtra ? (
-                    <MedidorExtraJuridica onClose={onClose} />
-                ) : (
                     <form
                         onSubmit={(e) => {
                             e.preventDefault();
@@ -251,20 +219,34 @@ const FormularioAfiliacionJuridico = ({ onClose, initialView = "afiliacion" }: P
                                         <label className="block mb-1 font-semibold text-gray-700">
                                             Cédula Jurídica <span className="text-red-500">*</span>
                                         </label>
-                                        <input
-                                            type="text"
-                                            value={field.state.value}
-                                            onChange={(e) => {
-                                                const formatted = formatCedulaJuridica(e.target.value);
-                                                field.handleChange(formatted);
-                                                validateField("Cedula_Juridica", formatted);
-                                                saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted }); // ← NUEVO
-
-                                            }}
-                                            placeholder="3-XXX-XXXXXX"
-                                            className={commonClasses}
-                                            maxLength={12}
-                                        />
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                value={field.state.value}
+                                                onChange={(e) => {
+                                                    const formatted = formatCedulaJuridica(e.target.value);
+                                                    field.handleChange(formatted);
+                                                    validateField("Cedula_Juridica", formatted);
+                                                    saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted });
+                                                    if (/^\d-\d{3}-\d{6}$/.test(formatted)) {
+                                                        lookupJuridica(formatted).then(razonSocial => {
+                                                            if (razonSocial) form.setFieldValue('Razon_Social', razonSocial);
+                                                        });
+                                                    }
+                                                }}
+                                                placeholder="3-XXX-XXXXXX"
+                                                className={commonClasses}
+                                                maxLength={12}
+                                            />
+                                            {loadingCedula && (
+                                                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                                    <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                    </svg>
+                                                </div>
+                                            )}
+                                        </div>
                                         {fieldErrors["Cedula_Juridica"] && (
                                             <span className="text-red-500 text-sm block mt-1">{fieldErrors["Cedula_Juridica"]}</span>
                                         )}
@@ -492,7 +474,6 @@ const FormularioAfiliacionJuridico = ({ onClose, initialView = "afiliacion" }: P
 
               </div>
                     </form>
-                )}
             </div>
         </div>
     );

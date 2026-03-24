@@ -275,7 +275,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
     <div className="flex justify-center text-gray-800 p-3 sm:p-4 w-full">
       <form
         onSubmit={handleSubmit}
-        className="bg-white shadow-lg px-5 py-3 sm:px-6 sm:py-4 rounded-[24px] w-[95%] max-w-7xl mx-auto max-h-auto overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
+        className="bg-white shadow-lg px-5 py-3 sm:px-6 sm:py-4 rounded-[24px] w-[95%] max-w-7xl mx-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
       >
         <h2 className="text-center text-xl font-semibold mb-6">Formulario para ser asociado</h2>
 
@@ -489,7 +489,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
                   onBlur={() => setTouched(prev => ({ ...prev, Motivo_Solicitud: true }))}
                   placeholder={getPlaceholder("Motivo_Solicitud")}
                   maxLength={250}
-                  className={`${commonClasses} resize-none h-24 overflow-y-scroll`}
+                  className={`${commonClasses} resize-none h-24 overflow-y-auto scrollbar-thumb-blue-600 scrollbar-thin scrollbar-track-blue-100`}
                 />
                 {touched["Motivo_Solicitud"] && fieldErrors["Motivo_Solicitud"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Solicitud"]}</span>

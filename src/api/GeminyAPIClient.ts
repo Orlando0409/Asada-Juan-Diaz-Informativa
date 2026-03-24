@@ -13,7 +13,7 @@ export class GeminiAPIClient {
     }
     
     this.ApiKey = apiKey;
-    // Usar gemini-2.0-flash-001 que está disponible en GA según las notas de versión
+    // Usar gemini-2.5-flash que está disponible en GA según las notas de versión
    this.apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${this.ApiKey}`;
   }
 

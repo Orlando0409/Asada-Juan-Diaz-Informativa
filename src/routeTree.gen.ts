@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AuthRouteImport } from './routes/auth'
 import { Route as ConsultaRouteImport } from './routes/Consulta'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SolicitudesMedidorExtraRouteImport } from './routes/(Solicitudes)/MedidorExtra'
@@ -23,11 +22,6 @@ import { Route as ContactoQuejasRouteImport } from './routes/(Contacto)/Quejas'
 import { Route as AboutUsHistoriaRouteImport } from './routes/(AboutUs)/Historia'
 import { Route as AboutUsCalidadAguaRouteImport } from './routes/(AboutUs)/CalidadAgua'
 
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ConsultaRoute = ConsultaRouteImport.update({
   id: '/Consulta',
   path: '/Consulta',
@@ -94,7 +88,6 @@ const AboutUsCalidadAguaRoute = AboutUsCalidadAguaRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/Consulta': typeof ConsultaRoute
-  '/auth': typeof AuthRoute
   '/CalidadAgua': typeof AboutUsCalidadAguaRoute
   '/Historia': typeof AboutUsHistoriaRoute
   '/Quejas': typeof ContactoQuejasRoute
@@ -109,7 +102,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/Consulta': typeof ConsultaRoute
-  '/auth': typeof AuthRoute
   '/CalidadAgua': typeof AboutUsCalidadAguaRoute
   '/Historia': typeof AboutUsHistoriaRoute
   '/Quejas': typeof ContactoQuejasRoute
@@ -125,7 +117,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/Consulta': typeof ConsultaRoute
-  '/auth': typeof AuthRoute
   '/(AboutUs)/CalidadAgua': typeof AboutUsCalidadAguaRoute
   '/(AboutUs)/Historia': typeof AboutUsHistoriaRoute
   '/(Contacto)/Quejas': typeof ContactoQuejasRoute
@@ -142,7 +133,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/Consulta'
-    | '/auth'
     | '/CalidadAgua'
     | '/Historia'
     | '/Quejas'
@@ -157,7 +147,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/Consulta'
-    | '/auth'
     | '/CalidadAgua'
     | '/Historia'
     | '/Quejas'
@@ -172,7 +161,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/Consulta'
-    | '/auth'
     | '/(AboutUs)/CalidadAgua'
     | '/(AboutUs)/Historia'
     | '/(Contacto)/Quejas'
@@ -188,7 +176,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ConsultaRoute: typeof ConsultaRoute
-  AuthRoute: typeof AuthRoute
   AboutUsCalidadAguaRoute: typeof AboutUsCalidadAguaRoute
   AboutUsHistoriaRoute: typeof AboutUsHistoriaRoute
   ContactoQuejasRoute: typeof ContactoQuejasRoute
@@ -203,13 +190,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/Consulta': {
       id: '/Consulta'
       path: '/Consulta'
@@ -300,7 +280,6 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ConsultaRoute: ConsultaRoute,
-  AuthRoute: AuthRoute,
   AboutUsCalidadAguaRoute: AboutUsCalidadAguaRoute,
   AboutUsHistoriaRoute: AboutUsHistoriaRoute,
   ContactoQuejasRoute: ContactoQuejasRoute,

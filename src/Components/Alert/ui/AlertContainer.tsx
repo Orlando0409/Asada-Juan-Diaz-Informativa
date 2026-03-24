@@ -7,7 +7,7 @@ export const AlertContainer: React.FC = () => {
   const { alerts, removeAlert } = useAlerts();
 
   return (
-    <div className="fixed top-4 right-4 z-100 space-y-2 max-w-sm w-full">
+    <div className="fixed top-4 right-4 z-[100] space-y-2 max-w-sm w-full">
       {alerts.map((alert) => (
         <Alert
           key={alert.id}
