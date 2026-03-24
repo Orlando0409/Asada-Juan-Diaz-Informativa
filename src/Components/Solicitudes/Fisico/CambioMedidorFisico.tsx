@@ -1,8 +1,10 @@
+
 import { useForm } from "@tanstack/react-form";
 import { useEffect, useRef, useState } from "react";
 import { CambioMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/CambioMedidor";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { useCambioMedidorFisica, useMedidores } from "../../../Hook/Solicitudes/HookFisicas";
+import { useAlerts } from "../../../context/AlertContext";
 import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import { Loader2 } from "lucide-react";
 import PhoneInputComponent from "../PhoneInputComponent";
@@ -27,6 +29,9 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isSending, setIsSending] = useState(false);
+  const [esAfiliado, setEsAfiliado] = useState<boolean | null>(null);
+  // Usar sistema global de alertas
+  const { showError } = useAlerts();
   const mutation = useCambioMedidorFisica();
   const [mostrarFormulario, setMostrarFormulario] = useState(true);
   const { lookup, isLoading } = useCedulaLookup();
@@ -98,7 +103,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
     }
   };
 
-  const handleCedulaChange = async (cedula: string) => {
+  const handleCedulaChange = (cedula: string) => {
     const tipoId = form.state.values.Tipo_Identificacion;
     const identificacionProcesada = handleIdentificacionInput(cedula, tipoId);
 
@@ -111,15 +116,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
       delete newErrors['Identificacion'];
       return newErrors;
     });
-
-    if (tipoId === 'Cedula Nacional' && /^\d{9}$/.test(identificacionProcesada)) {
-      const resultado = await lookup(identificacionProcesada);
-      if (resultado) {
-        form.setFieldValue('Nombre', resultado.firstname || '');
-        form.setFieldValue('Apellido1', resultado.lastname1 || '');
-        form.setFieldValue('Apellido2', resultado.lastname2 || '');
-      }
-    }
+    // Ya no se valida afiliación aquí
   };
 
   const getPlaceholder = (fieldName: string, tipoIdentificacion?: TipoIdentificacion) => {
@@ -177,6 +174,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
     },
     onSubmit: async ({ value }) => {
       setFormErrors({});
+      setFieldErrors({});
       try {
         value.Numero_Telefono = normalizePhoneNumber(value.Numero_Telefono);
         const validation = CambioMedidorSchema.safeParse(value);
@@ -189,6 +187,23 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
           setFormErrors(validationErrors);
           return;
         }
+
+        // Validar afiliación solo al enviar
+        const tipoId = value.Tipo_Identificacion;
+        if (tipoId === 'Cedula Nacional' && /^\d{9}$/.test(value.Identificacion)) {
+          const soloDigitos = value.Identificacion.replace(/\D/g, '');
+          try {
+            const resultado = await lookup(soloDigitos);
+            if (resultado) {
+              form.setFieldValue('Nombre', resultado.firstname || '');
+              form.setFieldValue('Apellido1', resultado.lastname1 || '');
+              form.setFieldValue('Apellido2', resultado.lastname2 || '');
+            }
+          } catch (error: any) {
+            // Si hay error, igual permitimos el envío para no bloquear el flujo
+          }
+        }
+
         const formData = new FormData();
         Object.entries(validation.data).forEach(([key, val]) => {
           if (val !== undefined && val !== null && val !== "") {
@@ -222,6 +237,23 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
       }
     },
   });
+
+
+  // Mostrar alert cuando se verifica afiliación (igual que DesconexionFisica)
+  useEffect(() => {
+    if (
+      identificacion &&
+      !isMedidoresLoading &&
+      identificacion.length >= 9
+    ) {
+      if (medidores.length === 0) {
+        showError(
+          "No Eres Afiliado",
+          "No puedes solicitar el cambio porque no eres un afiliado con medidores activos. Completa tu afiliación primero."
+        );
+      }
+    }
+  }, [identificacion, medidores.length, isMedidoresLoading, showError]);
 
   useEffect(() => {
     const savedData = sessionStorage.getItem(STORAGE_KEY);
@@ -448,10 +480,10 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
           {/* Número de Medidor y Motivo */}
           <form.Field name="Id_Medidor">
             {(field) => {
+              const noMedidores = identificacion && !isMedidoresLoading && medidores.length === 0;
               return (
                 <div className="mb-3 w-full">
                   <label htmlFor="Id_Medidor" className="block mb-1 font-medium">Número de Medidor <span className="text-red-500">*</span></label>
-
                   <div className="relative">
                     <select
                       id="Id_Medidor"
@@ -462,7 +494,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                       }}
                       onBlur={field.handleBlur}
                       className={commonClasses}
-                      disabled={!identificacion || isMedidoresLoading}
+                      disabled={!!(!identificacion || isMedidoresLoading || noMedidores)}
                     >
                       <option value="">Seleccione un medidor</option>
                       {medidores.map((med) => (
@@ -471,24 +503,12 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                         </option>
                       ))}
                     </select>
-
-                    {isMedidoresLoading && (
-                      <div className="absolute right-10 top-1/2 -translate-y-1/2">
-                        <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
-                      </div>
-                    )}
                   </div>
-
                   {fieldErrors["Id_Medidor"] && (
-                    <span className="text-red-500 text-sm block mt-1">
-                      {fieldErrors["Id_Medidor"]}
-                    </span>
+                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Id_Medidor"]}</span>
                   )}
-
-                  {medidores.length === 0 && identificacion && !isMedidoresLoading && (
-                    <span className="text-red-500 text-sm block mt-1">
-                      No se encontraron medidores para esta identificación
-                    </span>
+                  {noMedidores && (
+                    <span className="text-red-500 text-sm block mt-1">No hay medidores asociados a esta cédula. Primero debes ser afiliado.</span>
                   )}
                 </div>
               );
@@ -633,26 +653,23 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
             }}
           </form.Field>
         </div>
-
-         <div className="flex justify-center gap-4 mt-6 ml-50">
-            
-                <button
-                  type="submit"
-                  disabled={isSending}
-                  className={`w-[120px] py-2 rounded transition ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
-                >
-                  {isSending ? 'Enviando...' : 'Enviar'}
-                </button>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  disabled={isSending}
-                  className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  Cancelar
-                </button>
-
-              </div>
+        <div className="flex justify-center gap-4 mt-6 ml-50">
+          <button
+            type="submit"
+            disabled={!!(isSending || (identificacion && !isMedidoresLoading && medidores.length === 0))}
+            className={`w-[120px] py-2 rounded transition ${(isSending || (identificacion && !isMedidoresLoading && medidores.length === 0)) ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
+          >
+            {isSending ? 'Enviando...' : 'Enviar'}
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isSending}
+            className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            Cancelar
+          </button>
+        </div>
       </form>
     </div>
   );

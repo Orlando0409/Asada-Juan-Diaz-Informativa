@@ -4,6 +4,7 @@ import { z } from "zod";
 import { CambioMedidorJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/CambioMedidorJuridico";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { useCambioMedidorJuridica, useMedidoresJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
+import { useAlerts } from "../../../context/AlertContext";
 import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import { Loader2 } from "lucide-react";
 import PhoneInputComponent from "../PhoneInputComponent";
@@ -30,6 +31,8 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const [isSending, setIsSending] = useState(false);
     const mutation = useCambioMedidorJuridica();
+    const { showError } = useAlerts();
+    const [esAfiliado, setEsAfiliado] = useState<boolean | null>(null);
     const { lookupJuridica, isLoading: loadingCedula } = useCedulaLookup();
     const [mostrarFormulario, setMostrarFormulario] = useState(true);
     const [cedulaJuridica, setCedulaJuridica] = useState('');
@@ -57,6 +60,27 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                     errorMessage = 'Error de validación';
                 }
                 setFieldErrors(prev => ({ ...prev, [fieldName]: errorMessage }));
+            }
+        }
+    };
+
+    // Validar afiliación jurídica al cambiar la cédula jurídica
+    const handleCedulaJuridicaChange = async (value: string) => {
+        const cedula = value.trim();
+        setCedulaJuridica(cedula);
+        handleFieldChange('Cedula_Juridica', cedula);
+        setEsAfiliado(null);
+        if (/^\d-\d{3}-\d{6}$/.test(cedula)) {
+            const cedulaSoloDigitos = cedula.replace(/\D/g, "");
+            try {
+                const resultado = await lookupJuridica(cedulaSoloDigitos);
+                if (resultado) {
+                    setEsAfiliado(true);
+                } else {
+                    setEsAfiliado(false);
+                }
+            } catch (error: any) {
+                setEsAfiliado(false);
             }
         }
     };
@@ -103,6 +127,10 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
         onSubmit: async ({ value }) => {
             setFormErrors({});
             setFieldErrors({});
+            if (esAfiliado === false) {
+                showError('No afiliado', 'Debe estar afiliado antes de realizar esta solicitud.', 4000);
+                return;
+            }
             try {
                 // Validar y normalizar el teléfono internacional
                 const phoneNumber = parsePhoneNumberFromString(value.Numero_Telefono || "");
@@ -164,6 +192,23 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
         },
     });
 
+
+    // Mostrar alert cuando se verifica afiliación (igual que DesconexionFisica)
+    useEffect(() => {
+        if (
+            cedulaJuridica &&
+            !isMedidoresLoading &&
+            cedulaJuridica.length >= 10 // cédula jurídica CR tiene 10 dígitos
+        ) {
+            if (medidores.length === 0) {
+                showError(
+                    "No Eres Afiliado",
+                    "No puedes solicitar el cambio porque no eres un afiliado con medidores activos. Completa tu afiliación primero."
+                );
+            }
+        }
+    }, [cedulaJuridica, medidores.length, isMedidoresLoading, showError]);
+
     useEffect(() => {
         const savedData = sessionStorage.getItem(STORAGE_KEY);
         if (savedData) {
@@ -179,7 +224,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                 console.error('Error al cargar datos guardados:', error);
             }
         }
-    }, []); //prueba 
+    }, []); //prueba
 
 
 
@@ -232,18 +277,12 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                     <input
                                         type="text"
                                         value={field.state.value}
-                                        onChange={(e) => {
+                                        onChange={async (e) => {
                                             const formatted = formatCedulaJuridica(e.target.value);
                                             field.handleChange(formatted);
-                                            handleFieldChange("Cedula_Juridica", formatted);
-                                            setCedulaJuridica(formatted.replace(/-/g, ''));
+                                            await handleCedulaJuridicaChange(formatted);
                                             form.setFieldValue('Id_Medidor', 0);
                                             saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted });
-                                            if (/^\d-\d{3}-\d{6}$/.test(formatted)) {
-                                                lookupJuridica(formatted).then(razonSocial => {
-                                                    if (razonSocial) form.setFieldValue('Razon_Social', razonSocial);
-                                                });
-                                            }
                                         }}
                                         placeholder={getPlaceholder("Cedula_Juridica")}
                                         className={commonClasses}
@@ -263,31 +302,9 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                 {formErrors["Cedula_Juridica"] && !fieldErrors["Cedula_Juridica"] && (
                                     <span className="text-red-500 text-sm block mt-1">{formErrors["Cedula_Juridica"]}</span>
                                 )}
-                            </div>
-                        )}
-                    </form.Field>
-                    {/* Correo */}
-                    <form.Field name="Correo">
-                        {(field) => (
-                            <div className="mb-3 w-full">
-                                <label htmlFor="Correo" className="block mb-1 font-medium">Correo electrónico <span className="text-red-500">*</span></label>
-                                <input
-                                    type="email"
-                                    value={field.state.value}
-                                    onChange={(e) => {
-                                        field.handleChange(e.target.value);
-                                        handleFieldChange("Correo", e.target.value);
-                                        saveToSessionStorage({ ...form.state.values, Correo: e.target.value });
-                                    }}
-                                    placeholder={getPlaceholder("Correo")}
-                                    maxLength={100}
-                                    className={commonClasses}
-                                />
-                                {fieldErrors["Correo"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Correo"]}</span>
-                                )}
-                                {formErrors["Correo"] && !fieldErrors["Correo"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Correo"]}</span>
+                                {/* Inline error if afiliado jurídico not found */}
+                                {esAfiliado === false && (
+                                    <span className="text-red-500 text-sm block mt-1">no existe Afiliado juridico con esta cedula</span>
                                 )}
                             </div>
                         )}
@@ -407,7 +424,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
 
                                     {medidores.length === 0 && cedulaJuridica && !isMedidoresLoading && (
                                         <span className="text-red-500 text-sm block mt-1">
-                                            No se encontraron medidores para esta identificación
+                                            No se encontraron medidores para esta identificación.Primero debes ser afiliado
                                         </span>
                                     )}
                                 </div>
@@ -529,25 +546,25 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                 </div>
 
 
-               <div className="flex justify-center gap-4 mt-6 ml-50">
-            
-                <button
-                  type="submit"
-                  disabled={isSending}
-                  className={`w-[120px] py-2 rounded transition ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
-                >
-                  {isSending ? 'Enviando...' : 'Enviar'}
-                </button>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  disabled={isSending}
-                  className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  Cancelar
-                </button>
+                <div className="flex justify-center gap-4 mt-6 ml-50">
 
-              </div>
+                    <button
+                        type="submit"
+                        disabled={!!(isSending || (cedulaJuridica && !isMedidoresLoading && medidores.length === 0))}
+                        className={`w-[120px] py-2 rounded transition ${(isSending || (cedulaJuridica && !isMedidoresLoading && medidores.length === 0)) ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
+                    >
+                        {isSending ? 'Enviando...' : 'Enviar'}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        disabled={isSending}
+                        className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                        Cancelar
+                    </button>
+
+                </div>
             </form>
         </div>
     );

@@ -1,5 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import { useEffect, useRef, useState } from "react";
+import { useAlerts } from '../../../context/AlertContext';
 import { DesconexionMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/DesconexionMedidor";
 import { useDesconexionFisica, useMedidores } from "../../../Hook/Solicitudes/HookFisicas";
 import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
@@ -25,6 +26,8 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isSending, setIsSending] = useState(false);
   const [identificacion, setIdentificacion] = useState('');
+  const [esAfiliado, setEsAfiliado] = useState<boolean | null>(null);
+  const { showError } = useAlerts();
   const mutation = useDesconexionFisica();
   const planosInputRef = useRef<HTMLInputElement>(null);
   const escrituraInputRef = useRef<HTMLInputElement>(null);
@@ -111,13 +114,31 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
       return newErrors;
     });
 
+    setEsAfiliado(null);
     if (tipoId === 'Cedula Nacional' && /^\d{9}$/.test(identificacionProcesada)) {
-      const resultado = await lookup(identificacionProcesada);
-      if (resultado) {
-        form.setFieldValue('Nombre', resultado.firstname || '');
-        form.setFieldValue('Apellido1', resultado.lastname1 || '');
-        form.setFieldValue('Apellido2', resultado.lastname2 || '');
+      try {
+        const resultado = await lookup(identificacionProcesada);
+        if (resultado) {
+          setEsAfiliado(true);
+          setFormErrors(prev => {
+            const newErrors = { ...prev };
+            delete newErrors['Identificacion'];
+            return newErrors;
+          });
+          form.setFieldValue('Nombre', resultado.firstname || '');
+          form.setFieldValue('Apellido1', resultado.lastname1 || '');
+          form.setFieldValue('Apellido2', resultado.lastname2 || '');
+        } else {
+          setEsAfiliado(false);
+          // No mostrar error en el campo Identificacion
+        }
+      } catch (error: any) {
+        setEsAfiliado(false);
+        // No mostrar error en el campo Identificacion
       }
+    } else {
+      setEsAfiliado(null);
+      // No limpiar alertas, solo mostrar si corresponde
     }
   };
 
@@ -176,6 +197,15 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
 
     onSubmit: async ({ value }) => {
       setFormErrors({});
+      // Validar que sea afiliado (tenga medidores activos)
+      if (!identificacion || medidores.length === 0) {
+        showError(
+          "No Eres Afiliado",
+          "No puedes solicitar la desconexión porque no eres un afiliado con medidores activos. Completa tu afiliación primero."
+        );
+        // No mostrar error en el formulario, solo alerta global
+        return;
+      }
       try {
         value.Numero_Telefono = normalizePhoneNumber(value.Numero_Telefono);
 
@@ -217,6 +247,27 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
       }
     },
   });
+  // Mostrar alert cuando se verifica afiliación (igual que MedidorExtraFisico)
+  useEffect(() => {
+    if (
+      identificacion &&
+      !isMedidoresLoading &&
+      identificacion.length >= 9
+    ) {
+      if (medidores.length > 0) {
+        // Si es afiliado, podrías mostrar un success opcional
+        // showSuccess(
+        //   "Eres un afiliado puedes seguir con la solicitud",
+        //   `. Medidores actuales: ${medidores.length}`
+        // );
+      } else {
+        showError(
+          "No Eres Afiliado",
+          "No puedes solicitar la desconexión porque no eres un afiliado con medidores activos. Completa tu afiliación primero."
+        );
+      }
+    }
+  }, [identificacion, medidores.length, isMedidoresLoading, showError]);
 
 
   useEffect(() => {
@@ -235,6 +286,10 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
       }
     }
   }, []);
+
+
+  // El mensaje ahora se muestra como alert global, no local
+
   if (!mostrarFormulario) return null;
 
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring focus:ring-blue-300';
@@ -325,6 +380,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                       {formErrors['Identificacion']}
                     </span>
                   )}
+                  {/* mensaje si no es afiliado eliminado, solo alert global */}
                 </div>
               )}
             </form.Field>
@@ -708,24 +764,24 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
         </div>
 
         <div className="flex justify-center gap-4 mt-6 ml-50">
-            
-                <button
-                  type="submit"
-                  disabled={isSending}
-                  className={`w-[120px] py-2 rounded transition ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
-                >
-                  {isSending ? 'Enviando...' : 'Enviar'}
-                </button>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  disabled={isSending}
-                  className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  Cancelar
-                </button>
 
-              </div>
+          <button
+            type="submit"
+            disabled={isSending}
+            className={`w-[120px] py-2 rounded transition ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
+          >
+            {isSending ? 'Enviando...' : 'Enviar'}
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isSending}
+            className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            Cancelar
+          </button>
+
+        </div>
       </form>
     </div>
   );

@@ -27,6 +27,8 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
   const planosInputRef = useRef<HTMLInputElement>(null);
   const escrituraInputRef = useRef<HTMLInputElement>(null);
   const [_mostrarFormulario, setMostrarFormulario] = useState(true);
+  // Estado para mostrar medidor extra
+  const [showMedidorExtra, setShowMedidorExtra] = useState(initialView === "medidor-extra");
   const mutation = useAfiliacionFisica();
 
   const { lookup, isLoading: loadingCedula } = useCedulaLookup()
@@ -292,437 +294,437 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
       >
         <h2 className="text-center text-xl font-semibold mb-4">Solicitud de Afiliación - Persona Física</h2>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              const isValid = validateBeforeSubmit(form.state.values);
-              if (!isValid) return;
-              form.handleSubmit();
-            }}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const isValid = validateBeforeSubmit(form.state.values);
+            if (!isValid) return;
+            form.handleSubmit();
+          }}
 
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
-              {/* Tipo de Identificación */}
-              <div className="mb-3">
-                <form.Field name="Tipo_Identificacion">
-                  {(field) => (
-                    <div>
-                      <label htmlFor="Tipo_Identificacion" className="block mb-1 font-medium">
-                        Tipo de Identificación <span className="text-red-500">*</span>
-                      </label>
-                      <select
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
+            {/* Tipo de Identificación */}
+            <div className="mb-3">
+              <form.Field name="Tipo_Identificacion">
+                {(field) => (
+                  <div>
+                    <label htmlFor="Tipo_Identificacion" className="block mb-1 font-medium">
+                      Tipo de Identificación <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={field.state.value}
+                      onChange={(e) => {
+                        field.handleChange(e.target.value);
+                        validateField('Tipo_Identificacion', e.target.value, form.state.values);
+                        form.setFieldValue('Identificacion', '');
+                        setFieldErrors(prev => {
+                          const newErrors = { ...prev };
+                          delete newErrors['Identificacion'];
+                          return newErrors;
+                        });
+                        // Limpiar error de identificación duplicada al cambiar tipo
+                        setFormErrors(prev => {
+                          const newErrors = { ...prev };
+                          delete newErrors['Identificacion'];
+                          return newErrors;
+                        });
+                      }}
+                      className={`${commonClasses} ${fieldErrors['Tipo_Identificacion'] ? 'border-blue-500 focus:ring-blue-300' : ''}`}
+                    >
+                      <option value="">Seleccione tipo de identificación</option>
+                      {TipoIdentificacionValues.map((tipo) => (
+                        <option key={tipo} value={tipo}>{tipo}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </form.Field>
+            </div>
+
+            {/* Número de Identificación */}
+            <div className="mb-3">
+              <form.Field name="Identificacion">
+                {(field) => (
+                  <div>
+                    <label htmlFor="Identificacion" className="block mb-1 font-medium">
+                      Número de Identificación <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
                         value={field.state.value}
-                        onChange={(e) => {
-                          field.handleChange(e.target.value);
-                          validateField('Tipo_Identificacion', e.target.value, form.state.values);
-                          form.setFieldValue('Identificacion', '');
-                          setFieldErrors(prev => {
-                            const newErrors = { ...prev };
-                            delete newErrors['Identificacion'];
-                            return newErrors;
-                          });
-                          // Limpiar error de identificación duplicada al cambiar tipo
-                          setFormErrors(prev => {
-                            const newErrors = { ...prev };
-                            delete newErrors['Identificacion'];
-                            return newErrors;
-                          });
-                        }}
-                        className={`${commonClasses} ${fieldErrors['Tipo_Identificacion'] ? 'border-blue-500 focus:ring-blue-300' : ''}`}
-                      >
-                        <option value="">Seleccione tipo de identificación</option>
-                        {TipoIdentificacionValues.map((tipo) => (
-                          <option key={tipo} value={tipo}>{tipo}</option>
-                        ))}
-                      </select>
+                        onChange={(e) => handleCedulaChange(e.target.value)}
+                        placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion as TipoIdentificacion)}
+                        disabled={!form.state.values.Tipo_Identificacion || loadingCedula}
+                        className={`${commonClasses} ${(fieldErrors['Identificacion'] || formErrors['Identificacion']) ? 'border-red-500 focus:ring-red-300' : ''} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                        maxLength={
+                          form.state.values.Tipo_Identificacion === 'Cedula Nacional' ? 9 :
+                            form.state.values.Tipo_Identificacion === 'Dimex' ? 12 :
+                              form.state.values.Tipo_Identificacion === 'Pasaporte' ? 9 : 20
+                        }
+                      />
+                      {loadingCedula && (
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                          <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </form.Field>
-              </div>
+                    {loadingCedula && <p className="text-xs text-blue-600 mt-1">Buscando información...</p>}
+                    {/* Mostrar error de validación de formato */}
+                    {fieldErrors['Identificacion'] && (
+                      <span className="text-red-500 text-sm block mt-1">
+                        {fieldErrors['Identificacion']}
+                      </span>
+                    )}
+                    {/* Mostrar error de identificación duplicada */}
+                    {formErrors['Identificacion'] && !fieldErrors['Identificacion'] && (
+                      <span className="text-red-500 text-sm block mt-1">
+                        {formErrors['Identificacion']}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </form.Field>
+            </div>
 
-              {/* Número de Identificación */}
-              <div className="mb-3">
-                <form.Field name="Identificacion">
-                  {(field) => (
-                    <div>
-                      <label htmlFor="Identificacion" className="block mb-1 font-medium">
-                        Número de Identificación <span className="text-red-500">*</span>
-                      </label>
-                      <div className="relative">
-                        <input
-                          type="text"
-                          value={field.state.value}
-                          onChange={(e) => handleCedulaChange(e.target.value)}
-                          placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion as TipoIdentificacion)}
-                          disabled={!form.state.values.Tipo_Identificacion || loadingCedula}
-                          className={`${commonClasses} ${(fieldErrors['Identificacion'] || formErrors['Identificacion']) ? 'border-red-500 focus:ring-red-300' : ''} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                          maxLength={
-                            form.state.values.Tipo_Identificacion === 'Cedula Nacional' ? 9 :
-                              form.state.values.Tipo_Identificacion === 'Dimex' ? 12 :
-                                form.state.values.Tipo_Identificacion === 'Pasaporte' ? 9 : 20
-                          }
-                        />
-                        {loadingCedula && (
-                          <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                            <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                          </div>
-                        )}
+            {/* Nombre */}
+            <form.Field name="Nombre">
+              {(field) => (
+                <div className="mb-3 w-full">
+                  <label htmlFor="Nombre" className="block mb-1 font-medium">Nombre <span className="text-red-500">*</span></label>
+                  <input
+                    type="text"
+                    value={field.state.value}
+                    onChange={(e) => {
+                      const cleanValue = sanitizeNameInput(e.target.value);
+                      field.handleChange(cleanValue);
+                      validateField("Nombre", cleanValue, form.state.values);
+                      saveToSessionStorage({ ...form.state.values, Nombre: cleanValue });
+                    }}
+                    placeholder={getPlaceholder("Nombre")}
+                    maxLength={50}
+                    className={commonClasses}
+                  />
+                  {fieldErrors["Nombre"] && (
+                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Nombre"]}</span>
+                  )}
+                  {formErrors["Nombre"] && !fieldErrors["Nombre"] && (
+                    <span className="text-red-500 text-sm block mt-1">{formErrors["Nombre"]}</span>
+                  )}
+
+                </div>
+              )}
+            </form.Field>
+            {/* Primer Apellido */}
+            <form.Field name="Apellido1">
+              {(field) => (
+                <div className="mb-3 w-full">
+                  <label htmlFor="Apellido1" className="block mb-1 font-medium">Primer Apellido <span className="text-red-500">*</span></label>
+                  <input
+                    type="text"
+                    value={field.state.value}
+                    onChange={(e) => {
+                      const cleanValue = sanitizeNameInput(e.target.value);
+                      field.handleChange(cleanValue);
+                      validateField("Apellido1", cleanValue, form.state.values);
+                      saveToSessionStorage({ ...form.state.values, Apellido1: cleanValue });
+                    }}
+                    placeholder={getPlaceholder("Apellido1")}
+                    maxLength={50}
+                    className={commonClasses}
+                  />
+                  {fieldErrors["Apellido1"] && (
+                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido1"]}</span>
+                  )}
+                  {formErrors["Apellido1"] && !fieldErrors["Apellido1"] && (
+                    <span className="text-red-500 text-sm block mt-1">{formErrors["Apellido1"]}</span>
+                  )}
+                </div>
+              )}
+            </form.Field>
+            {/* Segundo Apellido */}
+            <form.Field name="Apellido2">
+              {(field) => (
+                <div className="mb-3 w-full">
+                  <label htmlFor="Apellido2" className="block mb-1 font-medium">Segundo Apellido <span className="text-red-500">*</span></label>
+                  <input
+                    type="text"
+                    value={field.state.value}
+                    onChange={(e) => {
+                      const cleanValue = sanitizeNameInput(e.target.value);
+                      field.handleChange(cleanValue);
+                      validateField("Apellido2", cleanValue, form.state.values);
+                      saveToSessionStorage({ ...form.state.values, Apellido2: cleanValue });
+                    }}
+                    placeholder={getPlaceholder("Apellido2")}
+                    maxLength={50}
+                    className={commonClasses}
+                  />
+                  {fieldErrors["Apellido2"] && (
+                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido2"]}</span>
+                  )}
+                  {formErrors["Apellido2"] && !fieldErrors["Apellido2"] && (
+                    <span className="text-red-500 text-sm block mt-1">{formErrors["Apellido2"]}</span>
+                  )}
+                </div>
+              )}
+            </form.Field>
+            {/* Dirección Exacta */}
+            <form.Field name="Direccion_Exacta">
+              {(field) => (
+                <div className="mb-3 w-full">
+                  <label htmlFor="Direccion_Exacta" className="block mb-1 font-medium">Dirección exacta <span className="text-red-500">*</span></label>
+                  <textarea
+                    value={field.state.value}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                      validateField("Direccion_Exacta", e.target.value, form.state.values);
+                      saveToSessionStorage({ ...form.state.values, Direccion_Exacta: e.target.value }); // ← NUEVO
+                    }}
+                    placeholder={getPlaceholder("Direccion_Exacta")}
+                    maxLength={100}
+                    className={commonClasses}
+                  />
+                  {fieldErrors["Direccion_Exacta"] && (
+                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Direccion_Exacta"]}</span>
+                  )}
+                  {formErrors["Direccion_Exacta"] && !fieldErrors["Direccion_Exacta"] && (
+                    <span className="text-red-500 text-sm block mt-1">{formErrors["Direccion_Exacta"]}</span>
+                  )}
+                </div>
+              )}
+            </form.Field>
+            {/* Correo */}
+            <form.Field name="Correo">
+              {(field) => (
+                <div className="mb-3 w-full">
+                  <label htmlFor="Correo" className="block mb-1 font-medium">Correo electrónico <span className="text-red-500">*</span></label>
+                  <input
+                    type="email"
+                    value={field.state.value}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                      validateField("Correo", e.target.value, form.state.values);
+                      saveToSessionStorage({ ...form.state.values, Correo: e.target.value }); // ← NUEVO
+                    }}
+                    placeholder={getPlaceholder("Correo")}
+                    maxLength={100}
+                    className={commonClasses}
+                  />
+                  {fieldErrors["Correo"] && (
+                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Correo"]}</span>
+                  )}
+                  {formErrors["Correo"] && !fieldErrors["Correo"] && (
+                    <span className="text-red-500 text-sm block mt-1">{formErrors["Correo"]}</span>
+                  )}
+                </div>
+              )}
+            </form.Field>
+            {/* Teléfono internacional */}
+            <form.Field name="Numero_Telefono">
+              {(field) => (
+                <div className="mb-3 w-full">
+                  <label htmlFor="Numero_Telefono" className="block mb-1 font-medium">Número de teléfono <span className="text-red-500">*</span></label>
+                  <PhoneInputComponent
+                    value={field.state.value}
+                    onChange={(value) => {
+                      field.handleChange(value || "");
+                      validateField("Numero_Telefono", value || "", form.state.values);
+                      saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" }); // ← NUEVO
+                    }}
+                    className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
+                  />
+                  {fieldErrors["Numero_Telefono"] && (
+                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
+                  )}
+                  {formErrors["Numero_Telefono"] && !fieldErrors["Numero_Telefono"] && (
+                    <span className="text-red-500 text-sm block mt-1">{formErrors["Numero_Telefono"]}</span>
+                  )}
+                </div>
+              )}
+            </form.Field>
+            {/* Edad */}
+            <form.Field name="Edad">
+              {(field) => (
+                <div className="mb-3 w-full">
+                  <label htmlFor="Edad" className="block mb-1 font-medium">Edad <span className="text-red-500">*</span></label>
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min={18}
+                    value={field.state.value || ''}
+                    onChange={(e) => {
+                      const soloNumeros = e.target.value.replace(/[^0-9]/g, '');
+                      const edadValue = soloNumeros === '' ? undefined : Number(soloNumeros);
+                      field.handleChange(edadValue);
+                      validateField("Edad", edadValue, form.state.values);
+                      saveToSessionStorage({ ...form.state.values, Edad: edadValue });
+                    }}
+                    placeholder={getPlaceholder("Edad")}
+                    className={commonClasses}
+                  />
+                  {fieldErrors["Edad"] && (
+                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Edad"]}</span>
+                  )}
+                  {formErrors["Edad"] && !fieldErrors["Edad"] && (
+                    <span className="text-red-500 text-sm block mt-1">{formErrors["Edad"]}</span>
+                  )}
+                </div>
+              )}
+            </form.Field>
+          </div>
+
+          {/* Archivos */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+            <form.Field name="Planos_Terreno">
+              {(field) => {
+                const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
+                return (
+                  <div className="w-full mb-2">
+                    <label htmlFor="Planos_Terreno" className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
+                    <input
+                      type="file"
+                      accept=".png,.jpg,.jpeg,.heic,.pdf"
+                      disabled={!!archivoActual}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] ?? null;
+                        field.handleChange(file ?? undefined);
+                        setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: file }));
+                        validateField("Planos_Terreno", file);
+                      }}
+                      className="hidden"
+                      id="Planos_Terreno"
+                      ref={planosInputRef}
+                      key={archivoActual ? archivoActual.name : 'planos'}
+                    />
+                    <label
+                      htmlFor="Planos_Terreno"
+                      className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
+                    >
+                      {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
+                    </label>
+                    {archivoActual && (
+                      <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
+                        <span>{archivoActual.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            field.handleChange(undefined);
+                            setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
+                            setFieldErrors(prev => ({
+                              ...prev,
+                              ["Planos_Terreno"]: `Debe subir el plano del terreno`,
+                            }));
+                            if (planosInputRef.current) planosInputRef.current.value = "";
+                          }}
+                          className="text-red-500 hover:underline text-xs"
+                        >
+                          Eliminar
+                        </button>
                       </div>
-                      {loadingCedula && <p className="text-xs text-blue-600 mt-1">Buscando información...</p>}
-                      {/* Mostrar error de validación de formato */}
-                      {fieldErrors['Identificacion'] && (
-                        <span className="text-red-500 text-sm block mt-1">
-                          {fieldErrors['Identificacion']}
-                        </span>
-                      )}
-                      {/* Mostrar error de identificación duplicada */}
-                      {formErrors['Identificacion'] && !fieldErrors['Identificacion'] && (
-                        <span className="text-red-500 text-sm block mt-1">
-                          {formErrors['Identificacion']}
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </form.Field>
-              </div>
-
-              {/* Nombre */}
-              <form.Field name="Nombre">
-                {(field) => (
-                  <div className="mb-3 w-full">
-                    <label htmlFor="Nombre" className="block mb-1 font-medium">Nombre <span className="text-red-500">*</span></label>
+                    )}
+                    {fieldErrors["Planos_Terreno"] && (
+                      <span className="text-red-500 text-sm block mt-1">
+                        {fieldErrors["Planos_Terreno"]}
+                      </span>
+                    )}
+                    {formErrors["Planos_Terreno"] && !fieldErrors["Planos_Terreno"] && (
+                      <span className="text-red-500 text-sm block mt-1">
+                        {formErrors["Planos_Terreno"]}
+                      </span>
+                    )}
+                  </div>
+                );
+              }}
+            </form.Field>
+            <form.Field name="Escritura_Terreno">
+              {(field) => {
+                const archivoActual = archivoSeleccionado["Escritura_Terreno"] ?? null;
+                return (
+                  <div className="w-full mb-2">
+                    <label htmlFor="Escritura_Terreno" className="block mb-1 font-medium">Escritura del terreno <span className="text-red-500">*</span></label>
                     <input
-                      type="text"
-                      value={field.state.value}
+                      type="file"
+                      accept=".png,.jpg,.jpeg,.heic,.pdf"  // 🔥 CAMBIO: Agregué .pdf
+                      disabled={!!archivoActual}
                       onChange={(e) => {
-                        const cleanValue = sanitizeNameInput(e.target.value);
-                        field.handleChange(cleanValue);
-                        validateField("Nombre", cleanValue, form.state.values);
-                        saveToSessionStorage({ ...form.state.values, Nombre: cleanValue });
+                        const file = e.target.files?.[0] ?? null;
+                        field.handleChange(file ?? undefined);
+                        setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: file }));
+                        validateField("Escritura_Terreno", file);
                       }}
-                      placeholder={getPlaceholder("Nombre")}
-                      maxLength={50}
-                      className={commonClasses}
+                      className="hidden"
+                      id="Escritura_Terreno"
+                      ref={escrituraInputRef}
+                      key={archivoActual ? archivoActual.name : 'escritura'}
                     />
-                    {fieldErrors["Nombre"] && (
-                      <span className="text-red-500 text-sm block mt-1">{fieldErrors["Nombre"]}</span>
+                    <label
+                      htmlFor="Escritura_Terreno"
+                      className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
+                    >
+                      {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
+                    </label>
+                    {archivoActual && (
+                      <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
+                        <span>{archivoActual.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            field.handleChange(undefined);
+                            setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: null }));
+                            setFieldErrors(prev => ({
+                              ...prev,
+                              ["Escritura_Terreno"]: `Debe subir la escritura del terreno`,
+                            }));
+                            if (escrituraInputRef.current) escrituraInputRef.current.value = "";
+                          }}
+                          className="text-red-500 hover:underline text-xs"
+                        >
+                          Eliminar
+                        </button>
+                      </div>
                     )}
-                    {formErrors["Nombre"] && !fieldErrors["Nombre"] && (
-                      <span className="text-red-500 text-sm block mt-1">{formErrors["Nombre"]}</span>
+                    {fieldErrors["Escritura_Terreno"] && (
+                      <span className="text-red-500 text-sm block mt-1">
+                        {fieldErrors["Escritura_Terreno"]}
+                      </span>
                     )}
+                    {formErrors["Escritura_Terreno"] && !fieldErrors["Escritura_Terreno"] && (
+                      <span className="text-red-500 text-sm block mt-1">
+                        {formErrors["Escritura_Terreno"]}
+                      </span>
+                    )}
+                  </div>
+                );
+              }}
+            </form.Field>
+          </div>
 
-                  </div>
-                )}
-              </form.Field>
-              {/* Primer Apellido */}
-              <form.Field name="Apellido1">
-                {(field) => (
-                  <div className="mb-3 w-full">
-                    <label htmlFor="Apellido1" className="block mb-1 font-medium">Primer Apellido <span className="text-red-500">*</span></label>
-                    <input
-                      type="text"
-                      value={field.state.value}
-                      onChange={(e) => {
-                        const cleanValue = sanitizeNameInput(e.target.value);
-                        field.handleChange(cleanValue);
-                        validateField("Apellido1", cleanValue, form.state.values);
-                        saveToSessionStorage({ ...form.state.values, Apellido1: cleanValue });
-                      }}
-                      placeholder={getPlaceholder("Apellido1")}
-                      maxLength={50}
-                      className={commonClasses}
-                    />
-                    {fieldErrors["Apellido1"] && (
-                      <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido1"]}</span>
-                    )}
-                    {formErrors["Apellido1"] && !fieldErrors["Apellido1"] && (
-                      <span className="text-red-500 text-sm block mt-1">{formErrors["Apellido1"]}</span>
-                    )}
-                  </div>
-                )}
-              </form.Field>
-              {/* Segundo Apellido */}
-              <form.Field name="Apellido2">
-                {(field) => (
-                  <div className="mb-3 w-full">
-                    <label htmlFor="Apellido2" className="block mb-1 font-medium">Segundo Apellido <span className="text-red-500">*</span></label>
-                    <input
-                      type="text"
-                      value={field.state.value}
-                      onChange={(e) => {
-                        const cleanValue = sanitizeNameInput(e.target.value);
-                        field.handleChange(cleanValue);
-                        validateField("Apellido2", cleanValue, form.state.values);
-                        saveToSessionStorage({ ...form.state.values, Apellido2: cleanValue });
-                      }}
-                      placeholder={getPlaceholder("Apellido2")}
-                      maxLength={50}
-                      className={commonClasses}
-                    />
-                    {fieldErrors["Apellido2"] && (
-                      <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido2"]}</span>
-                    )}
-                    {formErrors["Apellido2"] && !fieldErrors["Apellido2"] && (
-                      <span className="text-red-500 text-sm block mt-1">{formErrors["Apellido2"]}</span>
-                    )}
-                  </div>
-                )}
-              </form.Field>
-              {/* Dirección Exacta */}
-              <form.Field name="Direccion_Exacta">
-                {(field) => (
-                  <div className="mb-3 w-full">
-                    <label htmlFor="Direccion_Exacta" className="block mb-1 font-medium">Dirección exacta <span className="text-red-500">*</span></label>
-                    <textarea
-                      value={field.state.value}
-                      onChange={(e) => {
-                        field.handleChange(e.target.value);
-                        validateField("Direccion_Exacta", e.target.value, form.state.values);
-                        saveToSessionStorage({ ...form.state.values, Direccion_Exacta: e.target.value }); // ← NUEVO
-                      }}
-                      placeholder={getPlaceholder("Direccion_Exacta")}
-                      maxLength={100}
-                      className={commonClasses}
-                    />
-                    {fieldErrors["Direccion_Exacta"] && (
-                      <span className="text-red-500 text-sm block mt-1">{fieldErrors["Direccion_Exacta"]}</span>
-                    )}
-                    {formErrors["Direccion_Exacta"] && !fieldErrors["Direccion_Exacta"] && (
-                      <span className="text-red-500 text-sm block mt-1">{formErrors["Direccion_Exacta"]}</span>
-                    )}
-                  </div>
-                )}
-              </form.Field>
-              {/* Correo */}
-              <form.Field name="Correo">
-                {(field) => (
-                  <div className="mb-3 w-full">
-                    <label htmlFor="Correo" className="block mb-1 font-medium">Correo electrónico <span className="text-red-500">*</span></label>
-                    <input
-                      type="email"
-                      value={field.state.value}
-                      onChange={(e) => {
-                        field.handleChange(e.target.value);
-                        validateField("Correo", e.target.value, form.state.values);
-                        saveToSessionStorage({ ...form.state.values, Correo: e.target.value }); // ← NUEVO
-                      }}
-                      placeholder={getPlaceholder("Correo")}
-                      maxLength={100}
-                      className={commonClasses}
-                    />
-                    {fieldErrors["Correo"] && (
-                      <span className="text-red-500 text-sm block mt-1">{fieldErrors["Correo"]}</span>
-                    )}
-                    {formErrors["Correo"] && !fieldErrors["Correo"] && (
-                      <span className="text-red-500 text-sm block mt-1">{formErrors["Correo"]}</span>
-                    )}
-                  </div>
-                )}
-              </form.Field>
-              {/* Teléfono internacional */}
-              <form.Field name="Numero_Telefono">
-                {(field) => (
-                  <div className="mb-3 w-full">
-                    <label htmlFor="Numero_Telefono" className="block mb-1 font-medium">Número de teléfono <span className="text-red-500">*</span></label>
-                    <PhoneInputComponent
-                      value={field.state.value}
-                      onChange={(value) => {
-                        field.handleChange(value || "");
-                        validateField("Numero_Telefono", value || "", form.state.values);
-                        saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" }); // ← NUEVO
-                      }}
-                      className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
-                    />
-                    {fieldErrors["Numero_Telefono"] && (
-                      <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
-                    )}
-                    {formErrors["Numero_Telefono"] && !fieldErrors["Numero_Telefono"] && (
-                      <span className="text-red-500 text-sm block mt-1">{formErrors["Numero_Telefono"]}</span>
-                    )}
-                  </div>
-                )}
-              </form.Field>
-              {/* Edad */}
-              <form.Field name="Edad">
-                {(field) => (
-                  <div className="mb-3 w-full">
-                    <label htmlFor="Edad" className="block mb-1 font-medium">Edad <span className="text-red-500">*</span></label>
-                    <input
-                      type="number"
-                      inputMode="numeric"
-                      min={18}
-                      value={field.state.value || ''}
-                      onChange={(e) => {
-                        const soloNumeros = e.target.value.replace(/[^0-9]/g, '');
-                        const edadValue = soloNumeros === '' ? undefined : Number(soloNumeros);
-                        field.handleChange(edadValue);
-                        validateField("Edad", edadValue, form.state.values);
-                        saveToSessionStorage({ ...form.state.values, Edad: edadValue });
-                      }}
-                      placeholder={getPlaceholder("Edad")}
-                      className={commonClasses}
-                    />
-                    {fieldErrors["Edad"] && (
-                      <span className="text-red-500 text-sm block mt-1">{fieldErrors["Edad"]}</span>
-                    )}
-                    {formErrors["Edad"] && !fieldErrors["Edad"] && (
-                      <span className="text-red-500 text-sm block mt-1">{formErrors["Edad"]}</span>
-                    )}
-                  </div>
-                )}
-              </form.Field>
-            </div>
+          <div className="flex justify-center gap-4 mt-6 ml-50">
 
-            {/* Archivos */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-              <form.Field name="Planos_Terreno">
-                {(field) => {
-                  const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
-                  return (
-                    <div className="w-full mb-2">
-                      <label htmlFor="Planos_Terreno" className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
-                      <input
-                        type="file"
-                        accept=".png,.jpg,.jpeg,.heic,.pdf"
-                        disabled={!!archivoActual}
-                        onChange={(e) => {
-                          const file = e.target.files?.[0] ?? null;
-                          field.handleChange(file ?? undefined);
-                          setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: file }));
-                          validateField("Planos_Terreno", file);
-                        }}
-                        className="hidden"
-                        id="Planos_Terreno"
-                        ref={planosInputRef}
-                        key={archivoActual ? archivoActual.name : 'planos'}
-                      />
-                      <label
-                        htmlFor="Planos_Terreno"
-                        className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
-                      >
-                        {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
-                      </label>
-                      {archivoActual && (
-                        <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
-                          <span>{archivoActual.name}</span>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              field.handleChange(undefined);
-                              setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
-                              setFieldErrors(prev => ({
-                                ...prev,
-                                ["Planos_Terreno"]: `Debe subir el plano del terreno`,
-                              }));
-                              if (planosInputRef.current) planosInputRef.current.value = "";
-                            }}
-                            className="text-red-500 hover:underline text-xs"
-                          >
-                            Eliminar
-                          </button>
-                        </div>
-                      )}
-                      {fieldErrors["Planos_Terreno"] && (
-                        <span className="text-red-500 text-sm block mt-1">
-                          {fieldErrors["Planos_Terreno"]}
-                        </span>
-                      )}
-                      {formErrors["Planos_Terreno"] && !fieldErrors["Planos_Terreno"] && (
-                        <span className="text-red-500 text-sm block mt-1">
-                          {formErrors["Planos_Terreno"]}
-                        </span>
-                      )}
-                    </div>
-                  );
-                }}
-              </form.Field>
-              <form.Field name="Escritura_Terreno">
-                {(field) => {
-                  const archivoActual = archivoSeleccionado["Escritura_Terreno"] ?? null;
-                  return (
-                    <div className="w-full mb-2">
-                      <label htmlFor="Escritura_Terreno" className="block mb-1 font-medium">Escritura del terreno <span className="text-red-500">*</span></label>
-                      <input
-                        type="file"
-                        accept=".png,.jpg,.jpeg,.heic,.pdf"  // 🔥 CAMBIO: Agregué .pdf
-                        disabled={!!archivoActual}
-                        onChange={(e) => {
-                          const file = e.target.files?.[0] ?? null;
-                          field.handleChange(file ?? undefined);
-                          setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: file }));
-                          validateField("Escritura_Terreno", file);
-                        }}
-                        className="hidden"
-                        id="Escritura_Terreno"
-                        ref={escrituraInputRef}
-                        key={archivoActual ? archivoActual.name : 'escritura'}
-                      />
-                      <label
-                        htmlFor="Escritura_Terreno"
-                        className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
-                      >
-                        {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
-                      </label>
-                      {archivoActual && (
-                        <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
-                          <span>{archivoActual.name}</span>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              field.handleChange(undefined);
-                              setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: null }));
-                              setFieldErrors(prev => ({
-                                ...prev,
-                                ["Escritura_Terreno"]: `Debe subir la escritura del terreno`,
-                              }));
-                              if (escrituraInputRef.current) escrituraInputRef.current.value = "";
-                            }}
-                            className="text-red-500 hover:underline text-xs"
-                          >
-                            Eliminar
-                          </button>
-                        </div>
-                      )}
-                      {fieldErrors["Escritura_Terreno"] && (
-                        <span className="text-red-500 text-sm block mt-1">
-                          {fieldErrors["Escritura_Terreno"]}
-                        </span>
-                      )}
-                      {formErrors["Escritura_Terreno"] && !fieldErrors["Escritura_Terreno"] && (
-                        <span className="text-red-500 text-sm block mt-1">
-                          {formErrors["Escritura_Terreno"]}
-                        </span>
-                      )}
-                    </div>
-                  );
-                }}
-              </form.Field>
-            </div>
+            <button
+              type="submit"
+              disabled={isSending}
+              className={`w-[120px] py-2 rounded transition ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
+            >
+              {isSending ? 'Enviando...' : 'Enviar'}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isSending}
+              className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              Cancelar
+            </button>
 
-            <div className="flex justify-center gap-4 mt-6 ml-50">
-            
-                <button
-                  type="submit"
-                  disabled={isSending}
-                  className={`w-[120px] py-2 rounded transition ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
-                >
-                  {isSending ? 'Enviando...' : 'Enviar'}
-                </button>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  disabled={isSending}
-                  className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  Cancelar
-                </button>
+          </div>
 
-              </div>
-           
-          </form>
+        </form>
       </div>
     </div>
   );
