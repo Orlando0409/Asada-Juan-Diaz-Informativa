@@ -98,7 +98,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
             Motivo_Solicitud: '',
             Id_Medidor: 0,
             Planos_Terreno: undefined as File | undefined,
-            Escritura_Terreno: undefined as File | undefined,
+            Certificacion_Literal: undefined as File | undefined,
         },
 
         onSubmit: async ({ value }) => {
@@ -157,7 +157,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
         Numero_Telefono: "Número de Teléfono",
         Motivo_Solicitud: "Motivo de la Solicitud",
         Planos_Terreno: "Planos del Terreno",
-        Escritura_Terreno: "Escritura del Terreno"
+        Certificacion_Literal: "Certificacion Literal del Terreno"
     };
 
 
@@ -168,7 +168,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                 const parsed = JSON.parse(savedData);
                 // Cargar los valores en el formulario
                 Object.entries(parsed).forEach(([key, value]) => {
-                    if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
+                    if (key !== 'Planos_Terreno' && key !== 'Certificacion_Literal') {
                         form.setFieldValue(key as any, value as any);
                         // Si es la cédula jurídica, también actualizar el estado
                         if (key === 'Cedula_Juridica' && typeof value === 'string') {
@@ -201,7 +201,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
                     {/* Campos dinámicos - Primero los campos normales (sin archivos) */}
                     {Object.entries(campos)
-                        .filter(([fieldName]) => fieldName !== "Planos_Terreno" && fieldName !== "Escritura_Terreno")
+                        .filter(([fieldName]) => fieldName !== "Planos_Terreno" && fieldName !== "Certificacion_Literal")
                         .map(([fieldName, fieldProps]) => (
                             <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
                                 {(field) => {
@@ -389,7 +389,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
 
                     {/* Campos de archivos*/}
                     {Object.entries(campos)
-                        .filter(([fieldName]) => fieldName === "Planos_Terreno" || fieldName === "Escritura_Terreno")
+                        .filter(([fieldName]) => fieldName === "Planos_Terreno" || fieldName === "Certificacion_Literal")
                         .map(([fieldName, fieldProps]) => (
                             <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
                                 {(field) => {
@@ -436,7 +436,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                                                             if (fieldName === "Planos_Terreno" && planosInputRef.current) {
                                                                 planosInputRef.current.value = '';
                                                             }
-                                                            if (fieldName === "Escritura_Terreno" && escrituraInputRef.current) {
+                                                            if (fieldName === "Certificacion_Literal" && escrituraInputRef.current) {
                                                                 escrituraInputRef.current.value = '';
                                                             }
                                                         }}

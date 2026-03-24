@@ -5,7 +5,7 @@ export interface MedidorExtraJuridica {
   Numero_Telefono: string;
   Direccion_Exacta: string;
   Planos_Terreno?: File | string;
-  Escritura_Terreno?: File | string;
+  Certificacion_Literal?: File | string;
 }
 
 export const MedidorExtraJuridicaInicialState: MedidorExtraJuridica = {

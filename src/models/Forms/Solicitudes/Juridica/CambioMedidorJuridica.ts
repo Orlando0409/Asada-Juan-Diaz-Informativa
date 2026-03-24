@@ -7,7 +7,7 @@ export interface CambioMedidorJuridico {
   Motivo_Solicitud: string;
   Numero_Medidor_Anterior: number;
   Planos_Terreno?: File | string;
-  Escritura_Terreno?: File | string;
+  Certificacion_Literal?: File | string;
 }
 
 export const CambioMedidorJuridicoInicialState: CambioMedidorJuridico = {

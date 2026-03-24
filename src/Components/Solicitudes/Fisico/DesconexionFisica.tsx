@@ -47,7 +47,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
         Motivo_Solicitud: "Motivo válido",
         Id_Medidor: 1,
         Planos_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
-        Escritura_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
+        Certificacion_Literal: new File([''], 'test.jpg', { type: 'image/jpeg' }),
       };
 
       if (fieldName === "Identificacion" && allValues?.Tipo_Identificacion) {
@@ -171,7 +171,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
       Motivo_Solicitud: "",
       Id_Medidor: undefined as number | undefined,
       Planos_Terreno: undefined as File | undefined,
-      Escritura_Terreno: undefined as File | undefined,
+      Certificacion_Literal: undefined as File | undefined,
     },
 
     onSubmit: async ({ value }) => {
@@ -226,7 +226,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
         const parsed = JSON.parse(savedData);
         // Cargar los valores en el formulario
         Object.entries(parsed).forEach(([key, value]) => {
-          if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
+          if (key !== 'Planos_Terreno' && key !== 'Certificacion_Literal') {
             form.setFieldValue(key as any, value as any);
           }
         });
@@ -641,12 +641,12 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
               );
             }}
           </form.Field>
-          <form.Field name="Escritura_Terreno">
+          <form.Field name="Certificacion_Literal">
             {(field) => {
-              const archivoActual = archivoSeleccionado["Escritura_Terreno"] ?? null;
+              const archivoActual = archivoSeleccionado["Certificacion_Literal"] ?? null;
               return (
                 <div className="w-full mb-2">
-                  <label htmlFor="Escritura_Terreno" className="block mb-1 font-medium">Escritura del terreno <span className="text-red-500">*</span></label>
+                  <label htmlFor="Certificacion_Literal" className="block mb-1 font-medium">Certificacion Literal del terreno <span className="text-red-500">*</span></label>
                   <input
                     type="file"
                     accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -654,16 +654,16 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                     onChange={(e) => {
                       const file = e.target.files?.[0] ?? null;
                       field.handleChange(file ?? undefined);
-                      setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: file }));
-                      validateField("Escritura_Terreno", file);
+                      setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: file }));
+                      validateField("Certificacion_Literal", file);
                     }}
                     className="hidden"
-                    id="Escritura_Terreno"
+                    id="Certificacion_Literal"
                     ref={escrituraInputRef}
                     key={archivoActual ? archivoActual.name : 'escritura'}
                   />
                   <label
-                    htmlFor="Escritura_Terreno"
+                    htmlFor="Certificacion_Literal"
                     className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
                   >
                     {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
@@ -675,10 +675,10 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                         type="button"
                         onClick={() => {
                           field.handleChange(undefined);
-                          setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: null }));
+                          setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: null }));
                           setFieldErrors(prev => ({
                             ...prev,
-                            ["Escritura_Terreno"]: `Debe subir la escritura del terreno`,
+                            ["Certificacion_Literal"]: `Debe subir la certificacion literal del terreno`,
                           }));
                           if (escrituraInputRef.current) {
                             escrituraInputRef.current.value = '';
@@ -690,15 +690,15 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                       </button>
                     </div>
                   )}
-                  {/* muestra errores de escritura*/}
-                  {fieldErrors["Escritura_Terreno"] && (
+                  {/* muestra errores de certificacion literal*/}
+                  {fieldErrors["Certificacion_Literal"] && (
                     <span className="text-red-500 text-sm block mt-1">
-                      {fieldErrors["Escritura_Terreno"]}
+                      {fieldErrors["Certificacion_Literal"]}
                     </span>
                   )}
-                  {formErrors["Escritura_Terreno"] && !fieldErrors["Escritura_Terreno"] && (
+                  {formErrors["Certificacion_Literal"] && !fieldErrors["Certificacion_Literal"] && (
                     <span className="text-red-500 text-sm block mt-1">
-                      {formErrors["Escritura_Terreno"]}
+                      {formErrors["Certificacion_Literal"]}
                     </span>
                   )}
                 </div>

@@ -43,7 +43,7 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                 Numero_Telefono: "+50688887777",
                 Direccion_Exacta: "San José, Costa Rica",
                 Planos_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
-                Escritura_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
+                Certificacion_Literal: new File([''], 'test.jpg', { type: 'image/jpeg' }),
             };
             dummy[fieldName] = value;
 
@@ -95,7 +95,7 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
             Numero_Telefono: '',
             Direccion_Exacta: '',
             Planos_Terreno: undefined as File | undefined,
-            Escritura_Terreno: undefined as File | undefined,
+            Certificacion_Literal: undefined as File | undefined,
         },
 
         onSubmit: async ({ value }) => {
@@ -151,7 +151,7 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                 const parsed = JSON.parse(savedData);
                 // Cargar los valores en el formulario
                 Object.entries(parsed).forEach(([key, value]) => {
-                    if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
+                        if (key !== 'Planos_Terreno' && key !== 'Certificacion_Literal') {
                         form.setFieldValue(key as any, value as any);
                     }
                 });
@@ -387,12 +387,12 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                                     );
                                 }}
                             </form.Field>
-                            <form.Field name="Escritura_Terreno">
+                            <form.Field name="Certificacion_Literal">
                                 {(field) => {
-                                    const archivoActual = archivoSeleccionado["Escritura_Terreno"] ?? null;
+                                    const archivoActual = archivoSeleccionado["Certificacion_Literal"] ?? null;
                                     return (
                                         <div className="mb-3">
-                                            <label className="block mb-1 font-semibold text-gray-700">Escritura del terreno <span className="text-red-500">*</span></label>
+                                            <label className="block mb-1 font-semibold text-gray-700">Certificacion Literal del terreno <span className="text-red-500">*</span></label>
                                             <input
                                                 type="file"
                                                 accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -400,16 +400,16 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                                                 onChange={(e) => {
                                                     const file = e.target.files?.[0] ?? null;
                                                     field.handleChange(file ?? undefined);
-                                                    setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: file }));
-                                                    validateField("Escritura_Terreno", file);
+                                                    setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: file }));
+                                                    validateField("Certificacion_Literal", file);
                                                 }}
                                                 className="hidden"
-                                                id="Escritura_Terreno"
+                                                id="Certificacion_Literal"
                                                 ref={escrituraInputRef}
                                                 key={archivoActual ? archivoActual.name : 'escritura'}
                                             />
                                             <label
-                                                htmlFor="Escritura_Terreno"
+                                                htmlFor="Certificacion_Literal"
                                                 className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-blue-700 cursor-pointer'}`}
                                             >
                                                 {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
@@ -421,10 +421,10 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                                                         type="button"
                                                         onClick={() => {
                                                             field.handleChange(undefined);
-                                                            setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: null }));
+                                                            setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: null }));
                                                             setFieldErrors(prev => ({
                                                                 ...prev,
-                                                                ["Escritura_Terreno"]: `Debe subir la escritura del terreno`,
+                                                                ["Certificacion_Literal"]: `Debe subir la certificacion literal del terreno`,
                                                             }));
                                                             if (escrituraInputRef.current) {
                                                                 escrituraInputRef.current.value = '';
@@ -436,11 +436,11 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                                                     </button>
                                                 </div>
                                             )}
-                                            {fieldErrors["Escritura_Terreno"] && (
-                                                <span className="text-red-500 text-sm block mt-1">{fieldErrors["Escritura_Terreno"]}</span>
+                                            {fieldErrors["Certificacion_Literal"] && (
+                                                <span className="text-red-500 text-sm block mt-1">{fieldErrors["Certificacion_Literal"]}</span>
                                             )}
-                                            {formErrors["Escritura_Terreno"] && !fieldErrors["Escritura_Terreno"] && (
-                                                <span className="text-red-500 text-sm block mt-1">{formErrors["Escritura_Terreno"]}</span>
+                                            {formErrors["Certificacion_Literal"] && !fieldErrors["Certificacion_Literal"] && (
+                                                <span className="text-red-500 text-sm block mt-1">{formErrors["Certificacion_Literal"]}</span>
                                             )}
                                         </div>
                                     );
