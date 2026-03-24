@@ -1,4 +1,5 @@
 import {
+    GenerarPDFConsultaPago,
     getConsultaPagosAfiliadoFisico,
     getConsultaPagosAfiliadoJuridico,
     getConsultaPagosMedidor,
@@ -6,6 +7,7 @@ import {
 import type {
     ConsultaFisicaDTO,
     ConsultaFisicaResponse,
+    GenerarFacturaConsultaDTO,
     ConsultaMedidorResponse,
     ConsultaJuridicaDTO,
     ConsultaJuridicaResponse,
@@ -42,9 +44,20 @@ export const useConsultaPago = () => {
         }
     };
 
+    const generarPDFConsultaPago = async (consultaData: GenerarFacturaConsultaDTO): Promise<Blob> => {
+        try {
+            const response = await GenerarPDFConsultaPago(consultaData);
+            return response;
+        } catch (error) {
+            console.error("Error al generar PDF de consulta de pago:", error);
+            throw error;
+        }
+    };
+
     return {
         consultaPagosMedidor,
         consultaPagosAfiliadoFisico,
         consultaPagosAfiliadoJuridico,
+        generarPDFConsultaPago,
     };
 }
