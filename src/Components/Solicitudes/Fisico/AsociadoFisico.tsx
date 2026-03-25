@@ -271,29 +271,6 @@ const FormularioAsociado = ({ onClose }: Props) => {
   const commonClasses =
     "w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring focus:ring-blue-300";
 
-  // Checar que todos los campos requeridos estén llenos y sin errores
-  const allFieldsFilled = () => {
-    const v = form.state.values;
-    return (
-      v.Nombre?.trim().length > 1 &&
-      v.Apellido1?.trim().length > 1 &&
-      v.Tipo_Identificacion &&
-      v.Identificacion?.trim().length > 0 &&
-      v.Correo?.trim().length > 0 &&
-      v.Numero_Telefono?.trim().length > 0 &&
-      v.Motivo_Solicitud?.trim().length > 4
-    );
-  };
-
-  const hasAnyError = () => {
-    return (
-      Object.keys(formErrors).length > 0 ||
-      Object.keys(fieldErrors).length > 0
-    );
-  };
-
-  const isSubmitDisabled = isSending || !allFieldsFilled() || hasAnyError();
-
   return (
     <div className="flex justify-center text-gray-800 p-3 sm:p-4 w-full">
       <form
@@ -529,12 +506,17 @@ const FormularioAsociado = ({ onClose }: Props) => {
 
         <div className="flex justify-center gap-4 mt-6 ml-50">
           <button
-            type="submit"
-            disabled={isSubmitDisabled}
-            className={`w-[120px] py-2 rounded transition ${isSubmitDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
-          >
-            {isSending ? 'Enviando...' : 'Enviar'}
-          </button>
+                        type="submit"
+                        className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
+                        disabled={
+                            isSending ||
+                            Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
+                            Object.values(fieldErrors).some(Boolean) ||
+                            Object.values(formErrors).some(Boolean)
+                        }
+                    >
+                        {isSending ? 'Enviando...' : 'Enviar Solicitud'}
+                    </button>
           <button
             type="button"
             onClick={onClose}

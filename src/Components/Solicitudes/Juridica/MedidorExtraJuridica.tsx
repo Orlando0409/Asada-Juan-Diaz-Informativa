@@ -517,6 +517,14 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                 >
                     {mutation.isPending ? 'Enviando...' : 'Enviar Solicitud'}
                 </button>
+                <button
+                    type="button"
+                    onClick={onClose}
+                    disabled={mutation.isPending}
+                    className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                    Cancelar
+                </button>
             </div>
         </form>
     );

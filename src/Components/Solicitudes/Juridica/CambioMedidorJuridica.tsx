@@ -550,10 +550,15 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
 
                     <button
                         type="submit"
-                        disabled={!!(isSending || (cedulaJuridica && !isMedidoresLoading && medidores.length === 0))}
-                        className={`w-[120px] py-2 rounded transition ${(isSending || (cedulaJuridica && !isMedidoresLoading && medidores.length === 0)) ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
+                        className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
+                        disabled={
+                            isSending ||
+                            Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
+                            Object.values(fieldErrors).some(Boolean) ||
+                            Object.values(formErrors).some(Boolean)
+                        }
                     >
-                        {isSending ? 'Enviando...' : 'Enviar'}
+                        {isSending ? 'Enviando...' : 'Enviar Solicitud'}
                     </button>
                     <button
                         type="button"

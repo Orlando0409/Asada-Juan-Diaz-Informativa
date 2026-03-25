@@ -654,21 +654,31 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
           </form.Field>
         </div>
         <div className="flex justify-center gap-4 mt-6 ml-50">
+          {/* Botones */}
+
+          <div className="flex justify-end items-center gap-3 mt-8">
           <button
-            type="submit"
-            disabled={!!(isSending || (identificacion && !isMedidoresLoading && medidores.length === 0))}
-            className={`w-[120px] py-2 rounded transition ${(isSending || (identificacion && !isMedidoresLoading && medidores.length === 0)) ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
-          >
-            {isSending ? 'Enviando...' : 'Enviar'}
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={isSending}
-            className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            Cancelar
-          </button>
+                        type="submit"
+                        className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
+                        disabled={
+                            isSending ||
+                            Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
+                            Object.values(fieldErrors).some(Boolean) ||
+                            Object.values(formErrors).some(Boolean)
+                        }
+                    >
+                        {isSending ? 'Enviando...' : 'Enviar Solicitud'}
+                    </button>
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isSending}
+              className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              Cancelar
+            </button>
+          </div>
+
         </div>
       </form>
     </div>
