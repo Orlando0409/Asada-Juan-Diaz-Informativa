@@ -291,6 +291,35 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
 
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring focus:ring-blue-300';
 
+  // --- NUEVO: Lógica para habilitar/deshabilitar el botón de enviar ---
+  // Checar que todos los campos requeridos estén llenos y sin errores
+  const allFieldsFilled = () => {
+    const v = form.state.values;
+    // Checar campos requeridos
+    return (
+      v.Nombre?.trim().length > 1 &&
+      v.Apellido1?.trim().length > 1 &&
+      v.Tipo_Identificacion &&
+      v.Identificacion?.trim().length > 0 &&
+      v.Correo?.trim().length > 0 &&
+      v.Numero_Telefono?.trim().length > 0 &&
+      v.Direccion_Exacta?.trim().length > 9 &&
+      v.Edad !== undefined && v.Edad !== null && v.Edad >= 18 &&
+      form.state.values.Planos_Terreno instanceof File &&
+      form.state.values.Escritura_Terreno instanceof File
+    );
+  };
+
+  const hasAnyError = () => {
+    // Si hay errores en formErrors o fieldErrors
+    return (
+      Object.keys(formErrors).length > 0 ||
+      Object.keys(fieldErrors).length > 0
+    );
+  };
+
+  const isSubmitDisabled = isSending || !allFieldsFilled() || hasAnyError();
+
   return (
     <div className="w-full text-gray-800">
       <div
@@ -304,9 +333,7 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
             const isValid = validateBeforeSubmit(form.state.values);
             if (!isValid) return;
             form.handleSubmit();
-          }}
-
-        >
+          }}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
             {/* Tipo de Identificación */}
             <div className="mb-3">
@@ -708,12 +735,12 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
             </form.Field>
           </div>
 
-          <div className="flex justify-center gap-4 mt-6 ml-50">
 
+          <div className="flex justify-center gap-4 mt-6 ml-50">
             <button
               type="submit"
-              disabled={isSending}
-              className={`w-[120px] py-2 rounded transition ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
+              disabled={isSubmitDisabled}
+              className={`w-[120px] py-2 rounded transition ${isSubmitDisabled ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
             >
               {isSending ? 'Enviando...' : 'Enviar'}
             </button>
@@ -725,12 +752,11 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
             >
               Cancelar
             </button>
-
           </div>
 
         </form>
       </div>
-    </div>
+    </div >
   );
 };
 
