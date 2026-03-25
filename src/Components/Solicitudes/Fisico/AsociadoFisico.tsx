@@ -462,7 +462,8 @@ const FormularioAsociado = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(value) => {
                     handleFieldChange("Numero_Telefono", value || "");
-                    saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" }); // ← NUEVO
+                    saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" });
+                    validateField("Numero_Telefono", value || "");
                   }}
                   className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
                 />
@@ -503,25 +504,25 @@ const FormularioAsociado = ({ onClose }: Props) => {
         </div>
 
 
-         <div className="flex justify-center gap-4 mt-6 ml-50">
-            
-                <button
-                  type="submit"
-                  disabled={isSending}
-                  className={`w-[120px] py-2 rounded transition ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
-                >
-                  {isSending ? 'Enviando...' : 'Enviar'}
-                </button>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  disabled={isSending}
-                  className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  Cancelar
-                </button>
+        <div className="flex justify-center gap-4 mt-6 ml-50">
 
-              </div>
+          <button
+            type="submit"
+            disabled={isSending}
+            className={`w-[120px] py-2 rounded transition ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
+          >
+            {isSending ? 'Enviando...' : 'Enviar'}
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isSending}
+            className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            Cancelar
+          </button>
+
+        </div>
       </form>
     </div>
   );

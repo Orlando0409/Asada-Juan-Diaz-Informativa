@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 export const CambioMedidorJuridicaSchema = z.object({
   Cedula_Juridica: z.string()
@@ -14,8 +15,20 @@ export const CambioMedidorJuridicaSchema = z.object({
     .max(99, 'El correo no puede tener más de 100 caracteres')
     .email('El correo electrónico no es válido'),
   Numero_Telefono: z.string()
-    .min(8, 'El número de teléfono debe tener al menos 8 dígitos')
-    .regex(/^\+?[0-9]{8,15}$/, 'El número de teléfono debe estar en formato internacional, ej. +50688887777'),
+    .min(1, 'El número de teléfono es obligatorio')
+    .refine((phone) => {
+      const phoneNumber = parsePhoneNumberFromString(phone || "");
+      return !!phoneNumber && phoneNumber.isValid();
+    }, {
+      message: 'Debe ingresar un número de teléfono válido con código de país, ej. +50688887777'
+    })
+    .transform((phone) => {
+      const phoneNumber = parsePhoneNumberFromString(phone || "");
+      if (!phoneNumber || !phoneNumber.isValid()) {
+        throw new Error('Debe ingresar un número de teléfono válido con código de país, ej. +50688887777');
+      }
+      return phoneNumber.format('E.164');
+    }),
   Direccion_Exacta: z.string()
     .min(10, 'La dirección debe tener al menos 10 caracteres')
     .max(254, 'La dirección no puede tener más de 255 caracteres'),

@@ -204,7 +204,7 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
             try {
                 cleanedValue.Numero_Telefono = normalizePhoneNumber(cleanedValue.Numero_Telefono);
             } catch (error: any) {
-                setFormErrors({ Numero_Telefono: error.message });
+                setFormErrors({ Numero_Telefono: 'Número de teléfono inválido' });
                 return;
             }
 
@@ -314,363 +314,363 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
         >
             <h2 className="text-center text-xl font-semibold mb-4">Solicitud de Medidor Extra - Persona Física</h2>
 
-                {formErrors.general && (
-                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-                        {formErrors.general}
-                    </div>
-                )}
+            {formErrors.general && (
+                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                    {formErrors.general}
+                </div>
+            )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
-                    {/* Tipo de Identificación */}
-                    <div className="mb-3">
-                        <form.Field name="Tipo_Identificacion">
-                            {(field) => (
-                                <div>
-                                    <label className="block mb-1 font-medium">
-                                        Tipo de Identificación <span className="text-red-500">*</span>
-                                    </label>
-                                    <select
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
+                {/* Tipo de Identificación */}
+                <div className="mb-3">
+                    <form.Field name="Tipo_Identificacion">
+                        {(field) => (
+                            <div>
+                                <label className="block mb-1 font-medium">
+                                    Tipo de Identificación <span className="text-red-500">*</span>
+                                </label>
+                                <select
+                                    value={field.state.value}
+                                    onChange={(e) => {
+                                        field.handleChange(e.target.value);
+                                        validateField('Tipo_Identificacion', e.target.value, form.state.values);
+                                        form.setFieldValue('Identificacion', '');
+                                        setIdentificacionValidada('');
+                                        setFieldErrors(prev => {
+                                            const newErrors = { ...prev };
+                                            delete newErrors['Identificacion'];
+                                            return newErrors;
+                                        });
+                                    }}
+                                    className={commonClasses}
+                                >
+                                    <option value="">Seleccione tipo de identificación</option>
+                                    {TipoIdentificacionValues.map((tipo) => (
+                                        <option key={tipo} value={tipo}>{tipo}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+                    </form.Field>
+                </div>
+
+                {/* Número de Identificación */}
+                <div className="mb-3">
+                    <form.Field name="Identificacion">
+                        {(field) => (
+                            <div>
+                                <label className="block mb-1 font-medium">
+                                    Número de Identificación <span className="text-red-500">*</span>
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type="text"
                                         value={field.state.value}
-                                        onChange={(e) => {
-                                            field.handleChange(e.target.value);
-                                            validateField('Tipo_Identificacion', e.target.value, form.state.values);
-                                            form.setFieldValue('Identificacion', '');
-                                            setIdentificacionValidada('');
-                                            setFieldErrors(prev => {
-                                                const newErrors = { ...prev };
-                                                delete newErrors['Identificacion'];
-                                                return newErrors;
-                                            });
-                                        }}
-                                        className={commonClasses}
-                                    >
-                                        <option value="">Seleccione tipo de identificación</option>
-                                        {TipoIdentificacionValues.map((tipo) => (
-                                            <option key={tipo} value={tipo}>{tipo}</option>
-                                        ))}
-                                    </select>
+                                        onChange={(e) => handleCedulaChange(e.target.value)}
+                                        placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion as TipoIdentificacion)}
+                                        disabled={!form.state.values.Tipo_Identificacion || loadingCedula}
+                                        className={`${commonClasses} ${(fieldErrors['Identificacion'] || formErrors['Identificacion']) ? 'border-red-500 focus:ring-red-300' : ''} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                                        maxLength={
+                                            form.state.values.Tipo_Identificacion === 'Cedula Nacional' ? 9 :
+                                                form.state.values.Tipo_Identificacion === 'Dimex' ? 12 :
+                                                    form.state.values.Tipo_Identificacion === 'Pasaporte' ? 9 : 20
+                                        }
+                                    />
+                                    {loadingCedula && (
+                                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                            <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                            </svg>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                        </form.Field>
-                    </div>
+                                {fieldErrors['Identificacion'] && (
+                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors['Identificacion']}</span>
+                                )}
+                                {formErrors['Identificacion'] && !fieldErrors['Identificacion'] && (
+                                    <span className="text-red-500 text-sm block mt-1">{formErrors['Identificacion']}</span>
+                                )}
+                            </div>
+                        )}
+                    </form.Field>
+                </div>
 
-                    {/* Número de Identificación */}
-                    <div className="mb-3">
-                        <form.Field name="Identificacion">
-                            {(field) => (
-                                <div>
-                                    <label className="block mb-1 font-medium">
-                                        Número de Identificación <span className="text-red-500">*</span>
-                                    </label>
-                                    <div className="relative">
-                                        <input
-                                            type="text"
-                                            value={field.state.value}
-                                            onChange={(e) => handleCedulaChange(e.target.value)}
-                                            placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion as TipoIdentificacion)}
-                                            disabled={!form.state.values.Tipo_Identificacion || loadingCedula}
-                                            className={`${commonClasses} ${(fieldErrors['Identificacion'] || formErrors['Identificacion']) ? 'border-red-500 focus:ring-red-300' : ''} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                                            maxLength={
-                                                form.state.values.Tipo_Identificacion === 'Cedula Nacional' ? 9 :
-                                                    form.state.values.Tipo_Identificacion === 'Dimex' ? 12 :
-                                                        form.state.values.Tipo_Identificacion === 'Pasaporte' ? 9 : 20
-                                            }
-                                        />
-                                        {loadingCedula && (
-                                            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                                <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                </svg>
-                                            </div>
-                                        )}
+                {/* Nombre */}
+                <form.Field name="Nombre">
+                    {(field) => (
+                        <div className="mb-3">
+                            <label className="block mb-1 font-medium">Nombre <span className="text-red-500">*</span></label>
+                            <input
+                                type="text"
+                                value={field.state.value}
+                                onChange={(e) => {
+                                    const cleanValue = sanitizeNameInput(e.target.value);
+                                    field.handleChange(cleanValue);
+                                    validateField("Nombre", cleanValue, form.state.values);
+                                    saveToSessionStorage({ ...form.state.values, Nombre: cleanValue });
+                                }}
+                                placeholder={getPlaceholder("Nombre")}
+                                maxLength={50}
+                                className={commonClasses}
+                            />
+                            {fieldErrors["Nombre"] && (
+                                <span className="text-red-500 text-sm block mt-1">{fieldErrors["Nombre"]}</span>
+                            )}
+                        </div>
+                    )}
+                </form.Field>
+
+                {/* Primer Apellido */}
+                <form.Field name="Apellido1">
+                    {(field) => (
+                        <div className="mb-3">
+                            <label className="block mb-1 font-medium">Primer Apellido <span className="text-red-500">*</span></label>
+                            <input
+                                type="text"
+                                value={field.state.value}
+                                onChange={(e) => {
+                                    const cleanValue = sanitizeNameInput(e.target.value);
+                                    field.handleChange(cleanValue);
+                                    validateField("Apellido1", cleanValue, form.state.values);
+                                    saveToSessionStorage({ ...form.state.values, Apellido1: cleanValue });
+                                }}
+                                placeholder={getPlaceholder("Apellido1")}
+                                maxLength={50}
+                                className={commonClasses}
+                            />
+                            {fieldErrors["Apellido1"] && (
+                                <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido1"]}</span>
+                            )}
+                        </div>
+                    )}
+                </form.Field>
+
+                {/* Segundo Apellido */}
+                <form.Field name="Apellido2">
+                    {(field) => (
+                        <div className="mb-3">
+                            <label className="block mb-1 font-medium">Segundo Apellido</label>
+                            <input
+                                type="text"
+                                value={field.state.value}
+                                onChange={(e) => {
+                                    const cleanValue = sanitizeNameInput(e.target.value);
+                                    field.handleChange(cleanValue);
+                                    validateField("Apellido2", cleanValue, form.state.values);
+                                    saveToSessionStorage({ ...form.state.values, Apellido2: cleanValue });
+                                }}
+                                placeholder={getPlaceholder("Apellido2")}
+                                maxLength={50}
+                                className={commonClasses}
+                            />
+                            {fieldErrors["Apellido2"] && (
+                                <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido2"]}</span>
+                            )}
+                        </div>
+                    )}
+                </form.Field>
+
+                {/* Correo */}
+                <form.Field name="Correo">
+                    {(field) => (
+                        <div className="mb-3">
+                            <label className="block mb-1 font-medium">Correo Electrónico <span className="text-red-500">*</span></label>
+                            <input
+                                type="email"
+                                value={field.state.value}
+                                onChange={(e) => {
+                                    field.handleChange(e.target.value);
+                                    validateField("Correo", e.target.value, form.state.values);
+                                    saveToSessionStorage({ ...form.state.values, Correo: e.target.value });
+                                }}
+                                placeholder={getPlaceholder("Correo")}
+                                maxLength={100}
+                                className={commonClasses}
+                            />
+                            {fieldErrors["Correo"] && (
+                                <span className="text-red-500 text-sm block mt-1">{fieldErrors["Correo"]}</span>
+                            )}
+                        </div>
+                    )}
+                </form.Field>
+
+                {/* Número de Teléfono */}
+                <form.Field name="Numero_Telefono">
+                    {(field) => (
+                        <div className="mb-3">
+                            <label className="block mb-1 font-medium">Número de Teléfono <span className="text-red-500">*</span></label>
+                            <PhoneInputComponent
+                                value={field.state.value}
+                                onChange={(value) => {
+                                    field.handleChange(value);
+                                    validateField("Numero_Telefono", value, form.state.values);
+                                    saveToSessionStorage({ ...form.state.values, Numero_Telefono: value });
+                                }}
+                                hasError={!!fieldErrors["Numero_Telefono"] || !!formErrors["Numero_Telefono"]}
+                            />
+                            {fieldErrors["Numero_Telefono"] && (
+                                <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
+                            )}
+                        </div>
+                    )}
+                </form.Field>
+
+                {/* Dirección Exacta */}
+                <form.Field name="Direccion_Exacta">
+                    {(field) => (
+                        <div className="mb-3">
+                            <label className="block mb-1 font-medium">Dirección Exacta <span className="text-red-500">*</span></label>
+                            <input
+                                type="text"
+                                value={field.state.value}
+                                onChange={(e) => {
+                                    field.handleChange(e.target.value);
+                                    validateField("Direccion_Exacta", e.target.value, form.state.values);
+                                    saveToSessionStorage({ ...form.state.values, Direccion_Exacta: e.target.value });
+                                }}
+                                placeholder={getPlaceholder("Direccion_Exacta")}
+                                maxLength={255}
+                                className={commonClasses}
+                            />
+                            {fieldErrors["Direccion_Exacta"] && (
+                                <span className="text-red-500 text-sm block mt-1">{fieldErrors["Direccion_Exacta"]}</span>
+                            )}
+                        </div>
+                    )}
+                </form.Field>
+
+            </div>
+
+            {/* Archivos */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 mt-2">
+                <form.Field name="Planos_Terreno">
+                    {(field) => {
+                        const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
+                        return (
+                            <div className="w-full mb-2">
+                                <label className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
+                                <input
+                                    type="file"
+                                    accept=".png,.jpg,.jpeg,.heic,.pdf"
+                                    disabled={!!archivoActual}
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0] ?? null;
+                                        field.handleChange(file ?? undefined);
+                                        setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: file }));
+                                        validateField("Planos_Terreno", file);
+                                    }}
+                                    className="hidden"
+                                    id="planos_medidor_fisico"
+                                    ref={planosInputRef}
+                                    key={archivoActual ? archivoActual.name : 'planos'}
+                                />
+                                <label
+                                    htmlFor="planos_medidor_fisico"
+                                    className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
+                                >
+                                    {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
+                                </label>
+                                {archivoActual && (
+                                    <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
+                                        <span>{archivoActual.name}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                field.handleChange(undefined);
+                                                setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
+                                                setFieldErrors(prev => ({
+                                                    ...prev,
+                                                    ["Planos_Terreno"]: `Debe subir el plano del terreno`,
+                                                }));
+                                                if (planosInputRef.current) planosInputRef.current.value = "";
+                                            }}
+                                            className="text-red-500 hover:underline text-xs"
+                                        >
+                                            Eliminar
+                                        </button>
                                     </div>
-                                    {fieldErrors['Identificacion'] && (
-                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors['Identificacion']}</span>
-                                    )}
-                                    {formErrors['Identificacion'] && !fieldErrors['Identificacion'] && (
-                                        <span className="text-red-500 text-sm block mt-1">{formErrors['Identificacion']}</span>
-                                    )}
-                                </div>
-                            )}
-                        </form.Field>
-                    </div>
-
-                    {/* Nombre */}
-                    <form.Field name="Nombre">
-                        {(field) => (
-                            <div className="mb-3">
-                                <label className="block mb-1 font-medium">Nombre <span className="text-red-500">*</span></label>
+                                )}
+                                {fieldErrors["Planos_Terreno"] && (
+                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Planos_Terreno"]}</span>
+                                )}
+                                {formErrors["Planos_Terreno"] && !fieldErrors["Planos_Terreno"] && (
+                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Planos_Terreno"]}</span>
+                                )}
+                            </div>
+                        );
+                    }}
+                </form.Field>
+                <form.Field name="Escritura_Terreno">
+                    {(field) => {
+                        const archivoActual = archivoSeleccionado["Escritura_Terreno"] ?? null;
+                        return (
+                            <div className="w-full mb-2">
+                                <label className="block mb-1 font-medium">Escritura del terreno <span className="text-red-500">*</span></label>
                                 <input
-                                    type="text"
-                                    value={field.state.value}
+                                    type="file"
+                                    accept=".png,.jpg,.jpeg,.heic,.pdf"
+                                    disabled={!!archivoActual}
                                     onChange={(e) => {
-                                        const cleanValue = sanitizeNameInput(e.target.value);
-                                        field.handleChange(cleanValue);
-                                        validateField("Nombre", cleanValue, form.state.values);
-                                        saveToSessionStorage({ ...form.state.values, Nombre: cleanValue });
+                                        const file = e.target.files?.[0] ?? null;
+                                        field.handleChange(file ?? undefined);
+                                        setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: file }));
+                                        validateField("Escritura_Terreno", file);
                                     }}
-                                    placeholder={getPlaceholder("Nombre")}
-                                    maxLength={50}
-                                    className={commonClasses}
+                                    className="hidden"
+                                    id="escritura_medidor_fisico"
+                                    ref={escrituraInputRef}
+                                    key={archivoActual ? archivoActual.name : 'escritura'}
                                 />
-                                {fieldErrors["Nombre"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Nombre"]}</span>
+                                <label
+                                    htmlFor="escritura_medidor_fisico"
+                                    className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
+                                >
+                                    {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
+                                </label>
+                                {archivoActual && (
+                                    <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
+                                        <span>{archivoActual.name}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                field.handleChange(undefined);
+                                                setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: null }));
+                                                setFieldErrors(prev => ({
+                                                    ...prev,
+                                                    ["Escritura_Terreno"]: `Debe subir la escritura del terreno`,
+                                                }));
+                                                if (escrituraInputRef.current) escrituraInputRef.current.value = "";
+                                            }}
+                                            className="text-red-500 hover:underline text-xs"
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </div>
+                                )}
+                                {fieldErrors["Escritura_Terreno"] && (
+                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Escritura_Terreno"]}</span>
+                                )}
+                                {formErrors["Escritura_Terreno"] && !fieldErrors["Escritura_Terreno"] && (
+                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Escritura_Terreno"]}</span>
                                 )}
                             </div>
-                        )}
-                    </form.Field>
+                        );
+                    }}
+                </form.Field>
+            </div>
 
-                    {/* Primer Apellido */}
-                    <form.Field name="Apellido1">
-                        {(field) => (
-                            <div className="mb-3">
-                                <label className="block mb-1 font-medium">Primer Apellido <span className="text-red-500">*</span></label>
-                                <input
-                                    type="text"
-                                    value={field.state.value}
-                                    onChange={(e) => {
-                                        const cleanValue = sanitizeNameInput(e.target.value);
-                                        field.handleChange(cleanValue);
-                                        validateField("Apellido1", cleanValue, form.state.values);
-                                        saveToSessionStorage({ ...form.state.values, Apellido1: cleanValue });
-                                    }}
-                                    placeholder={getPlaceholder("Apellido1")}
-                                    maxLength={50}
-                                    className={commonClasses}
-                                />
-                                {fieldErrors["Apellido1"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido1"]}</span>
-                                )}
-                            </div>
-                        )}
-                    </form.Field>
-
-                    {/* Segundo Apellido */}
-                    <form.Field name="Apellido2">
-                        {(field) => (
-                            <div className="mb-3">
-                                <label className="block mb-1 font-medium">Segundo Apellido</label>
-                                <input
-                                    type="text"
-                                    value={field.state.value}
-                                    onChange={(e) => {
-                                        const cleanValue = sanitizeNameInput(e.target.value);
-                                        field.handleChange(cleanValue);
-                                        validateField("Apellido2", cleanValue, form.state.values);
-                                        saveToSessionStorage({ ...form.state.values, Apellido2: cleanValue });
-                                    }}
-                                    placeholder={getPlaceholder("Apellido2")}
-                                    maxLength={50}
-                                    className={commonClasses}
-                                />
-                                {fieldErrors["Apellido2"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido2"]}</span>
-                                )}
-                            </div>
-                        )}
-                    </form.Field>
-
-                    {/* Correo */}
-                    <form.Field name="Correo">
-                        {(field) => (
-                            <div className="mb-3">
-                                <label className="block mb-1 font-medium">Correo Electrónico <span className="text-red-500">*</span></label>
-                                <input
-                                    type="email"
-                                    value={field.state.value}
-                                    onChange={(e) => {
-                                        field.handleChange(e.target.value);
-                                        validateField("Correo", e.target.value, form.state.values);
-                                        saveToSessionStorage({ ...form.state.values, Correo: e.target.value });
-                                    }}
-                                    placeholder={getPlaceholder("Correo")}
-                                    maxLength={100}
-                                    className={commonClasses}
-                                />
-                                {fieldErrors["Correo"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Correo"]}</span>
-                                )}
-                            </div>
-                        )}
-                    </form.Field>
-
-                    {/* Número de Teléfono */}
-                    <form.Field name="Numero_Telefono">
-                        {(field) => (
-                            <div className="mb-3">
-                                <label className="block mb-1 font-medium">Número de Teléfono <span className="text-red-500">*</span></label>
-                                <PhoneInputComponent
-                                    value={field.state.value}
-                                    onChange={(value) => {
-                                        field.handleChange(value);
-                                        validateField("Numero_Telefono", value, form.state.values);
-                                        saveToSessionStorage({ ...form.state.values, Numero_Telefono: value });
-                                    }}
-                                    hasError={!!fieldErrors["Numero_Telefono"] || !!formErrors["Numero_Telefono"]}
-                                />
-                                {fieldErrors["Numero_Telefono"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
-                                )}
-                            </div>
-                        )}
-                    </form.Field>
-
-                    {/* Dirección Exacta */}
-                    <form.Field name="Direccion_Exacta">
-                        {(field) => (
-                            <div className="mb-3">
-                                <label className="block mb-1 font-medium">Dirección Exacta <span className="text-red-500">*</span></label>
-                                <input
-                                    type="text"
-                                    value={field.state.value}
-                                    onChange={(e) => {
-                                        field.handleChange(e.target.value);
-                                        validateField("Direccion_Exacta", e.target.value, form.state.values);
-                                        saveToSessionStorage({ ...form.state.values, Direccion_Exacta: e.target.value });
-                                    }}
-                                    placeholder={getPlaceholder("Direccion_Exacta")}
-                                    maxLength={255}
-                                    className={commonClasses}
-                                />
-                                {fieldErrors["Direccion_Exacta"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Direccion_Exacta"]}</span>
-                                )}
-                            </div>
-                        )}
-                    </form.Field>
-
-                </div>
-
-                {/* Archivos */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 mt-2">
-                    <form.Field name="Planos_Terreno">
-                        {(field) => {
-                            const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
-                            return (
-                                <div className="w-full mb-2">
-                                    <label className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
-                                    <input
-                                        type="file"
-                                        accept=".png,.jpg,.jpeg,.heic,.pdf"
-                                        disabled={!!archivoActual}
-                                        onChange={(e) => {
-                                            const file = e.target.files?.[0] ?? null;
-                                            field.handleChange(file ?? undefined);
-                                            setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: file }));
-                                            validateField("Planos_Terreno", file);
-                                        }}
-                                        className="hidden"
-                                        id="planos_medidor_fisico"
-                                        ref={planosInputRef}
-                                        key={archivoActual ? archivoActual.name : 'planos'}
-                                    />
-                                    <label
-                                        htmlFor="planos_medidor_fisico"
-                                        className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
-                                    >
-                                        {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
-                                    </label>
-                                    {archivoActual && (
-                                        <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
-                                            <span>{archivoActual.name}</span>
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    field.handleChange(undefined);
-                                                    setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
-                                                    setFieldErrors(prev => ({
-                                                        ...prev,
-                                                        ["Planos_Terreno"]: `Debe subir el plano del terreno`,
-                                                    }));
-                                                    if (planosInputRef.current) planosInputRef.current.value = "";
-                                                }}
-                                                className="text-red-500 hover:underline text-xs"
-                                            >
-                                                Eliminar
-                                            </button>
-                                        </div>
-                                    )}
-                                    {fieldErrors["Planos_Terreno"] && (
-                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors["Planos_Terreno"]}</span>
-                                    )}
-                                    {formErrors["Planos_Terreno"] && !fieldErrors["Planos_Terreno"] && (
-                                        <span className="text-red-500 text-sm block mt-1">{formErrors["Planos_Terreno"]}</span>
-                                    )}
-                                </div>
-                            );
-                        }}
-                    </form.Field>
-                    <form.Field name="Escritura_Terreno">
-                        {(field) => {
-                            const archivoActual = archivoSeleccionado["Escritura_Terreno"] ?? null;
-                            return (
-                                <div className="w-full mb-2">
-                                    <label className="block mb-1 font-medium">Escritura del terreno <span className="text-red-500">*</span></label>
-                                    <input
-                                        type="file"
-                                        accept=".png,.jpg,.jpeg,.heic,.pdf"
-                                        disabled={!!archivoActual}
-                                        onChange={(e) => {
-                                            const file = e.target.files?.[0] ?? null;
-                                            field.handleChange(file ?? undefined);
-                                            setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: file }));
-                                            validateField("Escritura_Terreno", file);
-                                        }}
-                                        className="hidden"
-                                        id="escritura_medidor_fisico"
-                                        ref={escrituraInputRef}
-                                        key={archivoActual ? archivoActual.name : 'escritura'}
-                                    />
-                                    <label
-                                        htmlFor="escritura_medidor_fisico"
-                                        className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
-                                    >
-                                        {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
-                                    </label>
-                                    {archivoActual && (
-                                        <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
-                                            <span>{archivoActual.name}</span>
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    field.handleChange(undefined);
-                                                    setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: null }));
-                                                    setFieldErrors(prev => ({
-                                                        ...prev,
-                                                        ["Escritura_Terreno"]: `Debe subir la escritura del terreno`,
-                                                    }));
-                                                    if (escrituraInputRef.current) escrituraInputRef.current.value = "";
-                                                }}
-                                                className="text-red-500 hover:underline text-xs"
-                                            >
-                                                Eliminar
-                                            </button>
-                                        </div>
-                                    )}
-                                    {fieldErrors["Escritura_Terreno"] && (
-                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors["Escritura_Terreno"]}</span>
-                                    )}
-                                    {formErrors["Escritura_Terreno"] && !fieldErrors["Escritura_Terreno"] && (
-                                        <span className="text-red-500 text-sm block mt-1">{formErrors["Escritura_Terreno"]}</span>
-                                    )}
-                                </div>
-                            );
-                        }}
-                    </form.Field>
-                </div>
-
-                {/* Botones */}
-                <div className="flex justify-end items-center gap-3 mt-8">
-                    <button
-                        type="submit"
-                        className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
-                        disabled={!identificacionValidada || loadingMedidores || mutation.isPending}
-                    >
-                        {mutation.isPending ? 'Enviando...' : 'Enviar Solicitud'}
-                    </button>
-                </div>
-            </form>
+            {/* Botones */}
+            <div className="flex justify-end items-center gap-3 mt-8">
+                <button
+                    type="submit"
+                    className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
+                    disabled={!identificacionValidada || loadingMedidores || mutation.isPending}
+                >
+                    {mutation.isPending ? 'Enviando...' : 'Enviar Solicitud'}
+                </button>
+            </div>
+        </form>
     );
 };
 

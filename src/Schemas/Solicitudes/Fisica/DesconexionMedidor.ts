@@ -47,7 +47,7 @@ export const DesconexionMedidorSchema = z.object({
       const phoneNumber = parsePhoneNumberFromString(phone || "");
       return !!phoneNumber && phoneNumber.isValid();
     }, {
-      message: 'Número de teléfono inválido'
+      message: 'número de teléfono válido con código de país, ej. +50688887777".'
     }),
 
   // Campos específicos de CreateSolicitudDesconexionFisicaDto

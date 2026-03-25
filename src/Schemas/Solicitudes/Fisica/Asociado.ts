@@ -1,3 +1,4 @@
+import parsePhoneNumberFromString from 'libphonenumber-js';
 import { z } from 'zod';
 
 // Tipo para TipoIdentificacion - Debe coincidir con el backend
@@ -50,10 +51,14 @@ export const AsociadoSchema = z.object({
     .transform(val => val.trim().toLowerCase()),
 
   Numero_Telefono: z.string()
-    .min(1, 'El número de teléfono no puede estar vacío')
-    .refine(val => val.trim().length > 0, 'El número de teléfono no puede estar vacío')
-    .transform(val => val.trim()),
-
+     .min(1, 'El número de teléfono no puede estar vacío')
+     .refine((phone) => {
+       const phoneNumber = parsePhoneNumberFromString(phone || "");
+       return !!phoneNumber && phoneNumber.isValid();
+     }, {
+       message: 'número de teléfono válido con código de país, ej. +50688887777".'
+     }),
+      
   // Validaciones específicas de CreateSolicitudAsociadoFisicaDto
   Motivo_Solicitud: z.string()
     .min(1, 'El motivo de la solicitud no puede estar vacío')

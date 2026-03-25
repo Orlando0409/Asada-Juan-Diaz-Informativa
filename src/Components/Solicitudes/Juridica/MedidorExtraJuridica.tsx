@@ -139,6 +139,7 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                 Direccion_Exacta: (value.Direccion_Exacta || '').trim(),
             };
 
+            // Ya no es necesario normalizar manualmente el teléfono, el schema lo hace
             // Validar con Zod
             const validation = MedidorExtraJuridicaSchema.safeParse(cleanedValue);
             if (!validation.success) {

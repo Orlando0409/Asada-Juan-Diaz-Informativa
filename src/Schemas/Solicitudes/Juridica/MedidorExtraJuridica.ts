@@ -2,6 +2,7 @@
 import { z } from 'zod';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
+
 export const MedidorExtraJuridicaSchema = z.object({
   Cedula_Juridica: z.string()
     .length(12, 'La cédula jurídica debe tener 12 caracteres')
@@ -26,6 +27,13 @@ export const MedidorExtraJuridicaSchema = z.object({
       return !!phoneNumber && phoneNumber.isValid();
     }, {
       message: 'Debe ingresar un número de teléfono válido con código de país, ej. +50688887777'
+    })
+    .transform((phone) => {
+      const phoneNumber = parsePhoneNumberFromString(phone || "");
+      if (!phoneNumber || !phoneNumber.isValid()) {
+        throw new Error('Debe ingresar un número de teléfono válido con código de país, ej. +50688887777');
+      }
+      return phoneNumber.format('E.164');
     }),
 
   Direccion_Exacta: z.string()

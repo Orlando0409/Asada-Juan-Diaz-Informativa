@@ -467,6 +467,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   onChange={(value) => {
                     field.handleChange(value || "");
                     saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" });
+                    validateField("Numero_Telefono", value || "");
                   }}
                   className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
                 />

@@ -174,8 +174,7 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
     try {
       normalizePhoneNumber(values.Numero_Telefono ?? "");
     } catch (error: any) {
-      validationErrors["Numero_Telefono"] =
-        error?.message || 'El número debe incluir el código de país y comenzar con "+".';
+      validationErrors["Numero_Telefono"] = 'Número de teléfono inválido';
     }
 
     const validation = AfiliacionSchema.safeParse(values);
@@ -183,7 +182,12 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
       validation.error.errors.forEach((err) => {
         const field = err.path[0] as string;
         if (!validationErrors[field]) {
-          validationErrors[field] = err.message;
+          // Si el error es de teléfono, usar el mensaje del backend
+          if (field === "Numero_Telefono") {
+            validationErrors[field] = 'Número de teléfono inválido';
+          } else {
+            validationErrors[field] = err.message;
+          }
         }
       });
     }

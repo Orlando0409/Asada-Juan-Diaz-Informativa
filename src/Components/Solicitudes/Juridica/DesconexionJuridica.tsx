@@ -15,7 +15,7 @@ type Props = {
 };
 const STORAGE_KEY = 'desconexionmedidor_juridica_temp';
 
-const normalizePhoneNumber = (phone: string): string => {
+export const normalizePhoneNumber = (phone: string): string => {
     const phoneNumber = parsePhoneNumberFromString(phone);
     if (!phoneNumber?.isValid()) {
         throw new Error('Debe ingresar un número de teléfono válido con código de país, ej. +50688887777');
@@ -193,7 +193,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
         }
     }, []);
 
-  //strar alert cuando se verifica afiliación (igual que DesconexionFisica)
+    //strar alert cuando se verifica afiliación (igual que DesconexionFisica)
     useEffect(() => {
         if (
             cedulaJuridica &&
