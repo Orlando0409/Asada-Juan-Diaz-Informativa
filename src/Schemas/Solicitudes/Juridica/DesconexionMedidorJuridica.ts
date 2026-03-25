@@ -50,7 +50,7 @@ export const DesconexionJuridicaSchema = z.object({
     .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), 'Solo se aceptan archivos .jpg, .jpeg, .png, .heic, .pdf')
     .optional(),
 
-  Escritura_Terreno: z
+  Certificacion_Literal: z
     .instanceof(File)
     .refine((file) => file.size <= MAX_FILE_SIZE, 'El archivo no debe exceder 5MB')
 

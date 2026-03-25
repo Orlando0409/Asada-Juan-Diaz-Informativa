@@ -22,7 +22,7 @@ export interface CambioMedidor {
   Motivo_Solicitud: string;
   Id_Medidor: number;
   Planos_Terreno?: File | string;
-  Escritura_Terreno?: File | string;
+  Certificacion_Literal?: File | string;
 }
 
 export const CambioMedidorInicialState: CambioMedidorFisico = {
@@ -50,5 +50,5 @@ export interface CambioMedidorFisico {
   Motivo_Solicitud: string;
   Id_Medidor: number;
   Planos_Terreno?: File | string;
-  Escritura_Terreno?: File | string;
+  Certificacion_Literal?: File | string;
 }

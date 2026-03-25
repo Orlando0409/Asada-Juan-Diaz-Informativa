@@ -90,10 +90,10 @@ export const AfiliacionSchema = z.object({
       'El plano del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
     ),
 
-  Escritura_Terreno: z.instanceof(File, { message: "Debe subir la escritura del terreno" })
+  Certificacion_Literal: z.instanceof(File, { message: "Debe subir la certificacion literal del terreno" })
     .refine(
       file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
-      'La escritura del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
+      'La certificacion literal del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
     ),
 }).refine(
   (data) => {

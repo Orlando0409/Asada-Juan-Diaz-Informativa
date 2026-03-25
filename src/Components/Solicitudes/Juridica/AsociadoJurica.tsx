@@ -141,7 +141,7 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                 const parsed = JSON.parse(savedData);
                 // Cargar los valores en el formulario
                 Object.entries(parsed).forEach(([key, value]) => {
-                    if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
+                    if (key !== 'Planos_Terreno' && key !== 'Certificacion_Literal') {
                         form.setFieldValue(key as any, value as any);
                     }
                 });

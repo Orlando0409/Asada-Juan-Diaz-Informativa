@@ -51,7 +51,7 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                 Numero_Telefono: "+50688887777",
                 Correo: "test@test.com",
                 Planos_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
-                Escritura_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
+                Certificacion_Literal: new File([''], 'test.jpg', { type: 'image/jpeg' }),
             };
 
             if (fieldName === "Identificacion" && allValues?.Tipo_Identificacion) {
@@ -177,7 +177,7 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
             Direccion_Exacta: '',
             Numero_Telefono: '',
             Planos_Terreno: undefined as File | undefined,
-            Escritura_Terreno: undefined as File | undefined,
+            Certificacion_Literal: undefined as File | undefined,
         },
 
         onSubmit: async ({ value }) => {
@@ -542,123 +542,123 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
 
             </div>
 
-            {/* Archivos */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 mt-2">
-                <form.Field name="Planos_Terreno">
-                    {(field) => {
-                        const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
-                        return (
-                            <div className="w-full mb-2">
-                                <label className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
-                                <input
-                                    type="file"
-                                    accept=".png,.jpg,.jpeg,.heic,.pdf"
-                                    disabled={!!archivoActual}
-                                    onChange={(e) => {
-                                        const file = e.target.files?.[0] ?? null;
-                                        field.handleChange(file ?? undefined);
-                                        setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: file }));
-                                        validateField("Planos_Terreno", file);
-                                    }}
-                                    className="hidden"
-                                    id="planos_medidor_fisico"
-                                    ref={planosInputRef}
-                                    key={archivoActual ? archivoActual.name : 'planos'}
-                                />
-                                <label
-                                    htmlFor="planos_medidor_fisico"
-                                    className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
-                                >
-                                    {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
-                                </label>
-                                {archivoActual && (
-                                    <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
-                                        <span>{archivoActual.name}</span>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                field.handleChange(undefined);
-                                                setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
-                                                setFieldErrors(prev => ({
-                                                    ...prev,
-                                                    ["Planos_Terreno"]: `Debe subir el plano del terreno`,
-                                                }));
-                                                if (planosInputRef.current) planosInputRef.current.value = "";
-                                            }}
-                                            className="text-red-500 hover:underline text-xs"
-                                        >
-                                            Eliminar
-                                        </button>
-                                    </div>
-                                )}
-                                {fieldErrors["Planos_Terreno"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Planos_Terreno"]}</span>
-                                )}
-                                {formErrors["Planos_Terreno"] && !fieldErrors["Planos_Terreno"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Planos_Terreno"]}</span>
-                                )}
-                            </div>
-                        );
-                    }}
-                </form.Field>
-                <form.Field name="Escritura_Terreno">
-                    {(field) => {
-                        const archivoActual = archivoSeleccionado["Escritura_Terreno"] ?? null;
-                        return (
-                            <div className="w-full mb-2">
-                                <label className="block mb-1 font-medium">Escritura del terreno <span className="text-red-500">*</span></label>
-                                <input
-                                    type="file"
-                                    accept=".png,.jpg,.jpeg,.heic,.pdf"
-                                    disabled={!!archivoActual}
-                                    onChange={(e) => {
-                                        const file = e.target.files?.[0] ?? null;
-                                        field.handleChange(file ?? undefined);
-                                        setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: file }));
-                                        validateField("Escritura_Terreno", file);
-                                    }}
-                                    className="hidden"
-                                    id="escritura_medidor_fisico"
-                                    ref={escrituraInputRef}
-                                    key={archivoActual ? archivoActual.name : 'escritura'}
-                                />
-                                <label
-                                    htmlFor="escritura_medidor_fisico"
-                                    className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
-                                >
-                                    {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
-                                </label>
-                                {archivoActual && (
-                                    <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
-                                        <span>{archivoActual.name}</span>
-                                        <button
-                                            type="button"
-                                            onClick={() => {
-                                                field.handleChange(undefined);
-                                                setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: null }));
-                                                setFieldErrors(prev => ({
-                                                    ...prev,
-                                                    ["Escritura_Terreno"]: `Debe subir la escritura del terreno`,
-                                                }));
-                                                if (escrituraInputRef.current) escrituraInputRef.current.value = "";
-                                            }}
-                                            className="text-red-500 hover:underline text-xs"
-                                        >
-                                            Eliminar
-                                        </button>
-                                    </div>
-                                )}
-                                {fieldErrors["Escritura_Terreno"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Escritura_Terreno"]}</span>
-                                )}
-                                {formErrors["Escritura_Terreno"] && !fieldErrors["Escritura_Terreno"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Escritura_Terreno"]}</span>
-                                )}
-                            </div>
-                        );
-                    }}
-                </form.Field>
-            </div>
+                {/* Archivos */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 mt-2">
+                    <form.Field name="Planos_Terreno">
+                        {(field) => {
+                            const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
+                            return (
+                                <div className="w-full mb-2">
+                                    <label className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
+                                    <input
+                                        type="file"
+                                        accept=".png,.jpg,.jpeg,.heic,.pdf"
+                                        disabled={!!archivoActual}
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0] ?? null;
+                                            field.handleChange(file ?? undefined);
+                                            setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: file }));
+                                            validateField("Planos_Terreno", file);
+                                        }}
+                                        className="hidden"
+                                        id="planos_medidor_fisico"
+                                        ref={planosInputRef}
+                                        key={archivoActual ? archivoActual.name : 'planos'}
+                                    />
+                                    <label
+                                        htmlFor="planos_medidor_fisico"
+                                        className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
+                                    >
+                                        {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
+                                    </label>
+                                    {archivoActual && (
+                                        <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
+                                            <span>{archivoActual.name}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    field.handleChange(undefined);
+                                                    setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
+                                                    setFieldErrors(prev => ({
+                                                        ...prev,
+                                                        ["Planos_Terreno"]: `Debe subir el plano del terreno`,
+                                                    }));
+                                                    if (planosInputRef.current) planosInputRef.current.value = "";
+                                                }}
+                                                className="text-red-500 hover:underline text-xs"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </div>
+                                    )}
+                                    {fieldErrors["Planos_Terreno"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors["Planos_Terreno"]}</span>
+                                    )}
+                                    {formErrors["Planos_Terreno"] && !fieldErrors["Planos_Terreno"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{formErrors["Planos_Terreno"]}</span>
+                                    )}
+                                </div>
+                            );
+                        }}
+                    </form.Field>
+                    <form.Field name="Certificacion_Literal">
+                        {(field) => {
+                            const archivoActual = archivoSeleccionado["Certificacion_Literal"] ?? null;
+                            return (
+                                <div className="w-full mb-2">
+                                    <label className="block mb-1 font-medium">Certificacion Literal del terreno <span className="text-red-500">*</span></label>
+                                    <input
+                                        type="file"
+                                        accept=".png,.jpg,.jpeg,.heic,.pdf"
+                                        disabled={!!archivoActual}
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0] ?? null;
+                                            field.handleChange(file ?? undefined);
+                                            setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: file }));
+                                            validateField("Certificacion_Literal", file);
+                                        }}
+                                        className="hidden"
+                                        id="escritura_medidor_fisico"
+                                        ref={escrituraInputRef}
+                                        key={archivoActual ? archivoActual.name : 'escritura'}
+                                    />
+                                    <label
+                                        htmlFor="escritura_medidor_fisico"
+                                        className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
+                                    >
+                                        {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
+                                    </label>
+                                    {archivoActual && (
+                                        <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
+                                            <span>{archivoActual.name}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    field.handleChange(undefined);
+                                                    setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: null }));
+                                                    setFieldErrors(prev => ({
+                                                        ...prev,
+                                                        ["Certificacion_Literal"]: `Debe subir la certificacion literal del terreno`,
+                                                    }));
+                                                    if (escrituraInputRef.current) escrituraInputRef.current.value = "";
+                                                }}
+                                                className="text-red-500 hover:underline text-xs"
+                                            >
+                                                Eliminar
+                                            </button>
+                                        </div>
+                                    )}
+                                    {fieldErrors["Certificacion_Literal"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors["Certificacion_Literal"]}</span>
+                                    )}
+                                    {formErrors["Certificacion_Literal"] && !fieldErrors["Certificacion_Literal"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{formErrors["Certificacion_Literal"]}</span>
+                                    )}
+                                </div>
+                            );
+                        }}
+                    </form.Field>
+                </div>
 
             {/* Botones */}
             <div className="flex justify-end items-center gap-3 mt-8">

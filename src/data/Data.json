@@ -90,8 +90,8 @@
         "type": "file",
         "required": true
       },
-      "Escritura_Terreno": {
-        "label": "Escritura del terreno",
+      "Certificacion_Literal": {
+        "label": "Certificacion Literal del terreno",
         "type": "file",
         "required": true
       }
@@ -199,8 +199,8 @@
         "type": "file",
         "required": true
       },
-      "Escritura_Terreno": {
-        "label": "Escritura del terreno",
+      "Certificacion_Literal": {
+        "label": "Certificacion Literal del terreno",
         "type": "file",
         "required": true
       }
@@ -293,8 +293,8 @@
         "type": "file",
         "required": true
       },
-      "Escritura_Terreno": {
-        "label": "Escritura del terreno",
+      "Certificacion_Literal": {
+        "label": "Certificacion Literal del terreno",
         "type": "file",
         "required": true
       }
@@ -332,8 +332,8 @@
         "type": "file",
         "required": true
       },
-      "Escritura_Terreno": {
-        "label": "Escritura del terreno",
+      "Certificacion_Literal": {
+        "label": "Certificacion Literal del terreno",
         "type": "file",
         "required": true
       }
@@ -374,8 +374,8 @@
         "type": "file",
         "required": true
       },
-      "Escritura_Terreno": {
-        "label": "Escritura del terreno",
+      "Certificacion_Literal": {
+        "label": "Certificacion Literal del terreno",
         "type": "file",
         "required": true
       }
@@ -475,8 +475,8 @@
         "type": "file",
         "required": true
       },
-      "Escritura_Terreno": {
-        "label": "Escritura del terreno",
+      "Certificacion_Literal": {
+        "label": "Certificacion Literal del terreno",
         "type": "file",
         "required": true
       }

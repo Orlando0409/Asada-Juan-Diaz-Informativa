@@ -47,7 +47,7 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
         Numero_Telefono: "+50688887777",
         Correo: "test@test.com",
         Planos_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
-        Escritura_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
+        Certificacion_Literal: new File([''], 'test.jpg', { type: 'image/jpeg' }),
       };
 
       if (fieldName === "Identificacion" && allValues?.Tipo_Identificacion) {
@@ -208,7 +208,7 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
       Numero_Telefono: '',
       Edad: undefined as number | undefined,
       Planos_Terreno: undefined as File | undefined,
-      Escritura_Terreno: undefined as File | undefined,
+      Certificacion_Literal: undefined as File | undefined,
       Motivo_Solicitud: '',
     },
 
@@ -278,7 +278,7 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
         const parsed = JSON.parse(savedData);
         // Cargar los valores en el formulario
         Object.entries(parsed).forEach(([key, value]) => {
-          if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
+          if (key !== 'Planos_Terreno' && key !== 'Certificacion_Literal') {
             form.setFieldValue(key as any, value as any);
           }
         });
@@ -609,131 +609,131 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
             </form.Field>
           </div>
 
-          {/* Archivos */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-            <form.Field name="Planos_Terreno">
-              {(field) => {
-                const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
-                return (
-                  <div className="w-full mb-2">
-                    <label htmlFor="Planos_Terreno" className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
-                    <input
-                      type="file"
-                      accept=".png,.jpg,.jpeg,.heic,.pdf"
-                      disabled={!!archivoActual}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0] ?? null;
-                        field.handleChange(file ?? undefined);
-                        setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: file }));
-                        validateField("Planos_Terreno", file);
-                      }}
-                      className="hidden"
-                      id="Planos_Terreno"
-                      ref={planosInputRef}
-                      key={archivoActual ? archivoActual.name : 'planos'}
-                    />
-                    <label
-                      htmlFor="Planos_Terreno"
-                      className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
-                    >
-                      {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
-                    </label>
-                    {archivoActual && (
-                      <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
-                        <span>{archivoActual.name}</span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            field.handleChange(undefined);
-                            setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
-                            setFieldErrors(prev => ({
-                              ...prev,
-                              ["Planos_Terreno"]: `Debe subir el plano del terreno`,
-                            }));
-                            if (planosInputRef.current) planosInputRef.current.value = "";
-                          }}
-                          className="text-red-500 hover:underline text-xs"
-                        >
-                          Eliminar
-                        </button>
-                      </div>
-                    )}
-                    {fieldErrors["Planos_Terreno"] && (
-                      <span className="text-red-500 text-sm block mt-1">
-                        {fieldErrors["Planos_Terreno"]}
-                      </span>
-                    )}
-                    {formErrors["Planos_Terreno"] && !fieldErrors["Planos_Terreno"] && (
-                      <span className="text-red-500 text-sm block mt-1">
-                        {formErrors["Planos_Terreno"]}
-                      </span>
-                    )}
-                  </div>
-                );
-              }}
-            </form.Field>
-            <form.Field name="Escritura_Terreno">
-              {(field) => {
-                const archivoActual = archivoSeleccionado["Escritura_Terreno"] ?? null;
-                return (
-                  <div className="w-full mb-2">
-                    <label htmlFor="Escritura_Terreno" className="block mb-1 font-medium">Escritura del terreno <span className="text-red-500">*</span></label>
-                    <input
-                      type="file"
-                      accept=".png,.jpg,.jpeg,.heic,.pdf"  // 🔥 CAMBIO: Agregué .pdf
-                      disabled={!!archivoActual}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0] ?? null;
-                        field.handleChange(file ?? undefined);
-                        setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: file }));
-                        validateField("Escritura_Terreno", file);
-                      }}
-                      className="hidden"
-                      id="Escritura_Terreno"
-                      ref={escrituraInputRef}
-                      key={archivoActual ? archivoActual.name : 'escritura'}
-                    />
-                    <label
-                      htmlFor="Escritura_Terreno"
-                      className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
-                    >
-                      {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
-                    </label>
-                    {archivoActual && (
-                      <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
-                        <span>{archivoActual.name}</span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            field.handleChange(undefined);
-                            setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: null }));
-                            setFieldErrors(prev => ({
-                              ...prev,
-                              ["Escritura_Terreno"]: `Debe subir la escritura del terreno`,
-                            }));
-                            if (escrituraInputRef.current) escrituraInputRef.current.value = "";
-                          }}
-                          className="text-red-500 hover:underline text-xs"
-                        >
-                          Eliminar
-                        </button>
-                      </div>
-                    )}
-                    {fieldErrors["Escritura_Terreno"] && (
-                      <span className="text-red-500 text-sm block mt-1">
-                        {fieldErrors["Escritura_Terreno"]}
-                      </span>
-                    )}
-                    {formErrors["Escritura_Terreno"] && !fieldErrors["Escritura_Terreno"] && (
-                      <span className="text-red-500 text-sm block mt-1">
-                        {formErrors["Escritura_Terreno"]}
-                      </span>
-                    )}
-                  </div>
-                );
-              }}
-            </form.Field>
-          </div>
+            {/* Archivos */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+              <form.Field name="Planos_Terreno">
+                {(field) => {
+                  const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
+                  return (
+                    <div className="w-full mb-2">
+                      <label htmlFor="Planos_Terreno" className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
+                      <input
+                        type="file"
+                        accept=".png,.jpg,.jpeg,.heic,.pdf"
+                        disabled={!!archivoActual}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0] ?? null;
+                          field.handleChange(file ?? undefined);
+                          setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: file }));
+                          validateField("Planos_Terreno", file);
+                        }}
+                        className="hidden"
+                        id="Planos_Terreno"
+                        ref={planosInputRef}
+                        key={archivoActual ? archivoActual.name : 'planos'}
+                      />
+                      <label
+                        htmlFor="Planos_Terreno"
+                        className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
+                      >
+                        {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
+                      </label>
+                      {archivoActual && (
+                        <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
+                          <span>{archivoActual.name}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              field.handleChange(undefined);
+                              setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
+                              setFieldErrors(prev => ({
+                                ...prev,
+                                ["Planos_Terreno"]: `Debe subir el plano del terreno`,
+                              }));
+                              if (planosInputRef.current) planosInputRef.current.value = "";
+                            }}
+                            className="text-red-500 hover:underline text-xs"
+                          >
+                            Eliminar
+                          </button>
+                        </div>
+                      )}
+                      {fieldErrors["Planos_Terreno"] && (
+                        <span className="text-red-500 text-sm block mt-1">
+                          {fieldErrors["Planos_Terreno"]}
+                        </span>
+                      )}
+                      {formErrors["Planos_Terreno"] && !fieldErrors["Planos_Terreno"] && (
+                        <span className="text-red-500 text-sm block mt-1">
+                          {formErrors["Planos_Terreno"]}
+                        </span>
+                      )}
+                    </div>
+                  );
+                }}
+              </form.Field>
+      <form.Field name="Certificacion_Literal">
+        {(field) => {
+          const archivoActual = archivoSeleccionado["Certificacion_Literal"] ?? null;
+                  return (
+                    <div className="w-full mb-2">
+                      <label htmlFor="Certificacion_Literal" className="block mb-1 font-medium">Certificacion Literal del terreno <span className="text-red-500">*</span></label>
+                      <input
+                        type="file"
+                        accept=".png,.jpg,.jpeg,.heic,.pdf"  // 🔥 CAMBIO: Agregué .pdf
+                        disabled={!!archivoActual}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0] ?? null;
+                          field.handleChange(file ?? undefined);
+                          setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: file }));
+                          validateField("Certificacion_Literal", file);
+                        }}
+                        className="hidden"
+                        id="Certificacion_Literal"
+                        ref={escrituraInputRef}
+                        key={archivoActual ? archivoActual.name : 'escritura'}
+                      />
+                      <label
+                        htmlFor="Certificacion_Literal"
+                        className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
+                      >
+                        {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
+                      </label>
+                      {archivoActual && (
+                        <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
+                          <span>{archivoActual.name}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              field.handleChange(undefined);
+                              setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: null }));
+                              setFieldErrors(prev => ({
+                                ...prev,
+                                ["Certificacion_Literal"]: `Debe subir la certificacion literal del terreno`,
+                              }));
+                              if (escrituraInputRef.current) escrituraInputRef.current.value = "";
+                            }}
+                            className="text-red-500 hover:underline text-xs"
+                          >
+                            Eliminar
+                          </button>
+                        </div>
+                      )}
+                      {fieldErrors["Certificacion_Literal"] && (
+                        <span className="text-red-500 text-sm block mt-1">
+                          {fieldErrors["Certificacion_Literal"]}
+                        </span>
+                      )}
+                      {formErrors["Certificacion_Literal"] && !fieldErrors["Certificacion_Literal"] && (
+                        <span className="text-red-500 text-sm block mt-1">
+                          {formErrors["Certificacion_Literal"]}
+                        </span>
+                      )}
+                    </div>
+                  );
+                }}
+              </form.Field>
+            </div>
 
 
           <div className="flex justify-center gap-4 mt-6 ml-50">
