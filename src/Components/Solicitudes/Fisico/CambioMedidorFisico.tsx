@@ -103,7 +103,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
     }
   };
 
-  const handleCedulaChange = (cedula: string) => {
+  const handleCedulaChange = async (cedula: string) => {
     const tipoId = form.state.values.Tipo_Identificacion;
     const identificacionProcesada = handleIdentificacionInput(cedula, tipoId);
 
@@ -116,6 +116,15 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
       delete newErrors['Identificacion'];
       return newErrors;
     });
+
+    if (tipoId === 'Cedula Nacional' && /^\d{9}$/.test(identificacionProcesada)) {
+      const resultado = await lookup(identificacionProcesada);
+      if (resultado) {
+        form.setFieldValue('Nombre', resultado.firstname || '');
+        form.setFieldValue('Apellido1', resultado.lastname1 || '');
+        form.setFieldValue('Apellido2', resultado.lastname2 || '');
+      }
+    }
     // Ya no se valida afiliación aquí
   };
 
