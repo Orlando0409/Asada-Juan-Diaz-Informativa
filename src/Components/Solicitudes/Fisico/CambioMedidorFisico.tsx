@@ -459,22 +459,27 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
             )}
           </form.Field>
           <form.Field name="Numero_Telefono">
-            {(field) => (
-              <div className="mb-3 w-full">
-                <label htmlFor="Numero_Telefono" className="block mb-1 font-medium">Número de teléfono <span className="text-red-500">*</span></label>
-                <PhoneInputComponent
-                  value={field.state.value}
-                  onChange={(value) => {
-                    field.handleChange(value || "");
-                    saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" });
-                  }}
-                  className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
-                />
-                {fieldErrors["Numero_Telefono"] && (
-                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
-                )}
-              </div>
-            )}
+            {(field) => {
+              // Mostrar error solo si el campo está tocado o el valor tiene al menos 2 caracteres
+              const showError = !!fieldErrors["Numero_Telefono"] && (field.state.meta.isTouched || (field.state.value && field.state.value.length >= 2));
+              return (
+                <div className="mb-3 w-full">
+                  <label htmlFor="Numero_Telefono" className="block mb-1 font-medium">Número de teléfono <span className="text-red-500">*</span></label>
+                  <PhoneInputComponent
+                    value={field.state.value}
+                    onChange={(value) => {
+                      field.handleChange(value || "");
+                      saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" });
+                      validateField("Numero_Telefono", value || "", form.state.values); // Validar en cada cambio para mostrar error en tiempo real
+                    }}
+                    className={`${showError ? 'border-red-500' : ''}`}
+                  />
+                  {showError && (
+                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
+                  )}
+                </div>
+              );
+            }}
           </form.Field>
 
           {/* Número de Medidor y Motivo */}
@@ -489,8 +494,13 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                       id="Id_Medidor"
                       value={field.state.value || ''}
                       onChange={(e) => {
-                        const idMedidor = Number(e.target.value);
-                        field.handleChange(idMedidor);
+                        const val = e.target.value;
+                        if (val === '' || val === undefined) {
+                          field.handleChange(0); // Usa 0 como valor por defecto
+                        } else {
+                          const idMedidor = Number(val);
+                          field.handleChange(isNaN(idMedidor) ? 0 : idMedidor);
+                        }
                       }}
                       onBlur={field.handleBlur}
                       className={commonClasses}
@@ -657,18 +667,31 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
           {/* Botones */}
 
           <div className="flex justify-end items-center gap-3 mt-8">
-          <button
-                        type="submit"
-                        className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
-                        disabled={
-                            isSending ||
-                            Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
-                            Object.values(fieldErrors).some(Boolean) ||
-                            Object.values(formErrors).some(Boolean)
-                        }
-                    >
-                        {isSending ? 'Enviando...' : 'Enviar Solicitud'}
-                    </button>
+            <button
+              type="submit"
+              className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
+              disabled={
+                isSending ||
+                Object.values(fieldErrors).some(Boolean) ||
+                Object.values(formErrors).some(Boolean) ||
+                [
+                  form.state.values.Nombre,
+                  form.state.values.Apellido1,
+                  form.state.values.Apellido2,
+                  form.state.values.Tipo_Identificacion,
+                  form.state.values.Identificacion,
+                  form.state.values.Correo,
+                  form.state.values.Direccion_Exacta,
+                  form.state.values.Numero_Telefono,
+                  form.state.values.Id_Medidor,
+                  form.state.values.Motivo_Solicitud,
+                  form.state.values.Planos_Terreno,
+                  form.state.values.Certificacion_Literal
+                ].some(val => val === undefined || val === null || val === "")
+              }
+            >
+              {isSending ? 'Enviando...' : 'Enviar Solicitud'}
+            </button>
             <button
               type="button"
               onClick={onClose}
