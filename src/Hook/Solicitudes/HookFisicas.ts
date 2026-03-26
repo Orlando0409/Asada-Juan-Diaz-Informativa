@@ -76,7 +76,7 @@ export const useAsociadoFisica = () => {
     const { showSuccess, showError } = useAlerts();
 
     const createAsociadoFisicoMutation = useMutation({
-        mutationFn: (data: AsociadoFisico) => createAsociadoFisica(data),
+        mutationFn: (data: FormData) => createAsociadoFisica(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["asociado"] });
             showSuccess("¡Solicitud creada!", "La solicitud de asociado ha sido creada con éxito.");
@@ -84,7 +84,13 @@ export const useAsociadoFisica = () => {
         onError: (error: any) => {
             const errorMessage = error?.response?.data?.message || 'Error al enviar el formulario.';
             console.log("Error al crear la solicitud:", error?.response?.data || error);
-            showError("Error", errorMessage);
+            // Si el error es "Ya existe una solicitud activa de afiliación...", solo mostrar warning pero no bloquear
+            if (typeof errorMessage === 'string' && errorMessage.includes('afiliación')) {
+                showError("Advertencia", errorMessage);
+                queryClient.invalidateQueries({ queryKey: ["asociado"] });
+            } else {
+                showError("Error", errorMessage);
+            }
         },
     });
 

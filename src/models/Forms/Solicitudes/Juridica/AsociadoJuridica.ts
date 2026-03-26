@@ -4,6 +4,8 @@ export interface AsociadoJuridico {
   Correo: string;
   Numero_Telefono: string;
   Motivo_Solicitud: string;
+  Planos_Terreno?: File | string;
+  Escrituras_Terreno?: File | string;
 }
 
 export const AsociadoJuridicoInicialState: AsociadoJuridico = {
@@ -12,6 +14,8 @@ export const AsociadoJuridicoInicialState: AsociadoJuridico = {
   Correo: '',
   Numero_Telefono: '',
   Motivo_Solicitud: '',
+  Escrituras_Terreno: undefined,
+  Planos_Terreno: undefined,
 };
 
 export interface AsociadoJuridicoFormData {
@@ -20,4 +24,7 @@ export interface AsociadoJuridicoFormData {
   Correo: string;
   Numero_Telefono: string;
   Motivo_Solicitud: string;
+  Planos_Terreno?: File | string;
+   Escrituras_Terreno?: File | string;
+
 }

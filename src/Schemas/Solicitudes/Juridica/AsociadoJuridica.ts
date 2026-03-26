@@ -19,7 +19,7 @@ export const AsociadoJuridicaSchema = z.object({
       const phoneNumber = parsePhoneNumberFromString(phone || "");
       return !!phoneNumber && phoneNumber.isValid();
     }, {
-      message: 'Debe ingresar un número de teléfono válido con código de país, ej. +50688887777'
+      message: 'Debe ingresar un número de teléfono válido'
     }),
 
   Motivo_Solicitud: z.string()

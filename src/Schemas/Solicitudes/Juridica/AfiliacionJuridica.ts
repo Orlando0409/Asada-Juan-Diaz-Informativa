@@ -22,7 +22,7 @@ export const AfiliacionJuridicaSchema = z.object({
       const phoneNumber = parsePhoneNumberFromString(phone || "");
       return !!phoneNumber && phoneNumber.isValid();
     }, {
-      message: 'Debe ingresar un número de teléfono válido con código de país, ej. +50688887777'
+      message: 'Debe ingresar un número de teléfono válido'
     }),
 
   Direccion_Exacta: z.string()
