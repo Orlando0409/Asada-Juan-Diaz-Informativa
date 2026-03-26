@@ -451,7 +451,9 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                             isSending ||
                             Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
                             Object.values(fieldErrors).some(Boolean) ||
-                            Object.values(formErrors).some(Boolean)
+                            Object.values(formErrors).some(Boolean)||
+                          !archivoSeleccionado["Planos_Terreno"] ||
+                          !archivoSeleccionado["Escrituras_Terreno"]
                         }
                     >
                         {isSending ? 'Enviando...' : 'Enviar Solicitud'}

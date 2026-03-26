@@ -653,10 +653,12 @@ const FormularioAsociado = ({ onClose }: Props) => {
                         type="submit"
                         className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
                         disabled={
-                            isSending ||
-                            Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
-                            Object.values(fieldErrors).some(Boolean) ||
-                            Object.values(formErrors).some(Boolean)
+                          isSending ||
+                          Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
+                          Object.values(fieldErrors).some(Boolean) ||
+                          Object.values(formErrors).some(Boolean) ||
+                          !archivoSeleccionado["Planos_Terreno"] ||
+                          !archivoSeleccionado["Escrituras_Terreno"]
                         }
                     >
                         {isSending ? 'Enviando...' : 'Enviar Solicitud'}
