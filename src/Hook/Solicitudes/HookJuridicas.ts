@@ -77,7 +77,7 @@ export const useAsociadoJuridica = () => {
     const { showSuccess, showError } = useAlerts();
 
     const createAsociadoJuridicoMutation = useMutation({
-        mutationFn: (data: AsociadoJuridico) => createAsociadoJuridica(data),
+        mutationFn: (data: FormData) => createAsociadoJuridica(data),
 
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["asociado"] });

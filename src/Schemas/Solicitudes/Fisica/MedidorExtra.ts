@@ -52,12 +52,12 @@ export const MedidorExtraFisicoSchema = z.object({
             const phoneNumber = parsePhoneNumberFromString(phone || "");
             return !!phoneNumber && phoneNumber.isValid();
         }, {
-            message: 'Debe ingresar un número de teléfono válido con código de país, ej. +50688887777'
+            message: 'Debe ingresar un número de teléfono válido '
         })
         .transform((phone) => {
             const phoneNumber = parsePhoneNumberFromString(phone || "");
             if (!phoneNumber || !phoneNumber.isValid()) {
-                throw new Error('Debe ingresar un número de teléfono válido con código de país, ej. +50688887777');
+                throw new Error('Debe ingresar un número de teléfono válido');
             }
             return phoneNumber.format('E.164');
         }),
