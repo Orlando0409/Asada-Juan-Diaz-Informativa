@@ -23,7 +23,7 @@ const STORAGE_KEY = 'asociado_fisica_temp';
 
 
 const FormularioAsociado = ({ onClose }: Props) => {
-  const sanitizeNameInput = (value: string) => value.replace(/\d/g, "");
+  const sanitizeNameInput = (value: string) => value.replaceAll(/\d/g, "");
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const planosInputRef = useRef<HTMLInputElement>(null);
   const escrituraInputRef = useRef<HTMLInputElement>(null);
@@ -37,48 +37,25 @@ const FormularioAsociado = ({ onClose }: Props) => {
 
 
   const validateField = (fieldName: string, value: any, allValues?: any) => {
-    try {
-      const dummy: any = {
-        Nombre: "Test",
-        Apellido1: "Test",
-        Apellido2: "",
-        Tipo_Identificacion: "Cedula Nacional",
-        Identificacion: "123456789",
-        Numero_Telefono: "+50688887777",
-        Correo: "test@test.com",
-        Motivo_Solicitud: "1234567890",
-      };
+    const valuesToValidate = {
+      ...allValues,
+      [fieldName]: value,
+    };
 
-      if (fieldName === "Identificacion" && allValues?.Tipo_Identificacion) {
-        dummy.Tipo_Identificacion = allValues.Tipo_Identificacion;
-        dummy.Identificacion = value;
-      } else if (fieldName === "Tipo_Identificacion" && allValues?.Identificacion) {
-        dummy.Tipo_Identificacion = value;
-        dummy.Identificacion = allValues.Identificacion;
+    const validation = AsociadoSchema.safeParse(valuesToValidate);
+    const fieldIssue = validation.success
+      ? undefined
+      : validation.error.errors.find((err) => err.path[0] === fieldName);
+
+    setFieldErrors(prev => {
+      const newErrors = { ...prev };
+      if (fieldIssue) {
+        newErrors[fieldName] = fieldIssue.message;
       } else {
-        dummy[fieldName] = value;
-      }
-
-      AsociadoSchema.parse(dummy);
-
-      setFieldErrors(prev => {
-        const newErrors = { ...prev };
         delete newErrors[fieldName];
-        return newErrors;
-      });
-    } catch (error: any) {
-      let errorMessage = '';
-      if (error.errors && Array.isArray(error.errors)) {
-        const fieldError = error.errors.find((err: any) => err.path.includes(fieldName));
-        errorMessage = fieldError?.message || error.errors[0]?.message;
-      } else if (error.message) {
-        errorMessage = error.message;
       }
-      setFieldErrors(prev => ({
-        ...prev,
-        [fieldName]: errorMessage,
-      }));
-    }
+      return newErrors;
+    });
   };
 
   // Validación en tiempo real del formulario
@@ -91,7 +68,9 @@ const FormularioAsociado = ({ onClose }: Props) => {
       if (error.errors && Array.isArray(error.errors)) {
         error.errors.forEach((err: any) => {
           const field = err.path[0] as string;
-          errors[field] = err.message;
+          if (!errors[field]) {
+            errors[field] = err.message;
+          }
         });
       }
       setFieldErrors(errors);
@@ -101,13 +80,26 @@ const FormularioAsociado = ({ onClose }: Props) => {
   const handleIdentificacionInput = (value: string, tipoId: string): string => {
     switch (tipoId) {
       case "Cedula Nacional":
-        return value.replace(/[^0-9]/g, '').slice(0, 9);
+        return value.replaceAll(/\D/g, '').slice(0, 9);
       case "Dimex":
-        return value.replace(/[^0-9]/g, '').slice(0, 12);
+        return value.replaceAll(/\D/g, '').slice(0, 12);
       case "Pasaporte":
-        return value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 9).toUpperCase();
+        return value.replaceAll(/[^a-zA-Z0-9]/g, '').slice(0, 9).toUpperCase();
       default:
         return value;
+    }
+  };
+
+  const getIdentificacionMaxLength = (tipoIdentificacion: TipoIdentificacion): number => {
+    switch (tipoIdentificacion) {
+      case 'Cedula Nacional':
+        return 9;
+      case 'Dimex':
+        return 12;
+      case 'Pasaporte':
+        return 9;
+      default:
+        return 20;
     }
   };
 
@@ -201,7 +193,9 @@ const FormularioAsociado = ({ onClose }: Props) => {
           const validationErrors: Record<string, string> = {};
           validation.error.errors.forEach((err) => {
             const field = err.path[0] as string;
-            validationErrors[field] = err.message;
+            if (!validationErrors[field]) {
+              validationErrors[field] = err.message;
+            }
           });
           setFormErrors(validationErrors);
           setFieldErrors(validationErrors);
@@ -229,10 +223,10 @@ const FormularioAsociado = ({ onClose }: Props) => {
         formData.append('Motivo_Solicitud', value.Motivo_Solicitud);
         // Agregar archivos (solo como file, no como string)
         if (archivoSeleccionado["Planos_Terreno"]) {
-          formData.append('Planos_Terreno', archivoSeleccionado["Planos_Terreno"] as File);
+          formData.append('Planos_Terreno', archivoSeleccionado["Planos_Terreno"]);
         }
         if (archivoSeleccionado["Escrituras_Terreno"]) {
-          formData.append('Escrituras_Terreno', archivoSeleccionado["Escrituras_Terreno"] as File);
+          formData.append('Escrituras_Terreno', archivoSeleccionado["Escrituras_Terreno"]);
         }
 
         setIsSending(true);
@@ -347,11 +341,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
                     placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion)}
                     disabled={!form.state.values.Tipo_Identificacion}
                     className={`${commonClasses} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
-                    maxLength={
-                      form.state.values.Tipo_Identificacion === 'Cedula Nacional' ? 9 :
-                        form.state.values.Tipo_Identificacion === 'Dimex' ? 12 :
-                          form.state.values.Tipo_Identificacion === 'Pasaporte' ? 9 : 20
-                    }
+                    maxLength={getIdentificacionMaxLength(form.state.values.Tipo_Identificacion)}
                   />
                   {isLoading && (
                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
@@ -522,128 +512,112 @@ const FormularioAsociado = ({ onClose }: Props) => {
           </form.Field>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-            <form.Field name="Planos_Terreno">
-              {(field) => {
-                const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
-                return (
-                  <div className="w-full mb-2">
-                    <label htmlFor="Planos_Terreno" className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
-                    <input
-                      type="file"
-                      accept=".png,.jpg,.jpeg,.heic,.pdf"
-                      disabled={!!archivoActual}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0] ?? null;
-                        field.handleChange(file ?? undefined);
-                        setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: file }));
-                        validateField("Planos_Terreno", file);
-                      }}
-                      className="hidden"
-                      id="Planos_Terreno"
-                      ref={planosInputRef}
-                      key={archivoActual ? archivoActual.name : 'planos'}
-                    />
-                    <label
-                      htmlFor="Planos_Terreno"
-                      className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
-                    >
-                      {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
-                    </label>
-                    {archivoActual && (
-                      <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
-                        <span>{archivoActual.name}</span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            field.handleChange(undefined);
-                            setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
-                            setFieldErrors(prev => ({
-                              ...prev,
-                              ["Planos_Terreno"]: `Debe subir el plano del terreno`,
-                            }));
-                            if (planosInputRef.current) planosInputRef.current.value = "";
-                          }}
-                          className="text-red-500 hover:underline text-xs"
-                        >
-                          Eliminar
-                        </button>
-                      </div>
-                    )}
-                    {fieldErrors["Planos_Terreno"] && (
-                      <span className="text-red-500 text-sm block mt-1">
-                        {fieldErrors["Planos_Terreno"]}
-                      </span>
-                    )}
-                    {formErrors["Planos_Terreno"] && !fieldErrors["Planos_Terreno"] && (
-                      <span className="text-red-500 text-sm block mt-1">
-                        {formErrors["Planos_Terreno"]}
-                      </span>
-                    )}
-                  </div>
-                );
-              }}
-            </form.Field>
-            <form.Field name="Escrituras_Terreno">
-              {(field) => {
-                const archivoActual = archivoSeleccionado["Escrituras_Terreno"] ?? null;
-                return (
-                  <div className="w-full mb-2">
-                    <label htmlFor="Escrituras_Terreno" className="block mb-1 font-medium">Escrituras del terreno <span className="text-red-500">*</span></label>
-                    <input
-                      type="file"
-                      accept=".png,.jpg,.jpeg,.heic,.pdf"  
-                      disabled={!!archivoActual}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0] ?? null;
-                        field.handleChange(file ?? undefined);
-                        setArchivoSeleccionado(prev => ({ ...prev, ["Escrituras_Terreno"]: file }));
-                        validateField("Escrituras_Terreno", file);
-                      }}
-                      className="hidden"
-                      id="Escrituras_Terreno"
-                      ref={escrituraInputRef}
-                      key={archivoActual ? archivoActual.name : 'escritura'}
-                    />
-                    <label
-                      htmlFor="Escrituras_Terreno"
-                      className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
-                    >
-                      {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
-                    </label>
-                    {archivoActual && (
-                      <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
-                        <span>{archivoActual.name}</span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            field.handleChange(undefined);
-                            setArchivoSeleccionado(prev => ({ ...prev, ["Escrituras_Terreno"]: null }));
-                            setFieldErrors(prev => ({
-                              ...prev,
-                              ["Escrituras_Terreno"]: `Debe subir la escritura del terreno`,
-                            }));
-                            if (escrituraInputRef.current) escrituraInputRef.current.value = "";
-                          }}
-                          className="text-red-500 hover:underline text-xs"
-                        >
-                          Eliminar
-                        </button>
-                      </div>
-                    )}
-                    {fieldErrors["Escrituras_Terreno"] && (
-                      <span className="text-red-500 text-sm block mt-1">
-                        {fieldErrors["Escritura_Terreno"]}
-                      </span>
-                    )}
-                    {formErrors["Escritura_Terreno"] && !fieldErrors["Escritura_Terreno"] && (
-                      <span className="text-red-500 text-sm block mt-1">
-                        {formErrors["Escritura_Terreno"]}
-                      </span>
-                    )}
-                  </div>
-                );
-              }}
-            </form.Field>
+            <div className="w-full mb-2">
+              <label htmlFor="Planos_Terreno" className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
+              <input
+                type="file"
+                accept=".png,.jpg,.jpeg,.heic,.pdf"
+                disabled={!!archivoSeleccionado["Planos_Terreno"]}
+                onChange={(e) => {
+                  const file = e.target.files?.[0] ?? null;
+                  setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: file }));
+                  setFieldErrors(prev => {
+                    const next = { ...prev };
+                    if (file) {
+                      delete next["Planos_Terreno"];
+                    }
+                    return next;
+                  });
+                }}
+                className="hidden"
+                id="Planos_Terreno"
+                ref={planosInputRef}
+                key={archivoSeleccionado["Planos_Terreno"] ? archivoSeleccionado["Planos_Terreno"]?.name : 'planos'}
+              />
+              <label
+                htmlFor="Planos_Terreno"
+                className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoSeleccionado["Planos_Terreno"] ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
+              >
+                {archivoSeleccionado["Planos_Terreno"] ? 'Archivo cargado' : 'Subir archivo'}
+              </label>
+              {archivoSeleccionado["Planos_Terreno"] && (
+                <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
+                  <span>{archivoSeleccionado["Planos_Terreno"]?.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
+                      setFieldErrors(prev => ({
+                        ...prev,
+                        ["Planos_Terreno"]: 'Debe subir el plano del terreno',
+                      }));
+                      if (planosInputRef.current) planosInputRef.current.value = "";
+                    }}
+                    className="text-red-500 hover:underline text-xs"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              )}
+              {fieldErrors["Planos_Terreno"] && (
+                <span className="text-red-500 text-sm block mt-1">
+                  {fieldErrors["Planos_Terreno"]}
+                </span>
+              )}
+            </div>
+            <div className="w-full mb-2">
+              <label htmlFor="Escrituras_Terreno" className="block mb-1 font-medium">Escrituras del terreno <span className="text-red-500">*</span></label>
+              <input
+                type="file"
+                accept=".png,.jpg,.jpeg,.heic,.pdf"
+                disabled={!!archivoSeleccionado["Escrituras_Terreno"]}
+                onChange={(e) => {
+                  const file = e.target.files?.[0] ?? null;
+                  setArchivoSeleccionado(prev => ({ ...prev, ["Escrituras_Terreno"]: file }));
+                  setFieldErrors(prev => {
+                    const next = { ...prev };
+                    if (file) {
+                      delete next["Escrituras_Terreno"];
+                    }
+                    return next;
+                  });
+                }}
+                className="hidden"
+                id="Escrituras_Terreno"
+                ref={escrituraInputRef}
+                key={archivoSeleccionado["Escrituras_Terreno"] ? archivoSeleccionado["Escrituras_Terreno"]?.name : 'escritura'}
+              />
+              <label
+                htmlFor="Escrituras_Terreno"
+                className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoSeleccionado["Escrituras_Terreno"] ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
+              >
+                {archivoSeleccionado["Escrituras_Terreno"] ? 'Archivo cargado' : 'Subir archivo'}
+              </label>
+              {archivoSeleccionado["Escrituras_Terreno"] && (
+                <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
+                  <span>{archivoSeleccionado["Escrituras_Terreno"]?.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setArchivoSeleccionado(prev => ({ ...prev, ["Escrituras_Terreno"]: null }));
+                      setFieldErrors(prev => ({
+                        ...prev,
+                        ["Escrituras_Terreno"]: 'Debe subir la escritura del terreno',
+                      }));
+                      if (escrituraInputRef.current) escrituraInputRef.current.value = "";
+                    }}
+                    className="text-red-500 hover:underline text-xs"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              )}
+              {fieldErrors["Escrituras_Terreno"] && (
+                <span className="text-red-500 text-sm block mt-1">
+                  {fieldErrors["Escrituras_Terreno"]}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 

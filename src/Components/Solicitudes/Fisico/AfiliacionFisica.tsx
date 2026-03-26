@@ -44,7 +44,9 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
       if (error.errors && Array.isArray(error.errors)) {
         error.errors.forEach((err: any) => {
           const field = err.path[0] as string;
-          errors[field] = err.message;
+          if (!errors[field]) {
+            errors[field] = err.message;
+          }
         });
       }
       setFieldErrors(errors);
@@ -68,51 +70,25 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
 
   // Validación en tiempo real usando el schema
   const validateField = (fieldName: string, value: any, allValues?: any) => {
-    try {
-      const dummy: any = {
-        Nombre: "Test",
-        Apellido1: "Test",
-        Apellido2: "",
-        Tipo_Identificacion: "Cedula Nacional",
-        Identificacion: "123456789",
-        Edad: 18,
-        Direccion_Exacta: "1234567890",
-        Numero_Telefono: "+50688887777",
-        Correo: "test@test.com",
-        Planos_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
-        Certificacion_Literal: new File([''], 'test.jpg', { type: 'image/jpeg' }),
-      };
+    const valuesToValidate = {
+      ...allValues,
+      [fieldName]: value,
+    };
 
-      if (fieldName === "Identificacion" && allValues?.Tipo_Identificacion) {
-        dummy.Tipo_Identificacion = allValues.Tipo_Identificacion;
-        dummy.Identificacion = value;
-      } else if (fieldName === "Tipo_Identificacion" && allValues?.Identificacion) {
-        dummy.Tipo_Identificacion = value;
-        dummy.Identificacion = allValues.Identificacion;
+    const validation = AfiliacionSchema.safeParse(valuesToValidate);
+    const fieldIssue = validation.success
+      ? undefined
+      : validation.error.errors.find((err) => err.path[0] === fieldName);
+
+    setFieldErrors(prev => {
+      const newErrors = { ...prev };
+      if (fieldIssue) {
+        newErrors[fieldName] = fieldIssue.message;
       } else {
-        dummy[fieldName] = value;
-      }
-
-      AfiliacionSchema.parse(dummy);
-
-      setFieldErrors(prev => {
-        const newErrors = { ...prev };
         delete newErrors[fieldName];
-        return newErrors;
-      });
-    } catch (error: any) {
-      let errorMessage = '';
-      if (error.errors && Array.isArray(error.errors)) {
-        const fieldError = error.errors.find((err: any) => err.path.includes(fieldName));
-        errorMessage = fieldError?.message || error.errors[0]?.message;
-      } else if (error.message) {
-        errorMessage = error.message;
       }
-      setFieldErrors(prev => ({
-        ...prev,
-        [fieldName]: errorMessage,
-      }));
-    }
+      return newErrors;
+    });
   };
 
 
@@ -256,7 +232,9 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
           const validationErrors: Record<string, string> = {};
           validation.error.errors.forEach((err) => {
             const field = err.path[0] as string;
-            validationErrors[field] = err.message;
+            if (!validationErrors[field]) {
+              validationErrors[field] = err.message;
+            }
           });
           setFormErrors(validationErrors);
           return;

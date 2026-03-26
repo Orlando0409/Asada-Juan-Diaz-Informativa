@@ -20,20 +20,25 @@ export const DesconexionMedidorSchema = z.object({
     .refine(val => val.trim().length > 0, 'La identificación no puede estar vacía'),
 
   Nombre: z.string()
+    .min(1, 'El nombre no puede estar vacío')
     .min(2, 'El nombre debe tener al menos 2 caracteres')
     .max(49, 'El nombre no puede tener más de 50 caracteres')
     .refine(val => val.trim().length > 0, 'El nombre no puede estar vacío')
     .refine(val => /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(val), 'El nombre solo puede contener letras y espacios'),
 
   Apellido1: z.string()
+    .min(1, 'El primer apellido no puede estar vacío')
     .min(2, 'El primer apellido debe tener al menos 2 caracteres')
     .max(49, 'El primer apellido no puede tener más de 50 caracteres')
     .refine(val => val.trim().length > 0, 'El primer apellido no puede estar vacío')
     .refine(val => /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(val), 'El primer apellido solo puede contener letras y espacios'),
 
   Apellido2: z.string()
+     .min(1, 'El segundo apellido no puede estar vacío')
+    .min(2, 'El segundo apellido debe tener al menos 2 caracteres')
     .max(49, 'El segundo apellido no puede tener más de 50 caracteres')
-    .optional(),
+    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/, { message: 'El segundo apellido solo puede contener letras y espacios' })
+    .transform(val => val.trim()),
 
   Correo: z.string()
     .min(1, 'El correo no puede estar vacío')
