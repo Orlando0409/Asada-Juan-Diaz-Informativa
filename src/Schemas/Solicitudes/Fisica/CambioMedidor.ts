@@ -34,10 +34,11 @@ export const CambioMedidorSchema = z.object({
     .transform(val => val.trim()),
 
   Apellido2: z.string()
+     .min(1, 'El segundo apellido no puede estar vacío')
+    .min(2, 'El segundo apellido debe tener al menos 2 caracteres')
     .max(49, 'El segundo apellido no puede tener más de 50 caracteres')
-    .optional()
-    .or(z.literal(''))
-    .transform(val => val === '' ? undefined : val),
+    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/, { message: 'El segundo apellido solo puede contener letras y espacios' })
+    .transform(val => val.trim()),
 
   Correo: z.string()
     .min(1, 'El correo no puede estar vacío')

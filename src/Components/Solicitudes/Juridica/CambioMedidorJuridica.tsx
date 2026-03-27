@@ -78,6 +78,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
             try {
                 const resultado = await lookupJuridica(cedulaSoloDigitos);
                 if (resultado) {
+                    form.setFieldValue('Razon_Social', resultado);
                     setEsAfiliado(true);
                 } else {
                     setEsAfiliado(false);
