@@ -260,7 +260,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                         saveToSessionStorage({ ...form.state.values, Razon_Social: e.target.value });
                                     }}
                                     placeholder={getPlaceholder("Razon_Social")}
-                                    maxLength={50}
+                                    maxLength={255}
                                     className={commonClasses}
                                 />
                                 {fieldErrors["Razon_Social"] && (

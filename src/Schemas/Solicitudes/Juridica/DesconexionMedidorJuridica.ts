@@ -7,7 +7,7 @@ const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/hei
 export const DesconexionJuridicaSchema = z.object({
   Razon_Social: z.string()
     .min(2, 'La razón social debe tener al menos 2 caracteres')
-    .max(99, 'La razón social no puede tener más de 100 caracteres'),
+    .max(255, 'La razón social no puede tener más de 255 caracteres'),
 
   Cedula_Juridica: z.string()
     .min(10, 'La cédula jurídica debe tener al menos 10 caracteres')

@@ -282,7 +282,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                                                         }}
                                                         placeholder="3-XXX-XXXXXX"
                                                         className={commonClasses}
-                                                        maxLength={12}
+                                                        maxLength={255}
                                                     />
                                                     {loadingCedula && (
                                                         <div className="absolute right-3 top-1/2 -translate-y-1/2">

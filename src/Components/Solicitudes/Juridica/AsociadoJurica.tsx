@@ -35,8 +35,8 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
     const [_mostrarFormulario, setMostrarFormulario] = useState(true);
     // Estados y referencias para archivos
     const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
-  const planosInputRef = useRef<HTMLInputElement>(null);
-  const escrituraInputRef = useRef<HTMLInputElement>(null);
+    const planosInputRef = useRef<HTMLInputElement>(null);
+    const escrituraInputRef = useRef<HTMLInputElement>(null);
 
     // Validación en tiempo real de todo el formulario
     const validateAllFields = (values: any) => {
@@ -241,7 +241,7 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                                     }}
                                     onBlur={() => setTouched(prev => ({ ...prev, Razon_Social: true }))}
                                     placeholder="Ejemplo S.A."
-                                    maxLength={50}
+                                    maxLength={255}
                                     className={commonClasses}
                                 />
                                 {touched["Razon_Social"] && fieldErrors["Razon_Social"] && (
@@ -344,8 +344,14 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                                 disabled={!!archivoSeleccionado.Planos_Terreno}
                                 onChange={(e) => {
                                     const file = e.target.files?.[0] ?? null;
-                                    setArchivoSeleccionado(prev => ({ ...prev, Planos_Terreno: file }));
-                                    validateField("Planos_Terreno", file);
+                                    setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: file }));
+                                    setFieldErrors(prev => {
+                                        const next = { ...prev };
+                                        if (file) {
+                                            delete next["Planos_Terreno"];
+                                        }
+                                        return next;
+                                    });
                                 }}
                                 className="hidden"
                                 id="Planos_Terreno"
@@ -395,8 +401,14 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                                 disabled={!!archivoSeleccionado.Escrituras_Terreno}
                                 onChange={(e) => {
                                     const file = e.target.files?.[0] ?? null;
-                                    setArchivoSeleccionado(prev => ({ ...prev, Escrituras_Terreno: file }));
-                                    validateField("Escrituras_Terreno", file);
+                                    setArchivoSeleccionado(prev => ({ ...prev, ["Escrituras_Terreno"]: file }));
+                                    setFieldErrors(prev => {
+                                        const next = { ...prev };
+                                        if (file) {
+                                            delete next["Escrituras_Terreno"];
+                                        }
+                                        return next;
+                                    });
                                 }}
                                 className="hidden"
                                 id="Escrituras_Terreno"
@@ -451,9 +463,9 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                             isSending ||
                             Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
                             Object.values(fieldErrors).some(Boolean) ||
-                            Object.values(formErrors).some(Boolean)||
-                          !archivoSeleccionado["Planos_Terreno"] ||
-                          !archivoSeleccionado["Escrituras_Terreno"]
+                            Object.values(formErrors).some(Boolean) ||
+                            !archivoSeleccionado["Planos_Terreno"] ||
+                            !archivoSeleccionado["Escrituras_Terreno"]
                         }
                     >
                         {isSending ? 'Enviando...' : 'Enviar Solicitud'}

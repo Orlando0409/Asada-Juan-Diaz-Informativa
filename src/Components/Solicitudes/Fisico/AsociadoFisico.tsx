@@ -509,6 +509,8 @@ const FormularioAsociado = ({ onClose }: Props) => {
                 )}
               </div>
             )}
+
+            
           </form.Field>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
