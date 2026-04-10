@@ -61,45 +61,61 @@ function buildSitemapPages() {
 function getManualChunk(id: string): string | undefined {
   if (!id.includes('node_modules')) return undefined
 
-  if (id.includes('/react/') || id.includes('/react-dom/') || id.includes('/scheduler/')) {
+  const normalizedId = id.replaceAll('\\', '/')
+
+  if (
+    normalizedId.includes('/react/') ||
+    normalizedId.includes('/react-dom/') ||
+    normalizedId.includes('/scheduler/')
+  ) {
     return 'react-vendor'
   }
 
-  if (id.includes('/@tanstack/')) {
+  if (normalizedId.includes('/@tanstack/')) {
     return 'tanstack-vendor'
   }
 
-  if (id.includes('/framer-motion/') || id.includes('/lucide-react/')) {
+  if (
+    normalizedId.includes('/framer-motion/') ||
+    normalizedId.includes('/lucide-react/') ||
+    normalizedId.includes('/react-icons/')
+  ) {
     return 'motion-icons-vendor'
   }
 
-  if (id.includes('/leaflet/')) {
+  if (normalizedId.includes('/leaflet/')) {
     return 'maps-vendor'
   }
 
   if (
-    id.includes('/zod/') ||
-    id.includes('/react-hook-form/') ||
-    id.includes('/@material-tailwind/') ||
-    id.includes('/react-select/')
+    normalizedId.includes('/zod/') ||
+    normalizedId.includes('/react-hook-form/') ||
+    normalizedId.includes('/@material-tailwind/') ||
+    normalizedId.includes('/react-select/')
   ) {
     return 'forms-ui-vendor'
   }
 
   if (
-    id.includes('/swiper/') ||
-    id.includes('/react-slick/') ||
-    id.includes('/slick-carousel/')
+    normalizedId.includes('/swiper/') ||
+    normalizedId.includes('/react-slick/') ||
+    normalizedId.includes('/slick-carousel/')
   ) {
     return 'carousel-vendor'
   }
 
-  if (id.includes('/axios/') || id.includes('/date-fns/') || id.includes('/libphonenumber-js/')) {
+  if (
+    normalizedId.includes('/axios/') ||
+    normalizedId.includes('/date-fns/') ||
+    normalizedId.includes('/libphonenumber-js/')
+  ) {
     return 'utils-vendor'
   }
 
-  return 'vendor'
+  // Let Vite/Rollup handle the rest to avoid unsafe forced splits.
+  return undefined
 }
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -110,11 +126,12 @@ export default defineConfig({
       baseUrl: 'https://asadajuandiaz.com',
       pages: buildSitemapPages(),
     }),
-  ],
+  ].filter(Boolean),
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
+    dedupe: ['react', 'react-dom'],
   },
   server: {
     host: true,
