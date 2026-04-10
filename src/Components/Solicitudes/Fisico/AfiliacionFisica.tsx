@@ -584,7 +584,8 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
                     min={18}
                     value={field.state.value || ''}
                     onChange={(e) => {
-                      const soloNumeros = e.target.value.replace(/[^0-9]/g, '');
+                      const soloNumeros = e.target.value.replace(/[^1-9]/g, '');
+                   
                       const edadValue = soloNumeros === '' ? undefined : Number(soloNumeros);
                       field.handleChange(edadValue);
                       validateField("Edad", edadValue, form.state.values);
