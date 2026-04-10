@@ -10,7 +10,7 @@ export interface MedidorExtraFisico {
   Numero_Telefono: string;
   Direccion_Exacta: string;
   Planos_Terreno?: File | string;
-  Escritura_Terreno?: File | string;
+  Certificacion_Literal?: File | string;
 }
 
 export const MedidorExtraFisicoInicialState: MedidorExtraFisico = {
@@ -23,5 +23,5 @@ export const MedidorExtraFisicoInicialState: MedidorExtraFisico = {
   Numero_Telefono: '',
   Direccion_Exacta: '',
   Planos_Terreno: undefined,
-  Escritura_Terreno: undefined,
+  Certificacion_Literal: undefined,
 };

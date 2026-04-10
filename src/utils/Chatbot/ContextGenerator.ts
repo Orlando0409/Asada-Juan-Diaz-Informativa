@@ -66,7 +66,10 @@ export class ContextGenerator {
   }
 
   private static getServiciosContext(base: string): string {
-    const { DatosGenerales, CalidadAguaArchivos } = dataJson;
+    const { DatosGenerales } = dataJson;
+    const calidadAguaArchivos = ((dataJson as unknown as {
+      CalidadAguaArchivos?: Array<{ Titulo?: string; Titullo?: string }>;
+    }).CalidadAguaArchivos ?? []);
     const { caracteristicas_servicio, cobertura_servicio } = chatConfig.respuestas_optimizadas;
     
     return `${base}
@@ -77,8 +80,8 @@ export class ContextGenerator {
     - Cobertura: ${cobertura_servicio.join(' y ')}
 
     CONTROL DE CALIDAD:
-    Documentos disponibles (${CalidadAguaArchivos.length} reportes):
-    ${CalidadAguaArchivos.map(archivo => `- ${archivo.Titulo || archivo.Titullo}`).join('\n')}
+    Documentos disponibles (${calidadAguaArchivos.length} reportes):
+    ${calidadAguaArchivos.map((archivo: { Titulo?: string; Titullo?: string }) => `- ${archivo.Titulo || archivo.Titullo}`).join('\n')}
 
     Responde preguntas sobre servicios, calidad del agua, cobertura y documentación de calidad.`;
   }

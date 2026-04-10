@@ -1,5 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import { useEffect, useRef, useState } from "react";
+import { useAlerts } from '../../../context/AlertContext';
 import { DesconexionMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/DesconexionMedidor";
 import { useDesconexionFisica, useMedidores } from "../../../Hook/Solicitudes/HookFisicas";
 import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
@@ -25,6 +26,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isSending, setIsSending] = useState(false);
   const [identificacion, setIdentificacion] = useState('');
+  const { showError } = useAlerts();
   const mutation = useDesconexionFisica();
   const planosInputRef = useRef<HTMLInputElement>(null);
   const escrituraInputRef = useRef<HTMLInputElement>(null);
@@ -34,54 +36,25 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
 
   // Validación en tiempo real usando el schema
   const validateField = (fieldName: string, value: any, allValues?: any) => {
-    try {
-      const dummy: any = {
-        Nombre: "Test",
-        Apellido1: "Test",
-        Apellido2: "",
-        Tipo_Identificacion: "Cedula Nacional",
-        Identificacion: "123456789",
-        Direccion_Exacta: "Dirección válida",
-        Numero_Telefono: "+50688887777",
-        Correo: "test@test.com",
-        Motivo_Solicitud: "Motivo válido",
-        Id_Medidor: 1,
-        Planos_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
-        Escritura_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
-      };
+    const valuesToValidate = {
+      ...allValues,
+      [fieldName]: value,
+    };
 
-      if (fieldName === "Identificacion" && allValues?.Tipo_Identificacion) {
-        dummy.Tipo_Identificacion = allValues.Tipo_Identificacion;
-        dummy.Identificacion = value;
-      } else if (fieldName === "Tipo_Identificacion" && allValues?.Identificacion) {
-        dummy.Tipo_Identificacion = value;
-        dummy.Identificacion = allValues.Identificacion;
+    const validation = DesconexionMedidorSchema.safeParse(valuesToValidate);
+    const fieldIssue = validation.success
+      ? undefined
+      : validation.error.errors.find((err) => err.path[0] === fieldName);
+
+    setFieldErrors(prev => {
+      const newErrors = { ...prev };
+      if (fieldIssue) {
+        newErrors[fieldName] = fieldIssue.message;
       } else {
-        dummy[fieldName] = value;
-      }
-
-      DesconexionMedidorSchema.parse(dummy);
-
-      setFieldErrors(prev => {
-        const newErrors = { ...prev };
         delete newErrors[fieldName];
-        return newErrors;
-      });
-    } catch (error: any) {
-      let errorMessage = '';
-      if (error.errors && Array.isArray(error.errors)) {
-        const fieldError = error.errors.find((err: any) => err.path.includes(fieldName));
-        errorMessage = fieldError?.message || error.errors[0]?.message || 'Error de validación';
-      } else if (error.message) {
-        errorMessage = error.message;
-      } else {
-        errorMessage = 'Error de validación';
       }
-      setFieldErrors(prev => ({
-        ...prev,
-        [fieldName]: errorMessage,
-      }));
-    }
+      return newErrors;
+    });
   };
 
   const handleIdentificacionInput = (value: string, tipoId: string): string => {
@@ -112,12 +85,23 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
     });
 
     if (tipoId === 'Cedula Nacional' && /^\d{9}$/.test(identificacionProcesada)) {
-      const resultado = await lookup(identificacionProcesada);
-      if (resultado) {
-        form.setFieldValue('Nombre', resultado.firstname || '');
-        form.setFieldValue('Apellido1', resultado.lastname1 || '');
-        form.setFieldValue('Apellido2', resultado.lastname2 || '');
+      try {
+        const resultado = await lookup(identificacionProcesada);
+        if (resultado) {
+          setFormErrors(prev => {
+            const newErrors = { ...prev };
+            delete newErrors['Identificacion'];
+            return newErrors;
+          });
+          form.setFieldValue('Nombre', resultado.firstname || '');
+          form.setFieldValue('Apellido1', resultado.lastname1 || '');
+          form.setFieldValue('Apellido2', resultado.lastname2 || '');
+        }
+      } catch (error: any) {
+        // No mostrar error en el campo Identificacion
       }
+    } else {
+      // No limpiar alertas, solo mostrar si corresponde
     }
   };
 
@@ -171,11 +155,20 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
       Motivo_Solicitud: "",
       Id_Medidor: undefined as number | undefined,
       Planos_Terreno: undefined as File | undefined,
-      Escritura_Terreno: undefined as File | undefined,
+      Certificacion_Literal: undefined as File | undefined,
     },
 
     onSubmit: async ({ value }) => {
       setFormErrors({});
+      // Validar que sea afiliado (tenga medidores activos)
+      if (!identificacion || medidores.length === 0) {
+        showError(
+          "No Eres Afiliado",
+          "No puedes solicitar la desconexión porque no eres un afiliado con medidores activos. Completa tu afiliación primero."
+        );
+        // No mostrar error en el formulario, solo alerta global
+        return;
+      }
       try {
         value.Numero_Telefono = normalizePhoneNumber(value.Numero_Telefono);
 
@@ -184,7 +177,9 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
           const validationErrors: Record<string, string> = {};
           validation.error.errors.forEach((err) => {
             const field = err.path[0] as string;
-            validationErrors[field] = err.message;
+            if (!validationErrors[field]) {
+              validationErrors[field] = err.message;
+            }
           });
           setFormErrors(validationErrors);
           return;
@@ -217,6 +212,27 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
       }
     },
   });
+  // Mostrar alert cuando se verifica afiliación (igual que MedidorExtraFisico)
+  useEffect(() => {
+    if (
+      identificacion &&
+      !isMedidoresLoading &&
+      identificacion.length >= 9
+    ) {
+      if (medidores.length > 0) {
+        // Si es afiliado, podrías mostrar un success opcional
+        // showSuccess(
+        //   "Eres un afiliado puedes seguir con la solicitud",
+        //   `. Medidores actuales: ${medidores.length}`
+        // );
+      } else {
+        showError(
+          "No Eres Afiliado",
+          "No puedes solicitar la desconexión porque no eres un afiliado con medidores activos. Completa tu afiliación primero."
+        );
+      }
+    }
+  }, [identificacion, medidores.length, isMedidoresLoading, showError]);
 
 
   useEffect(() => {
@@ -226,7 +242,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
         const parsed = JSON.parse(savedData);
         // Cargar los valores en el formulario
         Object.entries(parsed).forEach(([key, value]) => {
-          if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
+          if (key !== 'Planos_Terreno' && key !== 'Certificacion_Literal') {
             form.setFieldValue(key as any, value as any);
           }
         });
@@ -235,6 +251,10 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
       }
     }
   }, []);
+
+
+  // El mensaje ahora se muestra como alert global, no local
+
   if (!mostrarFormulario) return null;
 
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring focus:ring-blue-300';
@@ -325,6 +345,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                       {formErrors['Identificacion']}
                     </span>
                   )}
+                  {/* mensaje si no es afiliado eliminado, solo alert global */}
                 </div>
               )}
             </form.Field>
@@ -641,12 +662,12 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
               );
             }}
           </form.Field>
-          <form.Field name="Escritura_Terreno">
+          <form.Field name="Certificacion_Literal">
             {(field) => {
-              const archivoActual = archivoSeleccionado["Escritura_Terreno"] ?? null;
+              const archivoActual = archivoSeleccionado["Certificacion_Literal"] ?? null;
               return (
                 <div className="w-full mb-2">
-                  <label htmlFor="Escritura_Terreno" className="block mb-1 font-medium">Escritura del terreno <span className="text-red-500">*</span></label>
+                  <label htmlFor="Certificacion_Literal" className="block mb-1 font-medium">Certificacion Literal del terreno <span className="text-red-500">*</span></label>
                   <input
                     type="file"
                     accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -654,16 +675,16 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                     onChange={(e) => {
                       const file = e.target.files?.[0] ?? null;
                       field.handleChange(file ?? undefined);
-                      setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: file }));
-                      validateField("Escritura_Terreno", file);
+                      setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: file }));
+                      validateField("Certificacion_Literal", file);
                     }}
                     className="hidden"
-                    id="Escritura_Terreno"
+                    id="Certificacion_Literal"
                     ref={escrituraInputRef}
                     key={archivoActual ? archivoActual.name : 'escritura'}
                   />
                   <label
-                    htmlFor="Escritura_Terreno"
+                    htmlFor="Certificacion_Literal"
                     className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
                   >
                     {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
@@ -675,10 +696,10 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                         type="button"
                         onClick={() => {
                           field.handleChange(undefined);
-                          setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: null }));
+                          setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: null }));
                           setFieldErrors(prev => ({
                             ...prev,
-                            ["Escritura_Terreno"]: `Debe subir la escritura del terreno`,
+                            ["Certificacion_Literal"]: `Debe subir la certificacion literal del terreno`,
                           }));
                           if (escrituraInputRef.current) {
                             escrituraInputRef.current.value = '';
@@ -690,15 +711,15 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                       </button>
                     </div>
                   )}
-                  {/* muestra errores de escritura*/}
-                  {fieldErrors["Escritura_Terreno"] && (
+                  {/* muestra errores de certificacion literal*/}
+                  {fieldErrors["Certificacion_Literal"] && (
                     <span className="text-red-500 text-sm block mt-1">
-                      {fieldErrors["Escritura_Terreno"]}
+                      {fieldErrors["Certificacion_Literal"]}
                     </span>
                   )}
-                  {formErrors["Escritura_Terreno"] && !fieldErrors["Escritura_Terreno"] && (
+                  {formErrors["Certificacion_Literal"] && !fieldErrors["Certificacion_Literal"] && (
                     <span className="text-red-500 text-sm block mt-1">
-                      {formErrors["Escritura_Terreno"]}
+                      {formErrors["Certificacion_Literal"]}
                     </span>
                   )}
                 </div>
@@ -707,16 +728,34 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
           </form.Field>
         </div>
 
-        <div className="flex justify-end items-end gap-4 mt-8">
-          <div className="flex justify-end items-end">
-            <button
-              type="submit"
-              disabled={isSending}
-              className={`w-[120px] py-2 rounded transition ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
-            >
-              {isSending ? 'Enviando...' : 'Enviar'}
-            </button>
+        <div className="flex justify-center gap-4 mt-6 ml-50">
+
+          {/* Botones */}
+
+          <div className="flex justify-end items-center gap-3 mt-8">
+           <button
+                        type="submit"
+                        className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
+                        disabled={
+                            isSending ||
+                            Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
+                            Object.values(fieldErrors).some(Boolean) ||
+                            Object.values(formErrors).some(Boolean)
+                        }
+                    >
+                        {isSending ? 'Enviando...' : 'Enviar Solicitud'}
+                    </button>
+
+             <button
+            type="button"
+            onClick={onClose}
+            disabled={isSending}
+            className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            Cancelar
+          </button>
           </div>
+
         </div>
       </form>
     </div>

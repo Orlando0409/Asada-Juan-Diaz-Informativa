@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 export const CambioMedidorJuridicaSchema = z.object({
   Cedula_Juridica: z.string()
@@ -7,15 +8,27 @@ export const CambioMedidorJuridicaSchema = z.object({
 
   Razon_Social: z.string()
     .min(2, 'La razón social debe tener al menos 2 caracteres')
-    .max(99, 'La razón social no puede tener más de 100 caracteres'),
+    .max(255, 'La razón social no puede tener más de 255 caracteres'),
 
   Correo: z.string()
     .min(1, 'El correo electrónico es obligatorio')
-    .max(99, 'El correo no puede tener más de 100 caracteres')
+    .max(255, 'El correo no puede tener más de 255 caracteres')
     .email('El correo electrónico no es válido'),
   Numero_Telefono: z.string()
-    .min(8, 'El número de teléfono debe tener al menos 8 dígitos')
-    .regex(/^\+?[0-9]{8,15}$/, 'El número de teléfono debe estar en formato internacional, ej. +50688887777'),
+    .min(1, 'El número de teléfono es obligatorio')
+    .refine((phone) => {
+      const phoneNumber = parsePhoneNumberFromString(phone || "");
+      return !!phoneNumber && phoneNumber.isValid();
+    }, {
+      message: 'Debe ingresar un número de teléfono válido'
+    })
+    .transform((phone) => {
+      const phoneNumber = parsePhoneNumberFromString(phone || "");
+      if (!phoneNumber || !phoneNumber.isValid()) {
+        throw new Error('Debe ingresar un número de teléfono válido');
+      }
+      return phoneNumber.format('E.164');
+    }),
   Direccion_Exacta: z.string()
     .min(10, 'La dirección debe tener al menos 10 caracteres')
     .max(254, 'La dirección no puede tener más de 255 caracteres'),
@@ -38,10 +51,10 @@ export const CambioMedidorJuridicaSchema = z.object({
       'El plano debe ser una imagen (JPG, PNG, HEIC) o PDF'
     ),
 
-  Escritura_Terreno: z.instanceof(File, { message: 'Debe subir la escritura del terreno' })
+  Certificacion_Literal: z.instanceof(File, { message: 'Debe subir la certificacion literal del terreno' })
     .refine(
       (file) => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
-      'La escritura debe ser una imagen (JPG, PNG, HEIC) o PDF'
+      'La certificacion literal debe ser una imagen (JPG, PNG, HEIC) o PDF'
     ),
 });
 

@@ -11,28 +11,6 @@
     },
     "descripcion": "En la ASADA de Juan Díaz trabajamos para brindar un servicio  de agua potable eficiente,sostenible y de alta calidad.Nuestro Compromiso es con la comunidad y el ambiente,garantizando una gestion responsable de este recurso."
   },
-  "CalidadAguaArchivos": [
-    {
-      "id": 1,
-      "Titullo": "ASADA Juan Díaz Pozo",
-      "url": ""
-    },
-    {
-      "id": 2,
-      "Titulo": "ASADA Juan Díaz Pánfilo Alvares Aguilar",
-      "url": "/2024-08-7460 ASADA Juan Díaz-Pánfilo Alvares Aguilar.pdf"
-    },
-    {
-      "id": 3,
-      "Titulo": "ASADA Juan Díaz - Ebais Juan Díaz",
-      "url": "/2024-08-7461 ASADA Juan Díaz-Ebais Juan Diaz.pdf"
-    },
-    {
-      "id": 4,
-      "Titulo": "ASADA Juan Díaz Tanque de Almacenamiento",
-      "url": "https://www.dropbox.com/scl/fi/h0k8sifpri44y169u2jd3/2024-08-7463-ASADA-Juan-D-az-Tanque-de-Almacenamiento-1.pdf?rlkey=4hoqngj6tmzbgl1qbb8nyjd96&dl=0"
-    }
-  ],
   "historia": "La ASADA de Juan Díaz fue fundada en el año 2005. En un inicio, la idea principal era construir un acueducto para uso agrícola, pensando en beneficiar a los agricultores de la zona. Sin embargo, un vecino de la zona donó un terreno para un pozo. Las personas de la comunidad pensaron en la necesidad de acceso al agua potable en los hogares, y llegaron a la conclusión de que el agua para consumo humano era prioridad más que para el uso agrícola. Ante esta situación, se decidió cambiar el destino del proyecto y enfocarlo en llevar agua a las casas. Con este nuevo propósito se logró concretar un convenio con la delegación, lo que permitió la formalización de la creación de la ASADA. De esta manera, un proyecto que estaba destinado a la agricultura se transformó en una solución para la comunidad de Juan Díaz y sus alrededores.",
   "imagenHistoria": {
     "src": "HISTORIA_ASADA.png",
@@ -53,7 +31,7 @@
       "Apellido2": {
         "label": "Segundo Apellido",
         "type": "text",
-        "required": false
+        "required": true
       },
       "Tipo_Identificacion": {
         "label": "Tipo de Identificación",
@@ -90,8 +68,8 @@
         "type": "file",
         "required": true
       },
-      "Escritura_Terreno": {
-        "label": "Escritura del terreno",
+      "Certificacion_Literal": {
+        "label": "Certificacion Literal del terreno",
         "type": "file",
         "required": true
       }
@@ -199,8 +177,8 @@
         "type": "file",
         "required": true
       },
-      "Escritura_Terreno": {
-        "label": "Escritura del terreno",
+      "Certificacion_Literal": {
+        "label": "Certificacion Literal del terreno",
         "type": "file",
         "required": true
       }
@@ -271,7 +249,7 @@
       "Apellido2": {
         "label": "Segundo Apellido",
         "type": "text",
-        "required": false
+        "required": true
       },
       "Correo": {
         "label": "Correo electrónico",
@@ -293,8 +271,8 @@
         "type": "file",
         "required": true
       },
-      "Escritura_Terreno": {
-        "label": "Escritura del terreno",
+      "Certificacion_Literal": {
+        "label": "Certificacion Literal del terreno",
         "type": "file",
         "required": true
       }
@@ -332,8 +310,8 @@
         "type": "file",
         "required": true
       },
-      "Escritura_Terreno": {
-        "label": "Escritura del terreno",
+      "Certificacion_Literal": {
+        "label": "Certificacion Literal del terreno",
         "type": "file",
         "required": true
       }
@@ -374,8 +352,8 @@
         "type": "file",
         "required": true
       },
-      "Escritura_Terreno": {
-        "label": "Escritura del terreno",
+      "Certificacion_Literal": {
+        "label": "Certificacion Literal del terreno",
         "type": "file",
         "required": true
       }
@@ -475,8 +453,8 @@
         "type": "file",
         "required": true
       },
-      "Escritura_Terreno": {
-        "label": "Escritura del terreno",
+      "Certificacion_Literal": {
+        "label": "Certificacion Literal del terreno",
         "type": "file",
         "required": true
       }
@@ -666,6 +644,7 @@
               "texto": "Medidor Extra",
               "ruta": "/MedidorExtra"
             }
+            
           ]
         },
         {
@@ -676,7 +655,7 @@
         },
         {
           "id": 4,
-          "texto": "Contáctanos",
+          "texto": "Infórmanos",
           "tipo": "dropdown",
           "subopciones": [
             {

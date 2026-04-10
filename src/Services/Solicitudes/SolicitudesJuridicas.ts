@@ -1,5 +1,4 @@
 import apiAuth from "../../api/apiAuth";
-import type { AsociadoJuridico } from "../../models/Forms/Solicitudes/Juridica/AsociadoJuridica";
 
 export async function createAfiliacionJuridica(data: FormData) {
     const response = await apiAuth.post("/solicitudes-juridicas/create/afiliacion", data);
@@ -16,7 +15,7 @@ export async function createCambioMedidorJuridica(data: FormData) {
     return response.data;
 }
 
-export async function createAsociadoJuridica(data: AsociadoJuridico) {
+export async function createAsociadoJuridica(data: FormData) {
     const response = await apiAuth.post("/solicitudes-juridicas/create/asociado", data);
     return response.data;
 }

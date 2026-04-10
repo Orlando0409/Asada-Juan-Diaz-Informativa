@@ -9,6 +9,8 @@ export interface AsociadoFisico {
   Correo: string;
   Numero_Telefono: string;
   Motivo_Solicitud: string;
+  Planos_Terreno?: File | string;
+  Escrituras_Terreno?: File | string;
 }
 
 export const AsociadoInicialState : AsociadoFisico = {
@@ -19,16 +21,7 @@ export const AsociadoInicialState : AsociadoFisico = {
   Apellido2: "",
   Correo: "",
   Numero_Telefono: "",
-  Motivo_Solicitud: ""
+  Motivo_Solicitud: "",
+  Planos_Terreno: undefined,
+  Escrituras_Terreno: undefined,
 };
-
-export interface AsociadoFisico {
-  Tipo_Identificacion: 'Cedula Nacional' | 'Dimex' | 'Pasaporte';
-  Identificacion: string;
-  Nombre: string;
-  Apellido1: string;
-  Apellido2: string;
-  Correo: string;
-  Numero_Telefono: string;
-  Motivo_Solicitud: string;
-}

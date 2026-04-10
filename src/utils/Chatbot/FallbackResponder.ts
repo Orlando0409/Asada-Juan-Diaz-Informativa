@@ -107,7 +107,10 @@ export class FallbackResponder {
   }
 
   private static getServiciosResponse(): string {
-    const { DatosGenerales, CalidadAguaArchivos } = dataJson;
+    const { DatosGenerales } = dataJson;
+    const calidadAguaArchivos = ((dataJson as unknown as {
+      CalidadAguaArchivos?: Array<unknown>;
+    }).CalidadAguaArchivos ?? []);
     const { caracteristicas_servicio, cobertura_servicio } = chatConfig.respuestas_optimizadas;
     
     return `💧 Nuestros Servicios
@@ -120,7 +123,7 @@ export class FallbackResponder {
     🌍 Cobertura: Comunidades de ${cobertura_servicio.join(' y ')}
 
     📊 Control de Calidad:
-    Contamos con ${CalidadAguaArchivos.length}+ reportes de calidad del agua actualizados.
+    Contamos con ${calidadAguaArchivos.length}+ reportes de calidad del agua actualizados.
 
     🔧 Servicios Adicionales:
     • Instalación de medidores

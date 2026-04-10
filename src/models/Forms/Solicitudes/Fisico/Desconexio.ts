@@ -10,7 +10,7 @@ export interface Desconexion {
   Motivo_Solicitud: string;
   Numero_Telefono:number,
   Planos_Terreno?: File | string;
-  Escritura_Terreno?: File | string;
+  Certificacion_Literal?: File | string;
 }
 export const DesconexionInicialState= {
   Nombre: "",
@@ -23,7 +23,7 @@ export const DesconexionInicialState= {
   Motivo_Solicitud: "",
   Numero_Telefono:0,
   Planos_Terreno: undefined,
-  Escritura_Terreno: undefined,
+  Certificacion_Literal: undefined,
 };
 export interface DesconexionFormData {
    Nombre: string;
@@ -36,5 +36,5 @@ export interface DesconexionFormData {
   Motivo_Solicitud: string;
   Numero_Telefono:number,
   Planos_Terreno?: File | string;
-  Escritura_Terreno?: File | string;
+  Certificacion_Literal?: File | string;
 }

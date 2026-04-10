@@ -1,8 +1,10 @@
+
 import { useForm } from "@tanstack/react-form";
 import { useEffect, useRef, useState } from "react";
 import { CambioMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/CambioMedidor";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { useCambioMedidorFisica, useMedidores } from "../../../Hook/Solicitudes/HookFisicas";
+import { useAlerts } from "../../../context/AlertContext";
 import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import { Loader2 } from "lucide-react";
 import PhoneInputComponent from "../PhoneInputComponent";
@@ -27,6 +29,8 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isSending, setIsSending] = useState(false);
+  // Usar sistema global de alertas
+  const { showError } = useAlerts();
   const mutation = useCambioMedidorFisica();
   const [mostrarFormulario, setMostrarFormulario] = useState(true);
   const { lookup, isLoading } = useCedulaLookup();
@@ -37,52 +41,25 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
 
 
   const validateField = (fieldName: string, value: any, allValues?: any) => {
-    try {
-      const dummy: any = {
-        Nombre: "Test",
-        Apellido1: "Test",
-        Apellido2: "",
-        Tipo_Identificacion: "Cedula Nacional",
-        Identificacion: "123456789",
-        Direccion_Exacta: "1234567890",
-        Numero_Telefono: "+50688887777",
-        Correo: "test@test.com",
-        Motivo_Solicitud: "1234567890",
-        Id_Medidor: 1,
-        Planos_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
-        Escritura_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
-      };
+    const valuesToValidate = {
+      ...allValues,
+      [fieldName]: value,
+    };
 
-      if (fieldName === "Identificacion" && allValues?.Tipo_Identificacion) {
-        dummy.Tipo_Identificacion = allValues.Tipo_Identificacion;
-        dummy.Identificacion = value;
-      } else if (fieldName === "Tipo_Identificacion" && allValues?.Identificacion) {
-        dummy.Tipo_Identificacion = value;
-        dummy.Identificacion = allValues.Identificacion;
+    const validation = CambioMedidorSchema.safeParse(valuesToValidate);
+    const fieldIssue = validation.success
+      ? undefined
+      : validation.error.errors.find((err) => err.path[0] === fieldName);
+
+    setFieldErrors(prev => {
+      const newErrors = { ...prev };
+      if (fieldIssue) {
+        newErrors[fieldName] = fieldIssue.message;
       } else {
-        dummy[fieldName] = value;
-      }
-
-      CambioMedidorSchema.parse(dummy);
-
-      setFieldErrors(prev => {
-        const newErrors = { ...prev };
         delete newErrors[fieldName];
-        return newErrors;
-      });
-    } catch (error: any) {
-      let errorMessage = '';
-      if (error.errors && Array.isArray(error.errors)) {
-        const fieldError = error.errors.find((err: any) => err.path.includes(fieldName));
-        errorMessage = fieldError?.message || error.errors[0]?.message;
-      } else if (error.message) {
-        errorMessage = error.message;
       }
-      setFieldErrors(prev => ({
-        ...prev,
-        [fieldName]: errorMessage,
-      }));
-    }
+      return newErrors;
+    });
   };
 
   const handleIdentificacionInput = (value: string, tipoId: string): string => {
@@ -120,6 +97,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
         form.setFieldValue('Apellido2', resultado.lastname2 || '');
       }
     }
+    // Ya no se valida afiliación aquí
   };
 
   const getPlaceholder = (fieldName: string, tipoIdentificacion?: TipoIdentificacion) => {
@@ -173,10 +151,11 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
       Motivo_Solicitud: '',
       Id_Medidor: 0,
       Planos_Terreno: undefined as File | undefined,
-      Escritura_Terreno: undefined as File | undefined,
+      Certificacion_Literal: undefined as File | undefined,
     },
     onSubmit: async ({ value }) => {
       setFormErrors({});
+      setFieldErrors({});
       try {
         value.Numero_Telefono = normalizePhoneNumber(value.Numero_Telefono);
         const validation = CambioMedidorSchema.safeParse(value);
@@ -184,11 +163,30 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
           const validationErrors: Record<string, string> = {};
           validation.error.errors.forEach((err) => {
             const field = err.path[0] as string;
-            validationErrors[field] = err.message;
+            if (!validationErrors[field]) {
+              validationErrors[field] = err.message;
+            }
           });
           setFormErrors(validationErrors);
           return;
         }
+
+        // Validar afiliación solo al enviar
+        const tipoId = value.Tipo_Identificacion;
+        if (tipoId === 'Cedula Nacional' && /^\d{9}$/.test(value.Identificacion)) {
+          const soloDigitos = value.Identificacion.replace(/\D/g, '');
+          try {
+            const resultado = await lookup(soloDigitos);
+            if (resultado) {
+              form.setFieldValue('Nombre', resultado.firstname || '');
+              form.setFieldValue('Apellido1', resultado.lastname1 || '');
+              form.setFieldValue('Apellido2', resultado.lastname2 || '');
+            }
+          } catch (error: any) {
+            // Si hay error, igual permitimos el envío para no bloquear el flujo
+          }
+        }
+
         const formData = new FormData();
         Object.entries(validation.data).forEach(([key, val]) => {
           if (val !== undefined && val !== null && val !== "") {
@@ -223,6 +221,23 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
     },
   });
 
+
+  // Mostrar alert cuando se verifica afiliación (igual que DesconexionFisica)
+  useEffect(() => {
+    if (
+      identificacion &&
+      !isMedidoresLoading &&
+      identificacion.length >= 9
+    ) {
+      if (medidores.length === 0) {
+        showError(
+          "No Eres Afiliado",
+          "No puedes solicitar el cambio porque no eres un afiliado con medidores activos. Completa tu afiliación primero."
+        );
+      }
+    }
+  }, [identificacion, medidores.length, isMedidoresLoading, showError]);
+
   useEffect(() => {
     const savedData = sessionStorage.getItem(STORAGE_KEY);
     if (savedData) {
@@ -230,7 +245,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
         const parsed = JSON.parse(savedData);
         // Cargar los valores en el formulario
         Object.entries(parsed).forEach(([key, value]) => {
-          if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
+          if (key !== 'Planos_Terreno' && key !== 'Certificacion_Literal') {
             form.setFieldValue(key as any, value as any);
           }
         });
@@ -264,7 +279,9 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                 <select
                   value={field.state.value}
                   onChange={(e) => {
-                    field.handleChange(e.target.value as TipoIdentificacion);
+                    const selectedTipo = e.target.value as TipoIdentificacion;
+                    field.handleChange(selectedTipo);
+                    validateField('Tipo_Identificacion', selectedTipo, form.state.values);
                     form.setFieldValue('Identificacion', '');
                     setIdentificacion('');
                     setFieldErrors(prev => { const newErrors = { ...prev }; delete newErrors['Identificacion']; return newErrors; });
@@ -325,6 +342,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   onChange={(e) => {
                     const cleanValue = sanitizeNameInput(e.target.value);
                     field.handleChange(cleanValue);
+                    validateField("Nombre", cleanValue, form.state.values);
                     saveToSessionStorage({ ...form.state.values, Nombre: cleanValue });
                   }}
                   placeholder={getPlaceholder("Nombre")}
@@ -347,6 +365,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   onChange={(e) => {
                     const cleanValue = sanitizeNameInput(e.target.value);
                     field.handleChange(cleanValue);
+                    validateField("Apellido1", cleanValue, form.state.values);
                     saveToSessionStorage({ ...form.state.values, Apellido1: cleanValue });
                   }}
                   placeholder={getPlaceholder("Apellido1")}
@@ -371,6 +390,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   onChange={(e) => {
                     const cleanValue = sanitizeNameInput(e.target.value);
                     field.handleChange(cleanValue);
+                    validateField("Apellido2", cleanValue, form.state.values);
                     saveToSessionStorage({ ...form.state.values, Apellido2: cleanValue });
                   }}
                   placeholder={getPlaceholder("Apellido2")}
@@ -390,8 +410,10 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                 <textarea
                   value={field.state.value}
                   onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    saveToSessionStorage({ ...form.state.values, Direccion_Exacta: e.target.value });
+                    const direccion = e.target.value;
+                    field.handleChange(direccion);
+                    validateField("Direccion_Exacta", direccion, form.state.values);
+                    saveToSessionStorage({ ...form.state.values, Direccion_Exacta: direccion });
                   }}
                   placeholder={getPlaceholder("Direccion_Exacta")}
                   maxLength={100}
@@ -413,8 +435,10 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   type="email"
                   value={field.state.value}
                   onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    saveToSessionStorage({ ...form.state.values, Correo: e.target.value });
+                    const correo = e.target.value;
+                    field.handleChange(correo);
+                    validateField("Correo", correo, form.state.values);
+                    saveToSessionStorage({ ...form.state.values, Correo: correo });
                   }}
                   placeholder={getPlaceholder("Correo")}
                   maxLength={100}
@@ -433,8 +457,10 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                 <PhoneInputComponent
                   value={field.state.value}
                   onChange={(value) => {
-                    field.handleChange(value || "");
-                    saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" });
+                    const telefono = value || "";
+                    field.handleChange(telefono);
+                    validateField("Numero_Telefono", telefono, form.state.values);
+                    saveToSessionStorage({ ...form.state.values, Numero_Telefono: telefono });
                   }}
                   className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
                 />
@@ -448,10 +474,10 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
           {/* Número de Medidor y Motivo */}
           <form.Field name="Id_Medidor">
             {(field) => {
+              const noMedidores = identificacion && !isMedidoresLoading && medidores.length === 0;
               return (
                 <div className="mb-3 w-full">
                   <label htmlFor="Id_Medidor" className="block mb-1 font-medium">Número de Medidor <span className="text-red-500">*</span></label>
-
                   <div className="relative">
                     <select
                       id="Id_Medidor"
@@ -459,10 +485,11 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                       onChange={(e) => {
                         const idMedidor = Number(e.target.value);
                         field.handleChange(idMedidor);
+                        validateField("Id_Medidor", idMedidor, form.state.values);
                       }}
                       onBlur={field.handleBlur}
                       className={commonClasses}
-                      disabled={!identificacion || isMedidoresLoading}
+                      disabled={!!(!identificacion || isMedidoresLoading || noMedidores)}
                     >
                       <option value="">Seleccione un medidor</option>
                       {medidores.map((med) => (
@@ -471,24 +498,12 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                         </option>
                       ))}
                     </select>
-
-                    {isMedidoresLoading && (
-                      <div className="absolute right-10 top-1/2 -translate-y-1/2">
-                        <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
-                      </div>
-                    )}
                   </div>
-
                   {fieldErrors["Id_Medidor"] && (
-                    <span className="text-red-500 text-sm block mt-1">
-                      {fieldErrors["Id_Medidor"]}
-                    </span>
+                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Id_Medidor"]}</span>
                   )}
-
-                  {medidores.length === 0 && identificacion && !isMedidoresLoading && (
-                    <span className="text-red-500 text-sm block mt-1">
-                      No se encontraron medidores para esta identificación
-                    </span>
+                  {noMedidores && (
+                    <span className="text-red-500 text-sm block mt-1">No hay medidores asociados a esta cédula. Primero debes ser afiliado.</span>
                   )}
                 </div>
               );
@@ -504,8 +519,10 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   id="Motivo_Solicitud"
                   value={field.state.value}
                   onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    saveToSessionStorage({ ...form.state.values, Motivo_Solicitud: e.target.value });
+                    const motivo = e.target.value;
+                    field.handleChange(motivo);
+                    validateField("Motivo_Solicitud", motivo, form.state.values);
+                    saveToSessionStorage({ ...form.state.values, Motivo_Solicitud: motivo });
                   }}
                   placeholder="Escribe el motivo de tu solicitud"
                   maxLength={250}
@@ -536,7 +553,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                       const file = e.target.files?.[0] ?? null;
                       field.handleChange(file ?? undefined);
                       setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: file }));
-                      validateField("Planos_Terreno", file);
+                      validateField("Planos_Terreno", file, form.state.values);
                     }}
                     className="hidden"
                     id="Planos_Terreno_CambioFisico"
@@ -577,13 +594,13 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
             }}
           </form.Field>
 
-          {/* Escritura del Terreno */}
-          <form.Field name="Escritura_Terreno">
+          {/* Certificacion Literal del Terreno */}
+          <form.Field name="Certificacion_Literal">
             {(field) => {
-              const archivoActual = archivoSeleccionado["Escritura_Terreno"] ?? null;
+              const archivoActual = archivoSeleccionado["Certificacion_Literal"] ?? null;
               return (
                 <div className="mb-3 w-full">
-                  <label className="block mb-1 font-medium">Escritura del terreno <span className="text-red-500">*</span></label>
+                  <label className="block mb-1 font-medium">Certificacion Literal del terreno <span className="text-red-500">*</span></label>
                   <input
                     type="file"
                     accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -591,16 +608,16 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                     onChange={(e) => {
                       const file = e.target.files?.[0] ?? null;
                       field.handleChange(file ?? undefined);
-                      setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: file }));
-                      validateField("Escritura_Terreno", file);
+                      setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: file }));
+                      validateField("Certificacion_Literal", file, form.state.values);
                     }}
                     className="hidden"
-                    id="Escritura_Terreno_CambioFisico"
+                    id="Certificacion_Literal_CambioFisico"
                     ref={escrituraInputRef}
                     key={archivoActual ? archivoActual.name : 'escritura'}
                   />
                   <label
-                    htmlFor="Escritura_Terreno_CambioFisico"
+                    htmlFor="Certificacion_Literal_CambioFisico"
                     className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-blue-700 cursor-pointer'}`}
                   >
                     {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
@@ -612,8 +629,8 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                         type="button"
                         onClick={() => {
                           field.handleChange(undefined);
-                          setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: null }));
-                          setFieldErrors(prev => ({ ...prev, ["Escritura_Terreno"]: 'Debe subir la escritura del terreno' }));
+                          setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: null }));
+                          setFieldErrors(prev => ({ ...prev, ["Certificacion_Literal"]: 'Debe subir la certificacion literal del terreno' }));
                           if (escrituraInputRef.current) escrituraInputRef.current.value = '';
                         }}
                         className="text-red-500 hover:underline text-xs"
@@ -622,28 +639,56 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                       </button>
                     </div>
                   )}
-                  {fieldErrors["Escritura_Terreno"] && (
-                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Escritura_Terreno"]}</span>
+                  {fieldErrors["Certificacion_Literal"] && (
+                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Certificacion_Literal"]}</span>
                   )}
-                  {formErrors["Escritura_Terreno"] && !fieldErrors["Escritura_Terreno"] && (
-                    <span className="text-red-500 text-sm block mt-1">{formErrors["Escritura_Terreno"]}</span>
+                  {formErrors["Certificacion_Literal"] && !fieldErrors["Certificacion_Literal"] && (
+                    <span className="text-red-500 text-sm block mt-1">{formErrors["Certificacion_Literal"]}</span>
                   )}
                 </div>
               );
             }}
           </form.Field>
         </div>
+        <div className="flex justify-center gap-4 mt-6 ml-50">
+          {/* Botones */}
 
-        <div className="flex justify-end items-end gap-4 mt-8">
-          <div className="flex justify-end items-end">
+          <div className="flex justify-end items-center gap-3 mt-8">
             <button
               type="submit"
-              disabled={isSending}
-              className={`w-[120px] py-2 rounded transition ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
+              className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
+              disabled={
+                isSending ||
+                Object.values(fieldErrors).some(Boolean) ||
+                Object.values(formErrors).some(Boolean) ||
+                [
+                  form.state.values.Nombre,
+                  form.state.values.Apellido1,
+                  form.state.values.Apellido2,
+                  form.state.values.Tipo_Identificacion,
+                  form.state.values.Identificacion,
+                  form.state.values.Correo,
+                  form.state.values.Direccion_Exacta,
+                  form.state.values.Numero_Telefono,
+                  form.state.values.Id_Medidor,
+                  form.state.values.Motivo_Solicitud,
+                  form.state.values.Planos_Terreno,
+                  form.state.values.Certificacion_Literal
+                ].some(val => val === undefined || val === null || val === "")
+              }
             >
-              {isSending ? 'Enviando...' : 'Enviar'}
+              {isSending ? 'Enviando...' : 'Enviar Solicitud'}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isSending}
+              className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              Cancelar
             </button>
           </div>
+
         </div>
       </form>
     </div>

@@ -7,10 +7,12 @@ export const AsociadoJuridicaSchema = z.object({
     .max(14, 'La cédula jurídica no puede tener más de 15 caracteres'),
 
   Razon_Social: z.string()
-    .min(2, 'La razón social debe tener al menos 2 caracteres'),
+    .min(2, 'La razón social debe tener al menos 2 caracteres')
+    .max(255, 'La razón social no puede tener más de 255 caracteres'),
 
   Correo: z.string()
     .min(1, 'El correo electrónico es obligatorio')
+    .max(255, 'El correo no puede tener más de 255 caracteres')
     .email('El correo electrónico no es válido'),
 
   Numero_Telefono: z.string()
@@ -19,7 +21,7 @@ export const AsociadoJuridicaSchema = z.object({
       const phoneNumber = parsePhoneNumberFromString(phone || "");
       return !!phoneNumber && phoneNumber.isValid();
     }, {
-      message: 'Debe ingresar un número de teléfono válido con código de país, ej. +50688887777'
+      message: 'Debe ingresar un número de teléfono válido'
     }),
 
   Motivo_Solicitud: z.string()

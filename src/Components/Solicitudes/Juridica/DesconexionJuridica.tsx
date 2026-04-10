@@ -1,3 +1,4 @@
+import { useAlerts } from "../../../context/AlertContext";
 import { useForm } from "@tanstack/react-form";
 import { useEffect, useRef, useState } from "react";
 import data from "../../../data/Data.json";
@@ -14,7 +15,7 @@ type Props = {
 };
 const STORAGE_KEY = 'desconexionmedidor_juridica_temp';
 
-const normalizePhoneNumber = (phone: string): string => {
+export const normalizePhoneNumber = (phone: string): string => {
     const phoneNumber = parsePhoneNumberFromString(phone);
     if (!phoneNumber?.isValid()) {
         throw new Error('Debe ingresar un número de teléfono válido con código de país, ej. +50688887777');
@@ -40,6 +41,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const [isSending, setIsSending] = useState(false);
     const mutation = useDesconexionJuridica();
+    const { showError } = useAlerts();
     const { lookupJuridica, isLoading: loadingCedula } = useCedulaLookup();
     const planosInputRef = useRef<HTMLInputElement>(null);
     const escrituraInputRef = useRef<HTMLInputElement>(null);
@@ -98,11 +100,20 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
             Motivo_Solicitud: '',
             Id_Medidor: 0,
             Planos_Terreno: undefined as File | undefined,
-            Escritura_Terreno: undefined as File | undefined,
+            Certificacion_Literal: undefined as File | undefined,
         },
 
         onSubmit: async ({ value }) => {
             setFormErrors({});
+
+            // Validar que sea afiliado (tenga medidores activos)
+            if (!cedulaJuridica || medidores.length === 0) {
+                showError(
+                    "No Eres Afiliado",
+                    "No puedes solicitar la desconexión porque no eres un afiliado con medidores activos. Completa tu afiliación primero."
+                );
+                return;
+            }
 
             try {
                 value.Numero_Telefono = normalizePhoneNumber(value.Numero_Telefono);
@@ -157,7 +168,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
         Numero_Telefono: "Número de Teléfono",
         Motivo_Solicitud: "Motivo de la Solicitud",
         Planos_Terreno: "Planos del Terreno",
-        Escritura_Terreno: "Escritura del Terreno"
+        Certificacion_Literal: "Certificacion Literal del Terreno"
     };
 
 
@@ -168,7 +179,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                 const parsed = JSON.parse(savedData);
                 // Cargar los valores en el formulario
                 Object.entries(parsed).forEach(([key, value]) => {
-                    if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
+                    if (key !== 'Planos_Terreno' && key !== 'Certificacion_Literal') {
                         form.setFieldValue(key as any, value as any);
                         // Si es la cédula jurídica, también actualizar el estado
                         if (key === 'Cedula_Juridica' && typeof value === 'string') {
@@ -182,10 +193,21 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
         }
     }, []);
 
-    // Debug: Monitor cambios en cedulaJuridica
+    //strar alert cuando se verifica afiliación (igual que DesconexionFisica)
     useEffect(() => {
-        console.log('🔍 Estado cedulaJuridica actualizado:', cedulaJuridica, 'Longitud:', cedulaJuridica.length);
-    }, [cedulaJuridica]);
+        if (
+            cedulaJuridica &&
+            !isMedidoresLoading &&
+            cedulaJuridica.length >= 10 // cédula jurídica CR tiene 10 dígitos
+        ) {
+            if (medidores.length === 0) {
+                showError(
+                    "No Eres Afiliado",
+                    "No puedes solicitar la desconexión porque no eres un afiliado con medidores activos. Completa tu afiliación primero."
+                );
+            }
+        }
+    }, [cedulaJuridica, medidores.length, isMedidoresLoading, showError]);
 
     return (
         <div className="flex justify-center text-gray-800 p-3 sm:p-4 w-full">
@@ -201,7 +223,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
                     {/* Campos dinámicos - Primero los campos normales (sin archivos) */}
                     {Object.entries(campos)
-                        .filter(([fieldName]) => fieldName !== "Planos_Terreno" && fieldName !== "Escritura_Terreno")
+                        .filter(([fieldName]) => fieldName !== "Planos_Terreno" && fieldName !== "Certificacion_Literal")
                         .map(([fieldName, fieldProps]) => (
                             <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
                                 {(field) => {
@@ -240,37 +262,37 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                                                     {fieldLabels[fieldName]}
                                                     {fieldProps.required && <span className="text-red-500">*</span>}
                                                 </label>
-                                        <div className="relative">
-                                            <input
-                                                type="text"
-                                                value={typeof field.state.value === "string" ? field.state.value : ""}
-                                                onChange={(e) => {
-                                                    const formatted = formatCedulaJuridica(e.target.value);
-                                                    const cedula = formatted.replace(/-/g, '');
-                                                    field.handleChange(formatted);
-                                                    handleFieldChange(fieldName, formatted);
-                                                    setCedulaJuridica(cedula);
-                                                    form.setFieldValue('Id_Medidor', 0);
-                                                    saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted });
-                                                    if (/^\d-\d{3}-\d{6}$/.test(formatted)) {
-                                                        lookupJuridica(formatted).then(razonSocial => {
-                                                            if (razonSocial) form.setFieldValue('Razon_Social', razonSocial);
-                                                        });
-                                                    }
-                                                }}
-                                                placeholder="3-XXX-XXXXXX"
-                                                className={commonClasses}
-                                                maxLength={12}
-                                            />
-                                            {loadingCedula && (
-                                                <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                                    <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                    </svg>
+                                                <div className="relative">
+                                                    <input
+                                                        type="text"
+                                                        value={typeof field.state.value === "string" ? field.state.value : ""}
+                                                        onChange={(e) => {
+                                                            const formatted = formatCedulaJuridica(e.target.value);
+                                                            const cedula = formatted.replace(/-/g, '');
+                                                            field.handleChange(formatted);
+                                                            handleFieldChange(fieldName, formatted);
+                                                            setCedulaJuridica(cedula);
+                                                            form.setFieldValue('Id_Medidor', 0);
+                                                            saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted });
+                                                            if (/^\d-\d{3}-\d{6}$/.test(formatted)) {
+                                                                lookupJuridica(formatted).then(razonSocial => {
+                                                                    if (razonSocial) form.setFieldValue('Razon_Social', razonSocial);
+                                                                });
+                                                            }
+                                                        }}
+                                                        placeholder="3-XXX-XXXXXX"
+                                                        className={commonClasses}
+                                                        maxLength={255}
+                                                    />
+                                                    {loadingCedula && (
+                                                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                                            <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                            </svg>
+                                                        </div>
+                                                    )}
                                                 </div>
-                                            )}
-                                        </div>
                                                 {fieldErrors[fieldName] && (
                                                     <span className="text-red-500 text-sm block mt-1">{fieldErrors[fieldName]}</span>
                                                 )}
@@ -389,7 +411,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
 
                     {/* Campos de archivos*/}
                     {Object.entries(campos)
-                        .filter(([fieldName]) => fieldName === "Planos_Terreno" || fieldName === "Escritura_Terreno")
+                        .filter(([fieldName]) => fieldName === "Planos_Terreno" || fieldName === "Certificacion_Literal")
                         .map(([fieldName, fieldProps]) => (
                             <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
                                 {(field) => {
@@ -436,7 +458,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                                                             if (fieldName === "Planos_Terreno" && planosInputRef.current) {
                                                                 planosInputRef.current.value = '';
                                                             }
-                                                            if (fieldName === "Escritura_Terreno" && escrituraInputRef.current) {
+                                                            if (fieldName === "Certificacion_Literal" && escrituraInputRef.current) {
                                                                 escrituraInputRef.current.value = '';
                                                             }
                                                         }}
@@ -459,14 +481,29 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                         ))}
                 </div>
 
-                <div className="flex justify-end items-end gap-4 mt-8">
+                <div className="flex justify-center gap-4 mt-6 ml-50">
+
                     <button
                         type="submit"
-                        disabled={isSending}
-                        className={`w-[120px] py-2 rounded transition ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
+                        className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
+                        disabled={
+                            isSending ||
+                            Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
+                            Object.values(fieldErrors).some(Boolean) ||
+                            Object.values(formErrors).some(Boolean)
+                        }
                     >
-                        {isSending ? 'Enviando...' : 'Enviar'}
+                        {isSending ? 'Enviando...' : 'Enviar Solicitud'}
                     </button>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        disabled={isSending}
+                        className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                        Cancelar
+                    </button>
+
                 </div>
             </form>
         </div>

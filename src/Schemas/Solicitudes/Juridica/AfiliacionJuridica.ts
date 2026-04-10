@@ -9,11 +9,11 @@ export const AfiliacionJuridicaSchema = z.object({
   Razon_Social: z.string()
       
     .min(2, 'La razón social debe tener al menos 2 caracteres')
-    .max(99, 'La razón social no puede tener más de 100 caracteres'),
+    .max(255, 'La razón social no puede tener más de 255 caracteres'),
 
   Correo: z.string()
     .min(1, 'El correo electrónico es obligatorio')
-    .max(99, 'El correo no puede tener más de 100 caracteres')
+    .max(255, 'El correo no puede tener más de 255 caracteres')
     .email('El correo electrónico no es válido'),
 
   Numero_Telefono: z.string()
@@ -22,7 +22,7 @@ export const AfiliacionJuridicaSchema = z.object({
       const phoneNumber = parsePhoneNumberFromString(phone || "");
       return !!phoneNumber && phoneNumber.isValid();
     }, {
-      message: 'Debe ingresar un número de teléfono válido con código de país, ej. +50688887777'
+      message: 'Debe ingresar un número de teléfono válido'
     }),
 
   Direccion_Exacta: z.string()
@@ -37,10 +37,10 @@ export const AfiliacionJuridicaSchema = z.object({
     ),
 
   
-  Escritura_Terreno: z.instanceof(File, { message: "Debe subir la escritura del terreno" })
+  Certificacion_Literal: z.instanceof(File, { message: "Debe subir la certificacion literal del terreno" })
    
     .refine(
       file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
-      'La escritura del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
+      'La certificacion literal del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
     ),
 });

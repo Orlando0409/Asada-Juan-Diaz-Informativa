@@ -1,3 +1,4 @@
+import parsePhoneNumberFromString from 'libphonenumber-js';
 import { z } from 'zod';
 
 // Tipo para TipoIdentificacion - Debe coincidir con el backend
@@ -37,10 +38,11 @@ export const AsociadoSchema = z.object({
     .transform(val => val.trim()),
 
   Apellido2: z.string()
+    .min(1, 'El segundo apellido no puede estar vacío')
+    .min(2, 'El segundo apellido debe tener al menos 2 caracteres')
     .max(49, 'El segundo apellido no puede tener más de 50 caracteres')
-    .optional()
-    .or(z.literal(''))
-    .transform(val => val === '' ? undefined : val),
+    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/, { message: 'El segundo apellido solo puede contener letras y espacios' })
+    .transform(val => val.trim()),
 
   Correo: z.string()
     .min(1, 'El correo no puede estar vacío')
@@ -50,10 +52,14 @@ export const AsociadoSchema = z.object({
     .transform(val => val.trim().toLowerCase()),
 
   Numero_Telefono: z.string()
-    .min(1, 'El número de teléfono no puede estar vacío')
-    .refine(val => val.trim().length > 0, 'El número de teléfono no puede estar vacío')
-    .transform(val => val.trim()),
-
+     .min(1, 'El número de teléfono no puede estar vacío')
+     .refine((phone) => {
+       const phoneNumber = parsePhoneNumberFromString(phone || "");
+       return !!phoneNumber && phoneNumber.isValid();
+     }, {
+       message: 'número de teléfono válido.'
+     }),
+      
   // Validaciones específicas de CreateSolicitudAsociadoFisicaDto
   Motivo_Solicitud: z.string()
     .min(1, 'El motivo de la solicitud no puede estar vacío')

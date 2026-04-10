@@ -4,6 +4,7 @@ import { z } from "zod";
 import { CambioMedidorJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/CambioMedidorJuridico";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { useCambioMedidorJuridica, useMedidoresJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
+import { useAlerts } from "../../../context/AlertContext";
 import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import { Loader2 } from "lucide-react";
 import PhoneInputComponent from "../PhoneInputComponent";
@@ -30,12 +31,16 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const [isSending, setIsSending] = useState(false);
     const mutation = useCambioMedidorJuridica();
+    const { showError } = useAlerts();
+    const [esAfiliado, setEsAfiliado] = useState<boolean | null>(null);
     const { lookupJuridica, isLoading: loadingCedula } = useCedulaLookup();
     const [mostrarFormulario, setMostrarFormulario] = useState(true);
+    // Guardar solo los dígitos para la consulta de medidores
     const [cedulaJuridica, setCedulaJuridica] = useState('');
     const planosInputRef = useRef<HTMLInputElement>(null);
     const escrituraInputRef = useRef<HTMLInputElement>(null);
-    const { medidores, isLoading: isMedidoresLoading } = useMedidoresJuridica(cedulaJuridica);
+    // Hook debe recibir solo los dígitos
+    const { medidores, isLoading: isMedidoresLoading } = useMedidoresJuridica(cedulaJuridica.replace(/\D/g, ""));
 
     // Validación en tiempo real SOLO del campo editado
     const handleFieldChange = (fieldName: string, value: any) => {
@@ -57,6 +62,29 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                     errorMessage = 'Error de validación';
                 }
                 setFieldErrors(prev => ({ ...prev, [fieldName]: errorMessage }));
+            }
+        }
+    };
+
+    // Validar afiliación jurídica y actualizar cédulaJuridica (siempre actualiza el valor sin importar formato)
+    const handleCedulaJuridicaChange = async (value: string) => {
+        const cedula = value.trim();
+        setCedulaJuridica(cedula); // Esto actualiza el valor que se pasa al hook (solo dígitos)
+        handleFieldChange('Cedula_Juridica', cedula);
+        setEsAfiliado(null);
+        // Buscar afiliación solo si hay al menos 9 dígitos (flexible)
+        const cedulaSoloDigitos = cedula.replace(/\D/g, "");
+        if (cedulaSoloDigitos.length >= 9) {
+            try {
+                const resultado = await lookupJuridica(cedulaSoloDigitos);
+                if (resultado) {
+                    form.setFieldValue('Razon_Social', resultado);
+                    setEsAfiliado(true);
+                } else {
+                    setEsAfiliado(false);
+                }
+            } catch (error: any) {
+                setEsAfiliado(false);
             }
         }
     };
@@ -97,12 +125,16 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
             Motivo_Solicitud: "",
             Id_Medidor: 0,
             Planos_Terreno: undefined as File | undefined,
-            Escritura_Terreno: undefined as File | undefined,
+            Certificacion_Literal: undefined as File | undefined,
         },
 
         onSubmit: async ({ value }) => {
             setFormErrors({});
             setFieldErrors({});
+            if (esAfiliado === false) {
+                showError('No afiliado', 'Debe estar afiliado antes de realizar esta solicitud.', 4000);
+                return;
+            }
             try {
                 // Validar y normalizar el teléfono internacional
                 const phoneNumber = parsePhoneNumberFromString(value.Numero_Telefono || "");
@@ -120,7 +152,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                     Direccion_Exacta: (value.Direccion_Exacta || '').trim(),
                     Motivo_Solicitud: (value.Motivo_Solicitud || '').trim(),
                     Planos_Terreno: value.Planos_Terreno,
-                    Escritura_Terreno: value.Escritura_Terreno,
+                    Certificacion_Literal: value.Certificacion_Literal,
                 };
 
                 const validation = CambioMedidorJuridicaSchema.safeParse(cleanedValue);
@@ -164,6 +196,23 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
         },
     });
 
+
+    // Mostrar alert cuando se verifica afiliación (igual que DesconexionFisica)
+    useEffect(() => {
+        if (
+            cedulaJuridica &&
+            !isMedidoresLoading &&
+            cedulaJuridica.length >= 10 // cédula jurídica CR tiene 10 dígitos
+        ) {
+            if (medidores.length === 0) {
+                showError(
+                    "No Eres Afiliado",
+                    "No puedes solicitar el cambio porque no eres un afiliado con medidores activos. Completa tu afiliación primero."
+                );
+            }
+        }
+    }, [cedulaJuridica, medidores.length, isMedidoresLoading, showError]);
+
     useEffect(() => {
         const savedData = sessionStorage.getItem(STORAGE_KEY);
         if (savedData) {
@@ -171,7 +220,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                 const parsed = JSON.parse(savedData);
                 // Cargar los valores en el formulario
                 Object.entries(parsed).forEach(([key, value]) => {
-                    if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
+                    if (key !== 'Planos_Terreno' && key !== 'Certificacion_Literal') {
                         form.setFieldValue(key as any, value as any);
                     }
                 });
@@ -179,7 +228,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                 console.error('Error al cargar datos guardados:', error);
             }
         }
-    }, []); //prueba 
+    }, []); //prueba
 
 
 
@@ -211,7 +260,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                         saveToSessionStorage({ ...form.state.values, Razon_Social: e.target.value });
                                     }}
                                     placeholder={getPlaceholder("Razon_Social")}
-                                    maxLength={50}
+                                    maxLength={255}
                                     className={commonClasses}
                                 />
                                 {fieldErrors["Razon_Social"] && (
@@ -232,18 +281,12 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                     <input
                                         type="text"
                                         value={field.state.value}
-                                        onChange={(e) => {
+                                        onChange={async (e) => {
                                             const formatted = formatCedulaJuridica(e.target.value);
                                             field.handleChange(formatted);
-                                            handleFieldChange("Cedula_Juridica", formatted);
-                                            setCedulaJuridica(formatted.replace(/-/g, ''));
+                                            await handleCedulaJuridicaChange(formatted);
                                             form.setFieldValue('Id_Medidor', 0);
                                             saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted });
-                                            if (/^\d-\d{3}-\d{6}$/.test(formatted)) {
-                                                lookupJuridica(formatted).then(razonSocial => {
-                                                    if (razonSocial) form.setFieldValue('Razon_Social', razonSocial);
-                                                });
-                                            }
                                         }}
                                         placeholder={getPlaceholder("Cedula_Juridica")}
                                         className={commonClasses}
@@ -263,10 +306,38 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                 {formErrors["Cedula_Juridica"] && !fieldErrors["Cedula_Juridica"] && (
                                     <span className="text-red-500 text-sm block mt-1">{formErrors["Cedula_Juridica"]}</span>
                                 )}
+                                {/* Mostrar error solo si NO hay medidores y la cédula tiene al menos 9 dígitos */}
+                                {medidores.length === 0 && cedulaJuridica.replace(/\D/g, "").length >= 9 && (
+                                    <span className="text-red-500 text-sm block mt-1">no existe Afiliado juridico con esta cedula</span>
+                                )}
                             </div>
                         )}
                     </form.Field>
-                    {/* Correo */}
+                    {/* Teléfono internacional */}
+                    <form.Field name="Numero_Telefono">
+                        {(field) => (
+                            <div className="mb-3 w-full">
+                                 <label htmlFor="Correo" className="block mb-1 font-medium">Número de teléfono <span className="text-red-500">*</span></label>
+                                <PhoneInputComponent
+                                    value={field.state.value}
+                                    onChange={(value) => {
+                                        field.handleChange(value || "");
+                                        handleFieldChange("Numero_Telefono", value || "");
+                                        saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" });
+                                    }}
+                                    className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
+                                />
+                                {fieldErrors["Numero_Telefono"] && (
+                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
+                                )}
+                                {formErrors["Numero_Telefono"] && !fieldErrors["Numero_Telefono"] && (
+                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Numero_Telefono"]}</span>
+                                )}
+                            </div>
+                        )}
+                    </form.Field>
+
+                    {/* Correo electrónico */}
                     <form.Field name="Correo">
                         {(field) => (
                             <div className="mb-3 w-full">
@@ -292,29 +363,6 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                             </div>
                         )}
                     </form.Field>
-                    {/* Teléfono internacional */}
-                    <form.Field name="Numero_Telefono">
-                        {(field) => (
-                            <div className="mb-3 w-full">
-                                <label htmlFor="Numero_Telefono" className="block mb-1 font-medium">Número de teléfono <span className="text-red-500">*</span></label>
-                                <PhoneInputComponent
-                                    value={field.state.value}
-                                    onChange={(value) => {
-                                        field.handleChange(value || "");
-                                        handleFieldChange("Numero_Telefono", value || "");
-                                        saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" });
-                                    }}
-                                    className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
-                                />
-                                {fieldErrors["Numero_Telefono"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
-                                )}
-                                {formErrors["Numero_Telefono"] && !fieldErrors["Numero_Telefono"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Numero_Telefono"]}</span>
-                                )}
-                            </div>
-                        )}
-                    </form.Field>
                     {/* Dirección Exacta */}
                     <form.Field name="Direccion_Exacta">
                         {(field) => (
@@ -336,31 +384,6 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                 )}
                                 {formErrors["Direccion_Exacta"] && !fieldErrors["Direccion_Exacta"] && (
                                     <span className="text-red-500 text-sm block mt-1">{formErrors["Direccion_Exacta"]}</span>
-                                )}
-                            </div>
-                        )}
-                    </form.Field>
-                    {/* Motivo de Solicitud */}
-                    <form.Field name="Motivo_Solicitud">
-                        {(field) => (
-                            <div className="mb-3 w-full">
-                                <label htmlFor="Motivo_Solicitud" className="block mb-1 font-medium">Motivo de solicitud <span className="text-red-500">*</span></label>
-                                <textarea
-                                    value={field.state.value}
-                                    onChange={(e) => {
-                                        field.handleChange(e.target.value);
-                                        handleFieldChange("Motivo_Solicitud", e.target.value);
-                                        saveToSessionStorage({ ...form.state.values, Motivo_Solicitud: e.target.value });
-                                    }}
-                                    placeholder="Escribe el motivo de tu solicitud"
-                                    maxLength={250}
-                                    className={`${commonClasses} resize-none h-24 overflow-y-auto scrollbar-thumb-blue-600 scrollbar-thin scrollbar-track-blue-100`}
-                                />
-                                {fieldErrors["Motivo_Solicitud"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Solicitud"]}</span>
-                                )}
-                                {formErrors["Motivo_Solicitud"] && !fieldErrors["Motivo_Solicitud"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Motivo_Solicitud"]}</span>
                                 )}
                             </div>
                         )}
@@ -391,14 +414,12 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                                 </option>
                                             ))}
                                         </select>
-
                                         {isMedidoresLoading && (
                                             <div className="absolute right-10 top-1/2 -translate-y-1/2">
                                                 <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
                                             </div>
                                         )}
                                     </div>
-
                                     {fieldErrors["Id_Medidor"] && (
                                         <span className="text-red-500 text-sm block mt-1">
                                             {fieldErrors["Id_Medidor"]}
@@ -407,13 +428,39 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
 
                                     {medidores.length === 0 && cedulaJuridica && !isMedidoresLoading && (
                                         <span className="text-red-500 text-sm block mt-1">
-                                            No se encontraron medidores para esta identificación
+                                            No se encontraron medidores para esta identificación.Primero debes ser afiliado
                                         </span>
                                     )}
                                 </div>
                             );
                         }}
                     </form.Field>
+
+                    {/* Motivo de Solicitud */}
+          <form.Field name="Motivo_Solicitud">
+            {(field) => (
+              <div className="mb-3 w-full">
+                <label htmlFor="Motivo_Solicitud" className="block mb-1 font-medium">Motivo de solicitud <span className="text-red-500">*</span></label>
+                <textarea
+                  id="Motivo_Solicitud"
+                  value={field.state.value}
+                  onChange={(e) => {
+                    field.handleChange(e.target.value);
+                    saveToSessionStorage({ ...form.state.values, Motivo_Solicitud: e.target.value });
+                  }}
+                  placeholder="Escribe el motivo de tu solicitud"
+                  maxLength={250}
+                  className={`${commonClasses} resize-none h-24 overflow-y-auto scrollbar-thumb-blue-600 scrollbar-thin scrollbar-track-blue-100`}
+                />
+                {fieldErrors["Motivo_Solicitud"] && (
+                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Solicitud"]}</span>
+                )}
+                {formErrors["Motivo_Solicitud"] && !fieldErrors["Motivo_Solicitud"] && (
+                  <span className="text-red-500 text-sm block mt-1">{formErrors["Motivo_Solicitud"]}</span>
+                )}
+              </div>
+            )}
+          </form.Field>
 
                     {/* Planos del Terreno */}
                     <form.Field name="Planos_Terreno">
@@ -471,13 +518,13 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                         }}
                     </form.Field>
 
-                    {/* Escritura del Terreno */}
-                    <form.Field name="Escritura_Terreno">
+                    {/* Certificacion Literal del Terreno */}
+                    <form.Field name="Certificacion_Literal">
                         {(field) => {
-                            const archivoActual = archivoSeleccionado["Escritura_Terreno"] ?? null;
+                            const archivoActual = archivoSeleccionado["Certificacion_Literal"] ?? null;
                             return (
                                 <div className="mb-3 w-full">
-                                    <label className="block mb-1 font-medium">Escritura del terreno <span className="text-red-500">*</span></label>
+                                    <label className="block mb-1 font-medium">Certificacion Literal del terreno <span className="text-red-500">*</span></label>
                                     <input
                                         type="file"
                                         accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -485,16 +532,16 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                         onChange={(e) => {
                                             const file = e.target.files?.[0] ?? null;
                                             field.handleChange(file ?? undefined);
-                                            setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: file }));
-                                            handleFieldChange("Escritura_Terreno", file);
+                                            setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: file }));
+                                            handleFieldChange("Certificacion_Literal", file);
                                         }}
                                         className="hidden"
-                                        id="Escritura_Terreno_CambioJuridica"
+                                        id="Certificacion_Literal_CambioJuridica"
                                         ref={escrituraInputRef}
                                         key={archivoActual ? archivoActual.name : 'escritura'}
                                     />
                                     <label
-                                        htmlFor="Escritura_Terreno_CambioJuridica"
+                                        htmlFor="Certificacion_Literal_CambioJuridica"
                                         className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-blue-700 cursor-pointer'}`}
                                     >
                                         {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
@@ -506,8 +553,8 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                                 type="button"
                                                 onClick={() => {
                                                     field.handleChange(undefined);
-                                                    setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: null }));
-                                                    setFieldErrors(prev => ({ ...prev, ["Escritura_Terreno"]: 'Debe subir la escritura del terreno' }));
+                                                    setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: null }));
+                                                    setFieldErrors(prev => ({ ...prev, ["Certificacion_Literal"]: 'Debe subir la certificacion literal del terreno' }));
                                                     if (escrituraInputRef.current) escrituraInputRef.current.value = '';
                                                 }}
                                                 className="text-red-500 hover:underline text-xs"
@@ -516,11 +563,11 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                             </button>
                                         </div>
                                     )}
-                                    {fieldErrors["Escritura_Terreno"] && (
-                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors["Escritura_Terreno"]}</span>
+                                    {fieldErrors["Certificacion_Literal"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors["Certificacion_Literal"]}</span>
                                     )}
-                                    {formErrors["Escritura_Terreno"] && !fieldErrors["Escritura_Terreno"] && (
-                                        <span className="text-red-500 text-sm block mt-1">{formErrors["Escritura_Terreno"]}</span>
+                                    {formErrors["Certificacion_Literal"] && !fieldErrors["Certificacion_Literal"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{formErrors["Certificacion_Literal"]}</span>
                                     )}
                                 </div>
                             );
@@ -529,20 +576,44 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                 </div>
 
 
-                <div className="flex justify-end items-end gap-4 mt-8">
 
-                    <div className="flex justify-end items-end">
-                        <button
-                            type="submit"
-                            disabled={isSending}
-                            className={`w-[120px] py-2 rounded transition ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
-                        >
-                            {isSending ? 'Enviando...' : 'Enviar'}
-                        </button>
-                    </div>
+
+                <div className="flex justify-center gap-4 mt-6 ml-50">
+
+                    <button
+                        type="submit"
+                        className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
+                        disabled={
+                            isSending ||
+                            Object.values(fieldErrors).some(Boolean) ||
+                            Object.values(formErrors).some(Boolean) ||
+                            [
+                                form.state.values.Razon_Social,
+                                form.state.values.Cedula_Juridica,
+                                form.state.values.Correo,
+                                form.state.values.Direccion_Exacta,
+                                form.state.values.Numero_Telefono,
+                                form.state.values.Id_Medidor,
+                                form.state.values.Motivo_Solicitud,
+                                form.state.values.Planos_Terreno,
+                                form.state.values.Certificacion_Literal
+                            ].some(val => val === undefined || val === null || val === "")
+                        }
+                    >
+                        {isSending ? 'Enviando...' : 'Enviar Solicitud'}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        disabled={isSending}
+                        className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                        Cancelar
+                    </button>
+
                 </div>
-            </form>
-        </div>
+            </form >
+        </div >
     );
 };
 

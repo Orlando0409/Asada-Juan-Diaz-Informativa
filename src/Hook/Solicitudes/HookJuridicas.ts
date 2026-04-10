@@ -1,7 +1,6 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createAfiliacionJuridica, createAgregarMedidorJuridica, createAsociadoJuridica, createCambioMedidorJuridica, createDesconexionJuridica, getMedidoresByIdentificacionJuridica } from "../../Services/Solicitudes/SolicitudesJuridicas";
-import type { AsociadoJuridico } from "../../models/Forms/Solicitudes/Juridica/AsociadoJuridica";
 import type { Medidor } from "../../models/Medidor";
 import type { MedidoresResponse } from "../../models/Forms/Solicitudes/Fisico/CambioMedidor";
 import { useAlerts } from "../../context/AlertContext";
@@ -77,7 +76,7 @@ export const useAsociadoJuridica = () => {
     const { showSuccess, showError } = useAlerts();
 
     const createAsociadoJuridicoMutation = useMutation({
-        mutationFn: (data: AsociadoJuridico) => createAsociadoJuridica(data),
+        mutationFn: (data: FormData) => createAsociadoJuridica(data),
 
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["asociado"] });

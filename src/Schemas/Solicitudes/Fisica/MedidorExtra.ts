@@ -1,4 +1,5 @@
 import z from 'zod';
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 export const TipoIdentificacionValues = [
     'Cedula Nacional',
@@ -33,10 +34,11 @@ export const MedidorExtraFisicoSchema = z.object({
         .transform(val => val.trim()),
 
     Apellido2: z.string()
+        .min(1, 'El segundo apellido no puede estar vacío')
+        .min(2, 'El segundo apellido debe tener al menos 2 caracteres')
         .max(49, 'El segundo apellido no puede tener más de 50 caracteres')
-        .optional()
-        .or(z.literal(''))
-        .transform(val => val === '' ? undefined : val),
+        .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/, { message: 'El segundo apellido solo puede contener letras y espacios' })
+        .transform(val => val.trim()),
 
     Correo: z.string()
         .min(1, 'El correo no puede estar vacío')
@@ -47,8 +49,19 @@ export const MedidorExtraFisicoSchema = z.object({
 
     Numero_Telefono: z.string()
         .min(1, 'El número de teléfono no puede estar vacío')
-        .refine(val => val.trim().length > 0, 'El número de teléfono no puede estar vacío')
-        .transform(val => val.trim()),
+        .refine((phone) => {
+            const phoneNumber = parsePhoneNumberFromString(phone || "");
+            return !!phoneNumber && phoneNumber.isValid();
+        }, {
+            message: 'Debe ingresar un número de teléfono válido '
+        })
+        .transform((phone) => {
+            const phoneNumber = parsePhoneNumberFromString(phone || "");
+            if (!phoneNumber || !phoneNumber.isValid()) {
+                throw new Error('Debe ingresar un número de teléfono válido');
+            }
+            return phoneNumber.format('E.164');
+        }),
 
     Direccion_Exacta: z.string()
         .min(1, 'La dirección no puede estar vacía')
@@ -64,10 +77,10 @@ export const MedidorExtraFisicoSchema = z.object({
             'El plano del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
         ),
 
-    Escritura_Terreno: z.instanceof(File, { message: "Debe subir la escritura del terreno" })
+    Certificacion_Literal: z.instanceof(File, { message: "Debe subir la certificacion literal del terreno" })
         .refine(
             file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
-            'La escritura del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
+            'La certificacion literal del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
         ),
 });
 

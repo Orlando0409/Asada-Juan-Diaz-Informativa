@@ -49,7 +49,7 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                 Numero_Telefono: "+50688887777",
                 Direccion_Exacta: "San José, Costa Rica",
                 Planos_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
-                Escritura_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
+                Certificacion_Literal: new File([''], 'test.jpg', { type: 'image/jpeg' }),
             };
             dummy[fieldName] = value;
 
@@ -116,7 +116,7 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
             Numero_Telefono: '',
             Direccion_Exacta: '',
             Planos_Terreno: undefined as File | undefined,
-            Escritura_Terreno: undefined as File | undefined,
+            Certificacion_Literal: undefined as File | undefined,
         },
 
         onSubmit: async ({ value }) => {
@@ -139,6 +139,7 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                 Direccion_Exacta: (value.Direccion_Exacta || '').trim(),
             };
 
+            // Ya no es necesario normalizar manualmente el teléfono, el schema lo hace
             // Validar con Zod
             const validation = MedidorExtraJuridicaSchema.safeParse(cleanedValue);
             if (!validation.success) {
@@ -290,7 +291,7 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                                     saveToSessionStorage({ ...form.state.values, Razon_Social: e.target.value });
                                 }}
                                 placeholder="Ejemplo S.A."
-                                maxLength={100}
+                                maxLength={255}
                                 className={commonClasses}
                             />
                             {fieldErrors["Razon_Social"] && (
@@ -448,12 +449,12 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                         );
                     }}
                 </form.Field>
-                <form.Field name="Escritura_Terreno">
+                <form.Field name="Certificacion_Literal">
                     {(field) => {
-                        const archivoActual = archivoSeleccionado["Escritura_Terreno"] ?? null;
+                        const archivoActual = archivoSeleccionado["Certificacion_Literal"] ?? null;
                         return (
                             <div className="w-full mb-2">
-                                <label className="block mb-1 font-semibold text-gray-700">Escritura del terreno <span className="text-red-500">*</span></label>
+                                <label className="block mb-1 font-semibold text-gray-700">Certificacion Literal del terreno <span className="text-red-500">*</span></label>
                                 <input
                                     type="file"
                                     accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -461,8 +462,8 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                                     onChange={(e) => {
                                         const file = e.target.files?.[0] ?? null;
                                         field.handleChange(file ?? undefined);
-                                        setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: file }));
-                                        validateField("Escritura_Terreno", file);
+                                        setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: file }));
+                                        validateField("Certificacion_Literal", file);
                                     }}
                                     className="hidden"
                                     id="escritura_medidor_juridico"
@@ -482,10 +483,10 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                                             type="button"
                                             onClick={() => {
                                                 field.handleChange(undefined);
-                                                setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: null }));
+                                                setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: null }));
                                                 setFieldErrors(prev => ({
                                                     ...prev,
-                                                    ["Escritura_Terreno"]: `Debe subir la escritura del terreno`,
+                                                    ["Certificacion_Literal"]: `Debe subir la certificacion literal del terreno`,
                                                 }));
                                                 if (escrituraInputRef.current) escrituraInputRef.current.value = "";
                                             }}
@@ -495,11 +496,11 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                                         </button>
                                     </div>
                                 )}
-                                {fieldErrors["Escritura_Terreno"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Escritura_Terreno"]}</span>
+                                {fieldErrors["Certificacion_Literal"] && (
+                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Certificacion_Literal"]}</span>
                                 )}
-                                {formErrors["Escritura_Terreno"] && !fieldErrors["Escritura_Terreno"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Escritura_Terreno"]}</span>
+                                {formErrors["Certificacion_Literal"] && !fieldErrors["Certificacion_Literal"] && (
+                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Certificacion_Literal"]}</span>
                                 )}
                             </div>
                         );
@@ -512,9 +513,22 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                 <button
                     type="submit"
                     className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
-                    disabled={!cedulaValidada || loadingMedidores || mutation.isPending}
+                    disabled={
+                        mutation.isPending ||
+                        Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
+                        Object.values(fieldErrors).some(Boolean) ||
+                        Object.values(formErrors).some(Boolean)
+                    }
                 >
                     {mutation.isPending ? 'Enviando...' : 'Enviar Solicitud'}
+                </button>
+                <button
+                    type="button"
+                    onClick={onClose}
+                    disabled={mutation.isPending}
+                    className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                    Cancelar
                 </button>
             </div>
         </form>

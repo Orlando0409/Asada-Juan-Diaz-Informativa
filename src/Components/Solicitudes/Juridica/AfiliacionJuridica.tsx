@@ -28,7 +28,7 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
     const { lookupJuridica, isLoading: loadingCedula } = useCedulaLookup();
     const planosInputRef = useRef<HTMLInputElement>(null);
     const escrituraInputRef = useRef<HTMLInputElement>(null);
- 
+
 
     const [mostrarFormulario, setMostrarFormulario] = useState(true);
 
@@ -43,7 +43,7 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                 Numero_Telefono: "+50688887777",
                 Direccion_Exacta: "San José, Costa Rica",
                 Planos_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
-                Escritura_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
+                Certificacion_Literal: new File([''], 'test.jpg', { type: 'image/jpeg' }),
             };
             dummy[fieldName] = value;
 
@@ -95,7 +95,7 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
             Numero_Telefono: '',
             Direccion_Exacta: '',
             Planos_Terreno: undefined as File | undefined,
-            Escritura_Terreno: undefined as File | undefined,
+            Certificacion_Literal: undefined as File | undefined,
         },
 
         onSubmit: async ({ value }) => {
@@ -143,6 +143,8 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
             }
         },
     });
+
+
     ///prueba 
     useEffect(() => {
         const savedData = sessionStorage.getItem(STORAGE_KEY);
@@ -151,7 +153,7 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                 const parsed = JSON.parse(savedData);
                 // Cargar los valores en el formulario
                 Object.entries(parsed).forEach(([key, value]) => {
-                    if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
+                        if (key !== 'Planos_Terreno' && key !== 'Certificacion_Literal') {
                         form.setFieldValue(key as any, value as any);
                     }
                 });
@@ -172,159 +174,159 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
             >
                 <h2 className="text-center text-xl font-semibold mb-4">Solicitud de Afiliación - Persona Jurídica</h2>
 
-                    <form
-                        onSubmit={(e) => {
-                            e.preventDefault();
-                            form.handleSubmit();
-                        }}
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        form.handleSubmit();
+                    }}
 
-                    >
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-2">
-                            {/* Razon Social */}
-                            <form.Field name="Razon_Social">
-                                {(field) => (
-                                    <div className="mb-3">
-                                        <label className="block mb-1 font-semibold text-gray-700">Razón Social <span className="text-red-500">*</span></label>
+                >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-2">
+                        {/* Razon Social */}
+                        <form.Field name="Razon_Social">
+                            {(field) => (
+                                <div className="mb-3">
+                                    <label className="block mb-1 font-semibold text-gray-700">Razón Social <span className="text-red-500">*</span></label>
+                                    <input
+                                        type="text"
+                                        value={field.state.value}
+                                        onChange={(e) => {
+                                            field.handleChange(e.target.value);
+                                            validateField("Razon_Social", e.target.value);
+                                            saveToSessionStorage({ ...form.state.values, Razon_Social: e.target.value }); // 
+                                        }}
+                                        placeholder="Ejemplo S.A."
+                                        maxLength={255}
+                                        className={commonClasses}
+                                    />
+                                    {fieldErrors["Razon_Social"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors["Razon_Social"]}</span>
+                                    )}
+                                    {formErrors["Razon_Social"] && !fieldErrors["Razon_Social"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{formErrors["Razon_Social"]}</span>
+                                    )}
+                                </div>
+                            )}
+                        </form.Field>
+                        {/* Cedula Juridica */}
+                        <form.Field name="Cedula_Juridica">
+                            {(field) => (
+                                <div className="mb-3">
+                                    <label className="block mb-1 font-semibold text-gray-700">
+                                        Cédula Jurídica <span className="text-red-500">*</span>
+                                    </label>
+                                    <div className="relative">
                                         <input
                                             type="text"
                                             value={field.state.value}
                                             onChange={(e) => {
-                                                field.handleChange(e.target.value);
-                                                validateField("Razon_Social", e.target.value);
-                                                saveToSessionStorage({ ...form.state.values, Razon_Social: e.target.value }); // 
+                                                const formatted = formatCedulaJuridica(e.target.value);
+                                                field.handleChange(formatted);
+                                                validateField("Cedula_Juridica", formatted);
+                                                saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted });
+                                                if (/^\d-\d{3}-\d{6}$/.test(formatted)) {
+                                                    lookupJuridica(formatted).then(razonSocial => {
+                                                        if (razonSocial) form.setFieldValue('Razon_Social', razonSocial);
+                                                    });
+                                                }
                                             }}
-                                            placeholder="Ejemplo S.A."
-                                            maxLength={50}
+                                            placeholder="3-XXX-XXXXXX"
                                             className={commonClasses}
+                                            maxLength={12}
                                         />
-                                        {fieldErrors["Razon_Social"] && (
-                                            <span className="text-red-500 text-sm block mt-1">{fieldErrors["Razon_Social"]}</span>
-                                        )}
-                                        {formErrors["Razon_Social"] && !fieldErrors["Razon_Social"] && (
-                                            <span className="text-red-500 text-sm block mt-1">{formErrors["Razon_Social"]}</span>
-                                        )}
-                                    </div>
-                                )}
-                            </form.Field>
-                            {/* Cedula Juridica */}
-                            <form.Field name="Cedula_Juridica">
-                                {(field) => (
-                                    <div className="mb-3">
-                                        <label className="block mb-1 font-semibold text-gray-700">
-                                            Cédula Jurídica <span className="text-red-500">*</span>
-                                        </label>
-                                        <div className="relative">
-                                            <input
-                                                type="text"
-                                                value={field.state.value}
-                                                onChange={(e) => {
-                                                    const formatted = formatCedulaJuridica(e.target.value);
-                                                    field.handleChange(formatted);
-                                                    validateField("Cedula_Juridica", formatted);
-                                                    saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted });
-                                                    if (/^\d-\d{3}-\d{6}$/.test(formatted)) {
-                                                        lookupJuridica(formatted).then(razonSocial => {
-                                                            if (razonSocial) form.setFieldValue('Razon_Social', razonSocial);
-                                                        });
-                                                    }
-                                                }}
-                                                placeholder="3-XXX-XXXXXX"
-                                                className={commonClasses}
-                                                maxLength={12}
-                                            />
-                                            {loadingCedula && (
-                                                <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                                    <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                    </svg>
-                                                </div>
-                                            )}
-                                        </div>
-                                        {fieldErrors["Cedula_Juridica"] && (
-                                            <span className="text-red-500 text-sm block mt-1">{fieldErrors["Cedula_Juridica"]}</span>
-                                        )}
-                                        {formErrors["Cedula_Juridica"] && !fieldErrors["Cedula_Juridica"] && (
-                                            <span className="text-red-500 text-sm block mt-1">{formErrors["Cedula_Juridica"]}</span>
+                                        {loadingCedula && (
+                                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                                                <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                </svg>
+                                            </div>
                                         )}
                                     </div>
-                                )}
-                            </form.Field>
-                            {/* Correo */}
-                            <form.Field name="Correo">
-                                {(field) => (
-                                    <div className="mb-3">
-                                        <label className="block mb-1 font-semibold text-gray-700">Correo electrónico <span className="text-red-500">*</span></label>
-                                        <input
-                                            type="email"
-                                            value={field.state.value}
-                                            onChange={(e) => {
-                                                field.handleChange(e.target.value);
-                                                validateField("Correo", e.target.value);
-                                                saveToSessionStorage({ ...form.state.values, Correo: e.target.value }); // ← NUEVO
-                                            }}
-                                            placeholder="empresa@email.com"
-                                            maxLength={100}
-                                            className={commonClasses}
-                                        />
-                                        {fieldErrors["Correo"] && (
-                                            <span className="text-red-500 text-sm block mt-1">{fieldErrors["Correo"]}</span>
-                                        )}
-                                        {formErrors["Correo"] && !fieldErrors["Correo"] && (
-                                            <span className="text-red-500 text-sm block mt-1">{formErrors["Correo"]}</span>
-                                        )}
-                                    </div>
-                                )}
-                            </form.Field>
-                            {/* Teléfono internacional */}
-                            <form.Field name="Numero_Telefono">
-                                {(field) => (
-                                    <div className="mb-3">
-                                        <label className="block mb-1 font-semibold text-gray-700">Número de teléfono <span className="text-red-500">*</span></label>
-                                        <PhoneInputComponent
-                                            value={field.state.value}
-                                            onChange={(value) => {
-                                                field.handleChange(value || "");
-                                                validateField("Numero_Telefono", value || "");
-                                                saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" }); // ← NUEVO
-                                            }}
-                                            className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
-                                        />
-                                        {fieldErrors["Numero_Telefono"] && (
-                                            <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
-                                        )}
-                                        {formErrors["Numero_Telefono"] && !fieldErrors["Numero_Telefono"] && (
-                                            <span className="text-red-500 text-sm block mt-1">{formErrors["Numero_Telefono"]}</span>
-                                        )}
-                                    </div>
-                                )}
-                            </form.Field>
-                            {/* Dirección Exacta */}
-                            <form.Field name="Direccion_Exacta">
-                                {(field) => (
-                                    <div className="mb-3">
-                                        <label className="block mb-1 font-semibold text-gray-700">Dirección exacta <span className="text-red-500">*</span></label>
-                                        <textarea
-                                            value={field.state.value}
-                                            onChange={(e) => {
-                                                field.handleChange(e.target.value);
-                                                validateField("Direccion_Exacta", e.target.value);
-                                                saveToSessionStorage({ ...form.state.values, Direccion_Exacta: e.target.value }); // ← NUEVO
-                                            }}
-                                            placeholder="San José, del Banco Nacional 200m sur"
-                                            maxLength={100}
-                                            className={commonClasses}
-                                        />
-                                        {fieldErrors["Direccion_Exacta"] && (
-                                            <span className="text-red-500 text-sm block mt-1">{fieldErrors["Direccion_Exacta"]}</span>
-                                        )}
-                                        {formErrors["Direccion_Exacta"] && !fieldErrors["Direccion_Exacta"] && (
-                                            <span className="text-red-500 text-sm block mt-1">{formErrors["Direccion_Exacta"]}</span>
-                                        )}
-                                    </div>
-                                )}
-                            </form.Field>
-                        </div>
+                                    {fieldErrors["Cedula_Juridica"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors["Cedula_Juridica"]}</span>
+                                    )}
+                                    {formErrors["Cedula_Juridica"] && !fieldErrors["Cedula_Juridica"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{formErrors["Cedula_Juridica"]}</span>
+                                    )}
+                                </div>
+                            )}
+                        </form.Field>
+                        {/* Correo */}
+                        <form.Field name="Correo">
+                            {(field) => (
+                                <div className="mb-3">
+                                    <label className="block mb-1 font-semibold text-gray-700">Correo electrónico <span className="text-red-500">*</span></label>
+                                    <input
+                                        type="email"
+                                        value={field.state.value}
+                                        onChange={(e) => {
+                                            field.handleChange(e.target.value);
+                                            validateField("Correo", e.target.value);
+                                            saveToSessionStorage({ ...form.state.values, Correo: e.target.value }); // ← NUEVO
+                                        }}
+                                        placeholder="empresa@email.com"
+                                        maxLength={100}
+                                        className={commonClasses}
+                                    />
+                                    {fieldErrors["Correo"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors["Correo"]}</span>
+                                    )}
+                                    {formErrors["Correo"] && !fieldErrors["Correo"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{formErrors["Correo"]}</span>
+                                    )}
+                                </div>
+                            )}
+                        </form.Field>
+                        {/* Teléfono internacional */}
+                        <form.Field name="Numero_Telefono">
+                            {(field) => (
+                                <div className="mb-3">
+                                    <label className="block mb-1 font-semibold text-gray-700">Número de teléfono <span className="text-red-500">*</span></label>
+                                    <PhoneInputComponent
+                                        value={field.state.value}
+                                        onChange={(value) => {
+                                            field.handleChange(value || "");
+                                            validateField("Numero_Telefono", value || "");
+                                            saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" }); // ← NUEVO
+                                        }}
+                                        className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
+                                    />
+                                    {fieldErrors["Numero_Telefono"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
+                                    )}
+                                    {formErrors["Numero_Telefono"] && !fieldErrors["Numero_Telefono"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{formErrors["Numero_Telefono"]}</span>
+                                    )}
+                                </div>
+                            )}
+                        </form.Field>
+                        {/* Dirección Exacta */}
+                        <form.Field name="Direccion_Exacta">
+                            {(field) => (
+                                <div className="mb-3">
+                                    <label className="block mb-1 font-semibold text-gray-700">Dirección exacta <span className="text-red-500">*</span></label>
+                                    <textarea
+                                        value={field.state.value}
+                                        onChange={(e) => {
+                                            field.handleChange(e.target.value);
+                                            validateField("Direccion_Exacta", e.target.value);
+                                            saveToSessionStorage({ ...form.state.values, Direccion_Exacta: e.target.value }); // ← NUEVO
+                                        }}
+                                        placeholder="San José, del Banco Nacional 200m sur"
+                                        maxLength={100}
+                                        className={commonClasses}
+                                    />
+                                    {fieldErrors["Direccion_Exacta"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors["Direccion_Exacta"]}</span>
+                                    )}
+                                    {formErrors["Direccion_Exacta"] && !fieldErrors["Direccion_Exacta"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{formErrors["Direccion_Exacta"]}</span>
+                                    )}
+                                </div>
+                            )}
+                        </form.Field>
+                    </div>
 
                         {/* Archivos */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 mt-4">
@@ -387,12 +389,12 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                                     );
                                 }}
                             </form.Field>
-                            <form.Field name="Escritura_Terreno">
+                            <form.Field name="Certificacion_Literal">
                                 {(field) => {
-                                    const archivoActual = archivoSeleccionado["Escritura_Terreno"] ?? null;
+                                    const archivoActual = archivoSeleccionado["Certificacion_Literal"] ?? null;
                                     return (
                                         <div className="mb-3">
-                                            <label className="block mb-1 font-semibold text-gray-700">Escritura del terreno <span className="text-red-500">*</span></label>
+                                            <label className="block mb-1 font-semibold text-gray-700">Certificacion Literal del terreno <span className="text-red-500">*</span></label>
                                             <input
                                                 type="file"
                                                 accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -400,16 +402,16 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                                                 onChange={(e) => {
                                                     const file = e.target.files?.[0] ?? null;
                                                     field.handleChange(file ?? undefined);
-                                                    setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: file }));
-                                                    validateField("Escritura_Terreno", file);
+                                                    setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: file }));
+                                                    validateField("Certificacion_Literal", file);
                                                 }}
                                                 className="hidden"
-                                                id="Escritura_Terreno"
+                                                id="Certificacion_Literal"
                                                 ref={escrituraInputRef}
                                                 key={archivoActual ? archivoActual.name : 'escritura'}
                                             />
                                             <label
-                                                htmlFor="Escritura_Terreno"
+                                                htmlFor="Certificacion_Literal"
                                                 className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-blue-700 cursor-pointer'}`}
                                             >
                                                 {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
@@ -421,10 +423,10 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                                                         type="button"
                                                         onClick={() => {
                                                             field.handleChange(undefined);
-                                                            setArchivoSeleccionado(prev => ({ ...prev, ["Escritura_Terreno"]: null }));
+                                                            setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: null }));
                                                             setFieldErrors(prev => ({
                                                                 ...prev,
-                                                                ["Escritura_Terreno"]: `Debe subir la escritura del terreno`,
+                                                                ["Certificacion_Literal"]: `Debe subir la certificacion literal del terreno`,
                                                             }));
                                                             if (escrituraInputRef.current) {
                                                                 escrituraInputRef.current.value = '';
@@ -436,11 +438,11 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                                                     </button>
                                                 </div>
                                             )}
-                                            {fieldErrors["Escritura_Terreno"] && (
-                                                <span className="text-red-500 text-sm block mt-1">{fieldErrors["Escritura_Terreno"]}</span>
+                                            {fieldErrors["Certificacion_Literal"] && (
+                                                <span className="text-red-500 text-sm block mt-1">{fieldErrors["Certificacion_Literal"]}</span>
                                             )}
-                                            {formErrors["Escritura_Terreno"] && !fieldErrors["Escritura_Terreno"] && (
-                                                <span className="text-red-500 text-sm block mt-1">{formErrors["Escritura_Terreno"]}</span>
+                                            {formErrors["Certificacion_Literal"] && !fieldErrors["Certificacion_Literal"] && (
+                                                <span className="text-red-500 text-sm block mt-1">{formErrors["Certificacion_Literal"]}</span>
                                             )}
                                         </div>
                                     );
@@ -448,22 +450,36 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                             </form.Field>
                         </div>
 
-                        <div className="flex justify-end items-end gap-4 mt-8">
+                    <div className="flex justify-center gap-4 mt-6 ml-50">
 
-                            <button
-                                type="submit"
-                                disabled={isSending}
-                                className={`w-[120px] py-2 rounded transition-colors ${isSending
-                                    ? 'bg-gray-400 cursor-not-allowed'
-                                    : 'bg-blue-600 hover:bg-blue-700'} text-white`}
-                            >
-                                {isSending ? 'Enviando...' : 'Enviar'}
-                            </button>
-                        </div>
-                    </form>
+                        <button
+                            type="submit"
+                            className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
+                            disabled={
+                                isSending ||
+                                Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
+                                Object.values(fieldErrors).some(Boolean) ||
+                                Object.values(formErrors).some(Boolean)
+                            }
+                        >
+                            {isSending ? 'Enviando...' : 'Enviar Solicitud'}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onClose}
+                            disabled={isSending}
+                            className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                            Cancelar
+                        </button>
+
+                    </div>
+                </form>
             </div>
         </div>
     );
 };
 
 export default FormularioAfiliacionJuridico;
+
+

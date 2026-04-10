@@ -9,7 +9,7 @@ export interface Afiliacion {
   Edad: number;
   Tipo_Identificacion: 'Cedula Nacional' | 'Dimex' | 'Pasaporte';
   Planos_Terreno?: File | string;
-  Escritura_Terreno?: File | string;
+  Certificacion_Literal?: File | string;
 }
 
 export const AfiliacionInicialState: Afiliacion = {
@@ -23,7 +23,7 @@ export const AfiliacionInicialState: Afiliacion = {
   Edad: 0,
   Tipo_Identificacion: 'Cedula Nacional',
   Planos_Terreno: undefined,
-  Escritura_Terreno: undefined,
+  Certificacion_Literal: undefined,
 };
 
 export interface AfiliacionFormData {
@@ -37,5 +37,5 @@ export interface AfiliacionFormData {
   Numero_Telefono: string;
   Edad: number;
   Planos_Terreno?: File | string;
-  Escritura_Terreno?: File | string;
+  Certificacion_Literal?: File | string;
 }

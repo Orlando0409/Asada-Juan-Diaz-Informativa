@@ -7,7 +7,7 @@ const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/hei
 export const DesconexionJuridicaSchema = z.object({
   Razon_Social: z.string()
     .min(2, 'La razón social debe tener al menos 2 caracteres')
-    .max(99, 'La razón social no puede tener más de 100 caracteres'),
+    .max(255, 'La razón social no puede tener más de 255 caracteres'),
 
   Cedula_Juridica: z.string()
     .min(10, 'La cédula jurídica debe tener al menos 10 caracteres')
@@ -29,7 +29,14 @@ export const DesconexionJuridicaSchema = z.object({
       const phoneNumber = parsePhoneNumberFromString(phone || "");
       return !!phoneNumber && phoneNumber.isValid();
     }, {
-      message: 'Debe ingresar un número de teléfono válido con código de país, ej. +50688887777'
+      message: 'Debe ingresar un número de teléfono válido'
+    })
+    .transform((phone) => {
+      const phoneNumber = parsePhoneNumberFromString(phone || "");
+      if (!phoneNumber || !phoneNumber.isValid()) {
+        throw new Error('Debe ingresar un número de teléfono válido');
+      }
+      return phoneNumber.format('E.164');
     }),
 
   Motivo_Solicitud: z.string()
@@ -43,7 +50,7 @@ export const DesconexionJuridicaSchema = z.object({
     .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), 'Solo se aceptan archivos .jpg, .jpeg, .png, .heic, .pdf')
     .optional(),
 
-  Escritura_Terreno: z
+  Certificacion_Literal: z
     .instanceof(File)
     .refine((file) => file.size <= MAX_FILE_SIZE, 'El archivo no debe exceder 5MB')
 

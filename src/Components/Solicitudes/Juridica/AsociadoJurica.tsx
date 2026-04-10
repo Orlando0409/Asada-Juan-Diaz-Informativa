@@ -1,5 +1,5 @@
 import { useForm } from "@tanstack/react-form";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { AsociadoJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/AsociadoJuridica";
 import { useAsociadoJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
 import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
@@ -33,6 +33,10 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
     const mutation = useAsociadoJuridica();
     const { lookupJuridica, isLoading: loadingCedula } = useCedulaLookup();
     const [_mostrarFormulario, setMostrarFormulario] = useState(true);
+    // Estados y referencias para archivos
+    const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
+    const planosInputRef = useRef<HTMLInputElement>(null);
+    const escrituraInputRef = useRef<HTMLInputElement>(null);
 
     // Validación en tiempo real de todo el formulario
     const validateAllFields = (values: any) => {
@@ -80,6 +84,7 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
             try {
                 value.Numero_Telefono = normalizePhoneNumber(value.Numero_Telefono);
 
+                // Validar campos de texto (sin archivos)
                 const validation = AsociadoJuridicaSchema.safeParse(value);
                 if (!validation.success) {
                     const validationErrors: Record<string, string> = {};
@@ -100,14 +105,27 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                     return;
                 }
 
-                setIsSending(true);
-                await mutation.createAsociado(value);
-                sessionStorage.removeItem(STORAGE_KEY);
+                // Crear FormData y agregar campos
+                const formData = new FormData();
+                Object.entries(value).forEach(([key, val]) => {
+                    if (val !== undefined && val !== null) {
+                        formData.append(key, val as string);
+                    }
+                });
+                if (archivoSeleccionado.Planos_Terreno) {
+                    formData.append('Planos_Terreno', archivoSeleccionado.Planos_Terreno);
+                }
+                if (archivoSeleccionado.Escrituras_Terreno) {
+                    formData.append('Escrituras_Terreno', archivoSeleccionado.Escrituras_Terreno);
+                }
 
+                setIsSending(true);
+                await mutation.createAsociado(formData);
+                sessionStorage.removeItem(STORAGE_KEY);
                 form.reset();
+                setArchivoSeleccionado({ Planos_Terreno: null, Escrituras_Terreno: null });
                 setMostrarFormulario(false);
                 onClose();
-                alert("¡Formulario enviado con éxito!");
             } catch (error: any) {
                 console.log(" ERROR EN SOLICITUD DE ASOCIADO JURÍDICO:", error);
             } finally {
@@ -141,7 +159,7 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                 const parsed = JSON.parse(savedData);
                 // Cargar los valores en el formulario
                 Object.entries(parsed).forEach(([key, value]) => {
-                    if (key !== 'Planos_Terreno' && key !== 'Escritura_Terreno') {
+                    if (key !== 'Planos_Terreno' && key !== 'Certificacion_Literal') {
                         form.setFieldValue(key as any, value as any);
                     }
                 });
@@ -223,7 +241,7 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                                     }}
                                     onBlur={() => setTouched(prev => ({ ...prev, Razon_Social: true }))}
                                     placeholder="Ejemplo S.A."
-                                    maxLength={50}
+                                    maxLength={255}
                                     className={commonClasses}
                                 />
                                 {touched["Razon_Social"] && fieldErrors["Razon_Social"] && (
@@ -314,20 +332,153 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                             </div>
                         )}
                     </form.Field>
+
+                    {/* Archivos */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 mt-4">
+                        {/* Planos del terreno */}
+                        <div className="mb-3">
+                            <label className="block mb-1 font-semibold text-gray-700">Planos del terreno <span className="text-red-500">*</span></label>
+                            <input
+                                type="file"
+                                accept=".png,.jpg,.jpeg,.heic,.pdf"
+                                disabled={!!archivoSeleccionado.Planos_Terreno}
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0] ?? null;
+                                    setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: file }));
+                                    setFieldErrors(prev => {
+                                        const next = { ...prev };
+                                        if (file) {
+                                            delete next["Planos_Terreno"];
+                                        }
+                                        return next;
+                                    });
+                                }}
+                                className="hidden"
+                                id="Planos_Terreno"
+                                ref={planosInputRef}
+                                key={archivoSeleccionado.Planos_Terreno ? archivoSeleccionado.Planos_Terreno.name : 'planos'}
+                            />
+                            <label
+                                htmlFor="Planos_Terreno"
+                                className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoSeleccionado.Planos_Terreno ? 'cursor-not-allowed opacity-50' : 'hover:bg-blue-700 cursor-pointer'}`}
+                            >
+                                {archivoSeleccionado.Planos_Terreno ? 'Archivo cargado' : 'Subir archivo'}
+                            </label>
+                            {archivoSeleccionado.Planos_Terreno && (
+                                <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
+                                    <span className="text-sm text-gray-700">{archivoSeleccionado.Planos_Terreno.name}</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setArchivoSeleccionado(prev => ({ ...prev, Planos_Terreno: null }));
+                                            setFieldErrors(prev => ({
+                                                ...prev,
+                                                ["Planos_Terreno"]: `Debe subir el plano del terreno`,
+                                            }));
+                                            if (planosInputRef.current) {
+                                                planosInputRef.current.value = '';
+                                            }
+                                        }}
+                                        className="text-red-500 hover:underline text-xs"
+                                    >
+                                        Eliminar
+                                    </button>
+                                </div>
+                            )}
+                            {fieldErrors["Planos_Terreno"] && (
+                                <span className="text-red-500 text-sm block mt-1">{fieldErrors["Planos_Terreno"]}</span>
+                            )}
+                            {formErrors["Planos_Terreno"] && !fieldErrors["Planos_Terreno"] && (
+                                <span className="text-red-500 text-sm block mt-1">{formErrors["Planos_Terreno"]}</span>
+                            )}
+                        </div>
+                        {/* Escrituras del terreno */}
+                        <div className="mb-3">
+                            <label className="block mb-1 font-semibold text-gray-700">Escrituras del terreno <span className="text-red-500">*</span></label>
+                            <input
+                                type="file"
+                                accept=".png,.jpg,.jpeg,.heic,.pdf"
+                                disabled={!!archivoSeleccionado.Escrituras_Terreno}
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0] ?? null;
+                                    setArchivoSeleccionado(prev => ({ ...prev, ["Escrituras_Terreno"]: file }));
+                                    setFieldErrors(prev => {
+                                        const next = { ...prev };
+                                        if (file) {
+                                            delete next["Escrituras_Terreno"];
+                                        }
+                                        return next;
+                                    });
+                                }}
+                                className="hidden"
+                                id="Escrituras_Terreno"
+                                ref={escrituraInputRef}
+                                key={archivoSeleccionado.Escrituras_Terreno ? archivoSeleccionado.Escrituras_Terreno.name : 'escritura'}
+                            />
+                            <label
+                                htmlFor="Escrituras_Terreno"
+                                className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoSeleccionado.Escrituras_Terreno ? 'cursor-not-allowed opacity-50' : 'hover:bg-blue-700 cursor-pointer'}`}
+                            >
+                                {archivoSeleccionado.Escrituras_Terreno ? 'Archivo cargado' : 'Subir archivo'}
+                            </label>
+                            {archivoSeleccionado.Escrituras_Terreno && (
+                                <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
+                                    <span className="text-sm text-gray-700">{archivoSeleccionado.Escrituras_Terreno.name}</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setArchivoSeleccionado(prev => ({ ...prev, Escrituras_Terreno: null }));
+                                            setFieldErrors(prev => ({
+                                                ...prev,
+                                                ["Escrituras_Terreno"]: `Debe subir la escritura del terreno`,
+                                            }));
+                                            if (escrituraInputRef.current) {
+                                                escrituraInputRef.current.value = '';
+                                            }
+                                        }}
+                                        className="text-red-500 hover:underline text-xs"
+                                    >
+                                        Eliminar
+                                    </button>
+                                </div>
+                            )}
+                            {fieldErrors["Escrituras_Terreno"] && (
+                                <span className="text-red-500 text-sm block mt-1">{fieldErrors["Escrituras_Terreno"]}</span>
+                            )}
+                            {formErrors["Escrituras_Terreno"] && !fieldErrors["Escrituras_Terreno"] && (
+                                <span className="text-red-500 text-sm block mt-1">{formErrors["Escrituras_Terreno"]}</span>
+                            )}
+                        </div>
+                    </div>
+
                 </div>
 
 
-                <div className="flex justify-end items-end gap-4 mt-8">
+                <div className="flex justify-center gap-4 mt-6 ml-50">
 
-                    <div className="flex justify-end items-end">
-                        <button
-                            type="submit"
-                            disabled={isSending}
-                            className={`w-[120px] py-2 rounded transition ${isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-900 hover:bg-blue-800'} text-white`}
-                        >
-                            {isSending ? 'Enviando...' : 'Enviar'}
-                        </button>
-                    </div>
+                    <button
+                        type="submit"
+                        className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
+                        disabled={
+                            isSending ||
+                            Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
+                            Object.values(fieldErrors).some(Boolean) ||
+                            Object.values(formErrors).some(Boolean) ||
+                            !archivoSeleccionado["Planos_Terreno"] ||
+                            !archivoSeleccionado["Escrituras_Terreno"]
+                        }
+                    >
+                        {isSending ? 'Enviando...' : 'Enviar Solicitud'}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={onClose}
+                        disabled={isSending}
+                        className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                        Cancelar
+                    </button>
+
                 </div>
             </form>
         </div>
