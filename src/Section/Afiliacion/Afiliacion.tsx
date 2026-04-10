@@ -48,8 +48,6 @@ type TarjetaClienteProps = {
   iconClassName: string
 }
 
-type FormView = "afiliacion" | "medidor-extra"
-
 const iconMap: Record<string, IconType> = {
   droplet: FiDroplet,
   fileText: FiFileText,

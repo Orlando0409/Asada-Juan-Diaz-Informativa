@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createAfiliacionFisica, createAgregarMedidorFisica, createAsociadoFisica, createCambioMedidorFisica, createDesconexionFisica, getMedidoresByIdentificacion } from "../../Services/Solicitudes/SolicitudesFisicas";
 import type { MedidoresResponse } from "../../models/Forms/Solicitudes/Fisico/CambioMedidor";
-import type { AsociadoFisico } from "../../Schemas/Solicitudes/Fisica/Asociado";
 import type { Medidor } from "../../models/Medidor";
 import { useAlerts } from "../../context/AlertContext";
 

@@ -1,5 +1,4 @@
 import apiAuth from "../../api/apiAuth";
-import type { AsociadoFisico } from "../../Schemas/Solicitudes/Fisica/Asociado";
 
 export async function createAfiliacionFisica(data: FormData) {
   const response = await apiAuth.post("/solicitudes-fisicas/create/afiliacion", data);
@@ -16,7 +15,7 @@ export async function createCambioMedidorFisica(data: FormData) {
   return response.data;
 }
 
-export async function createAsociadoFisica(data: AsociadoFisico) {
+export async function createAsociadoFisica(data: FormData) {
   const response = await apiAuth.post("/solicitudes-fisicas/create/asociado", data);
   return response.data;
 }
