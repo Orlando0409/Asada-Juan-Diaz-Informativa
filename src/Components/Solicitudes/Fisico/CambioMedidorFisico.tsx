@@ -655,18 +655,31 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
           {/* Botones */}
 
           <div className="flex justify-end items-center gap-3 mt-8">
-          <button
-                        type="submit"
-                        className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
-                        disabled={
-                            isSending ||
-                            Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
-                            Object.values(fieldErrors).some(Boolean) ||
-                            Object.values(formErrors).some(Boolean)
-                        }
-                    >
-                        {isSending ? 'Enviando...' : 'Enviar Solicitud'}
-                    </button>
+            <button
+              type="submit"
+              className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
+              disabled={
+                isSending ||
+                Object.values(fieldErrors).some(Boolean) ||
+                Object.values(formErrors).some(Boolean) ||
+                [
+                  form.state.values.Nombre,
+                  form.state.values.Apellido1,
+                  form.state.values.Apellido2,
+                  form.state.values.Tipo_Identificacion,
+                  form.state.values.Identificacion,
+                  form.state.values.Correo,
+                  form.state.values.Direccion_Exacta,
+                  form.state.values.Numero_Telefono,
+                  form.state.values.Id_Medidor,
+                  form.state.values.Motivo_Solicitud,
+                  form.state.values.Planos_Terreno,
+                  form.state.values.Certificacion_Literal
+                ].some(val => val === undefined || val === null || val === "")
+              }
+            >
+              {isSending ? 'Enviando...' : 'Enviar Solicitud'}
+            </button>
             <button
               type="button"
               onClick={onClose}

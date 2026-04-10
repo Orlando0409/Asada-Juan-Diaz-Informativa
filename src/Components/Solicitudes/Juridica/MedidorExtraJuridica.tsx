@@ -291,7 +291,7 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                                     saveToSessionStorage({ ...form.state.values, Razon_Social: e.target.value });
                                 }}
                                 placeholder="Ejemplo S.A."
-                                maxLength={100}
+                                maxLength={255}
                                 className={commonClasses}
                             />
                             {fieldErrors["Razon_Social"] && (

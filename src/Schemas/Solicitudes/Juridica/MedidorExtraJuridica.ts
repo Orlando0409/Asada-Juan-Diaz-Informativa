@@ -10,13 +10,13 @@ export const MedidorExtraJuridicaSchema = z.object({
 
   Razon_Social: z.string()
     .min(2, 'La razón social debe tener al menos 2 caracteres')
-    .max(99, 'La razón social no puede tener más de 100 caracteres')
+    .max(255, 'La razón social no puede tener más de 255 caracteres')
     .refine(val => val.trim().length > 0, 'La razón social no puede estar vacía')
     .transform(val => val.trim()),
 
   Correo: z.string()
     .min(1, 'El correo electrónico es obligatorio')
-    .max(99, 'El correo no puede tener más de 100 caracteres')
+    .max(255, 'El correo no puede tener más de 255 caracteres')
     .email('El correo electrónico no es válido')
     .transform(val => val.trim().toLowerCase()),
 
