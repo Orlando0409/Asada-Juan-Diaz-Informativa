@@ -39,7 +39,7 @@ function SectionOnVisible({
   }, [isVisible, rootMargin])
 
   return (
-    <div ref={containerRef} style={{ minHeight }}>
+    <div ref={containerRef} style={isVisible ? undefined : { minHeight }}>
       {isVisible ? children : null}
     </div>
   )
