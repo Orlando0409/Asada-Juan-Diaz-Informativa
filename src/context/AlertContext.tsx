@@ -1,7 +1,9 @@
-import React, { createContext, useContext, type ReactNode } from 'react';
-import { AlertContainer } from '../Components/Alert/ui/AlertContainer';
+import React, { createContext, lazy, Suspense, useContext, type ReactNode } from 'react';
 import { useAlert } from '../Hook/useAlert';
 
+const AlertContainer = lazy(() =>
+  import('../Components/Alert/ui/AlertContainer').then((module) => ({ default: module.AlertContainer }))
+);
 
 type AlertContextType = ReturnType<typeof useAlert>;
 
@@ -17,7 +19,11 @@ export const AlertProvider: React.FC<AlertProviderProps> = ({ children }) => {
   return (
     <AlertContext.Provider value={alertMethods}>
       {children}
-      <AlertContainer />
+      {alertMethods.alerts.length > 0 && (
+        <Suspense fallback={null}>
+          <AlertContainer />
+        </Suspense>
+      )}
     </AlertContext.Provider>
   );
 };

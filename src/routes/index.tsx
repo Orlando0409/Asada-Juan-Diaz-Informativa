@@ -12,7 +12,7 @@ const FaqSection = lazy(() => import('../Section/Landing/FAQ'))
 function SectionOnVisible({
   children,
   minHeight = 280,
-  rootMargin = '220px',
+  rootMargin = '80px',
   forceVisible = false,
 }: Readonly<{
   children: ReactNode
