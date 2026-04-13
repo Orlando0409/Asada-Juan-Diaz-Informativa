@@ -1,15 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { motion, type Variants } from 'framer-motion'
 import Data from '../../data/Data.json'
-
-const cardVariants: Variants = {
-  hidden: { opacity: 1, y: 0 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: 'easeOut', type: 'tween' },
-  },
-}
 
 const MisionVision = () => {
   const Mision = Data.mision
@@ -18,13 +8,8 @@ const MisionVision = () => {
   const Boton = Data.header.Leermas.texto
 
   return (
-    <motion.section
-      className="bg-white text-black px-6 py-12 sm:px-10 lg:px-20 lg:py-20 overflow-hidden"
-      initial={{ opacity: 1 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true, margin: '-80px' }}
-    >
-      <div className="text-center mb-10">
+    <section className="bg-white text-black px-6 py-12 sm:px-10 lg:px-20 lg:py-20 overflow-hidden animate-rise-in">
+      <div className="text-center mb-10 animate-rise-in" style={{ animationDelay: '40ms' }}>
         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-600">
           Quiénes somos
         </h2>
@@ -33,10 +18,10 @@ const MisionVision = () => {
 
       <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
         {/* Misión */}
-        <motion.article
+        <article
           className="flex-1 rounded-xl border border-sky-200 bg-white shadow-md flex flex-col gap-3 p-6
-                     will-change-transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-blue-400"
-          variants={cardVariants}
+                     animate-rise-in will-change-transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-blue-400"
+          style={{ animationDelay: '80ms' }}
           aria-label="Misión de la organización"
         >
           <div className="flex items-center gap-2">
@@ -52,13 +37,13 @@ const MisionVision = () => {
               {Mision}
             </p>
           </div>
-        </motion.article>
+        </article>
 
         {/* Visión */}
-        <motion.article
+        <article
           className="flex-1 rounded-xl border border-sky-200 bg-white shadow-md flex flex-col gap-3 p-6
-                     will-change-transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-blue-400"
-          variants={cardVariants}
+                     animate-rise-in will-change-transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-blue-400"
+          style={{ animationDelay: '130ms' }}
           aria-label="Visión de la organización"
         >
           <div className="flex items-center gap-2">
@@ -74,13 +59,13 @@ const MisionVision = () => {
               {Vision}
             </p>
           </div>
-        </motion.article>
+        </article>
 
         {/* Historia */}
-        <motion.article
+        <article
           className="flex-1 rounded-xl border border-sky-200 bg-white shadow-md flex flex-col gap-3 p-6
-                     will-change-transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-blue-400"
-          variants={cardVariants}
+                     animate-rise-in will-change-transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-blue-400"
+          style={{ animationDelay: '180ms' }}
           aria-label="Historia de la organización"
         >
           <div className="flex items-center gap-2">
@@ -108,9 +93,9 @@ const MisionVision = () => {
               </svg>
             </Link>
           </div>
-        </motion.article>
+        </article>
       </div>
-    </motion.section>
+    </section>
   )
 }
 
