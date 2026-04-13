@@ -14,7 +14,7 @@ const Hero = () => {
         playsInline
         preload="metadata"
       >
-        <track kind="captions" src="/captions/es.vtt" srcLang="es" label="Español" default />
+        <track kind="captions" src="/captions/es.vtt" srcLang="es" label="Español" />
       </video>
 
       <div className="absolute inset-0 bg-black/40"></div>
