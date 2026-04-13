@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
+import { LoadingSpinner } from '../../Components/LoadingSpinner'
 
 const FormularioContacto = lazy(() => import('../../Components/FormularioContacto'))
 
@@ -9,7 +10,7 @@ export const Route = createFileRoute('/(Contacto)/Quejas')({
 
 function RouteComponent() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<LoadingSpinner />}>
       <FormularioContacto key={'Queja'} tipo={'Queja'} />
     </Suspense>
   )

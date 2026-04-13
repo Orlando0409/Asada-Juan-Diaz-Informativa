@@ -2,6 +2,7 @@ import { Suspense, lazy, useEffect, useRef, useState, type ReactNode } from 'rea
 import { createFileRoute} from '@tanstack/react-router'
 import Hero from '../Section/Landing/Hero'
 import MisionVision from '../Section/Landing/MisionVision'
+import { LoadingSpinner } from '../Components/LoadingSpinner'
 
 const ServicioSection = lazy(() => import('../Section/Landing/Servicio'))
 const DatosGeneralesSection = lazy(() => import('../Section/Landing/DatosGenerales'))
@@ -39,7 +40,7 @@ function SectionOnVisible({
   }, [isVisible, rootMargin])
 
   return (
-    <div ref={containerRef} style={{ minHeight }}>
+    <div ref={containerRef} style={{ minHeight: isVisible ? undefined : minHeight }}>
       {isVisible ? children : null}
     </div>
   )
@@ -55,22 +56,22 @@ export const Route = createFileRoute('/')({
       <Hero/>
       <MisionVision/>
       <SectionOnVisible minHeight={360}>
-        <Suspense fallback={null}>
+        <Suspense fallback={<LoadingSpinner />}>
           <ServicioSection />
         </Suspense>
       </SectionOnVisible>
       <SectionOnVisible minHeight={420}>
-        <Suspense fallback={null}>
+        <Suspense fallback={<LoadingSpinner />}>
           <DatosGeneralesSection />
         </Suspense>
       </SectionOnVisible>
       <SectionOnVisible minHeight={360}>
-        <Suspense fallback={null}>
+        <Suspense fallback={<LoadingSpinner />}>
           <ProyectosSection />
         </Suspense>
       </SectionOnVisible>
       <SectionOnVisible minHeight={420}>
-        <Suspense fallback={null}>
+        <Suspense fallback={<LoadingSpinner />}>
           <FaqSection />
         </Suspense>
       </SectionOnVisible>
