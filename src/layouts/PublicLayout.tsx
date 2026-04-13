@@ -2,10 +2,10 @@ import React, { Suspense, lazy, useRef, useEffect, useState } from 'react';
 import { useRouterState } from '@tanstack/react-router';
 import Footer from '../Components/Footer/Footer';
 import Header from '../Components/Header/header';
-import { ChatProvider } from '../Provider/ChatProvider';
 import { ModalProvider } from '../context/ModalContext';
 
 const ChatBot = lazy(() => import('../Components/ChatAssistant/ChatBot').then((module) => ({ default: module.ChatBot })));
+const ChatProvider = lazy(() => import('../Provider/ChatProvider').then((module) => ({ default: module.ChatProvider })));
 
 interface PublicLayoutProps {
   children: React.ReactNode;
@@ -21,29 +21,39 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
   }, [location.pathname]);
 
   useEffect(() => {
-    const timeoutId = globalThis.setTimeout(() => {
-      setShowChat(true);
-    }, 1500);
+    if (showChat) return;
 
-    return () => globalThis.clearTimeout(timeoutId);
-  }, []);
+    const handleFirstInteraction = () => {
+      setShowChat(true);
+    };
+
+    globalThis.window.addEventListener('pointerdown', handleFirstInteraction, { once: true, passive: true });
+    globalThis.window.addEventListener('scroll', handleFirstInteraction, { once: true, passive: true });
+    globalThis.window.addEventListener('keydown', handleFirstInteraction, { once: true });
+
+    return () => {
+      globalThis.window.removeEventListener('pointerdown', handleFirstInteraction);
+      globalThis.window.removeEventListener('scroll', handleFirstInteraction);
+      globalThis.window.removeEventListener('keydown', handleFirstInteraction);
+    };
+  }, [showChat]);
 
   return (
     <ModalProvider>
-      <ChatProvider>
-        <div ref={containerRef} className='overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100'>
-          <Header />
-          <main className="flex flex-col">
-            {children}
-            {showChat && (
-              <Suspense fallback={null}>
+      <div ref={containerRef} className='overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100'>
+        <Header />
+        <main className="flex flex-col">
+          {children}
+          {showChat && (
+            <Suspense fallback={null}>
+              <ChatProvider>
                 <ChatBot />
-              </Suspense>
-            )}
-          </main>
-          <Footer />
-        </div>
-      </ChatProvider>
+              </ChatProvider>
+            </Suspense>
+          )}
+        </main>
+        <Footer />
+      </div>
     </ModalProvider>
   );
 };

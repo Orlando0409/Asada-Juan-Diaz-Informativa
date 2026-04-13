@@ -1,7 +1,3 @@
-import { FiCheckCircle, FiXCircle } from "react-icons/fi";
-import { HiInformationCircle } from "react-icons/hi";
-import { HiExclamationTriangle } from "react-icons/hi2";
-
 export type AlertType = 'success' | 'error' | 'warning' | 'info';
 
 export interface AlertProps {
@@ -38,7 +34,6 @@ export const alertConfig = {
     textColor: 'text-emerald-700',
     titleColor: 'text-emerald-900',
     progressColor: 'bg-emerald-500',
-    icon: FiCheckCircle,
   },
   error: {
     bgColor: 'bg-red-50/95',
@@ -46,7 +41,6 @@ export const alertConfig = {
     textColor: 'text-red-700',
     titleColor: 'text-red-900',
     progressColor: 'bg-red-500',
-    icon: FiXCircle,
   },
   warning: {
     bgColor: 'bg-amber-50/95',
@@ -54,7 +48,6 @@ export const alertConfig = {
     textColor: 'text-amber-700',
     titleColor: 'text-amber-900',
     progressColor: 'bg-amber-500',
-    icon: HiExclamationTriangle,
   },
   info: {
     bgColor: 'bg-blue-50/95',
@@ -62,6 +55,5 @@ export const alertConfig = {
     textColor: 'text-blue-700',
     titleColor: 'text-blue-900',
     progressColor: 'bg-blue-500',
-    icon: HiInformationCircle,
   },
 };

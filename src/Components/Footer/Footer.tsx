@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion'
 import Mapa from './mapa';
 import Redes from './Redes';
 import { useModal } from '../../context/ModalContext';
@@ -10,38 +9,41 @@ const Footer = () => {
   return (
     <footer className="w-full flex flex-col items-center gap-6 pt-8 pb-4 bg-gray-800 text-white overflow-hidden">
 
-      <motion.div
+      <div
         className="w-full flex flex-wrap justify-center items-start gap-6 px-4 lg:px-12"
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-40px' }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
+        style={{ animation: 'fadeInUp 0.6s ease-out forwards' }}
       >
         <Redes />
         {!isAnyModalOpen && (
-          <motion.div
+          <div
             className="w-full sm:w-auto flex-1 min-w-[280px] max-w-sm"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-40px' }}
-            transition={{ duration: 0.6, delay: 0.15, ease: 'easeOut' }}
+            style={{ animation: 'fadeInUp 0.6s ease-out 0.15s forwards', opacity: 0 }}
           >
             <Mapa />
-          </motion.div>
+          </div>
         )}
-      </motion.div>
+      </div>
 
-      <motion.div
+      <div
         className="w-full border-t border-white/10 pt-4"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true, margin: '-20px' }}
-        transition={{ duration: 0.5, delay: 0.3 }}
+        style={{ animation: 'fadeIn 0.5s ease-out 0.3s forwards', opacity: 0 }}
       >
         <p className="text-xs sm:text-sm text-center text-gray-400">
           © 2025 - {year} ASADA Juan Díaz. Todos los derechos reservados.
         </p>
-      </motion.div>
+      </div>
+
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+      `}</style>
     </footer>
   )
 }
