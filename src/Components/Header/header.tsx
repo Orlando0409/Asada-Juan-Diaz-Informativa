@@ -15,6 +15,8 @@ const Header = () => {
           alt='Logo de ASADA Juan Diaz'
           width={52}
           height={52}
+          fetchPriority='high'
+          loading='eager'
           decoding='async'
           className='h-full w-full'
         />
