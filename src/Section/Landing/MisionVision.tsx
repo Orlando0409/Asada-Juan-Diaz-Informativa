@@ -3,7 +3,7 @@ import { motion, type Variants } from 'framer-motion'
 import Data from '../../data/Data.json'
 
 const cardVariants: Variants = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 1, y: 0 },
   visible: {
     opacity: 1,
     y: 0,

@@ -12,6 +12,8 @@ const Hero = () => {
         autoPlay
         loop
         muted
+        playsInline
+        preload="metadata"
       />
 
       <div className="absolute inset-0 bg-black/40"></div>
