@@ -13,8 +13,8 @@ const Header = () => {
         <img
           src={logo.src}
           alt='Logo de ASADA Juan Diaz'
-          width={48}
-          height={48}
+          width={52}
+          height={52}
           decoding='async'
           className='h-full w-full'
         />
