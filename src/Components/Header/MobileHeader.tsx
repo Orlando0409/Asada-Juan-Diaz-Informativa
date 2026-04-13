@@ -22,6 +22,20 @@ const MobileHeader = ({ menuItems }: { menuItems: MenuItem[] }) => {
     setExpandedItem((prev) => (prev === itemId ? null : itemId))
   }
 
+  const smoothScrollToAnchor = (anchor: string) => {
+    const targetId = anchor.replace('#', '')
+    const element = globalThis.window.document.getElementById(targetId)
+
+    if (element) {
+      const offset = 95
+      const top = element.getBoundingClientRect().top + globalThis.window.scrollY - offset
+      globalThis.window.scrollTo({ top, behavior: 'smooth' })
+      return
+    }
+
+    globalThis.window.location.hash = anchor
+  }
+
   return (
     <>
       {/* Botón 3 Rayitas */}
@@ -48,22 +62,15 @@ const MobileHeader = ({ menuItems }: { menuItems: MenuItem[] }) => {
                       onClick={() => {
                      
                         if (currentPath === '/') {
-                       
-                          const element = document.querySelector(item.ruta!)
-                          if (element) {
-                            element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                          }
+                          smoothScrollToAnchor(item.ruta!)
                           setIsOpen(false)
                         } else {
-                          navigate({ to: '/' })
+                          navigate({ to: '/', hash: item.ruta!.replace('#', '') })
                           setIsOpen(false)
                           
                           setTimeout(() => {
-                            const element = document.querySelector(item.ruta!)
-                            if (element) {
-                              element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                            }
-                          }, 300)
+                            smoothScrollToAnchor(item.ruta!)
+                          }, 120)
                         }
                       }}
                       className='flex items-center gap-2 py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors duration-200 cursor-pointer w-full text-left bg-transparent border-none'

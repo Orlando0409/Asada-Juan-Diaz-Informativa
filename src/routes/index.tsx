@@ -13,13 +13,23 @@ function SectionOnVisible({
   children,
   minHeight = 280,
   rootMargin = '220px',
+  forceVisible = false,
 }: Readonly<{
   children: ReactNode
   minHeight?: number
   rootMargin?: string
+  forceVisible?: boolean
 }>) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const [isVisible, setIsVisible] = useState(false)
+
+  useEffect(() => {
+    if (forceVisible && !isVisible) {
+      setIsVisible(true)
+    }
+  }, [forceVisible, isVisible])
+
+  const shouldRender = isVisible || forceVisible
 
   useEffect(() => {
     if (!containerRef.current || isVisible) return
@@ -40,8 +50,18 @@ function SectionOnVisible({
   }, [isVisible, rootMargin])
 
   return (
-    <div ref={containerRef} style={{ minHeight: isVisible ? undefined : minHeight }}>
-      {isVisible ? children : null}
+    <div
+      ref={containerRef}
+      style={
+        shouldRender
+          ? undefined
+          : {
+              minHeight,
+              backgroundColor: '#fff',
+            }
+      }
+    >
+      {shouldRender ? children : null}
     </div>
   )
 }
@@ -51,6 +71,43 @@ export const Route = createFileRoute('/')({
 })
 
  function LandingPage() {
+  const [hash, setHash] = useState<string>(globalThis.window.location.hash)
+  const normalizedHash = hash.replace('#', '').toUpperCase()
+  const isFaqHash = normalizedHash === 'FAQ'
+
+  useEffect(() => {
+    const onHashChange = () => {
+      setHash(globalThis.window.location.hash)
+    }
+
+    globalThis.window.addEventListener('hashchange', onHashChange)
+    return () => globalThis.window.removeEventListener('hashchange', onHashChange)
+  }, [])
+
+  useEffect(() => {
+    if (!isFaqHash) return
+
+    let attempts = 0
+    const maxAttempts = 30
+    const timerId = globalThis.window.setInterval(() => {
+      const target = globalThis.window.document.getElementById('FAQ')
+      if (target) {
+        const offset = 95
+        const top = target.getBoundingClientRect().top + globalThis.window.scrollY - offset
+        globalThis.window.scrollTo({ top, behavior: 'smooth' })
+        globalThis.window.clearInterval(timerId)
+        return
+      }
+
+      attempts += 1
+      if (attempts >= maxAttempts) {
+        globalThis.window.clearInterval(timerId)
+      }
+    }, 50)
+
+    return () => globalThis.window.clearInterval(timerId)
+  }, [isFaqHash])
+
   return (
     <div>
       <Hero/>
@@ -70,7 +127,7 @@ export const Route = createFileRoute('/')({
           <ProyectosSection />
         </Suspense>
       </SectionOnVisible>
-      <SectionOnVisible minHeight={420}>
+      <SectionOnVisible minHeight={420} forceVisible={isFaqHash}>
         <Suspense fallback={<LoadingSpinner />}>
           <FaqSection />
         </Suspense>
