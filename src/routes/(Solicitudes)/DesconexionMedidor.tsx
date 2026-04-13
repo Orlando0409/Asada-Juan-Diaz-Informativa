@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
+import { LoadingSpinner } from '../../Components/LoadingSpinner'
 
 const DesconexionMedidor = lazy(() => import('../../Section/Afiliacion/DesconexionMedidor'))
 
@@ -9,7 +10,7 @@ export const Route = createFileRoute('/(Solicitudes)/DesconexionMedidor')({
 
 function RouteComponent() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<LoadingSpinner />}>
       <DesconexionMedidor />
     </Suspense>
   )
