@@ -42,7 +42,7 @@ const MisionVision = () => {
         {/* Misión */}
         <motion.article
           className="flex-1 rounded-xl border border-sky-200 bg-white shadow-md flex flex-col gap-3 p-6
-                     transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-blue-400"
+                     will-change-transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-blue-400"
           variants={cardVariants}
           aria-label="Misión de la organización"
         >
@@ -64,7 +64,7 @@ const MisionVision = () => {
         {/* Visión */}
         <motion.article
           className="flex-1 rounded-xl border border-sky-200 bg-white shadow-md flex flex-col gap-3 p-6
-                     transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-blue-400"
+                     will-change-transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-blue-400"
           variants={cardVariants}
           aria-label="Visión de la organización"
         >
@@ -86,7 +86,7 @@ const MisionVision = () => {
         {/* Historia */}
         <motion.article
           className="flex-1 rounded-xl border border-sky-200 bg-white shadow-md flex flex-col gap-3 p-6
-                     transition-all duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-blue-400"
+                     will-change-transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl hover:border-blue-400"
           variants={cardVariants}
           aria-label="Historia de la organización"
         >

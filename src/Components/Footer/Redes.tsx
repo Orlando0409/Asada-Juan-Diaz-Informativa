@@ -27,7 +27,7 @@ const Redes = () => {
         variants={colVariants}
         className="flex flex-col gap-2 justify-center items-center sm:items-start"
       >
-        <h3 className="font-semibold text-base sm:text-lg lg:text-xl">Contacto</h3>
+        <h2 className="font-semibold text-base sm:text-lg lg:text-xl">Contacto</h2>
         <p className="flex justify-start sm:justify-center items-center gap-2 text-sm sm:text-base lg:text-lg">
           <FaPhone className="text-green-500" /> {contacto.telefono}
         </p>
@@ -42,9 +42,9 @@ const Redes = () => {
         variants={colVariants}
         className="flex flex-col gap-2 justify-start items-center sm:items-start"
       >
-        <h3 className="font-semibold text-base sm:text-lg lg:text-xl">
+        <h2 className="font-semibold text-base sm:text-lg lg:text-xl">
           Horario de Atención
-        </h3>
+        </h2>
         <p className="text-sm sm:text-base lg:text-lg">{horarioAtencion}</p>
       </motion.div>
 
@@ -54,9 +54,9 @@ const Redes = () => {
         variants={colVariants}
         className="flex flex-col gap-2 justify-start items-center sm:items-start"
       >
-        <h3 className="font-semibold text-base sm:text-lg lg:text-xl">
+        <h2 className="font-semibold text-base sm:text-lg lg:text-xl">
           Redes Sociales
-        </h3>
+        </h2>
         <a
           href={redesSociales.WhatsApp}
           target="_blank"

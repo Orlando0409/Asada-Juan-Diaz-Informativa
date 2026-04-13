@@ -51,11 +51,12 @@ export default function Mapa() {
     }, [shouldLoadMap]);
 
   return (
-    <div 
-    ref={mapRef}
-    id="map"
-    className="w-full h-[250px]  z-1"
-    aria-label="Mapa de ubicación de ASADA Juan Díaz">
-    </div>
+    <section aria-label="Mapa de ubicación de ASADA Juan Díaz" className="w-full h-[250px]">
+      <div
+        ref={mapRef}
+        id="map"
+        className="w-full h-full z-1"
+      />
+    </section>
   );
 }

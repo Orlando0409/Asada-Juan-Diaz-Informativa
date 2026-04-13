@@ -15,7 +15,9 @@ const Servicio = () => {
         muted
         playsInline
         preload="none"
-      />
+      >
+        <track kind="captions" src="/captions/es.vtt" srcLang="es" label="Español" default />
+      </video>
 
       <div className="absolute inset-0 bg-black/40"></div>
 
