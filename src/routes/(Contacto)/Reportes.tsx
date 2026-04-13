@@ -1,10 +1,16 @@
+import { lazy, Suspense } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import FormularioContacto from '../../Components/FormularioContacto'
+
+const FormularioContacto = lazy(() => import('../../Components/FormularioContacto'))
 
 export const Route = createFileRoute('/(Contacto)/Reportes')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  return <FormularioContacto key={'Reporte'} tipo={'Reporte'} />
+  return (
+    <Suspense fallback={null}>
+      <FormularioContacto key={'Reporte'} tipo={'Reporte'} />
+    </Suspense>
+  )
 }

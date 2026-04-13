@@ -1,10 +1,16 @@
+import { lazy, Suspense } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import ConsultaRecibos from '../Section/Consulta/ConsultaPagos'
+
+const ConsultaRecibos = lazy(() => import('../Section/Consulta/ConsultaPagos'))
 
 export const Route = createFileRoute('/Consulta')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  return <ConsultaRecibos />
+  return (
+    <Suspense fallback={null}>
+      <ConsultaRecibos />
+    </Suspense>
+  )
 }
