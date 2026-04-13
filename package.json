@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:sitemap": "set ENABLE_SITEMAP=1&& tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },

@@ -7,6 +7,7 @@ import path from 'node:path'
 import sitemap from '@axelrindle/vite-plugin-sitemap'
 
 const ROUTES_DIR = path.resolve(__dirname, 'src/routes')
+const ENABLE_SITEMAP = process.env.ENABLE_SITEMAP === '1'
 
 function collectRouteFiles(dir: string): string[] {
   if (!fs.existsSync(dir)) return []
@@ -122,10 +123,11 @@ export default defineConfig({
     react(),
     tailwindcss(),
     tanstackRouter({ target: 'react' }),
-    sitemap({
-      baseUrl: 'https://asadajuandiaz.com',
-      pages: buildSitemapPages(),
-    }),
+    ENABLE_SITEMAP &&
+      sitemap({
+        baseUrl: 'https://asadajuandiaz.com',
+        pages: buildSitemapPages(),
+      }),
   ].filter(Boolean),
   resolve: {
     alias: {

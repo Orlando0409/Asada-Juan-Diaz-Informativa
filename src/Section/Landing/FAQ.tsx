@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
 import {
   Accordion,
   AccordionHeader,
@@ -77,49 +76,21 @@ const Faq: React.FC = () => {
       className="bg-white py-12 px-4 sm:px-6 lg:px-8"
     >
       <div className="py-8 max-w-4xl mx-auto">
-        <motion.div
-          className="text-center mb-10"
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-60px' }}
-          transition={{ duration: 0.5 }}
-        >
+        <div className="text-center mb-10 animate-fade-rise">
           <h1 className="text-4xl font-bold text-blue-600 mb-2">
             Preguntas Frecuentes
           </h1>
           <p className="text-gray-600">
             Aquí encontrarás respuestas a las preguntas más comunes.
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div 
-          className="space-y-5"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
-          variants={{
-            hidden: {},
-            visible: {
-              transition: {
-                staggerChildren: 0.08
-              }
-            }
-          }}
-        >
+        <div className="space-y-5">
           {faqs.map((faq, idx) => (
-            <motion.div
+            <div
               key={faq.id ?? idx}
-              variants={{
-                hidden: { opacity: 0, y: 20 },
-                visible: { 
-                  opacity: 1, 
-                  y: 0,
-                  transition: {
-                    duration: 0.4,
-                    ease: "easeOut"
-                  }
-                }
-              }}
+              className="animate-fade-rise"
+              style={{ animationDelay: `${idx * 80}ms` }}
             >
               <MTAccordion
               key={faq.id ?? idx}
@@ -146,9 +117,9 @@ const Faq: React.FC = () => {
                 </p>
               </MTAccordionBody>
             </MTAccordion>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );
