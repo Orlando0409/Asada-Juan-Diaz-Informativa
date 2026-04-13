@@ -20,6 +20,13 @@ const normalizePhoneNumber = (phone: string): string => {
 
 const STORAGE_KEY = 'medidor_extra_fisica_temp';
 
+const shouldValidateIdentificacion = (tipoId: string, identificacion: string): boolean => {
+    if (tipoId === 'Cedula Nacional') return /^\d{9}$/.test(identificacion);
+    if (tipoId === 'Dimex') return identificacion.length >= 9;
+    if (tipoId === 'Pasaporte') return identificacion.length >= 6;
+    return false;
+};
+
 const MedidorExtraFisico = ({ onClose }: Props) => {
     const sanitizeNameInput = (value: string) => value.replace(/\d/g, "");
     const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
@@ -44,7 +51,7 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
             const dummy: any = {
                 Nombre: "Test",
                 Apellido1: "Test",
-                Apellido2: "",
+                Apellido2: "Test",
                 Tipo_Identificacion: "Cedula Nacional",
                 Identificacion: "123456789",
                 Direccion_Exacta: "1234567890",
@@ -74,15 +81,23 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
         } catch (error: any) {
             let errorMessage = '';
             if (error.errors && Array.isArray(error.errors)) {
-                const fieldError = error.errors.find((err: any) => err.path.includes(fieldName));
-                errorMessage = fieldError?.message || error.errors[0]?.message;
+                const fieldError = error.errors.find((err: any) => err.path?.[0] === fieldName);
+                if (fieldError) {
+                    errorMessage = fieldError.message;
+                }
             } else if (error.message) {
                 errorMessage = error.message;
             }
-            setFieldErrors(prev => ({
-                ...prev,
-                [fieldName]: errorMessage,
-            }));
+
+            setFieldErrors(prev => {
+                const next = { ...prev };
+                if (errorMessage) {
+                    next[fieldName] = errorMessage;
+                } else {
+                    delete next[fieldName];
+                }
+                return next;
+            });
         }
     };
 
@@ -184,8 +199,24 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
             setFormErrors({});
             setFieldErrors({});
 
+            const identificacionActual = handleIdentificacionInput(
+                (value.Identificacion || '').trim(),
+                value.Tipo_Identificacion
+            );
+
+            if (shouldValidateIdentificacion(value.Tipo_Identificacion, identificacionActual) && identificacionActual !== identificacionValidada) {
+                setIdentificacionValidada(identificacionActual);
+                setFormErrors({ general: 'Estamos validando tus medidores. Intenta enviar de nuevo en unos segundos.' });
+                return;
+            }
+
+            if (loadingMedidores) {
+                setFormErrors({ general: 'Estamos validando tus medidores. Intenta enviar de nuevo en unos segundos.' });
+                return;
+            }
+
             // Verificar que sea afiliado (tenga medidores)
-            if (!identificacionValidada || medidores.length === 0) {
+            if (medidores.length === 0) {
                 setFormErrors({ general: 'Debe ser un afiliado con al menos un medidor activo para solicitar un medidor adicional.' });
                 return;
             }
@@ -266,6 +297,24 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
             }
         }
     }, []);
+
+    // Mantener sincronizada la identificación usada para consultar medidores.
+    useEffect(() => {
+        const tipo = form.state.values.Tipo_Identificacion;
+        const rawIdentificacion = form.state.values.Identificacion || '';
+        const identificacion = handleIdentificacionInput(rawIdentificacion, tipo);
+
+        if (shouldValidateIdentificacion(tipo, identificacion)) {
+            if (identificacion !== identificacionValidada) {
+                setIdentificacionValidada(identificacion);
+            }
+            return;
+        }
+
+        if (identificacionValidada) {
+            setIdentificacionValidada('');
+        }
+    }, [form.state.values.Tipo_Identificacion, form.state.values.Identificacion, identificacionValidada]);
 
     // Usar un efecto para cerrar el formulario cuando se complete con éxito
     useEffect(() => {
@@ -542,123 +591,123 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
 
             </div>
 
-                {/* Archivos */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 mt-2">
-                    <form.Field name="Planos_Terreno">
-                        {(field) => {
-                            const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
-                            return (
-                                <div className="w-full mb-2">
-                                    <label className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
-                                    <input
-                                        type="file"
-                                        accept=".png,.jpg,.jpeg,.heic,.pdf"
-                                        disabled={!!archivoActual}
-                                        onChange={(e) => {
-                                            const file = e.target.files?.[0] ?? null;
-                                            field.handleChange(file ?? undefined);
-                                            setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: file }));
-                                            validateField("Planos_Terreno", file);
-                                        }}
-                                        className="hidden"
-                                        id="planos_medidor_fisico"
-                                        ref={planosInputRef}
-                                        key={archivoActual ? archivoActual.name : 'planos'}
-                                    />
-                                    <label
-                                        htmlFor="planos_medidor_fisico"
-                                        className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
-                                    >
-                                        {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
-                                    </label>
-                                    {archivoActual && (
-                                        <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
-                                            <span>{archivoActual.name}</span>
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    field.handleChange(undefined);
-                                                    setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
-                                                    setFieldErrors(prev => ({
-                                                        ...prev,
-                                                        ["Planos_Terreno"]: `Debe subir el plano del terreno`,
-                                                    }));
-                                                    if (planosInputRef.current) planosInputRef.current.value = "";
-                                                }}
-                                                className="text-red-500 hover:underline text-xs"
-                                            >
-                                                Eliminar
-                                            </button>
-                                        </div>
-                                    )}
-                                    {fieldErrors["Planos_Terreno"] && (
-                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors["Planos_Terreno"]}</span>
-                                    )}
-                                    {formErrors["Planos_Terreno"] && !fieldErrors["Planos_Terreno"] && (
-                                        <span className="text-red-500 text-sm block mt-1">{formErrors["Planos_Terreno"]}</span>
-                                    )}
-                                </div>
-                            );
-                        }}
-                    </form.Field>
-                    <form.Field name="Certificacion_Literal">
-                        {(field) => {
-                            const archivoActual = archivoSeleccionado["Certificacion_Literal"] ?? null;
-                            return (
-                                <div className="w-full mb-2">
-                                    <label className="block mb-1 font-medium">Certificacion Literal del terreno <span className="text-red-500">*</span></label>
-                                    <input
-                                        type="file"
-                                        accept=".png,.jpg,.jpeg,.heic,.pdf"
-                                        disabled={!!archivoActual}
-                                        onChange={(e) => {
-                                            const file = e.target.files?.[0] ?? null;
-                                            field.handleChange(file ?? undefined);
-                                            setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: file }));
-                                            validateField("Certificacion_Literal", file);
-                                        }}
-                                        className="hidden"
-                                        id="escritura_medidor_fisico"
-                                        ref={escrituraInputRef}
-                                        key={archivoActual ? archivoActual.name : 'escritura'}
-                                    />
-                                    <label
-                                        htmlFor="escritura_medidor_fisico"
-                                        className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
-                                    >
-                                        {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
-                                    </label>
-                                    {archivoActual && (
-                                        <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
-                                            <span>{archivoActual.name}</span>
-                                            <button
-                                                type="button"
-                                                onClick={() => {
-                                                    field.handleChange(undefined);
-                                                    setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: null }));
-                                                    setFieldErrors(prev => ({
-                                                        ...prev,
-                                                        ["Certificacion_Literal"]: `Debe subir la certificacion literal del terreno`,
-                                                    }));
-                                                    if (escrituraInputRef.current) escrituraInputRef.current.value = "";
-                                                }}
-                                                className="text-red-500 hover:underline text-xs"
-                                            >
-                                                Eliminar
-                                            </button>
-                                        </div>
-                                    )}
-                                    {fieldErrors["Certificacion_Literal"] && (
-                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors["Certificacion_Literal"]}</span>
-                                    )}
-                                    {formErrors["Certificacion_Literal"] && !fieldErrors["Certificacion_Literal"] && (
-                                        <span className="text-red-500 text-sm block mt-1">{formErrors["Certificacion_Literal"]}</span>
-                                    )}
-                                </div>
-                            );
-                        }}
-                    </form.Field>
-                </div>
+            {/* Archivos */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 mt-2">
+                <form.Field name="Planos_Terreno">
+                    {(field) => {
+                        const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
+                        return (
+                            <div className="w-full mb-2">
+                                <label className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
+                                <input
+                                    type="file"
+                                    accept=".png,.jpg,.jpeg,.heic,.pdf"
+                                    disabled={!!archivoActual}
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0] ?? null;
+                                        field.handleChange(file ?? undefined);
+                                        setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: file }));
+                                        validateField("Planos_Terreno", file);
+                                    }}
+                                    className="hidden"
+                                    id="planos_medidor_fisico"
+                                    ref={planosInputRef}
+                                    key={archivoActual ? archivoActual.name : 'planos'}
+                                />
+                                <label
+                                    htmlFor="planos_medidor_fisico"
+                                    className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
+                                >
+                                    {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
+                                </label>
+                                {archivoActual && (
+                                    <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
+                                        <span>{archivoActual.name}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                field.handleChange(undefined);
+                                                setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
+                                                setFieldErrors(prev => ({
+                                                    ...prev,
+                                                    ["Planos_Terreno"]: `Debe subir el plano del terreno`,
+                                                }));
+                                                if (planosInputRef.current) planosInputRef.current.value = "";
+                                            }}
+                                            className="text-red-500 hover:underline text-xs"
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </div>
+                                )}
+                                {fieldErrors["Planos_Terreno"] && (
+                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Planos_Terreno"]}</span>
+                                )}
+                                {formErrors["Planos_Terreno"] && !fieldErrors["Planos_Terreno"] && (
+                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Planos_Terreno"]}</span>
+                                )}
+                            </div>
+                        );
+                    }}
+                </form.Field>
+                <form.Field name="Certificacion_Literal">
+                    {(field) => {
+                        const archivoActual = archivoSeleccionado["Certificacion_Literal"] ?? null;
+                        return (
+                            <div className="w-full mb-2">
+                                <label className="block mb-1 font-medium">Certificacion Literal del terreno <span className="text-red-500">*</span></label>
+                                <input
+                                    type="file"
+                                    accept=".png,.jpg,.jpeg,.heic,.pdf"
+                                    disabled={!!archivoActual}
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0] ?? null;
+                                        field.handleChange(file ?? undefined);
+                                        setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: file }));
+                                        validateField("Certificacion_Literal", file);
+                                    }}
+                                    className="hidden"
+                                    id="escritura_medidor_fisico"
+                                    ref={escrituraInputRef}
+                                    key={archivoActual ? archivoActual.name : 'escritura'}
+                                />
+                                <label
+                                    htmlFor="escritura_medidor_fisico"
+                                    className={`inline-block text-white bg-blue-600 px-3 py-1 rounded text-sm ${archivoActual ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#6FCAF1] cursor-pointer'}`}
+                                >
+                                    {archivoActual ? 'Archivo cargado' : 'Subir archivo'}
+                                </label>
+                                {archivoActual && (
+                                    <div className="border rounded-md p-3 bg-gray-50 pb-2 mb-2 flex justify-between items-center">
+                                        <span>{archivoActual.name}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                field.handleChange(undefined);
+                                                setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: null }));
+                                                setFieldErrors(prev => ({
+                                                    ...prev,
+                                                    ["Certificacion_Literal"]: `Debe subir la certificacion literal del terreno`,
+                                                }));
+                                                if (escrituraInputRef.current) escrituraInputRef.current.value = "";
+                                            }}
+                                            className="text-red-500 hover:underline text-xs"
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </div>
+                                )}
+                                {fieldErrors["Certificacion_Literal"] && (
+                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Certificacion_Literal"]}</span>
+                                )}
+                                {formErrors["Certificacion_Literal"] && !fieldErrors["Certificacion_Literal"] && (
+                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Certificacion_Literal"]}</span>
+                                )}
+                            </div>
+                        );
+                    }}
+                </form.Field>
+            </div>
 
             {/* Botones */}
             <div className="flex justify-end items-center gap-3 mt-8">
