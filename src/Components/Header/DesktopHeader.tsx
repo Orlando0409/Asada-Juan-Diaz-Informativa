@@ -23,6 +23,20 @@ const DesktopHeader = ({ menuItems }: DesktopHeaderProps) => {
     }, 150)
   }
 
+  const smoothScrollToAnchor = (anchor: string) => {
+    const targetId = anchor.replace('#', '')
+    const element = globalThis.window.document.getElementById(targetId)
+
+    if (element) {
+      const offset = 95
+      const top = element.getBoundingClientRect().top + globalThis.window.scrollY - offset
+      globalThis.window.scrollTo({ top, behavior: 'smooth' })
+      return
+    }
+
+    globalThis.window.location.hash = anchor
+  }
+
 
   return (
     <nav className='hidden md:block bg-white px-3 py-2 rounded-lg shadow-md'>
@@ -37,20 +51,13 @@ const DesktopHeader = ({ menuItems }: DesktopHeaderProps) => {
                   onClick={() => {
                     
                     if (currentPath === '/') {
-            
-                      const element = document.querySelector(item.ruta!)
-                      if (element) {
-                        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                      }
+                      smoothScrollToAnchor(item.ruta!)
                     } else {
-                      navigate({ to: '/' })
+                      navigate({ to: '/', hash: item.ruta!.replace('#', '') })
               
                       setTimeout(() => {
-                        const element = document.querySelector(item.ruta!)
-                        if (element) {
-                          element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                        }
-                      }, 300)
+                        smoothScrollToAnchor(item.ruta!)
+                      }, 120)
                     }
                   }}
                   className='hover:text-[#6FCAF1] transition-colors duration-200 flex items-center gap-2 cursor-pointer bg-transparent border-none font-medium'
