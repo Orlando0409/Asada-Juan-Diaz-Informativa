@@ -1,7 +1,47 @@
 import { useState } from 'react'
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
-import { FaBars, FaTimes, FaChevronDown } from 'react-icons/fa'
 import type { MenuItem } from '../../types/header/MenuItem'
+
+function MenuIcon({ open }: { open: boolean }) {
+  return open ? (
+    <svg aria-hidden='true' viewBox='0 0 24 24' fill='none' className='h-5 w-5'>
+      <path
+        d='M6 6l12 12M18 6 6 18'
+        stroke='currentColor'
+        strokeWidth='2'
+        strokeLinecap='round'
+      />
+    </svg>
+  ) : (
+    <svg aria-hidden='true' viewBox='0 0 24 24' fill='none' className='h-5 w-5'>
+      <path
+        d='M4 7h16M4 12h16M4 17h16'
+        stroke='currentColor'
+        strokeWidth='2'
+        strokeLinecap='round'
+      />
+    </svg>
+  )
+}
+
+function ChevronDownIcon({ isOpen }: Readonly<{ isOpen: boolean }>) {
+    return (
+    <svg
+      aria-hidden='true'
+      viewBox='0 0 20 20'
+      fill='none'
+      className={`h-3.5 w-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+    >
+      <path
+        d='M5 8l5 5 5-5'
+        stroke='currentColor'
+        strokeWidth='1.8'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+    </svg>
+  )
+}
 
 
 const MobileHeader = ({ menuItems }: { menuItems: MenuItem[] }) => {
@@ -46,7 +86,7 @@ const MobileHeader = ({ menuItems }: { menuItems: MenuItem[] }) => {
         aria-expanded={isOpen}
         aria-controls='mobile-navigation-menu'
       >
-        {isOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+        <MenuIcon open={isOpen} />
       </button>
 
       {/* Menú móvil desplegado */}
@@ -92,12 +132,7 @@ const MobileHeader = ({ menuItems }: { menuItems: MenuItem[] }) => {
                         <span className='flex items-center gap-2'>
                           {item.texto}
                         </span>
-                        <FaChevronDown 
-                          className={`transform transition-transform duration-200 ${
-                            expandedItem === item.id ? 'rotate-180' : ''
-                          }`}
-                          size={14}
-                        />
+                        <ChevronDownIcon isOpen={expandedItem === item.id} />
                       </button>
                       {expandedItem === item.id && (
                         <div className='pl-4 space-y-1'>

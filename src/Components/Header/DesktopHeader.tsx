@@ -1,7 +1,25 @@
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
-import { MdExpandMore } from 'react-icons/md'
 import type { DesktopHeaderProps } from '../../types/header/MenuItem'
 import { useRef, useState } from 'react'
+
+function ChevronDownIcon({ isOpen }: { isOpen: boolean }) {
+  return (
+    <svg
+      aria-hidden='true'
+      viewBox='0 0 20 20'
+      fill='none'
+      className={`h-3.5 w-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+    >
+      <path
+        d='M5 8l5 5 5-5'
+        stroke='currentColor'
+        strokeWidth='1.8'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+    </svg>
+  )
+}
 
 const DesktopHeader = ({ menuItems }: DesktopHeaderProps) => {
   const [expandedItem, setExpandedItem] = useState<number | null>(null)
@@ -80,12 +98,7 @@ const DesktopHeader = ({ menuItems }: DesktopHeaderProps) => {
               >
                 <button className='flex items-center gap-1 hover:text-[#6FCAF1] transition-colors duration-10'>
                   {item.texto}
-                  <MdExpandMore 
-                    size={13} 
-                    className={` ${
-                      expandedItem === item.id 
-                    }`}
-                  />
+                  <ChevronDownIcon isOpen={expandedItem === item.id} />
                 </button>
                 
                 {/* Dropdown desplegado */}

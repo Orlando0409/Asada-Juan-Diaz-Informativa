@@ -1,5 +1,4 @@
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
-import { motion } from "framer-motion";
 import BotonLeerMas from "../Proyecto/BotonLeermas";
 import type { Proyecto } from "../../types/Proyecto/Proyecto";
 
@@ -63,22 +62,10 @@ function ProyectosDesktop({
       <div className="absolute bottom-20 right-10 w-40 h-40 bg-indigo-200/20 rounded-full blur-3xl"></div>
       
       {/* Contenido principal desktop */}
-      <motion.div 
-        className="container mx-auto px-4 flex justify-center items-center min-h-[500px] gap-16"
-        initial={{ opacity: 0, y: 50 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: "-50px" }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-      >
+      <div className="container mx-auto px-4 flex justify-center items-center min-h-[500px] gap-16 animate-fade-rise">
 
         {/* Título izquierda */}
-        <motion.div 
-          className="text-right space-y-4"
-          initial={{ opacity: 0, x: -30 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
+        <div className="text-right space-y-4 animate-fade-rise" style={{ animationDelay: '120ms' }}>
           <h2 className="text-4xl xl:text-5xl 2xl:text-6xl font-bold text-blue-600">
             {titulo}
           </h2>
@@ -86,19 +73,13 @@ function ProyectosDesktop({
           <p className="text-gray-700 text-md leading-relaxed max-w-sm">
             {descripcion}
           </p>
-        </motion.div>
+        </div>
 
         {/* Línea divisoria */}
         <div className="w-px h-96 bg-gradient-to-b from-transparent via-gray-300 to-transparent"></div>
 
         {/* Carrusel desktop */}
-        <motion.div 
-          className="w-full max-w-lg relative group"
-          initial={{ opacity: 0, x: 30 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
+        <div className="w-full max-w-lg relative group animate-fade-rise" style={{ animationDelay: '180ms' }}>
           
           {/* Contenedor slides desktop */}
           <div className="relative overflow-hidden rounded-2xl shadow-2xl bg-white/10 backdrop-blur-sm p-1">
@@ -198,8 +179,8 @@ function ProyectosDesktop({
               style={{ width: `${porcentajeProgreso}%` }}
             ></div>
           </div>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </section>
   );
 }
