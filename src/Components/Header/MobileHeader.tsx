@@ -28,13 +28,16 @@ const MobileHeader = ({ menuItems }: { menuItems: MenuItem[] }) => {
       <button 
         className='md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100'
         onClick={toggleMenu}
+        aria-label={isOpen ? 'Cerrar menu de navegacion' : 'Abrir menu de navegacion'}
+        aria-expanded={isOpen}
+        aria-controls='mobile-navigation-menu'
       >
         {isOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
       </button>
 
       {/* Menú móvil desplegado */}
       {isOpen && (
-        <div className='absolute top-full left-0 w-full bg-white border-t border-gray-200 shadow-lg md:hidden z-40'>
+        <div id='mobile-navigation-menu' className='absolute top-full left-0 w-full bg-white border-t border-gray-200 shadow-lg md:hidden z-40'>
           <div className='py-4 px-4 space-y-2'>
             {menuItems.map((item) => {
               // Primero verificar si es un ancla

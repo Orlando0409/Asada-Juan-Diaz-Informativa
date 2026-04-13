@@ -564,7 +564,7 @@
       }
     },
     "requisitosSugerencias": {
-      "Mensaje": {
+      "Descripcion": {
         "label": "Descripción de tu sugerencia",
         "type": "textarea",
         "required": true
@@ -583,7 +583,7 @@
   },
   "header": {
     "logo": {
-      "src": "/logo-asada-juan-diaz.png",
+      "src": "/favicon.png",
       "ruta": "/"
     },
     "hero": {

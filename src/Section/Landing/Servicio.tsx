@@ -13,6 +13,8 @@ const Servicio = () => {
         autoPlay
         loop
         muted
+        playsInline
+        preload="none"
       />
 
       <div className="absolute inset-0 bg-black/40"></div>

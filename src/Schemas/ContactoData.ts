@@ -2,10 +2,10 @@ import { z } from 'zod';
 
 
 function getMaxLength(fieldName: string, fieldType: string): number {
-  if (fieldType === 'textarea') return 49
-  if (fieldName === 'Correo') return 49
-  if (fieldName === 'Ubicacion') return 49
-  if (fieldName.includes('Nombre') || fieldName.includes('Apellido')) return 19
+  if (fieldType === 'textarea') return 199
+  if (fieldName === 'Correo') return 99
+  if (fieldName === 'Ubicacion') return 99
+  if (fieldName.includes('Nombre') || fieldName.includes('Apellido')) return 49
   return 10 // Límite por defecto
 }
 
