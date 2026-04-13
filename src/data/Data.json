@@ -583,7 +583,7 @@
   },
   "header": {
     "logo": {
-      "src": "/favicon.png",
+      "src": "/favicon.webp",
       "ruta": "/"
     },
     "hero": {
