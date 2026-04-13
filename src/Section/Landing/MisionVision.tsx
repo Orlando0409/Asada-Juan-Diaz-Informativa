@@ -7,7 +7,7 @@ const cardVariants: Variants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: 'easeOut' },
+    transition: { duration: 0.6, ease: 'easeOut', type: 'tween' },
   },
 }
 
@@ -20,23 +20,16 @@ const MisionVision = () => {
   return (
     <motion.section
       className="bg-white text-black px-6 py-12 sm:px-10 lg:px-20 lg:py-20 overflow-hidden"
-      initial="hidden"
-      whileInView="visible"
+      initial={{ opacity: 1 }}
+      whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: '-80px' }}
-      variants={{
-        hidden: {},
-        visible: { transition: { staggerChildren: 0.15 } },
-      }}
     >
-      <motion.div
-        className="text-center mb-10"
-        variants={{ hidden: { opacity: 0, y: -20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
-      >
+      <div className="text-center mb-10">
         <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-600">
           Quiénes somos
         </h2>
         <div className="mx-auto mt-2 h-1 w-16 rounded-full bg-blue-600" />
-      </motion.div>
+      </div>
 
       <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
         {/* Misión */}
