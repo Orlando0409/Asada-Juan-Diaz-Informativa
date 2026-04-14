@@ -46,9 +46,7 @@ const DesktopHeader = ({ menuItems }: DesktopHeaderProps) => {
     const element = globalThis.window.document.getElementById(targetId)
 
     if (element) {
-      const offset = 95
-      const top = element.getBoundingClientRect().top + globalThis.window.scrollY - offset
-      globalThis.window.scrollTo({ top, behavior: 'smooth' })
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
       return
     }
 
@@ -101,7 +99,6 @@ const DesktopHeader = ({ menuItems }: DesktopHeaderProps) => {
                   <ChevronDownIcon isOpen={expandedItem === item.id} />
                 </button>
                 
-                {/* Dropdown desplegado */}
                 {expandedItem === item.id && (
                   <div className='absolute left-0 bg-white shadow-lg rounded-md mt-2 z-50 w-48 border border-gray-100'>
                     <ul className='py-2 text-sm text-gray-700'>

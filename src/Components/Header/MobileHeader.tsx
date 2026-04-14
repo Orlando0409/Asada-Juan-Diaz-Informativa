@@ -67,9 +67,7 @@ const MobileHeader = ({ menuItems }: { menuItems: MenuItem[] }) => {
     const element = globalThis.window.document.getElementById(targetId)
 
     if (element) {
-      const offset = 95
-      const top = element.getBoundingClientRect().top + globalThis.window.scrollY - offset
-      globalThis.window.scrollTo({ top, behavior: 'smooth' })
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
       return
     }
 
