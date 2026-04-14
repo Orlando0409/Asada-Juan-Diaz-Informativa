@@ -2,7 +2,16 @@ import { z } from 'zod';
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/heic"];
+const ACCEPTED_FILE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/heic", "application/pdf"];
+const ACCEPTED_FILE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".heic", ".pdf"];
+
+const isAcceptedUploadFile = (file: File) => {
+  const fileName = file.name.toLowerCase();
+  const hasValidExtension = ACCEPTED_FILE_EXTENSIONS.some((ext) => fileName.endsWith(ext));
+
+  // Some browsers/devices can provide an empty MIME type for HEIC/PDF uploads.
+  return ACCEPTED_FILE_TYPES.includes(file.type) || hasValidExtension;
+};
 
 export const DesconexionJuridicaSchema = z.object({
   Razon_Social: z.string()
@@ -47,14 +56,14 @@ export const DesconexionJuridicaSchema = z.object({
     .instanceof(File)
     .refine((file) => file.size <= MAX_FILE_SIZE, 'El archivo no debe exceder 5MB')
 
-    .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), 'Solo se aceptan archivos .jpg, .jpeg, .png, .heic, .pdf')
+    .refine((file) => isAcceptedUploadFile(file), 'Solo se aceptan archivos .jpg, .jpeg, .png, .heic, .pdf')
     .optional(),
 
   Certificacion_Literal: z
     .instanceof(File)
     .refine((file) => file.size <= MAX_FILE_SIZE, 'El archivo no debe exceder 5MB')
 
-    .refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), 'Solo se aceptan archivos .jpg, .jpeg, .png, .heic, .pdf')
+    .refine((file) => isAcceptedUploadFile(file), 'Solo se aceptan archivos .jpg, .jpeg, .png, .heic, .pdf')
     .optional(),
 
   Id_Medidor: z.number()
