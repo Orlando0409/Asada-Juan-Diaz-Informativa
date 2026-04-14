@@ -26,7 +26,6 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isSending, setIsSending] = useState(false);
   const [identificacion, setIdentificacion] = useState('');
-  const [esAfiliado, setEsAfiliado] = useState<boolean | null>(null);
   const { showError } = useAlerts();
   const mutation = useDesconexionFisica();
   const planosInputRef = useRef<HTMLInputElement>(null);
@@ -85,12 +84,10 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
       return newErrors;
     });
 
-    setEsAfiliado(null);
     if (tipoId === 'Cedula Nacional' && /^\d{9}$/.test(identificacionProcesada)) {
       try {
         const resultado = await lookup(identificacionProcesada);
         if (resultado) {
-          setEsAfiliado(true);
           setFormErrors(prev => {
             const newErrors = { ...prev };
             delete newErrors['Identificacion'];
@@ -99,16 +96,11 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
           form.setFieldValue('Nombre', resultado.firstname || '');
           form.setFieldValue('Apellido1', resultado.lastname1 || '');
           form.setFieldValue('Apellido2', resultado.lastname2 || '');
-        } else {
-          setEsAfiliado(false);
-          // No mostrar error en el campo Identificacion
         }
       } catch (error: any) {
-        setEsAfiliado(false);
         // No mostrar error en el campo Identificacion
       }
     } else {
-      setEsAfiliado(null);
       // No limpiar alertas, solo mostrar si corresponde
     }
   };

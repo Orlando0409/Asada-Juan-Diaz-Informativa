@@ -23,7 +23,6 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSending, setIsSending] = useState(false);
   const planosInputRef = useRef<HTMLInputElement>(null);
   const escrituraInputRef = useRef<HTMLInputElement>(null);
@@ -51,21 +50,6 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
       }
       setFieldErrors(errors);
     }
-  };
-
-  // Validar en tiempo real cada vez que cambia un campo y marcar como tocado
-  const handleFieldChange = (
-    fieldName: "Nombre" | "Apellido1" | "Apellido2" | "Identificacion" | "Correo" | "Numero_Telefono" | "Direccion_Exacta" | "Edad" | "Tipo_Identificacion",
-    value: any
-  ) => {
-    // Sanitizar campos de nombre
-    const cleanValue = ["Nombre", "Apellido1", "Apellido2"].includes(fieldName)
-      ? sanitizeNameInput(value)
-      : value;
-    setTouched(prev => ({ ...prev, [fieldName]: true }));
-    const newValues = { ...form.state.values, [fieldName]: cleanValue };
-    validateAllFields(newValues);
-    form.setFieldValue(fieldName, cleanValue);
   };
 
   // Validación en tiempo real usando el schema
@@ -177,37 +161,6 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
     }
   };
 
-  const validateBeforeSubmit = (values: any): boolean => {
-    const validationErrors: Record<string, string> = {};
-
-    try {
-      normalizePhoneNumber(values.Numero_Telefono ?? "");
-    } catch (error: any) {
-      validationErrors["Numero_Telefono"] = 'Número de teléfono inválido';
-    }
-
-    const validation = AfiliacionSchema.safeParse(values);
-    if (!validation.success) {
-      validation.error.errors.forEach((err) => {
-        const field = err.path[0] as string;
-        if (!validationErrors[field]) {
-          // Si el error es de teléfono, usar el mensaje del backend
-          if (field === "Numero_Telefono") {
-            validationErrors[field] = 'Número de teléfono inválido';
-          } else {
-            validationErrors[field] = err.message;
-          }
-        }
-      });
-    }
-
-    setFormErrors(validationErrors);
-    return Object.keys(validationErrors).length === 0;
-  };
-
-
-
-
   const form = useForm({
     defaultValues: {
       Nombre: '',
@@ -282,18 +235,11 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
   });
 
   useEffect(() => {
-    setShowMedidorExtra(initialView === "medidor-extra");
-  }, [initialView]);
-
-
-  // Validar todos los campos al intentar enviar
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    validateAllFields(form.state.values);
-    form.handleSubmit();
-  };
-  // (Eliminada la declaración duplicada de handleFieldChange)
-
+    const shouldShow = initialView === "medidor-extra";
+    if (showMedidorExtra !== shouldShow) {
+      setShowMedidorExtra(shouldShow);
+    }
+  }, [initialView, showMedidorExtra]);
   useEffect(() => {
     const savedData = sessionStorage.getItem(STORAGE_KEY);
     if (savedData) {
@@ -584,7 +530,8 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
                     min={18}
                     value={field.state.value || ''}
                     onChange={(e) => {
-                      const soloNumeros = e.target.value.replace(/[^0-9]/g, '');
+                      const soloNumeros = e.target.value.replace(/[^1-9]/g, '');
+                   
                       const edadValue = soloNumeros === '' ? undefined : Number(soloNumeros);
                       field.handleChange(edadValue);
                       validateField("Edad", edadValue, form.state.values);

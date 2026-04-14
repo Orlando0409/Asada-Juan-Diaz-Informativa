@@ -1,10 +1,17 @@
+import { lazy, Suspense } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import CalidadDeAgua from '../../Section/DatosGenerales/CalidadDeAgua'
+import { LoadingSpinner } from '../../Components/LoadingSpinner'
+
+const CalidadDeAgua = lazy(() => import('../../Section/DatosGenerales/CalidadDeAgua'))
 
 export const Route = createFileRoute('/(AboutUs)/CalidadAgua')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  return <CalidadDeAgua />
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <CalidadDeAgua />
+    </Suspense>
+  )
 }

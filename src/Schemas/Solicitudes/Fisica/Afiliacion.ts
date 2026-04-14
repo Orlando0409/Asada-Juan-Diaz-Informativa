@@ -81,7 +81,7 @@ export const AfiliacionSchema = z.object({
   })
     .int('La edad debe ser un numero entero')
     .min(18, 'La edad mínima para realizar la solicitud es 18 años')
-    .max(119, 'La edad máxima permitida es 120 años')
+    .max(90, 'La edad máxima permitida es 90 años')
     .positive('La edad debe ser un número positivo'),
 
   // Validaciones de archivos (específicas del frontend)

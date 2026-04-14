@@ -1,5 +1,4 @@
 import { Link } from '@tanstack/react-router'
-import { MdExpandMore } from 'react-icons/md'
 import type { DropdownProps } from '../../types/header/MenuItem'
 
 
@@ -8,7 +7,13 @@ const Dropdown = ({ texto, Subopcion }: DropdownProps) => {
     <li className='relative group'>
       <button className='flex items-center gap-1 hover:text-[#6FCAF1] transition-colors duration-200'>
         {texto}
-        <MdExpandMore size={18} className='transition-transform duration-200 group-hover:rotate-180' />
+        <svg
+          viewBox='0 0 24 24'
+          className='h-[18px] w-[18px] transition-transform duration-200 group-hover:rotate-180'
+          aria-hidden='true'
+        >
+          <path fill='currentColor' d='m7 10 5 5 5-5H7Z' />
+        </svg>
       </button>
       <div className='absolute left-0 hidden group-hover:block bg-white shadow-lg rounded-md mt-2 z-10 w-48 border border-gray-100'>
         <ul className='py-2 text-sm text-gray-700'>

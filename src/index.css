@@ -56,6 +56,63 @@
 }
 
 @layer utilities {
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-rise {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-scale-in {
+    from {
+      opacity: 0;
+      transform: translateY(18px) scale(0.98);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .animate-rise-in {
+    animation: rise-in 0.35s ease-out both;
+    will-change: transform;
+  }
+
+  .animate-fade-rise {
+    animation: fade-rise 0.45s ease-out both;
+    will-change: transform, opacity;
+  }
+
+  .animate-fade-scale-in {
+    animation: fade-scale-in 0.35s ease-out both;
+    will-change: transform, opacity;
+  }
+
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -63,5 +120,19 @@
 
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise-in {
+    animation: none;
+  }
+
+  .animate-fade-rise {
+    animation: none;
+  }
+
+  .animate-fade-scale-in {
+    animation: none;
   }
 }

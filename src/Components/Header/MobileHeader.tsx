@@ -1,7 +1,47 @@
 import { useState } from 'react'
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
-import { FaBars, FaTimes, FaChevronDown } from 'react-icons/fa'
 import type { MenuItem } from '../../types/header/MenuItem'
+
+function MenuIcon({ open }: { open: boolean }) {
+  return open ? (
+    <svg aria-hidden='true' viewBox='0 0 24 24' fill='none' className='h-5 w-5'>
+      <path
+        d='M6 6l12 12M18 6 6 18'
+        stroke='currentColor'
+        strokeWidth='2'
+        strokeLinecap='round'
+      />
+    </svg>
+  ) : (
+    <svg aria-hidden='true' viewBox='0 0 24 24' fill='none' className='h-5 w-5'>
+      <path
+        d='M4 7h16M4 12h16M4 17h16'
+        stroke='currentColor'
+        strokeWidth='2'
+        strokeLinecap='round'
+      />
+    </svg>
+  )
+}
+
+function ChevronDownIcon({ isOpen }: Readonly<{ isOpen: boolean }>) {
+    return (
+    <svg
+      aria-hidden='true'
+      viewBox='0 0 20 20'
+      fill='none'
+      className={`h-3.5 w-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+    >
+      <path
+        d='M5 8l5 5 5-5'
+        stroke='currentColor'
+        strokeWidth='1.8'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+    </svg>
+  )
+}
 
 
 const MobileHeader = ({ menuItems }: { menuItems: MenuItem[] }) => {
@@ -22,19 +62,34 @@ const MobileHeader = ({ menuItems }: { menuItems: MenuItem[] }) => {
     setExpandedItem((prev) => (prev === itemId ? null : itemId))
   }
 
+  const smoothScrollToAnchor = (anchor: string) => {
+    const targetId = anchor.replace('#', '')
+    const element = globalThis.window.document.getElementById(targetId)
+
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      return
+    }
+
+    globalThis.window.location.hash = anchor
+  }
+
   return (
     <>
       {/* Botón 3 Rayitas */}
       <button 
         className='md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100'
         onClick={toggleMenu}
+        aria-label={isOpen ? 'Cerrar menu de navegacion' : 'Abrir menu de navegacion'}
+        aria-expanded={isOpen}
+        aria-controls='mobile-navigation-menu'
       >
-        {isOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+        <MenuIcon open={isOpen} />
       </button>
 
       {/* Menú móvil desplegado */}
       {isOpen && (
-        <div className='absolute top-full left-0 w-full bg-white border-t border-gray-200 shadow-lg md:hidden z-40'>
+        <div id='mobile-navigation-menu' className='absolute top-full left-0 w-full bg-white border-t border-gray-200 shadow-lg md:hidden z-40'>
           <div className='py-4 px-4 space-y-2'>
             {menuItems.map((item) => {
               // Primero verificar si es un ancla
@@ -45,22 +100,15 @@ const MobileHeader = ({ menuItems }: { menuItems: MenuItem[] }) => {
                       onClick={() => {
                      
                         if (currentPath === '/') {
-                       
-                          const element = document.querySelector(item.ruta!)
-                          if (element) {
-                            element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                          }
+                          smoothScrollToAnchor(item.ruta!)
                           setIsOpen(false)
                         } else {
-                          navigate({ to: '/' })
+                          navigate({ to: '/', hash: item.ruta!.replace('#', '') })
                           setIsOpen(false)
                           
                           setTimeout(() => {
-                            const element = document.querySelector(item.ruta!)
-                            if (element) {
-                              element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                            }
-                          }, 300)
+                            smoothScrollToAnchor(item.ruta!)
+                          }, 120)
                         }
                       }}
                       className='flex items-center gap-2 py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors duration-200 cursor-pointer w-full text-left bg-transparent border-none'
@@ -82,12 +130,7 @@ const MobileHeader = ({ menuItems }: { menuItems: MenuItem[] }) => {
                         <span className='flex items-center gap-2'>
                           {item.texto}
                         </span>
-                        <FaChevronDown 
-                          className={`transform transition-transform duration-200 ${
-                            expandedItem === item.id ? 'rotate-180' : ''
-                          }`}
-                          size={14}
-                        />
+                        <ChevronDownIcon isOpen={expandedItem === item.id} />
                       </button>
                       {expandedItem === item.id && (
                         <div className='pl-4 space-y-1'>

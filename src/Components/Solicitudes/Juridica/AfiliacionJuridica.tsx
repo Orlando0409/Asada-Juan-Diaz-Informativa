@@ -6,7 +6,6 @@ import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import PhoneInputComponent from "../PhoneInputComponent";
 type Props = {
     onClose: () => void;
-    initialView?: "afiliacion" | "medidor-extra";
 };
 
 function formatCedulaJuridica(value: string) {
@@ -20,7 +19,7 @@ function formatCedulaJuridica(value: string) {
 //prueba
 const STORAGE_KEY = 'afiliacion_juridica_temp';
 
-const FormularioAfiliacionJuridico = ({ onClose, initialView = "afiliacion" }: Props) => {
+const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
     const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});

@@ -27,10 +27,10 @@ const FormularioContacto = ({ tipo }: Props) => {
 
   // Función para obtener el límite de caracteres según el tipo de campo
   const getMaxLength = (fieldName: string, fieldType: string): number => {
-    if (fieldType === 'textarea') return 50
-    if (fieldName === 'Correo') return 50
-    if (fieldName === 'Ubicacion') return 50
-    if (fieldName.includes('Nombre') || fieldName.includes('Apellido')) return 20
+    if (fieldType === 'textarea') return 200
+    if (fieldName === 'Correo') return 100
+    if (fieldName === 'Ubicacion') return 100
+    if (fieldName.includes('Nombre') || fieldName.includes('Apellido')) return 50
     return 10 // Límite por defecto
   }
 
@@ -156,7 +156,7 @@ const FormularioContacto = ({ tipo }: Props) => {
                       }}
                       placeholder={`${fieldProps.label}`}
                       maxLength={maxLength}
-                      className={`${commonClasses} h-28 resize-none`}
+                      className={`${commonClasses} h-28 resize-none scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100`}
                     />
                     <div className="flex justify-between items-center mt-1">
                       <div>

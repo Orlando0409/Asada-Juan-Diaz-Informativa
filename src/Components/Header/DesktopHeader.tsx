@@ -1,7 +1,25 @@
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
-import { MdExpandMore } from 'react-icons/md'
 import type { DesktopHeaderProps } from '../../types/header/MenuItem'
 import { useRef, useState } from 'react'
+
+function ChevronDownIcon({ isOpen }: { isOpen: boolean }) {
+  return (
+    <svg
+      aria-hidden='true'
+      viewBox='0 0 20 20'
+      fill='none'
+      className={`h-3.5 w-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+    >
+      <path
+        d='M5 8l5 5 5-5'
+        stroke='currentColor'
+        strokeWidth='1.8'
+        strokeLinecap='round'
+        strokeLinejoin='round'
+      />
+    </svg>
+  )
+}
 
 const DesktopHeader = ({ menuItems }: DesktopHeaderProps) => {
   const [expandedItem, setExpandedItem] = useState<number | null>(null)
@@ -23,6 +41,18 @@ const DesktopHeader = ({ menuItems }: DesktopHeaderProps) => {
     }, 150)
   }
 
+  const smoothScrollToAnchor = (anchor: string) => {
+    const targetId = anchor.replace('#', '')
+    const element = globalThis.window.document.getElementById(targetId)
+
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      return
+    }
+
+    globalThis.window.location.hash = anchor
+  }
+
 
   return (
     <nav className='hidden md:block bg-white px-3 py-2 rounded-lg shadow-md'>
@@ -37,20 +67,13 @@ const DesktopHeader = ({ menuItems }: DesktopHeaderProps) => {
                   onClick={() => {
                     
                     if (currentPath === '/') {
-            
-                      const element = document.querySelector(item.ruta!)
-                      if (element) {
-                        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                      }
+                      smoothScrollToAnchor(item.ruta!)
                     } else {
-                      navigate({ to: '/' })
+                      navigate({ to: '/', hash: item.ruta!.replace('#', '') })
               
                       setTimeout(() => {
-                        const element = document.querySelector(item.ruta!)
-                        if (element) {
-                          element.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                        }
-                      }, 300)
+                        smoothScrollToAnchor(item.ruta!)
+                      }, 120)
                     }
                   }}
                   className='hover:text-[#6FCAF1] transition-colors duration-200 flex items-center gap-2 cursor-pointer bg-transparent border-none font-medium'
@@ -73,15 +96,9 @@ const DesktopHeader = ({ menuItems }: DesktopHeaderProps) => {
               >
                 <button className='flex items-center gap-1 hover:text-[#6FCAF1] transition-colors duration-10'>
                   {item.texto}
-                  <MdExpandMore 
-                    size={13} 
-                    className={` ${
-                      expandedItem === item.id 
-                    }`}
-                  />
+                  <ChevronDownIcon isOpen={expandedItem === item.id} />
                 </button>
                 
-                {/* Dropdown desplegado */}
                 {expandedItem === item.id && (
                   <div className='absolute left-0 bg-white shadow-lg rounded-md mt-2 z-50 w-48 border border-gray-100'>
                     <ul className='py-2 text-sm text-gray-700'>

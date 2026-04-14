@@ -1,5 +1,4 @@
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
-import { motion } from "framer-motion";
 import BotonLeerMas from "../Proyecto/BotonLeermas";
 import type { Proyecto } from "../../types/Proyecto/Proyecto";
 
@@ -54,13 +53,7 @@ function ProyectosMobile({
       <div className="container mx-auto px-4">
         
         {/* Título móvil */}
-        <motion.div 
-          className="text-center space-y-4 mb-8"
-          initial={{ opacity: 0, y: -20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-        >
+        <div className="text-center space-y-4 mb-8 animate-fade-rise">
           <h2 className="text-3xl md:text-4xl font-bold text-blue-600 mb-2">
             {titulo}
           </h2>
@@ -68,16 +61,10 @@ function ProyectosMobile({
           <p className="text-gray-700 text-md leading-relaxed max-w-md mx-auto px-4">
             {descripcion}
           </p>
-        </motion.div>
+        </div>
 
         {/* Carrusel móvil */}
-        <motion.div 
-          className="w-full max-w-md mx-auto relative"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
+        <div className="w-full max-w-md mx-auto relative animate-fade-rise" style={{ animationDelay: '140ms' }}>
           
           {/* Contenedor slides móvil */}
           <div className="relative overflow-hidden rounded-2xl shadow-xl bg-white/5 backdrop-blur-sm p-1">
@@ -141,23 +128,19 @@ function ProyectosMobile({
           {/* Botones navegación móvil - Solo mostrar si hay más de un proyecto */}
           {proyectos.length > 1 && (
             <>
-              <motion.button
+              <button
                 onClick={irAAnterior}
                 className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-2 shadow-md transition-all duration-200 border border-gray-200"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
               >
                 <IoChevronBack className="w-4 h-4 text-gray-700" />
-              </motion.button>
+              </button>
               
-              <motion.button
+              <button
                 onClick={irASiguiente}
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-2 shadow-md transition-all duration-200 border border-gray-200"
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
               >
                 <IoChevronForward className="w-4 h-4 text-gray-700" />
-              </motion.button>
+              </button>
             </>
           )}
 
@@ -165,7 +148,7 @@ function ProyectosMobile({
           {proyectos.length > 1 && (
             <div className="flex justify-center mt-4 space-x-2">
               {proyectos.map((proyecto, index) => (
-                <motion.button
+                <button
                   key={`${proyecto.Id_Proyecto}-dot-${index}`}
                   onClick={() => irASlide(index)}
                   className={`transition-all duration-300 rounded-full ${
@@ -173,8 +156,6 @@ function ProyectosMobile({
                       ? 'w-6 h-2 bg-gradient-to-r from-blue-500 to-indigo-500' 
                       : 'w-2 h-2 bg-gray-300 hover:bg-gray-400'
                   }`}
-                  whileHover={{ scale: 1.2 }}
-                  whileTap={{ scale: 0.9 }}
                 />
               ))}
             </div>
@@ -189,7 +170,7 @@ function ProyectosMobile({
               />
             </div>
           )}
-        </motion.div>
+        </div>
       </div>
     </section>
   );

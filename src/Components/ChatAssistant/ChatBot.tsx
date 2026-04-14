@@ -63,6 +63,8 @@ export function ChatBot() {
           <Button
             onClick={() => setIsOpen(true)}
             className="w-12 h-12 flex justify-center items-center rounded-full shadow-lg"
+            aria-label="Abrir chat asistente"
+            title="Abrir chat asistente"
           >
             <BsChatDots className="w-10 h-10" />
           </Button>
@@ -95,6 +97,7 @@ export function ChatBot() {
                       onClick={clearMessages}
                       className="p-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
                       title="Limpiar conversación"
+                      aria-label="Limpiar conversación"
                     >
                       <IoRefresh className="w-4 h-4" />
                     </button>
@@ -103,6 +106,7 @@ export function ChatBot() {
                   onClick={() => setIsOpen(false)}
                   className="p-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
                   title="Cerrar chat"
+                  aria-label="Cerrar chat"
                 >
                   <IoClose className="w-4 h-4" />
                 </button>
@@ -170,8 +174,9 @@ export function ChatBot() {
                 placeholder="Escribe tu mensaje..."
                 disabled={isLoading}
                 className="flex-1"
+                aria-label="Escribe tu mensaje"
               />
-              <Button type="submit" disabled={!input.trim() || isLoading} title='Enviar mensaje'>
+              <Button type="submit" disabled={!input.trim() || isLoading} title='Enviar mensaje' aria-label='Enviar mensaje'>
                 <IoSend className="w-4 h-4" />
               </Button>
             </form>

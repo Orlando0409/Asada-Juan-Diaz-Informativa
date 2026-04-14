@@ -29,7 +29,6 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [isSending, setIsSending] = useState(false);
-  const [esAfiliado, setEsAfiliado] = useState<boolean | null>(null);
   // Usar sistema global de alertas
   const { showError } = useAlerts();
   const mutation = useCambioMedidorFisica();
