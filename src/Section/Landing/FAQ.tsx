@@ -73,7 +73,7 @@ const Faq: React.FC = () => {
     <section
       id="FAQ"
       aria-label="Preguntas frecuentes"
-      className="bg-white py-12 px-4 sm:px-6 lg:px-8"
+      className="bg-white py-12 px-4 sm:px-6 lg:px-8 scroll-mt-[95px]"
     >
       <div className="py-8 max-w-4xl mx-auto">
         <div className="text-center mb-10 animate-fade-rise">

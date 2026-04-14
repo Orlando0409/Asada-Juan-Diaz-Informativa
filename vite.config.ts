@@ -123,6 +123,16 @@ export default defineConfig({
     react(),
     tailwindcss(),
     tanstackRouter({ target: 'react' }),
+    {
+      name: 'defer-main-css',
+      enforce: 'post' as const,
+      transformIndexHtml(html: string) {
+        return html.replace(
+          /<link rel="stylesheet" crossorigin href="([^"]+)">/,
+          '<link rel="preload" as="style" href="$1" crossorigin onload="this.onload=null;this.rel=\'stylesheet\'">\n    <noscript><link rel="stylesheet" crossorigin href="$1"></noscript>'
+        )
+      },
+    },
     ENABLE_SITEMAP &&
       sitemap({
         baseUrl: 'https://asadajuandiaz.com',

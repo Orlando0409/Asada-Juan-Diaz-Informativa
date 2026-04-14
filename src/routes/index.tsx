@@ -60,6 +60,7 @@ function SectionOnVisible({
               backgroundColor: '#fff',
             }
       }
+      className="scroll-mt-[95px]"
     >
       {shouldRender ? children : null}
     </div>
