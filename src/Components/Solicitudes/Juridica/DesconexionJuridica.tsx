@@ -154,8 +154,6 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
         },
     });
 
-    if (!mostrarFormulario) return null;
-
     const campos = data.juridica.desconexion;
     const commonClasses = 'w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring focus:ring-blue-300';
 
@@ -208,6 +206,8 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
             }
         }
     }, [cedulaJuridica, medidores.length, isMedidoresLoading, showError]);
+
+    if (!mostrarFormulario) return null;
 
     return (
         <div className="flex justify-center text-gray-800 p-3 sm:p-4 w-full">
