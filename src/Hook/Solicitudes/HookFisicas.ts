@@ -3,16 +3,19 @@ import { createAfiliacionFisica, createAgregarMedidorFisica, createAsociadoFisic
 import type { MedidoresResponse } from "../../models/Forms/Solicitudes/Fisico/CambioMedidor";
 import type { Medidor } from "../../models/Medidor";
 import { useAlerts } from "../../context/AlertContext";
+import {useNavigate} from "@tanstack/react-router";
 
 export const useAfiliacionFisica = () => {
     const queryClient = useQueryClient();
     const { showSuccess, showError } = useAlerts();
+    const navigate = useNavigate();
 
     const createAfiliacionFisicaMutation = useMutation({
         mutationFn: (data: FormData) => createAfiliacionFisica(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["afiliaciones"] });
             showSuccess("¡Solicitud creada!", "La solicitud de afiliación ha sido creada con éxito.");
+            navigate({ to: "/" });
         },
         onError: (error: any) => {
             const errorMessage = error?.response?.data?.message;
@@ -29,12 +32,14 @@ export const useAfiliacionFisica = () => {
 export const useDesconexionFisica = () => {
     const queryClient = useQueryClient();
     const { showSuccess, showError } = useAlerts();
+    const navigate = useNavigate();
 
     const createDesconexionFisicaMutation = useMutation({
         mutationFn: (data: FormData) => createDesconexionFisica(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["desconexion"] });
             showSuccess("¡Solicitud creada!", "La solicitud de desconexión ha sido creada con éxito.");
+            navigate({ to: "/" });
         },
         onError: (error: any) => {
             const errorMessage = error?.response?.data?.message || 'Error al enviar el formulario.';
@@ -51,12 +56,14 @@ export const useDesconexionFisica = () => {
 export const useCambioMedidorFisica = () => {
     const queryClient = useQueryClient();
     const { showSuccess, showError } = useAlerts();
+    const navigate = useNavigate();
 
     const createCambioMedidorFisicoMutation = useMutation({
         mutationFn: (data: FormData) => createCambioMedidorFisica(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cambio-medidor"] });
             showSuccess("¡Solicitud creada!", "La solicitud de cambio de medidor ha sido creada con éxito.");
+            navigate({ to: "/" });
         },
         onError: (error: any) => {
             const errorMessage = error?.response?.data?.message || 'Error al enviar el formulario.';
@@ -73,12 +80,14 @@ export const useCambioMedidorFisica = () => {
 export const useAsociadoFisica = () => {
     const queryClient = useQueryClient();
     const { showSuccess, showError } = useAlerts();
+    const navigate = useNavigate();
 
     const createAsociadoFisicoMutation = useMutation({
         mutationFn: (data: FormData) => createAsociadoFisica(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["asociado"] });
             showSuccess("¡Solicitud creada!", "La solicitud de asociado ha sido creada con éxito.");
+            navigate({ to: "/" });
         },
         onError: (error: any) => {
             const errorMessage = error?.response?.data?.message || 'Error al enviar el formulario.';
@@ -101,12 +110,13 @@ export const useAsociadoFisica = () => {
 export const useAgregarMedidorFisica = () => {
     const queryClient = useQueryClient();
     const { showSuccess, showError } = useAlerts();
-
+    const navigate = useNavigate();
     const mutation = useMutation({
         mutationFn: (data: FormData) => createAgregarMedidorFisica(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["agregar-medidor"] });
             showSuccess("¡Solicitud creada!", "La solicitud de agregar medidor ha sido creada con éxito.");
+            navigate({ to: "/" });
         },
         onError: (error: any) => {
             const errorMessage = error?.response?.data?.message || error?.message || 'Error al enviar el formulario.';
