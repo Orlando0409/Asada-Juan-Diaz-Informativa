@@ -97,7 +97,7 @@ const DesconexionMedidor = () => {
 
   return (
     <section className="relative isolate min-h-screen bg-white px-4 py-8 sm:px-6 md:py-12 lg:px-8">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 pt-15">
         <motion.div
           className="overflow-hidden rounded-[32px] border border-sky-200 bg-white shadow-md"
           initial={{ opacity: 0, y: 24 }}

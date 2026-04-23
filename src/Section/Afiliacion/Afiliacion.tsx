@@ -1,6 +1,7 @@
 import { useState, useRef } from "react"
 import type { IconType } from "react-icons"
 import {
+  FiArrowDown,
   FiArrowRight,
   FiBriefcase,
   FiCheckCircle,
@@ -138,7 +139,7 @@ const InformacionAfiliacion = () => {
 
   return (
     <section className="relative isolate min-h-screen bg-white px-4 py-8 sm:px-6 md:py-12 lg:px-8">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 pt-15">
         <motion.div
           className="overflow-hidden rounded-[32px] border border-sky-200 bg-white shadow-md"
           initial={{ opacity: 0, y: 24 }}
@@ -154,6 +155,23 @@ const InformacionAfiliacion = () => {
             <div>
               <h2 className="mt-4 text-2xl font-semibold tracking-tight text-slate-900 sm:text-[1.9rem]">Beneficios como abonado</h2>
             </div>
+
+            <motion.div
+              className="mt-3 flex justify-center"
+              initial={{ opacity: 0, y: -8 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+            >
+              <motion.div
+                className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-blue-700 shadow-sm"
+                animate={{ y: [0, 4, 0] }}
+                transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <FiArrowDown className="h-3.5 w-3.5" />
+                Desliza para ver requisitos
+              </motion.div>
+            </motion.div>
 
             {beneficios.length > 0 && (
               <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
