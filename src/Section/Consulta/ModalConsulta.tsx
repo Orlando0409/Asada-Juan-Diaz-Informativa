@@ -6,6 +6,7 @@ import {
     Calendar,
     ChevronDown,
     Droplets,
+    FileText,
     Gauge,
     UserRound,
     Wallet,
@@ -103,7 +104,16 @@ const getNombreTitularLectura = (lectura: LecturaConsulta) => {
 };
 
 const getTitularDesdeMedidor = (medidor: MedidorConsultaResultado) => {
-    const primeraLectura = medidor['Historial de lecturas']?.[0];
+    // If it has 'Afiliado' directly (like the new por medidor response)
+    if (medidor.Afiliado) {
+        return {
+            nombre: medidor.Afiliado.Nombre_Completo || medidor.Afiliado.Razon_Social || medidor.Afiliado.Nombre || 'No disponible',
+            documento: medidor.Afiliado.Identificacion || medidor.Afiliado.Cedula_Juridica || 'No disponible',
+            esJuridico: !!medidor.Afiliado.Cedula_Juridica || !!medidor.Afiliado.Razon_Social,
+        };
+    }
+
+    const primeraLectura = medidor.Historial_Lecturas?.[0];
     if (!primeraLectura) {
         return null;
     }
@@ -167,7 +177,7 @@ const isSingleMedidor = (value: unknown): value is MedidorConsultaResultado => {
         return false;
     }
 
-    return 'Numero_Medidor' in value;
+    return 'Historial_Lecturas' in value || 'Facturas' in value;
 };
 
 type TitularResumen = {
@@ -252,23 +262,27 @@ const getSubtitulo = (tipo: ConsultaResultado['tipo']): string => {
 };
 
 const renderMedidor = (medidor: MedidorConsultaResultado, index: number) => {
-    const calculoFinal = medidor['Calculo final'];
-    const historial = medidor['Historial de lecturas'] ?? [];
+    const historial = medidor.Historial_Lecturas ?? [];
+    const facturas = medidor.Facturas ?? [];
     const primeraLectura = historial[0];
-    const afiliadoMedidor = primeraLectura?.Afiliado;
-    const esJuridico = afiliadoMedidor && 'Razon_Social' in afiliadoMedidor;
+    const afiliadoMedidor = medidor.Afiliado || primeraLectura?.Afiliado;
+    const esJuridico = afiliadoMedidor && ('Razon_Social' in afiliadoMedidor || 'Cedula_Juridica' in afiliadoMedidor);
 
     let nombreAfiliadorMedidor = 'No disponible';
     let cedulaAfiliado: string | undefined;
     let tipoAfiliado = 'Nombre';
 
         if (esJuridico && afiliadoMedidor) {
-            nombreAfiliadorMedidor = (afiliadoMedidor as any).Razon_Social;
-            cedulaAfiliado = (afiliadoMedidor as any).Cedula_Juridica;
+            const afiliadoJur = afiliadoMedidor as any;
+            nombreAfiliadorMedidor = afiliadoJur.Nombre_Completo || afiliadoJur.Razon_Social;
+            cedulaAfiliado = afiliadoJur.Cedula_Juridica || afiliadoJur.Identificacion;
         tipoAfiliado = 'Razón Social';
     } else if (afiliadoMedidor) {
         const afiliadoFisico = afiliadoMedidor as any;
-        nombreAfiliadorMedidor = `${afiliadoFisico.Nombre} ${afiliadoFisico.Primer_Apellido}`;
+        nombreAfiliadorMedidor = afiliadoFisico.Nombre_Completo || afiliadoFisico.Nombre ? `${afiliadoFisico.Nombre} ${afiliadoFisico.Primer_Apellido || ''}` : 'No disponible';
+        if (nombreAfiliadorMedidor === ' No disponible' && afiliadoFisico.Nombre_Completo) {
+            nombreAfiliadorMedidor = afiliadoFisico.Nombre_Completo;
+        }
         cedulaAfiliado = afiliadoFisico.Identificacion;
     }
 
@@ -343,31 +357,31 @@ const renderMedidor = (medidor: MedidorConsultaResultado, index: number) => {
                         </div>
                     )}
 
-                    {calculoFinal && (
+                    {facturas.length > 0 && facturas.some(f => f.Total) && (
                         <div className="border-b border-gray-200 p-5">
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                 <div className="rounded-lg bg-blue-50 p-4">
                                     <p className="text-xs font-semibold text-blue-700 uppercase tracking-wider mb-2">Total a pagar</p>
                                     <p className="text-lg font-bold text-blue-900">
-                                        {formatCurrency(calculoFinal.Total_A_Pagar)}
+                                        {formatCurrency(facturas.reduce((sum, f) => sum + (f.Total ? Number(f.Total.replace(/[^0-9.-]+/g,"")) : 0), 0))}
                                     </p>
                                 </div>
                                 <div className="rounded-lg bg-cyan-50 p-4">
-                                    <p className="text-xs font-semibold text-cyan-700 uppercase tracking-wider mb-2">Consumo</p>
+                                    <p className="text-xs font-semibold text-cyan-700 uppercase tracking-wider mb-2">Consumo Total</p>
                                     <p className="text-lg font-bold text-cyan-900">
-                                        {calculoFinal.Detalles.Consumo_M3} m³
+                                        {formatCurrency(facturas.reduce((sum, f) => sum + (f.Cargo_Consumo ? Number(f.Cargo_Consumo.replace(/[^0-9.-]+/g,"")) : 0), 0))}
                                     </p>
                                 </div>
                                 <div className="rounded-lg bg-indigo-50 p-4">
-                                    <p className="text-xs font-semibold text-indigo-700 uppercase tracking-wider mb-2">Costo/m³</p>
+                                    <p className="text-xs font-semibold text-indigo-700 uppercase tracking-wider mb-2">Recurso Hídrico</p>
                                     <p className="text-lg font-bold text-indigo-900">
-                                        {formatCurrency(calculoFinal.Detalles.Costo_Por_M3)}
+                                        {formatCurrency(facturas.reduce((sum, f) => sum + (f.Cargo_Recurso_Hidrico ? Number(f.Cargo_Recurso_Hidrico.replace(/[^0-9.-]+/g,"")) : 0), 0))}
                                     </p>
                                 </div>
                                 <div className="rounded-lg bg-slate-50 p-4">
                                     <p className="text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">Cargo Fijo</p>
                                     <p className="text-lg font-bold text-slate-900">
-                                        {formatCurrency(calculoFinal.Detalles.Cargo_Fijo)}
+                                        {formatCurrency(facturas.reduce((sum, f) => sum + (f.Cargo_Fijo ? Number(f.Cargo_Fijo.replace(/[^0-9.-]+/g,"")) : 0), 0))}
                                     </p>
                                 </div>
                             </div>
@@ -416,6 +430,58 @@ const renderMedidor = (medidor: MedidorConsultaResultado, index: number) => {
                             </details>
                         </div>
                     )}
+
+                    {facturas.length > 0 && (
+                        <div className="p-5">
+                            <details className="group" open={true}>
+                                <summary className="flex cursor-pointer list-none items-center justify-between rounded-lg bg-gray-50 px-4 py-3 font-medium text-gray-900 hover:bg-gray-100">
+                                    <span className="flex items-center gap-2">
+                                        <FileText className="h-4 w-4 text-blue-600" />
+                                        Facturas ({facturas.length})
+                                    </span>
+                                    <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
+                                </summary>
+
+                                <div className="mt-4 space-y-3">
+                                    {facturas.map((factura) => (
+                                        <div
+                                            key={factura.Numero_Factura}
+                                            className="rounded-lg border border-gray-200 bg-white p-4 hover:border-blue-300 transition-colors"
+                                        >
+                                            <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+                                                <span className="font-medium text-gray-900">{factura.Numero_Factura}</span>
+                                                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                                                    factura.Estado?.Nombre_Estado === 'Pagado' ? 'border border-green-300 bg-green-100 text-green-700' :
+                                                    (factura.Estado?.Nombre_Estado === 'Vencido' || factura.Estado?.Nombre_Estado === 'Vencida') ? 'border border-red-300 bg-red-100 text-red-700' :
+                                                    'border border-yellow-300 bg-yellow-100 text-yellow-700'
+                                                }`}>
+                                                    {factura.Estado?.Nombre_Estado || 'Desconocido'}
+                                                </span>
+                                            </div>
+
+                                            <div className="space-y-2 border-t border-gray-100 pt-3 text-sm">
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div>
+                                                        <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Emisión</p>
+                                                        <p className="text-sm font-medium text-gray-900">{formatDate(factura.Fecha_Emision)}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1">Vencimiento</p>
+                                                        <p className="text-sm font-medium text-gray-900">{formatDate(factura.Fecha_Vencimiento)}</p>
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex justify-between items-center border-t border-gray-100 pt-3">
+                                                    <span className="font-semibold text-gray-900">Total:</span>
+                                                    <span className="text-lg font-bold text-blue-600">{factura.Total || '0.00'}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </details>
+                        </div>
+                    )}
                 </>
             )}
         </article>
@@ -432,10 +498,14 @@ const ModalConsulta = ({ isOpen, onClose, resultado, onDownload, isDownloading }
 
     const medidores = getMedidoresDesdeResultado(resultado);
     const medidoresConError = medidores.filter((medidor) => !!medidor.BadRequestException).length;
-    const totalAPagar = medidores.reduce(
-        (sum, medidor) => sum + (medidor['Calculo final']?.Total_A_Pagar ?? 0),
-        0
-    );
+    const totalAPagar = medidores.reduce((sum, medidor) => {
+        const facturas = medidor.Facturas ?? [];
+        const sumFacturas = facturas.reduce((fSum, f) => {
+            const num = Number(f.Total?.replace(/[^0-9.-]+/g,""));
+            return fSum + (isNaN(num) ? 0 : num);
+        }, 0);
+        return sum + sumFacturas;
+    }, 0);
     const { nombreAfiliado, documentoAfiliado, esTitularJuridico } = getTitularResumen(resultado, medidores);
     const subtitulo = getSubtitulo(resultado.tipo);
 
