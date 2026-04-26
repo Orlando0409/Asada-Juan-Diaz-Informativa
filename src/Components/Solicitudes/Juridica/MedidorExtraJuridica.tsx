@@ -21,6 +21,7 @@ function formatCedulaJuridica(value: string) {
 }
 
 const STORAGE_KEY = 'medidor_extra_juridica_temp';
+const VALIDANDO_MEDIDORES_MSG = 'Estamos validando los medidores de tu empresa. Intenta enviar de nuevo en unos segundos.';
 
 const MedidorExtraJuridica = ({ onClose }: Props) => {
     const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
@@ -84,8 +85,9 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
 
         // Validar formato completo y buscar medidores
         if (/^3-\d{3}-\d{6}$/.test(formatted)) {
-            setCedulaValidada(formatted);
-            lookupJuridica(formatted).then(razonSocial => {
+            const cedulaSoloDigitos = formatted.replace(/\D/g, '');
+            setCedulaValidada(cedulaSoloDigitos);
+            lookupJuridica(cedulaSoloDigitos).then(razonSocial => {
                 if (razonSocial) form.setFieldValue('Razon_Social', razonSocial);
             });
         } else {
@@ -108,6 +110,12 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
         }
     };
 
+    const hasBlockingFormErrors = Object.entries(formErrors).some(([key, value]) => {
+        if (!value) return false;
+        if (key === 'general' && value === VALIDANDO_MEDIDORES_MSG) return false;
+        return true;
+    });
+
     const form = useForm({
         defaultValues: {
             Razon_Social: '',
@@ -122,6 +130,19 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
         onSubmit: async ({ value }) => {
             setFormErrors({});
             setFieldErrors({});
+
+            const cedulaFormulario = formatCedulaJuridica((value.Cedula_Juridica || '').trim());
+            const cedulaFormularioDigitos = cedulaFormulario.replace(/\D/g, '');
+            const requiereRevalidarCedula = /^3-\d{3}-\d{6}$/.test(cedulaFormulario) && cedulaFormularioDigitos !== cedulaValidada;
+
+            if (requiereRevalidarCedula) {
+                setCedulaValidada(cedulaFormularioDigitos);
+            }
+
+            if (requiereRevalidarCedula || loadingMedidores) {
+                setFormErrors({ general: VALIDANDO_MEDIDORES_MSG });
+                return;
+            }
 
             // Verificar que sea afiliado (tenga medidores)
             if (!cedulaValidada || medidores.length === 0) {
@@ -214,6 +235,17 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
             }
         }
     }, [cedulaValidada, medidores.length, loadingMedidores, alertShown, showSuccess, showError]);
+
+    // Limpiar mensaje transitorio de validación cuando ya terminó la consulta de medidores.
+    useEffect(() => {
+        if (!loadingMedidores && formErrors.general === VALIDANDO_MEDIDORES_MSG) {
+            setFormErrors(prev => {
+                const next = { ...prev };
+                delete next.general;
+                return next;
+            });
+        }
+    }, [loadingMedidores, formErrors.general]);
 
     if (!mostrarFormulario) return null;
 
@@ -517,9 +549,10 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
               className="w-sm md:w-auto px-1 py-1.5 md:px-6 md:py-4 bg-blue-600 hover:bg-blue-700 rounded text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm md: text-lg font-medium"
                disabled={
                         mutation.isPending ||
+                        loadingMedidores ||
                         Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
                         Object.values(fieldErrors).some(Boolean) ||
-                        Object.values(formErrors).some(Boolean)
+                        hasBlockingFormErrors
                     }
                 >
                     {mutation.isPending ? 'Enviando...' : 'Enviar Solicitud'}
