@@ -18,6 +18,9 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
 
   useEffect(() => {
     containerRef.current?.scrollTo({ top: 0, behavior: 'instant' });
+    globalThis.window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    if (document.documentElement) document.documentElement.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
   }, [location.pathname]);
 
   useEffect(() => {

@@ -2,9 +2,9 @@ import { useForm } from '@tanstack/react-form'
 import { motion } from 'framer-motion'
 import data from '../data/Data.json'
 import { type ContactoTipo, getRequisitosKey, type RequisitosContacto } from '../types/ContactoForms'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useCreateContacto } from '../Hook/Contacto/ContactoForms'
-import { getDynamicContactoSchema } from '../Schemas/ContactoData';
+import { getDynamicContactoSchema, getFieldSchemas, validateSingleField } from '../Schemas/ContactoData';
 
 
 type Props = {
@@ -14,7 +14,6 @@ type Props = {
 const FormularioContacto = ({ tipo }: Props) => {
   const [formkey, setFormKey] = useState<number>(0); // Estado para forzar el reinicio del formulario
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<File | null>(null)
-  const [formErrors, setFormErrors] = useState<Record<string, string>>({}) // Agrega un arreglo para manejo de errores
   const [isSubmitting, setIsSubmitting] = useState(false) // Control manual del estado de envío
 
   const mutation = useCreateContacto()
@@ -23,7 +22,8 @@ const FormularioContacto = ({ tipo }: Props) => {
   const clave = getRequisitosKey(tipo)
   const campos = requisitos[clave]
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300'
-  const DynamicContactoSchema = getDynamicContactoSchema(campos);
+  const DynamicContactoSchema = useMemo(() => getDynamicContactoSchema(campos), [campos]);
+  const fieldSchemas = useMemo(() => getFieldSchemas(campos), [campos]);
 
   // Función para obtener el límite de caracteres según el tipo de campo
   const getMaxLength = (fieldName: string, fieldType: string): number => {
@@ -32,39 +32,6 @@ const FormularioContacto = ({ tipo }: Props) => {
     if (fieldName === 'Ubicacion') return 100
     if (fieldName.includes('Nombre') || fieldName.includes('Apellido')) return 50
     return 10 // Límite por defecto
-  }
-
-  // Función para validar un campo individual en tiempo real
-  const validateField = (fieldName: string, value: any) => {
-    try {
-      // Validar el campo específico usando safeParse en el schema completo
-      const partialData = Object.entries(campos).reduce((acc, [key]) => {
-        acc[key] = key === fieldName ? value : ''
-        return acc
-      }, {} as Record<string, any>)
-      
-      const validation = DynamicContactoSchema.safeParse(partialData)
-      
-      if (validation.success) {
-        // Si pasa la validación, limpia el error de ese campo
-        setFormErrors(prev => {
-          const newErrors = { ...prev }
-          delete newErrors[fieldName]
-          return newErrors
-        })
-      } else {
-        // Si falla la validación, establece el error para este campo
-        const fieldError = validation.error.errors.find(err => err.path[0] === fieldName)
-        if (fieldError) {
-          setFormErrors(prev => ({
-            ...prev,
-            [fieldName]: fieldError.message
-          }))
-        }
-      }
-    } catch (error: any) {
-      console.error('Validation error:', error)
-    }
   }
 
 
@@ -84,31 +51,22 @@ const FormularioContacto = ({ tipo }: Props) => {
 
     onSubmit: async ({ value }) => {
       setIsSubmitting(true)
-      setFormErrors({}) // Limpia errores previos
 
-      // Valida con Zod al hacer submit
+      // Validación final con Zod al hacer submit (red de seguridad)
       const validation = DynamicContactoSchema.safeParse(value)
       if (!validation.success) {
-        const fieldErrors: Record<string, string> = {}
-        validation.error.errors.forEach((err) => {
-          const field = err.path[0] as string
-          fieldErrors[field] = err.message
-        })
-        setFormErrors(fieldErrors)
-        setIsSubmitting(false) 
+        setIsSubmitting(false)
         return
       }
 
-      // Si llegamos aquí, la validación pasó
       try {
          await mutation.mutateAsync({ data: value, tipo })
-         setFormKey((prev) => prev + 1) 
+         setFormKey((prev) => prev + 1)
          setArchivoSeleccionado(null)
-         setFormErrors({}) 
       } catch (error: any) {
         console.error('Error al enviar formulario:', error)
       } finally {
-        setIsSubmitting(false) 
+        setIsSubmitting(false)
       }
     },
   })
@@ -135,8 +93,20 @@ const FormularioContacto = ({ tipo }: Props) => {
         </h2>
 
         {Object.entries(campos).map(([fieldName, fieldProps]) => (
-          <form.Field key={fieldName} name={fieldName}>
+          <form.Field
+            key={fieldName}
+            name={fieldName}
+            validators={{
+              onChange: ({ value }) => validateSingleField(fieldSchemas[fieldName], value),
+              onBlur: ({ value }) => validateSingleField(fieldSchemas[fieldName], value),
+            }}
+          >
             {(field) => {
+              const errorMsg =
+                field.state.meta.isTouched && field.state.meta.errors.length > 0
+                  ? String(field.state.meta.errors[0])
+                  : undefined
+
               if (fieldProps.type === 'textarea') {
                 const maxLength = getMaxLength(fieldName, 'textarea')
                 return (
@@ -149,22 +119,16 @@ const FormularioContacto = ({ tipo }: Props) => {
                       id={field.name}
                       value={field.state.value as string}
                       onBlur={field.handleBlur}
-                      onChange={(e) => {
-                        const newValue = e.target.value
-                        field.handleChange(newValue)
-                        validateField(fieldName, newValue)
-                      }}
+                      onChange={(e) => field.handleChange(e.target.value)}
                       placeholder={`${fieldProps.label}`}
                       maxLength={maxLength}
-                      className={`${commonClasses} h-28 resize-none scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100`}
+                      aria-invalid={!!errorMsg}
+                      className={`${commonClasses} h-28 resize-none scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100 ${errorMsg ? 'border-red-500 focus:ring-red-300' : ''}`}
                     />
                     <div className="flex justify-between items-center mt-1">
                       <div>
-                        {/* Mostrar errores de validación */}
-                        {formErrors[fieldName] && (
-                          <span className="text-red-500 text-sm">
-                            {formErrors[fieldName]}
-                          </span>
+                        {errorMsg && (
+                          <span className="text-red-500 text-sm">{errorMsg}</span>
                         )}
                       </div>
                     </div>
@@ -234,22 +198,16 @@ const FormularioContacto = ({ tipo }: Props) => {
                     type="text"
                     value={field.state.value as string}
                     onBlur={field.handleBlur}
-                    onChange={(e) => {
-                      const newValue = e.target.value
-                      field.handleChange(newValue)
-                      validateField(fieldName, newValue)
-                    }}
+                    onChange={(e) => field.handleChange(e.target.value)}
                     placeholder={`${fieldProps.label}`}
                     maxLength={maxLength}
-                    className={commonClasses}
+                    aria-invalid={!!errorMsg}
+                    className={`${commonClasses} ${errorMsg ? 'border-red-500 focus:ring-red-300' : ''}`}
                   />
                   <div className="flex justify-between items-center mt-1">
                     <div>
-                      {/* Mostrar errores de validación */}
-                      {formErrors[fieldName] && (
-                        <span className="text-red-500 text-sm">
-                          {formErrors[fieldName]}
-                        </span>
+                      {errorMsg && (
+                        <span className="text-red-500 text-sm">{errorMsg}</span>
                       )}
                     </div>
                   </div>
@@ -259,21 +217,28 @@ const FormularioContacto = ({ tipo }: Props) => {
           </form.Field>
         ))}
 
-        <div className="flex justify-end items-end mt-6">
-          <button
-            type="submit"
-            disabled={isSubmitting} // Deshabilitar durante envío
-            className={`
-              w-[120px] py-2 rounded transition
-              ${isSubmitting 
-                ? 'bg-gray-400 cursor-not-allowed' 
-                : 'bg-blue-900 hover:bg-blue-800'
-              } text-white
-            `}
-          >
-            {isSubmitting ? 'Enviando...' : 'Enviar'}
-          </button>
-        </div>
+        <form.Subscribe selector={(state) => [state.canSubmit, state.isValidating]}>
+          {([canSubmit, isValidating]) => {
+            const disabled = isSubmitting || !canSubmit || isValidating
+            return (
+              <div className="flex justify-end items-end mt-6">
+                <button
+                  type="submit"
+                  disabled={disabled}
+                  className={`
+                    w-[120px] py-2 rounded transition
+                    ${disabled
+                      ? 'bg-gray-400 cursor-not-allowed'
+                      : 'bg-blue-900 hover:bg-blue-800'
+                    } text-white
+                  `}
+                >
+                  {isSubmitting ? 'Enviando...' : 'Enviar'}
+                </button>
+              </div>
+            )
+          }}
+        </form.Subscribe>
       </form>
       </motion.div>
     </div>
