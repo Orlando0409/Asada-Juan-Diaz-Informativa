@@ -1,26 +1,16 @@
 import { useForm } from "@tanstack/react-form";
 import { useEffect, useRef, useState } from "react";
 import { useAlerts } from '../../../context/AlertContext';
-import { DesconexionMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/DesconexionMedidor";
+import { DesconexionMedidorSchema, MotivoDesconexionValues, TipoIdentificacionValues, type MotivoDesconexion, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/DesconexionMedidor";
 import { useDesconexionFisica, useMedidores } from "../../../Hook/Solicitudes/HookFisicas";
-import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import { Loader2 } from "lucide-react";
-import PhoneInputComponent from "../PhoneInputComponent";
 
 type Props = {
   onClose: () => void;
 };
-
-const normalizePhoneNumber = (phone: string): string => {
-  if (!phone?.startsWith('+')) {
-    throw new Error('El número debe incluir el código de país y comenzar con "+". Ejemplo: +50688887777');
-  }
-  return phone;
-};
 const STORAGE_KEY = 'desconexion_fisica_temp';
 
 const FormularioDesconexionMedidor = ({ onClose }: Props) => {
-  const sanitizeNameInput = (value: string) => value.replace(/\d/g, "");
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -31,7 +21,6 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
   const planosInputRef = useRef<HTMLInputElement>(null);
   const escrituraInputRef = useRef<HTMLInputElement>(null);
   const [mostrarFormulario, setMostrarFormulario] = useState(true);
-  const { lookup, isLoading } = useCedulaLookup();
   const { medidores, isLoading: isMedidoresLoading } = useMedidores(identificacion);
 
   // Validación en tiempo real usando el schema
@@ -70,7 +59,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
     }
   };
 
-  const handleCedulaChange = async (cedula: string) => {
+  const handleCedulaChange = (cedula: string) => {
     const tipoId = form.state.values.Tipo_Identificacion;
     const identificacionProcesada = handleIdentificacionInput(cedula, tipoId);
 
@@ -83,38 +72,13 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
       delete newErrors['Identificacion'];
       return newErrors;
     });
-
-    if (tipoId === 'Cedula Nacional' && /^\d{9}$/.test(identificacionProcesada)) {
-      try {
-        const resultado = await lookup(identificacionProcesada);
-        if (resultado) {
-          setFormErrors(prev => {
-            const newErrors = { ...prev };
-            delete newErrors['Identificacion'];
-            return newErrors;
-          });
-          form.setFieldValue('Nombre', resultado.firstname || '');
-          form.setFieldValue('Apellido1', resultado.lastname1 || '');
-          form.setFieldValue('Apellido2', resultado.lastname2 || '');
-        }
-      } catch (error: any) {
-        // No mostrar error en el campo Identificacion
-      }
-    } else {
-      // No limpiar alertas, solo mostrar si corresponde
-    }
   };
 
 
   const getPlaceholder = (fieldName: string, tipoIdentificacion?: TipoIdentificacion) => {
     const placeholders: Record<string, string> = {
-      Nombre: 'Juan Carlos',
-      Apellido1: 'Pérez',
-      Apellido2: 'González',
-      Correo: 'ejemplo@gmail.com',
-      Numero_Telefono: '+50688887777',
       Direccion_Exacta: 'San José, del Banco Nacional 200m sur',
-      Motivo_Solicitud: 'Escribe el motivo de tu solicitud',
+      Motivo_Otro: 'Escribe la causa de desconexión',
     };
     if (fieldName === 'Identificacion') {
       switch (tipoIdentificacion) {
@@ -128,14 +92,12 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
   };
   const saveToSessionStorage = (values: any) => {
     try {
-      // Guardamos todo excepto los archivos
+      // Guardamos solo los campos que siguen en el formulario
       const dataToSave = {
-        Nombre: values.Nombre,
-        Apellido1: values.Apellido1,
-        Apellido2: values.Apellido2,
         Tipo_Identificacion: values.Tipo_Identificacion,
         Identificacion: values.Identificacion,
         Direccion_Exacta: values.Direccion_Exacta,
+        Id_Medidor: values.Id_Medidor,
       };
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
     } catch (error) {
@@ -144,15 +106,11 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
   };
   const form = useForm({
     defaultValues: {
-      Nombre: "",
-      Apellido1: "",
-      Apellido2: "",
       Tipo_Identificacion: "Cedula Nacional",
       Identificacion: "",
+      Motivo_Desconexion: "" as MotivoDesconexion,
+      Motivo_Otro: "",
       Direccion_Exacta: "",
-      Numero_Telefono: "",
-      Correo: "",
-      Motivo_Solicitud: "",
       Id_Medidor: undefined as number | undefined,
       Planos_Terreno: undefined as File | undefined,
       Certificacion_Literal: undefined as File | undefined,
@@ -170,7 +128,13 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
         return;
       }
       try {
-        value.Numero_Telefono = normalizePhoneNumber(value.Numero_Telefono);
+        const motivoSolicitud = value.Motivo_Desconexion === 'Otro (especifique)'
+          ? `${value.Motivo_Desconexion}: ${value.Motivo_Otro?.trim() || ''}`
+          : value.Motivo_Desconexion;
+        const payload = {
+          ...value,
+          Motivo_Solicitud: motivoSolicitud,
+        };
 
         const validation = DesconexionMedidorSchema.safeParse(value);
         if (!validation.success) {
@@ -186,7 +150,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
         }
 
         const formData = new FormData();
-        Object.entries(value).forEach(([key, val]) => {
+        Object.entries(payload).forEach(([key, val]) => {
           if (val !== undefined && val !== null && val !== "") {
             if (val instanceof File) {
               formData.append(key, val);
@@ -242,7 +206,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
         const parsed = JSON.parse(savedData);
         // Cargar los valores en el formulario
         Object.entries(parsed).forEach(([key, value]) => {
-          if (key !== 'Planos_Terreno' && key !== 'Certificacion_Literal') {
+          if (key !== 'Planos_Terreno' && key !== 'Certificacion_Literal' && key !== 'Motivo_Desconexion' && key !== 'Motivo_Otro') {
             form.setFieldValue(key as any, value as any);
           }
         });
@@ -328,11 +292,6 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                             form.state.values.Tipo_Identificacion === 'Pasaporte' ? 9 : 20
                       }
                     />
-                    {isLoading && (
-                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                        <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
-                      </div>
-                    )}
                   </div>
                   {/* muestra errores de identificación */}
                   {fieldErrors['Identificacion'] && (
@@ -352,90 +311,6 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
           </div>
 
 
-          {/* Nombre */}
-          <form.Field name="Nombre">
-            {(field) => (
-              <div className="mb-3 w-full">
-                <label htmlFor="Nombre" className="block mb-1 font-medium">Nombre <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  value={field.state.value}
-                  onChange={(e) => {
-                    const cleanValue = sanitizeNameInput(e.target.value);
-                    field.handleChange(cleanValue);
-                    validateField("Nombre", cleanValue, form.state.values);
-                    saveToSessionStorage({ ...form.state.values, Nombre: cleanValue });
-                  }}
-                  placeholder={getPlaceholder("Nombre")}
-                  maxLength={50}
-                  className={commonClasses}
-                />
-                {/*  muestra errores de nombre  */}
-                {fieldErrors["Nombre"] && (
-                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Nombre"]}</span>
-                )}
-                {formErrors["Nombre"] && !fieldErrors["Nombre"] && (
-                  <span className="text-red-500 text-sm block mt-1">{formErrors["Nombre"]}</span>
-                )}
-              </div>
-            )}
-          </form.Field>
-          {/* Primer Apellido */}
-          <form.Field name="Apellido1">
-            {(field) => (
-              <div className="mb-3 w-full">
-                <label htmlFor="Apellido1" className="block mb-1 font-medium">Primer Apellido <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  value={field.state.value}
-                  onChange={(e) => {
-                    const cleanValue = sanitizeNameInput(e.target.value);
-                    field.handleChange(cleanValue);
-                    validateField("Apellido1", cleanValue, form.state.values);
-                    saveToSessionStorage({ ...form.state.values, Apellido1: cleanValue });
-                  }}
-                  placeholder={getPlaceholder("Apellido1")}
-                  maxLength={50}
-                  className={commonClasses}
-                />
-                {/* Solo muestra errores de primer apellido aquí */}
-                {fieldErrors["Apellido1"] && (
-                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido1"]}</span>
-                )}
-                {formErrors["Apellido1"] && !fieldErrors["Apellido1"] && (
-                  <span className="text-red-500 text-sm block mt-1">{formErrors["Apellido1"]}</span>
-                )}
-              </div>
-            )}
-          </form.Field>
-          {/* Segundo Apellido */}
-          <form.Field name="Apellido2">
-            {(field) => (
-              <div className="mb-3 w-full">
-                <label htmlFor="Apellido2" className="block mb-1 font-medium">Segundo Apellido <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  value={field.state.value}
-                  onChange={(e) => {
-                    const cleanValue = sanitizeNameInput(e.target.value);
-                    field.handleChange(cleanValue);
-                    validateField("Apellido2", cleanValue, form.state.values);
-                    saveToSessionStorage({ ...form.state.values, Apellido2: cleanValue });
-                  }}
-                  placeholder={getPlaceholder("Apellido2")}
-                  maxLength={50}
-                  className={commonClasses}
-                />
-                {/* Solo muestra errores de segundo apellido aquí */}
-                {fieldErrors["Apellido2"] && (
-                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido2"]}</span>
-                )}
-                {formErrors["Apellido2"] && !fieldErrors["Apellido2"] && (
-                  <span className="text-red-500 text-sm block mt-1">{formErrors["Apellido2"]}</span>
-                )}
-              </div>
-            )}
-          </form.Field>
           {/* Dirección Exacta */}
           <form.Field name="Direccion_Exacta">
             {(field) => (
@@ -458,57 +333,6 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
                 )}
                 {formErrors["Direccion_Exacta"] && !fieldErrors["Direccion_Exacta"] && (
                   <span className="text-red-500 text-sm block mt-1">{formErrors["Direccion_Exacta"]}</span>
-                )}
-              </div>
-            )}
-          </form.Field>
-          {/* Correo */}
-          <form.Field name="Correo">
-            {(field) => (
-              <div className="mb-3 w-full">
-                <label htmlFor="Correo" className="block mb-1 font-medium">Correo electrónico <span className="text-red-500">*</span></label>
-                <input
-                  type="email"
-                  value={field.state.value}
-                  onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    validateField("Correo", e.target.value, form.state.values);
-                    saveToSessionStorage({ ...form.state.values, Correo: e.target.value });
-                  }}
-                  placeholder={getPlaceholder("Correo")}
-                  maxLength={100}
-                  className={commonClasses}
-                />
-                {/* Solo muestra errores de correo aquí */}
-                {fieldErrors["Correo"] && (
-                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Correo"]}</span>
-                )}
-                {formErrors["Correo"] && !fieldErrors["Correo"] && (
-                  <span className="text-red-500 text-sm block mt-1">{formErrors["Correo"]}</span>
-                )}
-              </div>
-            )}
-          </form.Field>
-          {/* Teléfono internacional */}
-          <form.Field name="Numero_Telefono">
-            {(field) => (
-              <div className="mb-3 w-full">
-                <label htmlFor="Numero_Telefono" className="block mb-1 font-medium">Número de teléfono <span className="text-red-500">*</span></label>
-                <PhoneInputComponent
-                  value={field.state.value}
-                  onChange={(value) => {
-                    field.handleChange(value || "");
-                    validateField("Numero_Telefono", value || "", form.state.values);
-                    saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" });
-                  }}
-                  className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
-                />
-                {/*  muestra errores de teléfono*/}
-                {fieldErrors["Numero_Telefono"] && (
-                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
-                )}
-                {formErrors["Numero_Telefono"] && !fieldErrors["Numero_Telefono"] && (
-                  <span className="text-red-500 text-sm block mt-1">{formErrors["Numero_Telefono"]}</span>
                 )}
               </div>
             )}
@@ -569,31 +393,68 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
           </div>
 
           {/* Motivo de Solicitud */}
-          <form.Field name="Motivo_Solicitud">
+          <form.Field name="Motivo_Desconexion">
             {(field) => (
-              <div className="mb-3 w-full">
-                <label htmlFor="Motivo_Solicitud" className="block mb-1 font-medium">Motivo de solicitud <span className="text-red-500">*</span></label>
-                <textarea
+              <div className="mb-3 w-full md:col-span-2">
+                <label htmlFor="Motivo_Desconexion" className="block mb-1 font-medium">Motivo de desconexión <span className="text-red-500">*</span></label>
+                <select
                   value={field.state.value}
                   onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    validateField("Motivo_Solicitud", e.target.value, form.state.values);
-                    saveToSessionStorage({ ...form.state.values, Motivo_Solicitud: e.target.value });
+                    const motivoSeleccionado = e.target.value as MotivoDesconexion;
+                    field.handleChange(motivoSeleccionado);
+                    validateField("Motivo_Desconexion", motivoSeleccionado, form.state.values);
+                    if (motivoSeleccionado !== 'Otro (especifique)') {
+                      form.setFieldValue('Motivo_Otro', '');
+                      setFieldErrors(prev => {
+                        const newErrors = { ...prev };
+                        delete newErrors['Motivo_Otro'];
+                        return newErrors;
+                      });
+                    }
+                    saveToSessionStorage({ ...form.state.values, Motivo_Desconexion: motivoSeleccionado });
                   }}
-                  placeholder={getPlaceholder("Motivo_Solicitud")}
-                  maxLength={250}
-                  className={`${commonClasses} resize-none h-24 overflow-y-auto scrollbar-thumb-blue-600 scrollbar-thin scrollbar-track-blue-100`}
-                />
-                {/* muestra errores de motivo*/}
-                {fieldErrors["Motivo_Solicitud"] && (
-                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Solicitud"]}</span>
+                  className={commonClasses}
+                >
+                  <option value="" disabled selected>Elije una opcion</option>
+                  {MotivoDesconexionValues.map((motivo) => (
+                    <option key={motivo} value={motivo}>{motivo}</option>
+                  ))}
+                </select>
+                {fieldErrors["Motivo_Desconexion"] && (
+                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Desconexion"]}</span>
                 )}
-                {formErrors["Motivo_Solicitud"] && !fieldErrors["Motivo_Solicitud"] && (
-                  <span className="text-red-500 text-sm block mt-1">{formErrors["Motivo_Solicitud"]}</span>
+                {formErrors["Motivo_Desconexion"] && !fieldErrors["Motivo_Desconexion"] && (
+                  <span className="text-red-500 text-sm block mt-1">{formErrors["Motivo_Desconexion"]}</span>
                 )}
               </div>
             )}
           </form.Field>
+          {form.state.values.Motivo_Desconexion === 'Otro (especifique)' && (
+            <form.Field name="Motivo_Otro">
+              {(field) => (
+                <div className="mb-3 w-full md:col-span-2">
+                  <label htmlFor="Motivo_Otro" className="block mb-1 font-medium">Especifique la causa <span className="text-red-500">*</span></label>
+                  <textarea
+                    value={field.state.value}
+                    onChange={(e) => {
+                      field.handleChange(e.target.value);
+                      validateField("Motivo_Otro", e.target.value, form.state.values);
+                      saveToSessionStorage({ ...form.state.values, Motivo_Otro: e.target.value });
+                    }}
+                    placeholder={getPlaceholder("Motivo_Otro")}
+                    maxLength={250}
+                    className={`${commonClasses} resize-none h-24 overflow-y-auto scrollbar-thumb-blue-600 scrollbar-thin scrollbar-track-blue-100`}
+                  />
+                  {fieldErrors["Motivo_Otro"] && (
+                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Otro"]}</span>
+                  )}
+                  {formErrors["Motivo_Otro"] && !fieldErrors["Motivo_Otro"] && (
+                    <span className="text-red-500 text-sm block mt-1">{formErrors["Motivo_Otro"]}</span>
+                  )}
+                </div>
+              )}
+            </form.Field>
+          )}
         </div>
 
         {/* Archivos */}
@@ -733,27 +594,27 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
           {/* Botones */}
 
           <div className="flex justify-end items-center gap-3 mt-8">
-           <button
-                        type="submit"
-                        className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
-                        disabled={
-                            isSending ||
-                            Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
-                            Object.values(fieldErrors).some(Boolean) ||
-                            Object.values(formErrors).some(Boolean)
-                        }
-                    >
-                        {isSending ? 'Enviando...' : 'Enviar Solicitud'}
-                    </button>
+            <button
+              type="submit"
+              className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
+              disabled={
+                isSending ||
+                Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
+                Object.values(fieldErrors).some(Boolean) ||
+                Object.values(formErrors).some(Boolean)
+              }
+            >
+              {isSending ? 'Enviando...' : 'Enviar Solicitud'}
+            </button>
 
-             <button
-            type="button"
-            onClick={onClose}
-            disabled={isSending}
-            className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            Cancelar
-          </button>
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={isSending}
+              className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              Cancelar
+            </button>
           </div>
 
         </div>

@@ -73,16 +73,14 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
     const form = useForm({
         defaultValues: {
             Cedula_Juridica: "",
-            Razon_Social: "",
-            Correo: "",
-            Numero_Telefono: "",
+           
             Motivo_Solicitud: "",
         },
         onSubmit: async ({ value }) => {
             setFormErrors({});
             setFieldErrors({});
             try {
-                value.Numero_Telefono = normalizePhoneNumber(value.Numero_Telefono);
+              
 
                 // Validar campos de texto (sin archivos)
                 const validation = AsociadoJuridicaSchema.safeParse(value);
@@ -149,7 +147,7 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
         setTouched(prev => ({ ...prev, [fieldName]: true }));
         const newValues = { ...form.state.values, [fieldName]: value };
         validateAllFields(newValues);
-        form.setFieldValue(fieldName, value);
+        //form.setFieldValue(fieldName, value);
     };
 
     useEffect(() => {
@@ -199,7 +197,7 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                                             handleFieldChange("Cedula_Juridica", formatted);
                                             if (/^\d-\d{3}-\d{6}$/.test(formatted)) {
                                                 lookupJuridica(formatted).then(razonSocial => {
-                                                    if (razonSocial) form.setFieldValue('Razon_Social', razonSocial);
+                                              
                                                 });
                                             }
                                         }}
@@ -226,85 +224,11 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                         )}
                     </form.Field>
                     {/* Razón Social */}
-                    <form.Field name="Razon_Social">
-                        {(field) => (
-                            <div className="mb-3 w-full">
-                                <label className="block mb-1 font-medium">
-                                    Razón Social <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    value={field.state.value}
-                                    onChange={(e) => {
-                                        handleFieldChange("Razon_Social", e.target.value);
-                                        saveToSessionStorage({ ...form.state.values, Razon_Social: e.target.value }); // ← NUEVO
-                                    }}
-                                    onBlur={() => setTouched(prev => ({ ...prev, Razon_Social: true }))}
-                                    placeholder="Ejemplo S.A."
-                                    maxLength={255}
-                                    className={commonClasses}
-                                />
-                                {touched["Razon_Social"] && fieldErrors["Razon_Social"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Razon_Social"]}</span>
-                                )}
-                                {formErrors["Razon_Social"] && !fieldErrors["Razon_Social"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Razon_Social"]}</span>
-                                )}
-                            </div>
-                        )}
-                    </form.Field>
+                    
                     {/* Correo */}
-                    <form.Field name="Correo">
-                        {(field) => (
-                            <div className="mb-3 w-full">
-                                <label className="block mb-1 font-medium">
-                                    Correo electrónico <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="email"
-                                    value={field.state.value}
-                                    onChange={(e) => {
-                                        handleFieldChange("Correo", e.target.value);
-                                        saveToSessionStorage({ ...form.state.values, Correo: e.target.value }); // ← NUEVO  
-                                    }}
-                                    onBlur={() => setTouched(prev => ({ ...prev, Correo: true }))}
-                                    placeholder="empresa@email.com"
-                                    maxLength={100}
-                                    className={commonClasses}
-                                />
-                                {touched["Correo"] && fieldErrors["Correo"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Correo"]}</span>
-                                )}
-                                {formErrors["Correo"] && !fieldErrors["Correo"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Correo"]}</span>
-                                )}
-                            </div>
-                        )}
-                    </form.Field>
+                  
                     {/* Teléfono internacional */}
-                    <form.Field name="Numero_Telefono">
-                        {(field) => (
-                            <div className="mb-3 w-full">
-                                <label className="block mb-1 font-medium">
-                                    Número de teléfono <span className="text-red-500">*</span>
-                                </label>
-                                <PhoneInputComponent
-                                    value={field.state.value}
-                                    onChange={(value) => {
-                                        handleFieldChange("Numero_Telefono", value || "");
-                                        saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" }); // ← NUEVO  
-                                    }}
-                                    className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
-                                />
-                                {touched["Numero_Telefono"] && fieldErrors["Numero_Telefono"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
-                                )}
-                                {formErrors["Numero_Telefono"] && !fieldErrors["Numero_Telefono"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Numero_Telefono"]}</span>
-                                )}
-                            </div>
-                        )}
-                    </form.Field>
+                   
                     {/* Motivo de Solicitud */}
                     <form.Field name="Motivo_Solicitud">
                         {(field) => (

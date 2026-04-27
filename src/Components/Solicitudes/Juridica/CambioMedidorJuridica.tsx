@@ -2,12 +2,10 @@ import { useForm } from "@tanstack/react-form";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { CambioMedidorJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/CambioMedidorJuridico";
-import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { useCambioMedidorJuridica, useMedidoresJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
 import { useAlerts } from "../../../context/AlertContext";
 import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import { Loader2 } from "lucide-react";
-import PhoneInputComponent from "../PhoneInputComponent";
 
 type Props = {
     onClose: () => void;
@@ -78,7 +76,6 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
             try {
                 const resultado = await lookupJuridica(cedulaSoloDigitos);
                 if (resultado) {
-                    form.setFieldValue('Razon_Social', resultado);
                     setEsAfiliado(true);
                 } else {
                     setEsAfiliado(false);
@@ -89,26 +86,11 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
         }
     };
 
-    const getPlaceholder = (fieldName: string) => {
-        const placeholders: Record<string, string> = {
-            Razon_Social: 'Ejemplo S.A.',
-            Cedula_Juridica: '3-XXX-XXXXXX',
-            Correo: 'empresa@email.com',
-            Numero_Telefono: '+50688887777',
-            Direccion_Exacta: 'San José, del Banco Nacional 200m sur',
-            Motivo_Solicitud: 'Cambio por daño',
-        };
-        return placeholders[fieldName] || '';
-    };
     const saveToSessionStorage = (values: any) => {
         try {
-            // Guardamos todo excepto los archivos
+            // Guardamos solo la cédula jurídica
             const dataToSave = {
-                Razon_Social: values.Razon_Social,
                 Cedula_Juridica: values.Cedula_Juridica,
-                Correo: values.Correo,
-                Numero_Telefono: values.Numero_Telefono,
-                Direccion_Exacta: values.Direccion_Exacta,
             };
             sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
         } catch (error) {
@@ -117,11 +99,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
     };
     const form = useForm({
         defaultValues: {
-            Razon_Social: "",
             Cedula_Juridica: "",
-            Correo: "",
-            Numero_Telefono: "",
-            Direccion_Exacta: "",
             Motivo_Solicitud: "",
             Id_Medidor: 0,
             Planos_Terreno: undefined as File | undefined,
@@ -136,20 +114,9 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                 return;
             }
             try {
-                // Validar y normalizar el teléfono internacional
-                const phoneNumber = parsePhoneNumberFromString(value.Numero_Telefono || "");
-                if (!phoneNumber?.isValid()) {
-                    setFormErrors({ Numero_Telefono: "Número de teléfono inválido" });
-                    return;
-                }
-
                 const cleanedValue = {
                     ...value,
-                    Razon_Social: (value.Razon_Social || '').trim(),
                     Cedula_Juridica: (value.Cedula_Juridica || '').trim(),
-                    Correo: (value.Correo || '').trim(),
-                    Numero_Telefono: phoneNumber.format("E.164"),
-                    Direccion_Exacta: (value.Direccion_Exacta || '').trim(),
                     Motivo_Solicitud: (value.Motivo_Solicitud || '').trim(),
                     Planos_Terreno: value.Planos_Terreno,
                     Certificacion_Literal: value.Certificacion_Literal,
@@ -246,32 +213,6 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                 <h2 className="text-center text-xl font-semibold mb-6">Formulario de cambio de medidor - Jurídica</h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-2">
-                    {/* Razón Social */}
-                    <form.Field name="Razon_Social">
-                        {(field) => (
-                            <div className="mb-3 w-full">
-                                <label htmlFor="RazonSocial" className="block mb-1 font-medium">Razón Social <span className="text-red-500">*</span></label>
-                                <input
-                                    type="text"
-                                    value={field.state.value}
-                                    onChange={(e) => {
-                                        field.handleChange(e.target.value);
-                                        handleFieldChange("Razon_Social", e.target.value);
-                                        saveToSessionStorage({ ...form.state.values, Razon_Social: e.target.value });
-                                    }}
-                                    placeholder={getPlaceholder("Razon_Social")}
-                                    maxLength={255}
-                                    className={commonClasses}
-                                />
-                                {fieldErrors["Razon_Social"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Razon_Social"]}</span>
-                                )}
-                                {formErrors["Razon_Social"] && !fieldErrors["Razon_Social"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Razon_Social"]}</span>
-                                )}
-                            </div>
-                        )}
-                    </form.Field>
                     {/* Cédula Jurídica */}
                     <form.Field name="Cedula_Juridica">
                         {(field) => (
@@ -288,7 +229,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                             form.setFieldValue('Id_Medidor', 0);
                                             saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted });
                                         }}
-                                        placeholder={getPlaceholder("Cedula_Juridica")}
+                                        placeholder="3-XXX-XXXXXX"
                                         className={commonClasses}
                                     />
                                     {loadingCedula && (
@@ -313,81 +254,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                             </div>
                         )}
                     </form.Field>
-                    {/* Teléfono internacional */}
-                    <form.Field name="Numero_Telefono">
-                        {(field) => (
-                            <div className="mb-3 w-full">
-                                 <label htmlFor="Correo" className="block mb-1 font-medium">Número de teléfono <span className="text-red-500">*</span></label>
-                                <PhoneInputComponent
-                                    value={field.state.value}
-                                    onChange={(value) => {
-                                        field.handleChange(value || "");
-                                        handleFieldChange("Numero_Telefono", value || "");
-                                        saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" });
-                                    }}
-                                    className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
-                                />
-                                {fieldErrors["Numero_Telefono"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
-                                )}
-                                {formErrors["Numero_Telefono"] && !fieldErrors["Numero_Telefono"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Numero_Telefono"]}</span>
-                                )}
-                            </div>
-                        )}
-                    </form.Field>
 
-                    {/* Correo electrónico */}
-                    <form.Field name="Correo">
-                        {(field) => (
-                            <div className="mb-3 w-full">
-                                <label htmlFor="Correo" className="block mb-1 font-medium">Correo electrónico <span className="text-red-500">*</span></label>
-                                <input
-                                    type="email"
-                                    value={field.state.value}
-                                    onChange={(e) => {
-                                        field.handleChange(e.target.value);
-                                        handleFieldChange("Correo", e.target.value);
-                                        saveToSessionStorage({ ...form.state.values, Correo: e.target.value });
-                                    }}
-                                    placeholder={getPlaceholder("Correo")}
-                                    maxLength={100}
-                                    className={commonClasses}
-                                />
-                                {fieldErrors["Correo"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Correo"]}</span>
-                                )}
-                                {formErrors["Correo"] && !fieldErrors["Correo"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Correo"]}</span>
-                                )}
-                            </div>
-                        )}
-                    </form.Field>
-                    {/* Dirección Exacta */}
-                    <form.Field name="Direccion_Exacta">
-                        {(field) => (
-                            <div className="mb-3 w-full">
-                                <label htmlFor="Direccion_Exacta" className="block mb-1 font-medium">Dirección exacta <span className="text-red-500">*</span></label>
-                                <textarea
-                                    value={field.state.value}
-                                    onChange={(e) => {
-                                        field.handleChange(e.target.value);
-                                        handleFieldChange("Direccion_Exacta", e.target.value);
-                                        saveToSessionStorage({ ...form.state.values, Direccion_Exacta: e.target.value });
-                                    }}
-                                    placeholder={getPlaceholder("Direccion_Exacta")}
-                                    maxLength={100}
-                                    className={commonClasses}
-                                />
-                                {fieldErrors["Direccion_Exacta"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Direccion_Exacta"]}</span>
-                                )}
-                                {formErrors["Direccion_Exacta"] && !fieldErrors["Direccion_Exacta"] && (
-                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Direccion_Exacta"]}</span>
-                                )}
-                            </div>
-                        )}
-                    </form.Field>
                     {/* Número de Medidor Anterior */}
                     <form.Field name="Id_Medidor">
                         {(field) => {
@@ -437,30 +304,30 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                     </form.Field>
 
                     {/* Motivo de Solicitud */}
-          <form.Field name="Motivo_Solicitud">
-            {(field) => (
-              <div className="mb-3 w-full">
-                <label htmlFor="Motivo_Solicitud" className="block mb-1 font-medium">Motivo de solicitud <span className="text-red-500">*</span></label>
-                <textarea
-                  id="Motivo_Solicitud"
-                  value={field.state.value}
-                  onChange={(e) => {
-                    field.handleChange(e.target.value);
-                    saveToSessionStorage({ ...form.state.values, Motivo_Solicitud: e.target.value });
-                  }}
-                  placeholder="Escribe el motivo de tu solicitud"
-                  maxLength={250}
-                  className={`${commonClasses} resize-none h-24 overflow-y-auto scrollbar-thumb-blue-600 scrollbar-thin scrollbar-track-blue-100`}
-                />
-                {fieldErrors["Motivo_Solicitud"] && (
-                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Solicitud"]}</span>
-                )}
-                {formErrors["Motivo_Solicitud"] && !fieldErrors["Motivo_Solicitud"] && (
-                  <span className="text-red-500 text-sm block mt-1">{formErrors["Motivo_Solicitud"]}</span>
-                )}
-              </div>
-            )}
-          </form.Field>
+                    <form.Field name="Motivo_Solicitud">
+                        {(field) => (
+                            <div className="mb-3 w-full">
+                                <label htmlFor="Motivo_Solicitud" className="block mb-1 font-medium">Motivo de solicitud <span className="text-red-500">*</span></label>
+                                <textarea
+                                    id="Motivo_Solicitud"
+                                    value={field.state.value}
+                                    onChange={(e) => {
+                                        field.handleChange(e.target.value);
+                                        saveToSessionStorage({ ...form.state.values, Motivo_Solicitud: e.target.value });
+                                    }}
+                                    placeholder="Escribe el motivo de tu solicitud"
+                                    maxLength={250}
+                                    className={`${commonClasses} resize-none h-24 overflow-y-auto scrollbar-thumb-blue-600 scrollbar-thin scrollbar-track-blue-100`}
+                                />
+                                {fieldErrors["Motivo_Solicitud"] && (
+                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Solicitud"]}</span>
+                                )}
+                                {formErrors["Motivo_Solicitud"] && !fieldErrors["Motivo_Solicitud"] && (
+                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Motivo_Solicitud"]}</span>
+                                )}
+                            </div>
+                        )}
+                    </form.Field>
 
                     {/* Planos del Terreno */}
                     <form.Field name="Planos_Terreno">
@@ -588,11 +455,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                             Object.values(fieldErrors).some(Boolean) ||
                             Object.values(formErrors).some(Boolean) ||
                             [
-                                form.state.values.Razon_Social,
                                 form.state.values.Cedula_Juridica,
-                                form.state.values.Correo,
-                                form.state.values.Direccion_Exacta,
-                                form.state.values.Numero_Telefono,
                                 form.state.values.Id_Medidor,
                                 form.state.values.Motivo_Solicitud,
                                 form.state.values.Planos_Terreno,

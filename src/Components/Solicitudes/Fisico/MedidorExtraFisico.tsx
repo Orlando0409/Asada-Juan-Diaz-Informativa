@@ -3,19 +3,10 @@ import { useForm } from "@tanstack/react-form";
 import { useEffect, useRef, useState } from "react";
 import { MedidorExtraFisicoSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/MedidorExtra";
 import { useAgregarMedidorFisica, useMedidores } from "../../../Hook/Solicitudes/HookFisicas";
-import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import { useAlerts } from "../../../context/AlertContext";
-import PhoneInputComponent from "../PhoneInputComponent";
 
 type Props = {
     onClose: () => void;
-};
-
-const normalizePhoneNumber = (phone: string): string => {
-    if (!phone.startsWith('+')) {
-        throw new Error('El número debe incluir el código de país y comenzar con "+". Ejemplo: +50688887777');
-    }
-    return phone;
 };
 
 const STORAGE_KEY = 'medidor_extra_fisica_temp';
@@ -28,7 +19,6 @@ const shouldValidateIdentificacion = (tipoId: string, identificacion: string): b
 };
 
 const MedidorExtraFisico = ({ onClose }: Props) => {
-    const sanitizeNameInput = (value: string) => value.replace(/\d/g, "");
     const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -39,7 +29,6 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
     const escrituraInputRef = useRef<HTMLInputElement>(null);
 
     const mutation = useAgregarMedidorFisica();
-    const { lookup, isLoading: loadingCedula } = useCedulaLookup();
     const { showSuccess, showError } = useAlerts();
 
     // Hook para obtener medidores existentes
@@ -49,14 +38,9 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
     const validateField = (fieldName: string, value: any, allValues?: any) => {
         try {
             const dummy: any = {
-                Nombre: "Test",
-                Apellido1: "Test",
-                Apellido2: "Test",
                 Tipo_Identificacion: "Cedula Nacional",
                 Identificacion: "123456789",
                 Direccion_Exacta: "1234567890",
-                Numero_Telefono: "+50688887777",
-                Correo: "test@test.com",
                 Planos_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
                 Certificacion_Literal: new File([''], 'test.jpg', { type: 'image/jpeg' }),
             };
@@ -114,7 +98,7 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
         }
     };
 
-    const handleCedulaChange = async (cedula: string) => {
+    const handleCedulaChange = (cedula: string) => {
         const tipoId = form.state.values.Tipo_Identificacion;
         const identificacion = handleIdentificacionInput(cedula, tipoId);
 
@@ -130,13 +114,6 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
         // Buscar datos y validar si ya es afiliado
         if (tipoId === 'Cedula Nacional' && /^\d{9}$/.test(identificacion)) {
             setIdentificacionValidada(identificacion);
-
-            const resultado = await lookup(identificacion);
-            if (resultado) {
-                form.setFieldValue('Nombre', resultado.firstname || '');
-                form.setFieldValue('Apellido1', resultado.lastname1 || '');
-                form.setFieldValue('Apellido2', resultado.lastname2 || '');
-            }
         } else if ((tipoId === 'Dimex' && identificacion.length >= 9) ||
             (tipoId === 'Pasaporte' && identificacion.length >= 6)) {
             setIdentificacionValidada(identificacion);
@@ -145,11 +122,6 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
 
     const getPlaceholder = (fieldName: string, tipoIdentificacion?: TipoIdentificacion) => {
         const placeholders: Record<string, string> = {
-            Nombre: 'Juan Carlos',
-            Apellido1: 'Pérez',
-            Apellido2: 'González',
-            Correo: 'ejemplo@gmail.com',
-            Numero_Telefono: '+50688887777',
             Direccion_Exacta: 'San José, del Banco Nacional 200m sur',
         };
         if (fieldName === 'Identificacion') {
@@ -163,34 +135,11 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
         return placeholders[fieldName] || '';
     };
 
-    const saveToSessionStorage = (values: any) => {
-        try {
-            const dataToSave = {
-                Nombre: values.Nombre,
-                Apellido1: values.Apellido1,
-                Apellido2: values.Apellido2,
-                Tipo_Identificacion: values.Tipo_Identificacion,
-                Identificacion: values.Identificacion,
-                Correo: values.Correo,
-                Numero_Telefono: values.Numero_Telefono,
-                Direccion_Exacta: values.Direccion_Exacta,
-            };
-            sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
-        } catch (error) {
-            console.error('Error al guardar en sessionStorage:', error);
-        }
-    };
-
     const form = useForm({
         defaultValues: {
-            Nombre: '',
-            Apellido1: '',
-            Apellido2: '',
             Tipo_Identificacion: "Cedula Nacional",
             Identificacion: '',
-            Correo: '',
             Direccion_Exacta: '',
-            Numero_Telefono: '',
             Planos_Terreno: undefined as File | undefined,
             Certificacion_Literal: undefined as File | undefined,
         },
@@ -224,20 +173,8 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
             // Limpiar y trimear todos los campos de texto
             const cleanedValue = {
                 ...value,
-                Nombre: (value.Nombre || '').trim(),
-                Apellido1: (value.Apellido1 || '').trim(),
-                Apellido2: (value.Apellido2 || '').trim(),
-                Correo: (value.Correo || '').trim(),
-                Numero_Telefono: (value.Numero_Telefono || '').trim().replace(/\s/g, ''),
                 Direccion_Exacta: (value.Direccion_Exacta || '').trim(),
             };
-
-            try {
-                cleanedValue.Numero_Telefono = normalizePhoneNumber(cleanedValue.Numero_Telefono);
-            } catch (error: any) {
-                setFormErrors({ Numero_Telefono: 'Número de teléfono inválido' });
-                return;
-            }
 
             const validation = MedidorExtraFisicoSchema.safeParse(cleanedValue);
             if (!validation.success) {
@@ -277,13 +214,8 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
             try {
                 const parsed = JSON.parse(savedData);
                 const allowedKeys = [
-                    'Nombre',
-                    'Apellido1',
-                    'Apellido2',
                     'Tipo_Identificacion',
                     'Identificacion',
-                    'Correo',
-                    'Numero_Telefono',
                     'Direccion_Exacta',
                 ];
 
@@ -417,7 +349,7 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                                         value={field.state.value}
                                         onChange={(e) => handleCedulaChange(e.target.value)}
                                         placeholder={getPlaceholder('Identificacion', form.state.values.Tipo_Identificacion as TipoIdentificacion)}
-                                        disabled={!form.state.values.Tipo_Identificacion || loadingCedula}
+                                        disabled={!form.state.values.Tipo_Identificacion}
                                         className={`${commonClasses} ${(fieldErrors['Identificacion'] || formErrors['Identificacion']) ? 'border-red-500 focus:ring-red-300' : ''} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                                         maxLength={
                                             form.state.values.Tipo_Identificacion === 'Cedula Nacional' ? 9 :
@@ -425,14 +357,6 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                                                     form.state.values.Tipo_Identificacion === 'Pasaporte' ? 9 : 20
                                         }
                                     />
-                                    {loadingCedula && (
-                                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                                            <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                            </svg>
-                                        </div>
-                                    )}
                                 </div>
                                 {fieldErrors['Identificacion'] && (
                                     <span className="text-red-500 text-sm block mt-1">{fieldErrors['Identificacion']}</span>
@@ -445,126 +369,6 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                     </form.Field>
                 </div>
 
-                {/* Nombre */}
-                <form.Field name="Nombre">
-                    {(field) => (
-                        <div className="mb-3">
-                            <label className="block mb-1 font-medium">Nombre <span className="text-red-500">*</span></label>
-                            <input
-                                type="text"
-                                value={field.state.value}
-                                onChange={(e) => {
-                                    const cleanValue = sanitizeNameInput(e.target.value);
-                                    field.handleChange(cleanValue);
-                                    validateField("Nombre", cleanValue, form.state.values);
-                                    saveToSessionStorage({ ...form.state.values, Nombre: cleanValue });
-                                }}
-                                placeholder={getPlaceholder("Nombre")}
-                                maxLength={50}
-                                className={commonClasses}
-                            />
-                            {fieldErrors["Nombre"] && (
-                                <span className="text-red-500 text-sm block mt-1">{fieldErrors["Nombre"]}</span>
-                            )}
-                        </div>
-                    )}
-                </form.Field>
-
-                {/* Primer Apellido */}
-                <form.Field name="Apellido1">
-                    {(field) => (
-                        <div className="mb-3">
-                            <label className="block mb-1 font-medium">Primer Apellido <span className="text-red-500">*</span></label>
-                            <input
-                                type="text"
-                                value={field.state.value}
-                                onChange={(e) => {
-                                    const cleanValue = sanitizeNameInput(e.target.value);
-                                    field.handleChange(cleanValue);
-                                    validateField("Apellido1", cleanValue, form.state.values);
-                                    saveToSessionStorage({ ...form.state.values, Apellido1: cleanValue });
-                                }}
-                                placeholder={getPlaceholder("Apellido1")}
-                                maxLength={50}
-                                className={commonClasses}
-                            />
-                            {fieldErrors["Apellido1"] && (
-                                <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido1"]}</span>
-                            )}
-                        </div>
-                    )}
-                </form.Field>
-
-                {/* Segundo Apellido */}
-                <form.Field name="Apellido2">
-                    {(field) => (
-                        <div className="mb-3">
-                            <label className="block mb-1 font-medium">Segundo Apellido</label>
-                            <input
-                                type="text"
-                                value={field.state.value}
-                                onChange={(e) => {
-                                    const cleanValue = sanitizeNameInput(e.target.value);
-                                    field.handleChange(cleanValue);
-                                    validateField("Apellido2", cleanValue, form.state.values);
-                                    saveToSessionStorage({ ...form.state.values, Apellido2: cleanValue });
-                                }}
-                                placeholder={getPlaceholder("Apellido2")}
-                                maxLength={50}
-                                className={commonClasses}
-                            />
-                            {fieldErrors["Apellido2"] && (
-                                <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido2"]}</span>
-                            )}
-                        </div>
-                    )}
-                </form.Field>
-
-                {/* Correo */}
-                <form.Field name="Correo">
-                    {(field) => (
-                        <div className="mb-3">
-                            <label className="block mb-1 font-medium">Correo Electrónico <span className="text-red-500">*</span></label>
-                            <input
-                                type="email"
-                                value={field.state.value}
-                                onChange={(e) => {
-                                    field.handleChange(e.target.value);
-                                    validateField("Correo", e.target.value, form.state.values);
-                                    saveToSessionStorage({ ...form.state.values, Correo: e.target.value });
-                                }}
-                                placeholder={getPlaceholder("Correo")}
-                                maxLength={100}
-                                className={commonClasses}
-                            />
-                            {fieldErrors["Correo"] && (
-                                <span className="text-red-500 text-sm block mt-1">{fieldErrors["Correo"]}</span>
-                            )}
-                        </div>
-                    )}
-                </form.Field>
-
-                {/* Número de Teléfono */}
-                <form.Field name="Numero_Telefono">
-                    {(field) => (
-                        <div className="mb-3">
-                            <label className="block mb-1 font-medium">Número de Teléfono <span className="text-red-500">*</span></label>
-                            <PhoneInputComponent
-                                value={field.state.value}
-                                onChange={(value) => {
-                                    field.handleChange(value);
-                                    validateField("Numero_Telefono", value, form.state.values);
-                                    saveToSessionStorage({ ...form.state.values, Numero_Telefono: value });
-                                }}
-                                hasError={!!fieldErrors["Numero_Telefono"] || !!formErrors["Numero_Telefono"]}
-                            />
-                            {fieldErrors["Numero_Telefono"] && (
-                                <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
-                            )}
-                        </div>
-                    )}
-                </form.Field>
-
                 {/* Dirección Exacta */}
                 <form.Field name="Direccion_Exacta">
                     {(field) => (
@@ -576,7 +380,6 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                                 onChange={(e) => {
                                     field.handleChange(e.target.value);
                                     validateField("Direccion_Exacta", e.target.value, form.state.values);
-                                    saveToSessionStorage({ ...form.state.values, Direccion_Exacta: e.target.value });
                                 }}
                                 placeholder={getPlaceholder("Direccion_Exacta")}
                                 maxLength={255}

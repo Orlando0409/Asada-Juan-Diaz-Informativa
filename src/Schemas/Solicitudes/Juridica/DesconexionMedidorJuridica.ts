@@ -1,9 +1,18 @@
 import { z } from 'zod';
-import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_FILE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/heic", "application/pdf"];
 const ACCEPTED_FILE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".heic", ".pdf"];
+
+export const MotivoDesconexionValues = [
+  'Morosidad',
+  'Infracción al reglamento de prestación del servicio',
+  'Conexión ilegal a terceros',
+  'Solicitud expresa de retiro del servicio por parte del usuario (traslado fuera de Juan Díaz)',
+  'Otro (especifique)',
+] as const;
+
+export type MotivoDesconexion = typeof MotivoDesconexionValues[number];
 
 const isAcceptedUploadFile = (file: File) => {
   const fileName = file.name.toLowerCase();
@@ -14,43 +23,16 @@ const isAcceptedUploadFile = (file: File) => {
 };
 
 export const DesconexionJuridicaSchema = z.object({
-  Razon_Social: z.string()
-    .min(2, 'La razón social debe tener al menos 2 caracteres')
-    .max(255, 'La razón social no puede tener más de 255 caracteres'),
-
   Cedula_Juridica: z.string()
     .min(10, 'La cédula jurídica debe tener al menos 10 caracteres')
     .max(12, 'La cédula jurídica no puede tener más de 12 caracteres')
     .regex(/^3-\d{3}-\d{6}$|^\d{10}$/, 'La cédula jurídica debe tener el formato 3-XXX-XXXXXX o 10 dígitos'),
 
-  Direccion_Exacta: z.string()
-    .min(10, 'La dirección debe tener al menos 10 caracteres')
-    .max(254, 'La dirección no puede tener más de 255 caracteres'),
+  Motivo_Desconexion: z.enum(MotivoDesconexionValues, {
+    errorMap: () => ({ message: 'Debe seleccionar una causa de desconexión válida' }),
+  }),
 
-  Correo: z.string()
-    .min(1, 'El correo electrónico es obligatorio')
-    .max(99, 'El correo no puede tener más de 100 caracteres')
-    .email('El correo electrónico no es válido'),
-
-  Numero_Telefono: z.string()
-    .min(1, 'El número de teléfono es obligatorio')
-    .refine((phone) => {
-      const phoneNumber = parsePhoneNumberFromString(phone || "");
-      return !!phoneNumber && phoneNumber.isValid();
-    }, {
-      message: 'Debe ingresar un número de teléfono válido'
-    })
-    .transform((phone) => {
-      const phoneNumber = parsePhoneNumberFromString(phone || "");
-      if (!phoneNumber || !phoneNumber.isValid()) {
-        throw new Error('Debe ingresar un número de teléfono válido');
-      }
-      return phoneNumber.format('E.164');
-    }),
-
-  Motivo_Solicitud: z.string()
-    .min(10, 'El motivo de la solicitud debe tener al menos 10 caracteres')
-    .max(499, 'El motivo de la solicitud no puede tener más de 500 caracteres'),
+  Motivo_Otro: z.string().trim().max(250, 'La causa adicional no puede tener más de 250 caracteres').optional(),
 
   Planos_Terreno: z
     .instanceof(File)
@@ -71,6 +53,15 @@ export const DesconexionJuridicaSchema = z.object({
     .gt(0, 'El Id del medidor debe ser mayor a 0')
     .positive('El Id del medidor debe ser positivo')
     .int('El Id del medidor debe ser un número entero'),
-});
+})
+  .superRefine(({ Motivo_Otro, Motivo_Desconexion }, ctx) => {
+    if (Motivo_Desconexion === 'Otro (especifique)' && (!Motivo_Otro || Motivo_Otro.trim().length === 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['Motivo_Otro'],
+        message: 'Debe especificar el motivo cuando selecciona "Otro (especifique)"',
+      });
+    }
+  });
 
 export type DesconexionJuridica = z.infer<typeof DesconexionJuridicaSchema>;

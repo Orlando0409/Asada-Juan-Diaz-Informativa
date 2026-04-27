@@ -2,26 +2,15 @@ import { useAlerts } from "../../../context/AlertContext";
 import { useForm } from "@tanstack/react-form";
 import { useEffect, useRef, useState } from "react";
 import data from "../../../data/Data.json";
-import { z } from "zod";
-import { DesconexionJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/DesconexionMedidorJuridica";
-import { parsePhoneNumberFromString } from 'libphonenumber-js';
+import { DesconexionJuridicaSchema, MotivoDesconexionValues } from "../../../Schemas/Solicitudes/Juridica/DesconexionMedidorJuridica";
+import type { MotivoDesconexion } from "../../../Schemas/Solicitudes/Juridica/DesconexionMedidorJuridica";
 import { useDesconexionJuridica, useMedidoresJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
-import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import { Loader2 } from "lucide-react";
-import PhoneInputComponent from "../PhoneInputComponent";
 
 type Props = {
     onClose: () => void;
 };
 const STORAGE_KEY = 'desconexionmedidor_juridica_temp';
-
-export const normalizePhoneNumber = (phone: string): string => {
-    const phoneNumber = parsePhoneNumberFromString(phone);
-    if (!phoneNumber?.isValid()) {
-        throw new Error('Debe ingresar un número de teléfono válido con código de país, ej. +50688887777');
-    }
-    return phoneNumber.format('E.164');
-};
 
 // Función para formatear la cédula jurídica con guiones
 function formatCedulaJuridica(value: string) {
@@ -33,8 +22,6 @@ function formatCedulaJuridica(value: string) {
     return formatted;
 }
 
-const fieldSchemas: Record<string, z.ZodTypeAny> = DesconexionJuridicaSchema.shape;
-
 const DesconexionMedidorJuridica = ({ onClose }: Props) => {
     const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
@@ -42,7 +29,6 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
     const [isSending, setIsSending] = useState(false);
     const mutation = useDesconexionJuridica();
     const { showError } = useAlerts();
-    const { lookupJuridica, isLoading: loadingCedula } = useCedulaLookup();
     const planosInputRef = useRef<HTMLInputElement>(null);
     const escrituraInputRef = useRef<HTMLInputElement>(null);
 
@@ -52,37 +38,37 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
 
     // Validación en tiempo real SOLO del campo editado
     const handleFieldChange = (fieldName: string, value: any) => {
-        if (fieldSchemas[fieldName]) {
-            try {
-                fieldSchemas[fieldName].parse(value);
-                setFieldErrors(prev => {
-                    const newErrors = { ...prev };
-                    delete newErrors[fieldName];
-                    return newErrors;
-                });
-            } catch (error: any) {
-                let errorMessage = '';
-                if (error.errors && Array.isArray(error.errors)) {
-                    errorMessage = error.errors[0]?.message || 'Error de validación';
-                } else if (error.message) {
-                    errorMessage = error.message;
+        // Validación personalizada por campo
+        switch (fieldName) {
+            case 'Cedula_Juridica':
+                if (!/^3-\d{3}-\d{6}$|^\d{10}$/.test(value)) {
+                    setFieldErrors(prev => ({ ...prev, [fieldName]: 'La cédula jurídica debe tener el formato 3-XXX-XXXXXX o 10 dígitos' }));
                 } else {
-                    errorMessage = 'Error de validación';
+                    setFieldErrors(prev => { const newErrors = { ...prev }; delete newErrors[fieldName]; return newErrors; });
                 }
-                setFieldErrors(prev => ({ ...prev, [fieldName]: errorMessage }));
-            }
+                break;
+            case 'Motivo_Desconexion':
+                if (!value) {
+                    setFieldErrors(prev => ({ ...prev, [fieldName]: 'Debe seleccionar una causa de desconexión válida' }));
+                } else {
+                    setFieldErrors(prev => { const newErrors = { ...prev }; delete newErrors[fieldName]; return newErrors; });
+                }
+                break;
+            case 'Motivo_Otro':
+                if (value && value.length > 250) {
+                    setFieldErrors(prev => ({ ...prev, [fieldName]: 'La causa adicional no puede tener más de 250 caracteres' }));
+                } else {
+                    setFieldErrors(prev => { const newErrors = { ...prev }; delete newErrors[fieldName]; return newErrors; });
+                }
+                break;
         }
     };
 
     const saveToSessionStorage = (values: any) => {
         try {
-            // Guardamos todo excepto los archivos
+            // Guardamos solo la cédula jurídica
             const dataToSave = {
-                Razon_Social: values.Razon_Social,
                 Cedula_Juridica: values.Cedula_Juridica,
-                Correo: values.Correo,
-                Numero_Telefono: values.Numero_Telefono,
-                Direccion_Exacta: values.Direccion_Exacta,
             };
             sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
         } catch (error) {
@@ -92,12 +78,9 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
 
     const form = useForm({
         defaultValues: {
-            Razon_Social: '',
             Cedula_Juridica: '',
-            Direccion_Exacta: '',
-            Correo: '',
-            Numero_Telefono: '',
-            Motivo_Solicitud: '',
+            Motivo_Desconexion: '' as MotivoDesconexion,
+            Motivo_Otro: '',
             Id_Medidor: 0,
             Planos_Terreno: undefined as File | undefined,
             Certificacion_Literal: undefined as File | undefined,
@@ -116,8 +99,6 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
             }
 
             try {
-                value.Numero_Telefono = normalizePhoneNumber(value.Numero_Telefono);
-
                 const validation = DesconexionJuridicaSchema.safeParse(value);
                 if (!validation.success) {
                     const fieldErrors: Record<string, string> = {};
@@ -159,12 +140,9 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
 
     // Labels para los campos jurídicos
     const fieldLabels: { [key: string]: string } = {
-        Razon_Social: "Razón Social",
         Cedula_Juridica: "Cédula Jurídica",
-        Direccion_Exacta: "Dirección Exacta",
-        Correo: "Correo Electrónico",
-        Numero_Telefono: "Número de Teléfono",
-        Motivo_Solicitud: "Motivo de la Solicitud",
+        Motivo_Desconexion: "Motivo de la Desconexión",
+        Motivo_Otro: "Por favor especifique",
         Planos_Terreno: "Planos del Terreno",
         Certificacion_Literal: "Certificacion Literal del Terreno"
     };
@@ -221,146 +199,107 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                 <h2 className="text-center text-xl font-semibold mb-6">Formulario de desconexión de medidor - Jurídica</h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                    {/* Campos dinámicos - Primero los campos normales (sin archivos) */}
-                    {Object.entries(campos)
-                        .filter(([fieldName]) => fieldName !== "Planos_Terreno" && fieldName !== "Certificacion_Literal")
-                        .map(([fieldName, fieldProps]) => (
-                            <form.Field key={fieldName} name={fieldName as keyof typeof form.state.values}>
-                                {(field) => {
-                                    // Teléfono internacional
-                                    if (fieldName === "Numero_Telefono") {
-                                        return (
-                                            <div className="mb-3 w-full">
-                                                <label className="block mb-1 font-medium">
-                                                    {fieldLabels[fieldName]}
-                                                    {fieldProps.required && <span className="text-red-500">*</span>}
-                                                </label>
-                                                <PhoneInputComponent
-                                                    value={typeof field.state.value === "string" ? field.state.value : ""}
-                                                    onChange={(value) => {
-                                                        field.handleChange(value || "");
-                                                        handleFieldChange(fieldName, value || "");
-                                                        saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" });
-                                                    }}
-                                                    className={`${fieldErrors[fieldName] ? 'border-red-500' : ''}`}
-                                                />
-                                                {fieldErrors[fieldName] && (
-                                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors[fieldName]}</span>
-                                                )}
-                                                {formErrors[fieldName] && !fieldErrors[fieldName] && (
-                                                    <span className="text-red-500 text-sm block mt-1">{formErrors[fieldName]}</span>
-                                                )}
-                                            </div>
-                                        );
-                                    }
+                    {/* Campo Cédula Jurídica */}
+                    <form.Field name="Cedula_Juridica">
+                        {(field) => (
+                            <div className="mb-3 w-full">
+                                <label className="block mb-1 font-medium">
+                                    {fieldLabels["Cedula_Juridica"]}
+                                    <span className="text-red-500">*</span>
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        value={typeof field.state.value === "string" ? field.state.value : ""}
+                                        onChange={(e) => {
+                                            const formatted = formatCedulaJuridica(e.target.value);
+                                            const cedula = formatted.replace(/-/g, '');
+                                            field.handleChange(formatted);
+                                            handleFieldChange("Cedula_Juridica", formatted);
+                                            setCedulaJuridica(cedula);
+                                            form.setFieldValue('Id_Medidor', 0);
+                                            saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted });
+                                        }}
+                                        placeholder="3-XXX-XXXXXX"
+                                        className={commonClasses}
+                                        maxLength={255}
+                                    />
+                                </div>
+                                {fieldErrors["Cedula_Juridica"] && (
+                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Cedula_Juridica"]}</span>
+                                )}
+                                {formErrors["Cedula_Juridica"] && !fieldErrors["Cedula_Juridica"] && (
+                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Cedula_Juridica"]}</span>
+                                )}
+                            </div>
+                        )}
+                    </form.Field>
 
-                                    // Cédula Jurídica con guiones
-                                    if (fieldName === "Cedula_Juridica") {
-                                        return (
-                                            <div className="mb-3 w-full">
-                                                <label className="block mb-1 font-medium">
-                                                    {fieldLabels[fieldName]}
-                                                    {fieldProps.required && <span className="text-red-500">*</span>}
-                                                </label>
-                                                <div className="relative">
-                                                    <input
-                                                        type="text"
-                                                        value={typeof field.state.value === "string" ? field.state.value : ""}
-                                                        onChange={(e) => {
-                                                            const formatted = formatCedulaJuridica(e.target.value);
-                                                            const cedula = formatted.replace(/-/g, '');
-                                                            field.handleChange(formatted);
-                                                            handleFieldChange(fieldName, formatted);
-                                                            setCedulaJuridica(cedula);
-                                                            form.setFieldValue('Id_Medidor', 0);
-                                                            saveToSessionStorage({ ...form.state.values, Cedula_Juridica: formatted });
-                                                            if (/^\d-\d{3}-\d{6}$/.test(formatted)) {
-                                                                lookupJuridica(formatted).then(razonSocial => {
-                                                                    if (razonSocial) form.setFieldValue('Razon_Social', razonSocial);
-                                                                });
-                                                            }
-                                                        }}
-                                                        placeholder="3-XXX-XXXXXX"
-                                                        className={commonClasses}
-                                                        maxLength={255}
-                                                    />
-                                                    {loadingCedula && (
-                                                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                                            <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                                            </svg>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                {fieldErrors[fieldName] && (
-                                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors[fieldName]}</span>
-                                                )}
-                                                {formErrors[fieldName] && !fieldErrors[fieldName] && (
-                                                    <span className="text-red-500 text-sm block mt-1">{formErrors[fieldName]}</span>
-                                                )}
-                                            </div>
-                                        );
-                                    }
+                    {/* Campo Motivo de Desconexión */}
+                    <form.Field name="Motivo_Desconexion">
+                        {(field) => (
+                            <div className="mb-3 w-full">
+                                <label className="block mb-1 font-medium">
+                                    {fieldLabels["Motivo_Desconexion"]}
+                                    <span className="text-red-500">*</span>
+                                </label>
+                                <select
+                                    value={(field.state.value as string) || ""}
+                                    onChange={(e) => {
+                                        const value = e.target.value as MotivoDesconexion;
+                                        field.handleChange(value);
+                                        handleFieldChange("Motivo_Desconexion", value);
+                                        if (value !== 'Otro (especifique)') {
+                                            form.setFieldValue('Motivo_Otro', '');
+                                        }
+                                    }}
+                                    className={commonClasses}
+                                >
+                                    <option value="" disabled selected>Elije una opcion</option>
+                                    {MotivoDesconexionValues.map((motivo) => (
+                                        <option key={motivo} value={motivo}>{motivo}</option>
+                                    ))}
+                                </select>
+                                {fieldErrors["Motivo_Desconexion"] && (
+                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Desconexion"]}</span>
+                                )}
+                                {formErrors["Motivo_Desconexion"] && !fieldErrors["Motivo_Desconexion"] && (
+                                    <span className="text-red-500 text-sm block mt-1">{formErrors["Motivo_Desconexion"]}</span>
+                                )}
+                            </div>
+                        )}
+                    </form.Field>
 
-                                    // Motivo de Solicitud (textarea)
-                                    if (fieldName === "Motivo_Solicitud" || fieldName === "Direccion_Exacta") {
-                                        return (
-                                            <div className="mb-3 w-full">
-                                                <label className="block mb-1 font-medium">
-                                                    {fieldLabels[fieldName]}
-                                                    {fieldProps.required && <span className="text-red-500">*</span>}
-                                                </label>
-                                                <textarea
-                                                    value={field.state.value as string}
-                                                    onChange={(e) => {
-                                                        field.handleChange(e.target.value);
-                                                        handleFieldChange(fieldName, e.target.value);
-                                                        saveToSessionStorage({ ...form.state.values, Motivo_Solicitud: e.target.value });
-                                                    }}
-                                                    placeholder={fieldLabels[fieldName]}
-                                                    maxLength={250}
-                                                    className={`${commonClasses} resize-none h-24 overflow-y-auto scrollbar-thumb-blue-600 scrollbar-thin scrollbar-track-blue-100`}
-                                                    style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-                                                />
-                                                {fieldErrors[fieldName] && (
-                                                    <span className="text-red-500 text-sm block mt-1">{fieldErrors[fieldName]}</span>
-                                                )}
-                                                {formErrors[fieldName] && !fieldErrors[fieldName] && (
-                                                    <span className="text-red-500 text-sm block mt-1">{formErrors[fieldName]}</span>
-                                                )}
-                                            </div>
-                                        );
-                                    }
-
-                                    // Otros campos
-                                    return (
-                                        <div className="mb-3 w-full">
-                                            <label className="block mb-1 font-medium">
-                                                {fieldLabels[fieldName]}
-                                                {fieldProps.required && <span className="text-red-500">*</span>}
-                                            </label>
-                                            <input
-                                                type={fieldName === "Correo" ? "email" : "text"}
-                                                value={(field.state.value as string | number) ?? ""}
-                                                onChange={(e) => {
-                                                    field.handleChange(e.target.value);
-                                                    handleFieldChange(fieldName, e.target.value);
-                                                }}
-                                                placeholder={fieldLabels[fieldName]}
-                                                className={commonClasses}
-                                            />
-                                            {fieldErrors[fieldName] && (
-                                                <span className="text-red-500 text-sm block mt-1">{fieldErrors[fieldName]}</span>
-                                            )}
-                                            {formErrors[fieldName] && !fieldErrors[fieldName] && (
-                                                <span className="text-red-500 text-sm block mt-1">{formErrors[fieldName]}</span>
-                                            )}
-                                        </div>
-                                    );
-                                }}
-                            </form.Field>
-                        ))}
+                    {/* Campo Motivo Otro (textarea condicional) */}
+                    {form.state.values.Motivo_Desconexion === 'Otro (especifique)' && (
+                        <form.Field name="Motivo_Otro">
+                            {(field) => (
+                                <div className="mb-3 w-full md:col-span-2">
+                                    <label className="block mb-1 font-medium">
+                                        {fieldLabels["Motivo_Otro"]}
+                                        <span className="text-red-500">*</span>
+                                    </label>
+                                    <textarea
+                                        value={field.state.value as string}
+                                        onChange={(e) => {
+                                            field.handleChange(e.target.value);
+                                            handleFieldChange("Motivo_Otro", e.target.value);
+                                        }}
+                                        placeholder={fieldLabels["Motivo_Otro"]}
+                                        maxLength={250}
+                                        className={`${commonClasses} resize-none h-24 overflow-y-auto scrollbar-thumb-blue-600 scrollbar-thin scrollbar-track-blue-100`}
+                                        style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                                    />
+                                    {fieldErrors["Motivo_Otro"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Otro"]}</span>
+                                    )}
+                                    {formErrors["Motivo_Otro"] && !fieldErrors["Motivo_Otro"] && (
+                                        <span className="text-red-500 text-sm block mt-1">{formErrors["Motivo_Otro"]}</span>
+                                    )}
+                                </div>
+                            )}
+                        </form.Field>
+                    )}
 
                     {/* Campo Id_Medidor */}
                     <form.Field name="Id_Medidor">

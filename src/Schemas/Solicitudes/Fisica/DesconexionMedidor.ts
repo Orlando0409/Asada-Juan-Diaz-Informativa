@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 // Enum para tipo de identificación
 export const TipoIdentificacionValues = [
@@ -8,6 +7,16 @@ export const TipoIdentificacionValues = [
   'Pasaporte',
 ] as const;
 export type TipoIdentificacion = typeof TipoIdentificacionValues[number];
+
+export const MotivoDesconexionValues = [
+  'Morosidad',
+  'Infracción al reglamento de prestación del servicio',
+  'Conexión ilegal a terceros',
+  'Solicitud expresa de retiro del servicio por parte del usuario (traslado fuera de Juan Díaz)',
+  'Otro (especifique)',
+] as const;
+
+export type MotivoDesconexion = typeof MotivoDesconexionValues[number];
 
 export const DesconexionMedidorSchema = z.object({
   // Campos comunes de CreateSolicitudFisicaDto
@@ -19,41 +28,11 @@ export const DesconexionMedidorSchema = z.object({
     .min(1, 'La identificación no puede estar vacía')
     .refine(val => val.trim().length > 0, 'La identificación no puede estar vacía'),
 
-  Nombre: z.string()
-    .min(1, 'El nombre no puede estar vacío')
-    .min(2, 'El nombre debe tener al menos 2 caracteres')
-    .max(49, 'El nombre no puede tener más de 50 caracteres')
-    .refine(val => val.trim().length > 0, 'El nombre no puede estar vacío')
-    .refine(val => /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(val), 'El nombre solo puede contener letras y espacios'),
+  Motivo_Desconexion: z.enum(MotivoDesconexionValues, {
+    errorMap: () => ({ message: 'Debe seleccionar una causa de desconexión válida' }),
+  }),
 
-  Apellido1: z.string()
-    .min(1, 'El primer apellido no puede estar vacío')
-    .min(2, 'El primer apellido debe tener al menos 2 caracteres')
-    .max(49, 'El primer apellido no puede tener más de 50 caracteres')
-    .refine(val => val.trim().length > 0, 'El primer apellido no puede estar vacío')
-    .refine(val => /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(val), 'El primer apellido solo puede contener letras y espacios'),
-
-  Apellido2: z.string()
-     .min(1, 'El segundo apellido no puede estar vacío')
-    .min(2, 'El segundo apellido debe tener al menos 2 caracteres')
-    .max(49, 'El segundo apellido no puede tener más de 50 caracteres')
-    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/, { message: 'El segundo apellido solo puede contener letras y espacios' })
-    .transform(val => val.trim()),
-
-  Correo: z.string()
-    .min(1, 'El correo no puede estar vacío')
-    .max(99, 'El correo no puede tener más de 100 caracteres')
-    .email('El correo electrónico debe tener un formato válido')
-    .refine(val => /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(val), 'El formato del correo electrónico no es válido'),
-
-  Numero_Telefono: z.string()
-    .min(1, 'El número de teléfono no puede estar vacío')
-    .refine((phone) => {
-      const phoneNumber = parsePhoneNumberFromString(phone || "");
-      return !!phoneNumber && phoneNumber.isValid();
-    }, {
-      message: 'número de teléfono válido".'
-    }),
+  Motivo_Otro: z.string().trim().max(250, 'La causa adicional no puede tener más de 250 caracteres').optional(),
 
   // Campos específicos de CreateSolicitudDesconexionFisicaDto
   Direccion_Exacta: z.string()
@@ -87,6 +66,14 @@ export const DesconexionMedidorSchema = z.object({
     .gt(0, 'El Id del medidor debe ser mayor a 0')
     .positive('El Id del medidor debe ser positivo')
     .int('El Id del medidor debe ser un número entero'),
+}).superRefine((data, context) => {
+  if (data.Motivo_Desconexion === 'Otro (especifique)' && !data.Motivo_Otro?.trim()) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['Motivo_Otro'],
+      message: 'Debe especificar la causa de desconexión',
+    });
+  }
 }).refine(
   (data) => {
     const identificacion = data.Identificacion.trim();
