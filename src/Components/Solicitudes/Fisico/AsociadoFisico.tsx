@@ -2,28 +2,16 @@ import { useForm } from "@tanstack/react-form";
 import { useEffect, useState, useRef } from "react";
 import { AsociadoSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/Asociado";
 import { useAsociadoFisica } from "../../../Hook/Solicitudes/HookFisicas";
-import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import { Loader2 } from "lucide-react";
-import PhoneInputComponent from "../PhoneInputComponent";
 
 type Props = {
   onClose: () => void;
 };
-
-
-const normalizePhoneNumber = (phone: string): string => {
-  if (!phone?.startsWith('+')) {
-    throw new Error('El número debe incluir el código de país y comenzar con "+". Ejemplo: +50688887777');
-  }
-  return phone;
-};
-
 const STORAGE_KEY = 'asociado_fisica_temp';
 
 
 
 const FormularioAsociado = ({ onClose }: Props) => {
-  const sanitizeNameInput = (value: string) => value.replaceAll(/\d/g, "");
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const planosInputRef = useRef<HTMLInputElement>(null);
   const escrituraInputRef = useRef<HTMLInputElement>(null);
@@ -33,7 +21,6 @@ const FormularioAsociado = ({ onClose }: Props) => {
   const [isSending, setIsSending] = useState(false);
   const mutation = useAsociadoFisica();
   const [_mostrarFormulario, setMostrarFormulario] = useState(true);
-  const { lookup, isLoading } = useCedulaLookup();
 
 
   const validateField = (fieldName: string, value: any, allValues?: any) => {
@@ -104,7 +91,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
   };
 
   // Función para cambio de Identificacion 
-  const handleCedulaChange = async (cedula: string) => {
+  const handleCedulaChange = (cedula: string) => {
     const tipoId = form.state.values.Tipo_Identificacion;
     const identificacion = handleIdentificacionInput(cedula, tipoId);
 
@@ -116,26 +103,12 @@ const FormularioAsociado = ({ onClose }: Props) => {
       delete newErrors['Identificacion'];
       return newErrors;
     });
-
-    if (tipoId === 'Cedula Nacional' && /^\d{9}$/.test(identificacion)) {
-      const resultado = await lookup(identificacion);
-      if (resultado) {
-        form.setFieldValue('Nombre', resultado.firstname || '');
-        form.setFieldValue('Apellido1', resultado.lastname1 || '');
-        form.setFieldValue('Apellido2', resultado.lastname2 || '');
-      }
-    }
   };
 
 
 
   const getPlaceholder = (fieldName: string, tipoIdentificacion?: TipoIdentificacion) => {
     const placeholders: Record<string, string> = {
-      Nombre: "Juan Carlos",
-      Apellido1: "Pérez",
-      Apellido2: "González",
-      Correo: "ejemplo@gmail.com",
-      Numero_Telefono: "+50688887777",
       Motivo_Solicitud: "Escribe el motivo de tu solicitud",
     };
     if (fieldName === "Identificacion") {
@@ -153,32 +126,10 @@ const FormularioAsociado = ({ onClose }: Props) => {
     return placeholders[fieldName] || "";
   };
 
-  const saveToSessionStorage = (values: any) => {
-    try {
-      // Guardamos todo excepto los archivos
-      const dataToSave = {
-        Nombre: values.Nombre,
-        Apellido1: values.Apellido1,
-        Apellido2: values.Apellido2,
-        Correo: values.Correo,
-        Numero_Telefono: values.Numero_Telefono,
-        Direccion_Exacta: values.Direccion_Exacta,
-      };
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
-    } catch (error) {
-      console.error('Error al guardar en sessionStorage:', error);
-    }
-  };
-
   const form = useForm({
     defaultValues: {
-      Nombre: "",
-      Apellido1: "",
-      Apellido2: "",
       Tipo_Identificacion: "Cedula Nacional" as TipoIdentificacion,
       Identificacion: "",
-      Correo: "",
-      Numero_Telefono: "",
       Motivo_Solicitud: "",
     },
 
@@ -186,8 +137,6 @@ const FormularioAsociado = ({ onClose }: Props) => {
       setFormErrors({});
       setFieldErrors({});
       try {
-        value.Numero_Telefono = normalizePhoneNumber(value.Numero_Telefono);
-
         const validation = AsociadoSchema.safeParse(value);
         if (!validation.success) {
           const validationErrors: Record<string, string> = {};
@@ -213,13 +162,8 @@ const FormularioAsociado = ({ onClose }: Props) => {
         // Crear FormData y agregar campos del DTO como string
         const formData = new FormData();
         // Campos del DTO (no archivos)
-        formData.append('Nombre', value.Nombre);
-        formData.append('Apellido1', value.Apellido1);
-        formData.append('Apellido2', value.Apellido2);
         formData.append('Tipo_Identificacion', value.Tipo_Identificacion);
         formData.append('Identificacion', value.Identificacion);
-        formData.append('Correo', value.Correo);
-        formData.append('Numero_Telefono', value.Numero_Telefono);
         formData.append('Motivo_Solicitud', value.Motivo_Solicitud);
         // Agregar archivos (solo como file, no como string)
         if (archivoSeleccionado["Planos_Terreno"]) {
@@ -252,17 +196,13 @@ const FormularioAsociado = ({ onClose }: Props) => {
 
   // Validar en tiempo real cada vez que cambia un campo y marcar como tocado
   const handleFieldChange = (
-    fieldName: "Nombre" | "Apellido1" | "Apellido2" | "Identificacion" | "Correo" | "Numero_Telefono" | "Motivo_Solicitud" | "Tipo_Identificacion",
+    fieldName: "Identificacion" | "Motivo_Solicitud" | "Tipo_Identificacion",
     value: any
   ) => {
-    // Sanitizar campos de nombre
-    const cleanValue = ["Nombre", "Apellido1", "Apellido2"].includes(fieldName)
-      ? sanitizeNameInput(value)
-      : value;
     setTouched(prev => ({ ...prev, [fieldName]: true }));
-    const newValues = { ...form.state.values, [fieldName]: cleanValue };
+    const newValues = { ...form.state.values, [fieldName]: value };
     validateAllFields(newValues);
-    form.setFieldValue(fieldName, cleanValue);
+    form.setFieldValue(fieldName, value);
   };
   useEffect(() => {
     const savedData = sessionStorage.getItem(STORAGE_KEY);
@@ -343,144 +283,12 @@ const FormularioAsociado = ({ onClose }: Props) => {
                     className={`${commonClasses} ${!form.state.values.Tipo_Identificacion ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                     maxLength={getIdentificacionMaxLength(form.state.values.Tipo_Identificacion)}
                   />
-                  {isLoading && (
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                      <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
-                    </div>
-                  )}
                 </div>
                 {touched["Identificacion"] && fieldErrors["Identificacion"] && (
                   <span className="text-red-500 text-sm block mt-1">{fieldErrors["Identificacion"]}</span>
                 )}
                 {formErrors["Identificacion"] && !fieldErrors["Identificacion"] && (
                   <span className="text-red-500 text-sm block mt-1">{formErrors["Identificacion"]}</span>
-                )}
-              </div>
-            )}
-          </form.Field>
-          {/* Nombre */}
-          <form.Field name="Nombre">
-            {(field) => (
-              <div className="mb-3 w-full">
-                <label htmlFor="Nombre" className="block mb-1 font-medium">Nombre <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  value={field.state.value}
-                  onChange={(e) => {
-                    handleFieldChange("Nombre", e.target.value);
-                    saveToSessionStorage({ ...form.state.values, Nombre: e.target.value });
-                  }}
-                  onBlur={() => setTouched(prev => ({ ...prev, Nombre: true }))}
-                  placeholder={getPlaceholder("Nombre")}
-                  maxLength={50}
-                  className={commonClasses}
-                />
-                {touched["Nombre"] && fieldErrors["Nombre"] && (
-                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Nombre"]}</span>
-                )}
-                {formErrors["Nombre"] && !fieldErrors["Nombre"] && (
-                  <span className="text-red-500 text-sm block mt-1">{formErrors["Nombre"]}</span>
-                )}
-              </div>
-            )}
-          </form.Field>
-          {/* Primer Apellido */}
-          <form.Field name="Apellido1">
-            {(field) => (
-              <div className="mb-3 w-full">
-                <label htmlFor="Apellido1" className="block mb-1 font-medium">Primer Apellido <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  value={field.state.value}
-                  onChange={(e) => {
-                    handleFieldChange("Apellido1", e.target.value);
-                    saveToSessionStorage({ ...form.state.values, Apellido1: e.target.value }); // ← NUEVO
-                  }}
-                  onBlur={() => setTouched(prev => ({ ...prev, Apellido1: true }))}
-                  placeholder={getPlaceholder("Apellido1")}
-                  maxLength={50}
-                  className={commonClasses}
-                />
-                {touched["Apellido1"] && fieldErrors["Apellido1"] && (
-                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido1"]}</span>
-                )}
-                {formErrors["Apellido1"] && !fieldErrors["Apellido1"] && (
-                  <span className="text-red-500 text-sm block mt-1">{formErrors["Apellido1"]}</span>
-                )}
-              </div>
-            )}
-          </form.Field>
-          {/* Segundo Apellido */}
-          <form.Field name="Apellido2">
-            {(field) => (
-              <div className="mb-3 w-full">
-                <label htmlFor="Apellido2" className="block mb-1 font-medium">Segundo Apellido <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  value={field.state.value}
-                  onChange={(e) => {
-                    handleFieldChange("Apellido2", e.target.value);
-                    saveToSessionStorage({ ...form.state.values, Apellido2: e.target.value }); // ← NUEVO
-                  }}
-                  onBlur={() => setTouched(prev => ({ ...prev, Apellido2: true }))}
-                  placeholder={getPlaceholder("Apellido2")}
-                  maxLength={50}
-                  className={commonClasses}
-                />
-                {touched["Apellido2"] && fieldErrors["Apellido2"] && (
-                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido2"]}</span>
-                )}
-                {formErrors["Apellido2"] && !fieldErrors["Apellido2"] && (
-                  <span className="text-red-500 text-sm block mt-1">{formErrors["Apellido2"]}</span>
-                )}
-              </div>
-            )}
-          </form.Field>
-          {/* Correo */}
-          <form.Field name="Correo">
-            {(field) => (
-              <div className="mb-3 w-full">
-                <label htmlFor="Correo" className="block mb-1 font-medium">Correo electrónico <span className="text-red-500">*</span></label>
-                <input
-                  type="email"
-                  value={field.state.value}
-                  onChange={(e) => {
-                    handleFieldChange("Correo", e.target.value);
-                    saveToSessionStorage({ ...form.state.values, Correo: e.target.value }); // ← NUEVO
-                  }}
-                  onBlur={() => setTouched(prev => ({ ...prev, Correo: true }))}
-                  placeholder={getPlaceholder("Correo")}
-                  maxLength={100}
-                  className={commonClasses}
-                />
-                {touched["Correo"] && fieldErrors["Correo"] && (
-                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Correo"]}</span>
-                )}
-                {formErrors["Correo"] && !fieldErrors["Correo"] && (
-                  <span className="text-red-500 text-sm block mt-1">{formErrors["Correo"]}</span>
-                )}
-              </div>
-            )}
-          </form.Field>
-          {/* Teléfono internacional */}
-          <form.Field name="Numero_Telefono">
-            {(field) => (
-              <div className="mb-3 w-full">
-                <label htmlFor="Numero_Telefono" className="block mb-1 font-medium">Número de teléfono <span className="text-red-500">*</span></label>
-                <PhoneInputComponent
-                  value={field.state.value}
-                  onChange={(value) => {
-                    handleFieldChange("Numero_Telefono", value || "");
-                    saveToSessionStorage({ ...form.state.values, Numero_Telefono: value || "" });
-                    validateField("Numero_Telefono", value || "");
-                  }}
-                  className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
-                />
-                {touched["Numero_Telefono"] && fieldErrors["Numero_Telefono"] && (
-                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
-                )}
-                {formErrors["Numero_Telefono"] && !fieldErrors["Numero_Telefono"] && (
-                  <span className="text-red-500 text-sm block mt-1">{formErrors["Numero_Telefono"]}</span>
                 )}
               </div>
             )}
@@ -494,7 +302,6 @@ const FormularioAsociado = ({ onClose }: Props) => {
                   value={field.state.value}
                   onChange={(e) => {
                     handleFieldChange("Motivo_Solicitud", e.target.value);
-                    saveToSessionStorage({ ...form.state.values, Motivo_Solicitud: e.target.value }); // ← NUEVO
                   }}
                   onBlur={() => setTouched(prev => ({ ...prev, Motivo_Solicitud: true }))}
                   placeholder={getPlaceholder("Motivo_Solicitud")}
@@ -510,7 +317,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
               </div>
             )}
 
-            
+
           </form.Field>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
@@ -626,19 +433,19 @@ const FormularioAsociado = ({ onClose }: Props) => {
 
         <div className="flex justify-center gap-4 mt-6 ml-50">
           <button
-                        type="submit"
-                        className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
-                        disabled={
-                          isSending ||
-                          Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
-                          Object.values(fieldErrors).some(Boolean) ||
-                          Object.values(formErrors).some(Boolean) ||
-                          !archivoSeleccionado["Planos_Terreno"] ||
-                          !archivoSeleccionado["Escrituras_Terreno"]
-                        }
-                    >
-                        {isSending ? 'Enviando...' : 'Enviar Solicitud'}
-                    </button>
+            type="submit"
+            className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
+            disabled={
+              isSending ||
+              Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
+              Object.values(fieldErrors).some(Boolean) ||
+              Object.values(formErrors).some(Boolean) ||
+              !archivoSeleccionado["Planos_Terreno"] ||
+              !archivoSeleccionado["Escrituras_Terreno"]
+            }
+          >
+            {isSending ? 'Enviando...' : 'Enviar Solicitud'}
+          </button>
           <button
             type="button"
             onClick={onClose}

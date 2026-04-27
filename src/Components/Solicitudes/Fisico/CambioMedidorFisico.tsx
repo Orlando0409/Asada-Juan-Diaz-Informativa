@@ -2,29 +2,18 @@
 import { useForm } from "@tanstack/react-form";
 import { useEffect, useRef, useState } from "react";
 import { CambioMedidorSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/CambioMedidor";
-import { parsePhoneNumberFromString } from 'libphonenumber-js';
 import { useCambioMedidorFisica, useMedidores } from "../../../Hook/Solicitudes/HookFisicas";
 import { useAlerts } from "../../../context/AlertContext";
 import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import { Loader2 } from "lucide-react";
-import PhoneInputComponent from "../PhoneInputComponent";
 
 type Props = {
   onClose: () => void;
 };
 
-const normalizePhoneNumber = (phone: string): string => {
-  const phoneNumber = parsePhoneNumberFromString(phone);
-  if (!phoneNumber?.isValid()) {
-    throw new Error('Número de teléfono inválido. Asegúrate de incluir el código de país, ej. +5215512345678');
-  }
-  return phoneNumber.format('E.164');
-};
-
 const STORAGE_KEY = 'cambiomedidor_fisico_temp';
 
 const FormularioCambioMedidor = ({ onClose }: Props) => {
-  const sanitizeNameInput = (value: string) => value.replace(/\d/g, "");
   const [archivoSeleccionado, setArchivoSeleccionado] = useState<{ [key: string]: File | null }>({});
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
@@ -90,24 +79,14 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
     });
 
     if (tipoId === 'Cedula Nacional' && /^\d{9}$/.test(identificacionProcesada)) {
-      const resultado = await lookup(identificacionProcesada);
-      if (resultado) {
-        form.setFieldValue('Nombre', resultado.firstname || '');
-        form.setFieldValue('Apellido1', resultado.lastname1 || '');
-        form.setFieldValue('Apellido2', resultado.lastname2 || '');
-      }
+      await lookup(identificacionProcesada);
     }
     // Ya no se valida afiliación aquí
   };
 
   const getPlaceholder = (fieldName: string, tipoIdentificacion?: TipoIdentificacion) => {
     const placeholders: Record<string, string> = {
-      Nombre: 'Juan Carlos',
-      Apellido1: 'Pérez',
-      Apellido2: 'González',
-      Correo: 'ejemplo@gmail.com',
-      Numero_Telefono: '+50688887777',
-      Direccion_Exacta: 'San José, del Banco Nacional 200m sur',
+
       Motivo_Solicitud: 'Cambio por daño',
       Id_Medidor: '1',
     };
@@ -121,33 +100,14 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
     }
     return placeholders[fieldName] || '';
   };
-  const saveToSessionStorage = (values: any) => {
-    try {
-      // Guardamos todo excepto los archivos
-      const dataToSave = {
-        Nombre: values.Nombre,
-        Apellido1: values.Apellido1,
-        Apellido2: values.Apellido2,
-        Correo: values.Correo,
-        Numero_Telefono: values.Numero_Telefono,
-        Direccion_Exacta: values.Direccion_Exacta,
-      };
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
-    } catch (error) {
-      console.error('Error al guardar en sessionStorage:', error);
-    }
-  };
+
 
   const form = useForm({
     defaultValues: {
-      Nombre: '',
-      Apellido1: '',
-      Apellido2: '',
+
       Tipo_Identificacion: 'Cedula Nacional' as TipoIdentificacion,
       Identificacion: '',
-      Direccion_Exacta: '',
-      Numero_Telefono: '',
-      Correo: '',
+
       Motivo_Solicitud: '',
       Id_Medidor: 0,
       Planos_Terreno: undefined as File | undefined,
@@ -157,7 +117,6 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
       setFormErrors({});
       setFieldErrors({});
       try {
-        value.Numero_Telefono = normalizePhoneNumber(value.Numero_Telefono);
         const validation = CambioMedidorSchema.safeParse(value);
         if (!validation.success) {
           const validationErrors: Record<string, string> = {};
@@ -176,12 +135,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
         if (tipoId === 'Cedula Nacional' && /^\d{9}$/.test(value.Identificacion)) {
           const soloDigitos = value.Identificacion.replace(/\D/g, '');
           try {
-            const resultado = await lookup(soloDigitos);
-            if (resultado) {
-              form.setFieldValue('Nombre', resultado.firstname || '');
-              form.setFieldValue('Apellido1', resultado.lastname1 || '');
-              form.setFieldValue('Apellido2', resultado.lastname2 || '');
-            }
+            await lookup(soloDigitos);
           } catch (error: any) {
             // Si hay error, igual permitimos el envío para no bloquear el flujo
           }
@@ -331,146 +285,6 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
               </div>
             )}
           </form.Field>
-          {/* Nombre y Primer Apellido  */}
-          <form.Field name="Nombre">
-            {(field) => (
-              <div className="mb-3 w-full">
-                <label htmlFor="Nombre" className="block mb-1 font-medium">Nombre <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  value={field.state.value}
-                  onChange={(e) => {
-                    const cleanValue = sanitizeNameInput(e.target.value);
-                    field.handleChange(cleanValue);
-                    validateField("Nombre", cleanValue, form.state.values);
-                    saveToSessionStorage({ ...form.state.values, Nombre: cleanValue });
-                  }}
-                  placeholder={getPlaceholder("Nombre")}
-                  maxLength={50}
-                  className={commonClasses}
-                />
-                {fieldErrors["Nombre"] && (
-                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Nombre"]}</span>
-                )}
-              </div>
-            )}
-          </form.Field>
-          <form.Field name="Apellido1">
-            {(field) => (
-              <div className="mb-3 w-full">
-                <label htmlFor="Apellido1" className="block mb-1 font-medium">Primer Apellido <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  value={field.state.value}
-                  onChange={(e) => {
-                    const cleanValue = sanitizeNameInput(e.target.value);
-                    field.handleChange(cleanValue);
-                    validateField("Apellido1", cleanValue, form.state.values);
-                    saveToSessionStorage({ ...form.state.values, Apellido1: cleanValue });
-                  }}
-                  placeholder={getPlaceholder("Apellido1")}
-                  maxLength={50}
-                  className={commonClasses}
-                />
-                {fieldErrors["Apellido1"] && (
-                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido1"]}</span>
-                )}
-              </div>
-            )}
-          </form.Field>
-
-          {/* Segundo Apellido y Dirección Exacta */}
-          <form.Field name="Apellido2">
-            {(field) => (
-              <div className="mb-3 w-full">
-                <label htmlFor="Apellido2" className="block mb-1 font-medium">Segundo Apellido <span className="text-red-500">*</span></label>
-                <input
-                  type="text"
-                  value={field.state.value}
-                  onChange={(e) => {
-                    const cleanValue = sanitizeNameInput(e.target.value);
-                    field.handleChange(cleanValue);
-                    validateField("Apellido2", cleanValue, form.state.values);
-                    saveToSessionStorage({ ...form.state.values, Apellido2: cleanValue });
-                  }}
-                  placeholder={getPlaceholder("Apellido2")}
-                  maxLength={50}
-                  className={commonClasses}
-                />
-                {fieldErrors["Apellido2"] && (
-                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Apellido2"]}</span>
-                )}
-              </div>
-            )}
-          </form.Field>
-          <form.Field name="Direccion_Exacta">
-            {(field) => (
-              <div className="mb-3 w-full">
-                <label htmlFor="Direccion_Exacta" className="block mb-1 font-medium">Dirección exacta <span className="text-red-500">*</span></label>
-                <textarea
-                  value={field.state.value}
-                  onChange={(e) => {
-                    const direccion = e.target.value;
-                    field.handleChange(direccion);
-                    validateField("Direccion_Exacta", direccion, form.state.values);
-                    saveToSessionStorage({ ...form.state.values, Direccion_Exacta: direccion });
-                  }}
-                  placeholder={getPlaceholder("Direccion_Exacta")}
-                  maxLength={100}
-                  className={commonClasses}
-                />
-                {fieldErrors["Direccion_Exacta"] && (
-                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Direccion_Exacta"]}</span>
-                )}
-              </div>
-            )}
-          </form.Field>
-
-          {/* Correo y Teléfono */}
-          <form.Field name="Correo">
-            {(field) => (
-              <div className="mb-3 w-full">
-                <label htmlFor="Correo" className="block mb-1 font-medium">Correo electrónico <span className="text-red-500">*</span></label>
-                <input
-                  type="email"
-                  value={field.state.value}
-                  onChange={(e) => {
-                    const correo = e.target.value;
-                    field.handleChange(correo);
-                    validateField("Correo", correo, form.state.values);
-                    saveToSessionStorage({ ...form.state.values, Correo: correo });
-                  }}
-                  placeholder={getPlaceholder("Correo")}
-                  maxLength={100}
-                  className={commonClasses}
-                />
-                {fieldErrors["Correo"] && (
-                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Correo"]}</span>
-                )}
-              </div>
-            )}
-          </form.Field>
-          <form.Field name="Numero_Telefono">
-            {(field) => (
-              <div className="mb-3 w-full">
-                <label htmlFor="Numero_Telefono" className="block mb-1 font-medium">Número de teléfono <span className="text-red-500">*</span></label>
-                <PhoneInputComponent
-                  value={field.state.value}
-                  onChange={(value) => {
-                    const telefono = value || "";
-                    field.handleChange(telefono);
-                    validateField("Numero_Telefono", telefono, form.state.values);
-                    saveToSessionStorage({ ...form.state.values, Numero_Telefono: telefono });
-                  }}
-                  className={`${fieldErrors["Numero_Telefono"] ? 'border-red-500' : ''}`}
-                />
-                {fieldErrors["Numero_Telefono"] && (
-                  <span className="text-red-500 text-sm block mt-1">{fieldErrors["Numero_Telefono"]}</span>
-                )}
-              </div>
-            )}
-          </form.Field>
-
           {/* Número de Medidor y Motivo */}
           <form.Field name="Id_Medidor">
             {(field) => {
@@ -522,7 +336,6 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                     const motivo = e.target.value;
                     field.handleChange(motivo);
                     validateField("Motivo_Solicitud", motivo, form.state.values);
-                    saveToSessionStorage({ ...form.state.values, Motivo_Solicitud: motivo });
                   }}
                   placeholder="Escribe el motivo de tu solicitud"
                   maxLength={250}
@@ -662,14 +475,8 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                 Object.values(fieldErrors).some(Boolean) ||
                 Object.values(formErrors).some(Boolean) ||
                 [
-                  form.state.values.Nombre,
-                  form.state.values.Apellido1,
-                  form.state.values.Apellido2,
                   form.state.values.Tipo_Identificacion,
                   form.state.values.Identificacion,
-                  form.state.values.Correo,
-                  form.state.values.Direccion_Exacta,
-                  form.state.values.Numero_Telefono,
                   form.state.values.Id_Medidor,
                   form.state.values.Motivo_Solicitud,
                   form.state.values.Planos_Terreno,
