@@ -3,18 +3,11 @@ import { useEffect, useState, useRef } from "react";
 import { AsociadoJuridicaSchema } from "../../../Schemas/Solicitudes/Juridica/AsociadoJuridica";
 import { useAsociadoJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
 import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
-import PhoneInputComponent from "../PhoneInputComponent";
 
 type Props = {
     onClose: () => void;
 };
 
-const normalizePhoneNumber = (phone: string): string => {
-    if (!phone || !phone.startsWith('+')) {
-        throw new Error('El número debe incluir el código de país y comenzar con "+". Ejemplo: +50688887777');
-    }
-    return phone;
-};
 function formatCedulaJuridica(value: string) {
     const digits = value.replace(/\D/g, "");
     let formatted = "";
@@ -73,14 +66,14 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
     const form = useForm({
         defaultValues: {
             Cedula_Juridica: "",
-           
+
             Motivo_Solicitud: "",
         },
         onSubmit: async ({ value }) => {
             setFormErrors({});
             setFieldErrors({});
             try {
-              
+
 
                 // Validar campos de texto (sin archivos)
                 const validation = AsociadoJuridicaSchema.safeParse(value);
@@ -147,7 +140,7 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
         setTouched(prev => ({ ...prev, [fieldName]: true }));
         const newValues = { ...form.state.values, [fieldName]: value };
         validateAllFields(newValues);
-        //form.setFieldValue(fieldName, value);
+        form.setFieldValue(fieldName as any, value);
     };
 
     useEffect(() => {
@@ -196,8 +189,8 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                                             const formatted = formatCedulaJuridica(e.target.value);
                                             handleFieldChange("Cedula_Juridica", formatted);
                                             if (/^\d-\d{3}-\d{6}$/.test(formatted)) {
-                                                lookupJuridica(formatted).then(razonSocial => {
-                                              
+                                                lookupJuridica(formatted).then(() => {
+
                                                 });
                                             }
                                         }}
@@ -224,11 +217,11 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                         )}
                     </form.Field>
                     {/* Razón Social */}
-                    
+
                     {/* Correo */}
-                  
+
                     {/* Teléfono internacional */}
-                   
+
                     {/* Motivo de Solicitud */}
                     <form.Field name="Motivo_Solicitud">
                         {(field) => (

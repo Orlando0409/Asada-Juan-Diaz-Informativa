@@ -5,7 +5,6 @@ import { MedidorExtraJuridicaSchema } from "../../../Schemas/Solicitudes/Juridic
 import { useAgregarMedidorJuridica, useMedidoresJuridica } from "../../../Hook/Solicitudes/HookJuridicas";
 import { useCedulaLookup } from "../../../Hook/Solicitudes/CedulaLookHook";
 import { useAlerts } from "../../../context/AlertContext";
-import PhoneInputComponent from "../PhoneInputComponent";
 
 type Props = {
     onClose: () => void;
@@ -44,9 +43,9 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
     const validateField = (fieldName: string, value: any) => {
         try {
             const dummy: any = {
-               
+
                 Cedula_Juridica: "3-123-123456",
-                
+
                 Planos_Terreno: new File([''], 'test.jpg', { type: 'image/jpeg' }),
                 Certificacion_Literal: new File([''], 'test.jpg', { type: 'image/jpeg' }),
             };
@@ -85,8 +84,8 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
         if (/^3-\d{3}-\d{6}$/.test(formatted)) {
             const cedulaSoloDigitos = formatted.replace(/\D/g, '');
             setCedulaValidada(cedulaSoloDigitos);
-            lookupJuridica(cedulaSoloDigitos).then(razonSocial => {
-               
+            lookupJuridica(cedulaSoloDigitos).then(() => {
+
             });
         } else {
             setCedulaValidada('');
@@ -96,9 +95,9 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
     const saveToSessionStorage = (values: any) => {
         try {
             const dataToSave = {
-                
+
                 Cedula_Juridica: values.Cedula_Juridica,
-               
+
             };
             sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
         } catch (error) {
@@ -114,9 +113,9 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
 
     const form = useForm({
         defaultValues: {
-           
+
             Cedula_Juridica: '',
-           
+
             Planos_Terreno: undefined as File | undefined,
             Certificacion_Literal: undefined as File | undefined,
         },
@@ -147,9 +146,9 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
             // Limpiar y trimear todos los campos de texto
             const cleanedValue = {
                 ...value,
-                
+
                 Cedula_Juridica: (value.Cedula_Juridica || '').trim(),
-               
+
             };
 
             // Ya no es necesario normalizar manualmente el teléfono, el schema lo hace
