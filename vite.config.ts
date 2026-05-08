@@ -128,7 +128,7 @@ export default defineConfig({
       enforce: 'post' as const,
       transformIndexHtml(html: string) {
         return html.replace(
-          /<link rel="stylesheet" crossorigin href="([^"]+)">/,
+          /<link rel="stylesheet" crossorigin href="(\/assets\/index-[^"]+\.css)">/g,
           '<link rel="preload" as="style" href="$1" crossorigin onload="this.onload=null;this.rel=\'stylesheet\'">\n    <noscript><link rel="stylesheet" crossorigin href="$1"></noscript>'
         )
       },
@@ -151,6 +151,13 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist', // importante para Cloudflare
+    modulePreload: {
+      resolveDependencies: (_filename, deps) =>
+        deps.filter(
+          (d) =>
+            !/(?:maps-vendor|forms-ui-vendor|carousel-vendor|motion-icons-vendor|utils-vendor)-[^/]+\.js$/.test(d)
+        ),
+    },
     rollupOptions: {
       output: {
         manualChunks: getManualChunk,

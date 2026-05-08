@@ -1,7 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
-import markerIcon from "leaflet/dist/images/marker-icon.png";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
 export default function Mapa() {
     const mapRef = useRef<HTMLDivElement>(null);
@@ -30,8 +27,19 @@ export default function Mapa() {
       if (!shouldLoadMap || !mapRef.current || globalThis.window === undefined) return;
 
       const initMap = async () => {
-        await import("leaflet/dist/leaflet.css");
-        const leafletModule = await import("leaflet");
+        const [
+          _css,
+          leafletModule,
+          markerIcon2xMod,
+          markerIconMod,
+          markerShadowMod,
+        ] = await Promise.all([
+          import("leaflet/dist/leaflet.css"),
+          import("leaflet"),
+          import("leaflet/dist/images/marker-icon-2x.png"),
+          import("leaflet/dist/images/marker-icon.png"),
+          import("leaflet/dist/images/marker-shadow.png"),
+        ]);
         const L = leafletModule.default;
 
         // In production builds, Leaflet's default relative marker paths can break.
@@ -41,9 +49,9 @@ export default function Mapa() {
         };
         delete defaultIconPrototype._getIconUrl;
         L.Icon.Default.mergeOptions({
-          iconRetinaUrl: markerIcon2x,
-          iconUrl: markerIcon,
-          shadowUrl: markerShadow,
+          iconRetinaUrl: markerIcon2xMod.default,
+          iconUrl: markerIconMod.default,
+          shadowUrl: markerShadowMod.default,
         });
 
         if (!mapRef.current || mapRef.current.childNodes.length > 0) return;

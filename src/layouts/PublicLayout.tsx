@@ -17,10 +17,11 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
   const [showChat, setShowChat] = useState(false);
 
   useEffect(() => {
-    containerRef.current?.scrollTo({ top: 0, behavior: 'instant' });
-    globalThis.window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    if (document.documentElement) document.documentElement.scrollTop = 0;
-    if (document.body) document.body.scrollTop = 0;
+    const container = containerRef.current;
+    globalThis.window.requestAnimationFrame(() => {
+      globalThis.window.scrollTo(0, 0);
+      if (container) container.scrollTop = 0;
+    });
   }, [location.pathname]);
 
   useEffect(() => {
