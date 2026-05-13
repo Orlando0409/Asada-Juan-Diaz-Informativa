@@ -17,60 +17,6 @@ export const CambioMedidorSchema = z.object({
     .refine(val => val.trim().length > 0, 'La identificación no puede estar vacía')
     .transform(val => val.trim()),
 
-  Nombre: z.string()
-    .min(1, 'El nombre no puede estar vacío')
-    .min(2, 'El nombre debe tener al menos 2 caracteres')
-    .max(49, 'El nombre no puede tener más de 50 caracteres')
-    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, { message: 'El nombre solo puede contener letras y espacios' })
-    .refine(val => val.trim().length > 0, 'El nombre no puede estar vacío')
-    .transform(val => val.trim()),
-
-  Apellido1: z.string()
-    .min(1, 'El primer apellido no puede estar vacío')
-    .min(2, 'El primer apellido debe tener al menos 2 caracteres')
-    .max(49, 'El primer apellido no puede tener más de 50 caracteres')
-    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, { message: 'El primer apellido solo puede contener letras y espacios' })
-    .refine(val => val.trim().length > 0, 'El primer apellido no puede estar vacío')
-    .transform(val => val.trim()),
-
-  Apellido2: z.string()
-     .min(1, 'El segundo apellido no puede estar vacío')
-    .min(2, 'El segundo apellido debe tener al menos 2 caracteres')
-    .max(49, 'El segundo apellido no puede tener más de 50 caracteres')
-    .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/, { message: 'El segundo apellido solo puede contener letras y espacios' })
-    .transform(val => val.trim()),
-
-  Correo: z.string()
-    .min(1, 'El correo no puede estar vacío')
-    .max(99, 'El correo no puede tener más de 100 caracteres')
-    .email('El correo electrónico debe tener un formato válido')
-    .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, { message: 'El formato del correo electrónico no es válido' })
-    .transform(val => val.trim().toLowerCase()),
-
-  Numero_Telefono: z.string()
-    .min(1, 'El número de teléfono no puede estar vacío')
-    .refine((phone) => {
-      const phoneNumber = parsePhoneNumberFromString(phone || "");
-      return !!phoneNumber && phoneNumber.isValid();
-    }, {
-      message: 'Debe ingresar un número de teléfono válido'
-    })
-    .transform((phone) => {
-      const phoneNumber = parsePhoneNumberFromString(phone || "");
-      if (!phoneNumber || !phoneNumber.isValid()) {
-        throw new Error('Debe ingresar un número de teléfono válido');
-      }
-      return phoneNumber.format('E.164');
-    }),
-
-  // Validaciones específicas de CreateSolicitudCambioMedidorFisicaDto
-  Direccion_Exacta: z.string()
-    .min(1, 'La dirección no puede estar vacía')
-    .min(10, 'La dirección debe tener al menos 10 caracteres')
-    .max(254, 'La dirección no puede tener más de 255 caracteres')
-    .regex(/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s.,#-]+$/, { message: 'La dirección solo puede contener letras, números, espacios y los caracteres .,-#' })
-    .refine(val => val.trim().length > 0, 'La dirección no puede estar vacía')
-    .transform(val => val.trim()),
 
   Motivo_Solicitud: z.string()
     .min(1, 'El motivo de la solicitud no puede estar vacío')
