@@ -1,5 +1,4 @@
 import { z } from 'zod'
-import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 export const CambioMedidorJuridicaSchema = z.object({
   Cedula_Juridica: z.string()

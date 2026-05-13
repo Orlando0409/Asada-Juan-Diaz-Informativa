@@ -627,7 +627,7 @@
             {
               "id": 2,
               "texto": "Cambio de medidor",
-              "ruta": "CambioMedidor"
+              "ruta": "/CambioMedidor"
             },
             {
               "id": 3,

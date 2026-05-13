@@ -2,7 +2,6 @@ import { useForm } from "@tanstack/react-form";
 import { useEffect, useState, useRef } from "react";
 import { AsociadoSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/Asociado";
 import { useAsociadoFisica } from "../../../Hook/Solicitudes/HookFisicas";
-import { Loader2 } from "lucide-react";
 
 type Props = {
   onClose: () => void;

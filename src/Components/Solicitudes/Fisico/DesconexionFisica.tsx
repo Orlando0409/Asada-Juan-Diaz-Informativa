@@ -401,6 +401,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
               Cancelar
             </button>
           </div>
+          </div>
 
  
       </form>
