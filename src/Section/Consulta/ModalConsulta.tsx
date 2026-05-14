@@ -18,6 +18,7 @@ import type {
     LecturaConsulta,
     MedidorConsultaResultado,
 } from '../../types/Consulta/Pagos';
+import { getEstadoFacturaBadgeClass } from '../../utils/Consulta/estadoFacturaBadge';
 
 type Props = {
     isOpen: boolean;
@@ -450,11 +451,7 @@ const renderMedidor = (medidor: MedidorConsultaResultado, index: number) => {
                                         >
                                             <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
                                                 <span className="font-medium text-gray-900">{factura.Numero_Factura}</span>
-                                                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                                                    factura.Estado?.Nombre_Estado === 'Pagado' ? 'border border-green-300 bg-green-100 text-green-700' :
-                                                    (factura.Estado?.Nombre_Estado === 'Vencido' || factura.Estado?.Nombre_Estado === 'Vencida') ? 'border border-red-300 bg-red-100 text-red-700' :
-                                                    'border border-yellow-300 bg-yellow-100 text-yellow-700'
-                                                }`}>
+                                                <span className={getEstadoFacturaBadgeClass(factura.Estado?.Nombre_Estado)}>
                                                     {factura.Estado?.Nombre_Estado || 'Desconocido'}
                                                 </span>
                                             </div>
