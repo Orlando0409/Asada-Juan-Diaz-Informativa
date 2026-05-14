@@ -2,7 +2,6 @@ import { useForm } from "@tanstack/react-form";
 import { useEffect, useState, useRef } from "react";
 import { AsociadoSchema, TipoIdentificacionValues, type TipoIdentificacion } from "../../../Schemas/Solicitudes/Fisica/Asociado";
 import { useAsociadoFisica } from "../../../Hook/Solicitudes/HookFisicas";
-import { Loader2 } from "lucide-react";
 
 type Props = {
   onClose: () => void;
@@ -228,7 +227,7 @@ const FormularioAsociado = ({ onClose }: Props) => {
     <div className="flex justify-center text-gray-800 p-3 sm:p-4 w-full">
       <form
         onSubmit={handleSubmit}
-        className="bg-white shadow-lg px-5 py-3 sm:px-6 sm:py-4 rounded-[24px] w-[95%] max-w-7xl mx-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
+        className="px-5 py-3 sm:px-6 sm:py-4 rounded-[24px] w-[95%] max-w-7xl mx-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
       >
         <h2 className="text-center text-xl font-semibold mb-6">Formulario para ser asociado</h2>
 
@@ -450,8 +449,8 @@ const FormularioAsociado = ({ onClose }: Props) => {
             type="button"
             onClick={onClose}
             disabled={isSending}
-            className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-          >
+           className="w-xs md:w-auto px-1 py-1.5 md:px-6 md:py-4 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 text-sm md: text-lg disabled:cursor-not-allowed"
+            >
             Cancelar
           </button>
         </div>

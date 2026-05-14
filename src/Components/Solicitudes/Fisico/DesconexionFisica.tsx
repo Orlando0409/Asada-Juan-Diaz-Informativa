@@ -207,7 +207,7 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
           e.preventDefault();
           form.handleSubmit();
         }}
-        className="bg-white shadow-lg px-5 py-3 sm:px-6 sm:py-4 rounded-[24px] w-[95%] max-w-7xl mx-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
+        className="px-5 py-3 sm:px-6 sm:py-4 rounded-[24px] w-[95%] max-w-7xl mx-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
       >
         <h2 className="text-center text-xl font-semibold mb-6">Formulario de desconexión de medidor</h2>
 
@@ -401,8 +401,9 @@ const FormularioDesconexionMedidor = ({ onClose }: Props) => {
               Cancelar
             </button>
           </div>
+          </div>
 
-        </div>
+ 
       </form>
     </div>
   );
