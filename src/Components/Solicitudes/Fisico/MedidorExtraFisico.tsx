@@ -401,7 +401,7 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                         const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
                         return (
                             <div className="w-full mb-2">
-                                <label className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
+                                <label className="block mb-1 font-medium">Planos del terreno <span className="text-gray-400 text-xs">(opcional)</span></label>
                                 <input
                                     type="file"
                                     accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -431,10 +431,6 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                                             onClick={() => {
                                                 field.handleChange(undefined);
                                                 setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
-                                                setFieldErrors(prev => ({
-                                                    ...prev,
-                                                    ["Planos_Terreno"]: `Debe subir el plano del terreno`,
-                                                }));
                                                 if (planosInputRef.current) planosInputRef.current.value = "";
                                             }}
                                             className="text-red-500 hover:underline text-xs"
@@ -458,7 +454,7 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                         const archivoActual = archivoSeleccionado["Certificacion_Literal"] ?? null;
                         return (
                             <div className="w-full mb-2">
-                                <label className="block mb-1 font-medium">Certificacion Literal del terreno <span className="text-red-500">*</span></label>
+                                <label className="block mb-1 font-medium">Certificacion Literal del terreno <span className="text-gray-400 text-xs">(opcional)</span></label>
                                 <input
                                     type="file"
                                     accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -488,10 +484,6 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                                             onClick={() => {
                                                 field.handleChange(undefined);
                                                 setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: null }));
-                                                setFieldErrors(prev => ({
-                                                    ...prev,
-                                                    ["Certificacion_Literal"]: `Debe subir la certificacion literal del terreno`,
-                                                }));
                                                 if (escrituraInputRef.current) escrituraInputRef.current.value = "";
                                             }}
                                             className="text-red-500 hover:underline text-xs"
@@ -519,7 +511,11 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                     className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
                     disabled={
                         mutation.isPending ||
-                        Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
+                        [
+                            form.state.values.Tipo_Identificacion,
+                            form.state.values.Identificacion,
+                            form.state.values.Direccion_Exacta,
+                        ].some(val => val === undefined || val === null || val === "") ||
                         Object.values(fieldErrors).some(Boolean) ||
                         Object.values(formErrors).some(Boolean)
                     }

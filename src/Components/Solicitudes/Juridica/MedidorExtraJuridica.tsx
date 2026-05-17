@@ -306,7 +306,7 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                         const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
                         return (
                             <div className="w-full mb-2">
-                                <label className="block mb-1 font-semibold text-gray-700">Planos del terreno <span className="text-red-500">*</span></label>
+                                <label className="block mb-1 font-semibold text-gray-700">Planos del terreno <span className="text-gray-400 text-xs">(opcional)</span></label>
                                 <input
                                     type="file"
                                     accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -336,10 +336,6 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                                             onClick={() => {
                                                 field.handleChange(undefined);
                                                 setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
-                                                setFieldErrors(prev => ({
-                                                    ...prev,
-                                                    ["Planos_Terreno"]: `Debe subir el plano del terreno`,
-                                                }));
                                                 if (planosInputRef.current) planosInputRef.current.value = "";
                                             }}
                                             className="text-red-500 hover:underline text-xs"
@@ -363,7 +359,7 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                         const archivoActual = archivoSeleccionado["Certificacion_Literal"] ?? null;
                         return (
                             <div className="w-full mb-2">
-                                <label className="block mb-1 font-semibold text-gray-700">Certificacion Literal del terreno <span className="text-red-500">*</span></label>
+                                <label className="block mb-1 font-semibold text-gray-700">Certificacion Literal del terreno <span className="text-gray-400 text-xs">(opcional)</span></label>
                                 <input
                                     type="file"
                                     accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -393,10 +389,6 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                                             onClick={() => {
                                                 field.handleChange(undefined);
                                                 setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: null }));
-                                                setFieldErrors(prev => ({
-                                                    ...prev,
-                                                    ["Certificacion_Literal"]: `Debe subir la certificacion literal del terreno`,
-                                                }));
                                                 if (escrituraInputRef.current) escrituraInputRef.current.value = "";
                                             }}
                                             className="text-red-500 hover:underline text-xs"
@@ -425,7 +417,9 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                     disabled={
                         mutation.isPending ||
                         loadingMedidores ||
-                        Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
+                        [
+                            form.state.values.Cedula_Juridica,
+                        ].some(val => val === undefined || val === null || val === "") ||
                         Object.values(fieldErrors).some(Boolean) ||
                         hasBlockingFormErrors
                     }
