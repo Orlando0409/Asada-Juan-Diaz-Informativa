@@ -272,7 +272,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                                     }}
                                     className={commonClasses}
                                 >
-                                    <option value="">Elije una opcion</option>
+                                    <option value="" disabled>Elige una opción</option>
                                     {MotivoDesconexionValues.map((motivo) => (
                                         <option key={motivo} value={motivo}>{motivo}</option>
                                     ))}
