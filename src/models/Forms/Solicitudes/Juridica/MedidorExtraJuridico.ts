@@ -1,6 +1,6 @@
 export interface MedidorExtraJuridica {
   Cedula_Juridica: string;
-  Direccion_Exacta?: string;
+  Direccion_Exacta: string;
 
   Planos_Terreno?: File | string;
   Certificacion_Literal?: File | string;

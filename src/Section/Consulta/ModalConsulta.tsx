@@ -276,7 +276,7 @@ const renderMedidor = (medidor: MedidorConsultaResultado, index: number) => {
     if (esJuridico && afiliadoMedidor) {
         const afiliadoJur = afiliadoMedidor as any;
         nombreAfiliadorMedidor = afiliadoJur.Razon_Social || 'No disponible';
-        cedulaAfiliado = afiliadoJur.Cedula_Juridica;
+        cedulaAfiliado = afiliadoJur.Identificacion || afiliadoJur.Cedula_Juridica;
         tipoAfiliado = 'Razón Social';
     } else if (afiliadoMedidor) {
         const afiliadoFisico = afiliadoMedidor as any;

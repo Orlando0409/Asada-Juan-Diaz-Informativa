@@ -101,7 +101,7 @@
         "required": true
       },
       "Certificacion_Literal": {
-        "label": "Certificacion Literal del terreno",
+        "label": "Certificación Literal del terreno",
         "type": "file",
         "required": true
       }
