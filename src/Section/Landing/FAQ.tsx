@@ -11,6 +11,15 @@ const MTAccordion = Accordion as any;
 const MTAccordionHeader = AccordionHeader as any;
 const MTAccordionBody = AccordionBody as any;
 
+const Icon = ({ id, open }: { id: number; open: number | null }) => (
+  <MdExpandMore
+    className={`transform transition-transform duration-300 ${
+      id === open ? "rotate-180 text-blue-600" : "text-gray-500"
+    }`}
+    size={24}
+  />
+);
+
 const Faq: React.FC = () => {
   const [open, setOpen] = useState<number | null>(null);
   const { data: faqs, isLoading, isError } = useFAQ();
@@ -19,15 +28,6 @@ const Faq: React.FC = () => {
     setOpen(open === value ? null : value);
   };
 
-  const Icon = ({ id, open }: { id: number; open: number | null }) => (
-    <MdExpandMore
-      className={`transform transition-transform duration-300 ${
-        id === open ? "rotate-180 text-blue-600" : "text-gray-500"
-      }`}
-      size={24}
-    />
-  );
-
   if (isLoading)
     return (
       <section
@@ -35,9 +35,9 @@ const Faq: React.FC = () => {
         aria-label="Preguntas frecuentes"
         className="flex flex-col items-center justify-center min-h-screen bg-white"
       >
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+        <div className="animate-spin rounded-full size-12 border-b-2 border-blue-600 mb-4"></div>
         <p className="text-gray-700 text-lg font-medium">
-          Cargando preguntas frecuentes...
+          Cargando preguntas frecuentes…
         </p>
       </section>
     );

@@ -5,11 +5,11 @@ import type { DropdownProps } from '../../types/header/MenuItem'
 const Dropdown = ({ texto, Subopcion }: DropdownProps) => {
   return (
     <li className='relative group'>
-      <button className='flex items-center gap-1 hover:text-[#6FCAF1] transition-colors duration-200'>
+      <button type="button" className='flex items-center gap-1 hover:text-[#6FCAF1] transition-colors duration-200'>
         {texto}
         <svg
           viewBox='0 0 24 24'
-          className='h-[18px] w-[18px] transition-transform duration-200 group-hover:rotate-180'
+          className='size-[18px] transition-transform duration-200 group-hover:rotate-180'
           aria-hidden='true'
         >
           <path fill='currentColor' d='m7 10 5 5 5-5H7Z' />

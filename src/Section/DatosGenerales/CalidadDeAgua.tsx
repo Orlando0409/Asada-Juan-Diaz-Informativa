@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useCalidadAguaVisiblesQuery } from '../../Hook/CalidadDeAgua/hookCalidadAgua';
 const CalidadDeAgua = () => {
 
@@ -6,7 +6,7 @@ const CalidadDeAgua = () => {
 
   return (
     <section className='bg-white text-gray-800 p-6 sm:p-10 md:-16 flex flex-col gap-12'>
-      <motion.div
+      <m.div
         className="pt-12 max-w-4xl mx-auto text-center"
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -21,11 +21,11 @@ const CalidadDeAgua = () => {
           </p>
 
         </blockquote>
-      </motion.div>
+      </m.div>
 
       {/*grid */}
       <div className="max-w-6xl mx-auto w-full">
-        <motion.h2
+        <m.h2
           className=' font-bold text-blue-900 mb-8 text-center text-xl sm:text-2xl md:text-3xl '
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -33,18 +33,18 @@ const CalidadDeAgua = () => {
           transition={{ duration: 0.45, ease: 'easeOut', delay: 0.1 }}
         >
           Documentos disponibles
-        </motion.h2>
+        </m.h2>
 
         {isLoading ? (
           <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full size-12 border-b-2 border-blue-600"></div>
           </div>
         ) : archivos.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500 text-lg">No hay documentos disponibles en este momento.</p>
           </div>
         ) : (
-          <motion.div 
+          <m.div 
             className='grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'
             initial="hidden"
             whileInView="visible"
@@ -58,7 +58,7 @@ const CalidadDeAgua = () => {
             }}
           >
             {archivos.map((archivo, idx: number) => (
-              <motion.div
+              <m.div
                 key={archivo.Id_Calidad_Agua ?? idx}
                 className='bg-white rounded-3xl shadow-md hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 p-5 flex flex-col items-center text-center'
                 variants={{
@@ -91,9 +91,9 @@ const CalidadDeAgua = () => {
                 >
                   Ver PDF
                 </a>
-              </motion.div>
+              </m.div>
             ))}
-          </motion.div>
+          </m.div>
         )}
       </div>
     </section>  )

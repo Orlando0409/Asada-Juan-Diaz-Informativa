@@ -27,8 +27,8 @@ const DatosGenerales = () => {
                        animate-rise-in transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-blue-400"
             style={{ animationDelay: `${80 + index * 50}ms` }}
           >
-            <div className="h-10 w-10 shrink-0 rounded-full bg-blue-100 flex items-center justify-center">
-              <Icon className="text-blue-600 h-5 w-5" />
+            <div className="size-10 shrink-0 rounded-full bg-blue-100 flex items-center justify-center">
+              <Icon className="text-blue-600 size-5" />
             </div>
             <div>
               <p className="text-xs font-semibold uppercase tracking-widest text-blue-600 mb-1">{label}</p>

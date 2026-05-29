@@ -258,7 +258,8 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
             setArchivoSeleccionado({});
             if (planosInputRef.current) planosInputRef.current.value = "";
             if (escrituraInputRef.current) escrituraInputRef.current.value = "";
-            setTimeout(() => onClose(), 1500); // con retraso para que el usuario vea el mensaje de éxito
+            const id = setTimeout(() => onClose(), 1500); // con retraso para que el usuario vea el mensaje de éxito
+            return () => clearTimeout(id);
         }
     }, [mutation.isSuccess]);
 

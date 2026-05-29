@@ -3,7 +3,7 @@ import React from 'react';
 // Button de enviar
 export function Button({ className, ...props }: Readonly<React.ButtonHTMLAttributes<HTMLButtonElement>>) {
   return (
-    <button
+    <button type="button"
       className={`px-4 py-2 rounded-md font-medium transition-colors disabled:opacity-50 bg-blue-600 text-white hover:bg-blue-700 ${className || ''}`}
       {...props}
     />

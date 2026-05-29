@@ -25,7 +25,7 @@ const MisionVision = () => {
           aria-label="Misión de la organización"
         >
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+            <div className="size-8 rounded-full bg-blue-100 flex items-center justify-center">
               <span className="text-blue-600 font-bold text-sm">M</span>
             </div>
             <p className="font-bold text-lg sm:text-xl lg:text-2xl text-blue-600">
@@ -47,7 +47,7 @@ const MisionVision = () => {
           aria-label="Visión de la organización"
         >
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+            <div className="size-8 rounded-full bg-blue-100 flex items-center justify-center">
               <span className="text-blue-600 font-bold text-sm">V</span>
             </div>
             <p className="font-bold text-lg sm:text-xl lg:text-2xl text-blue-600">
@@ -69,7 +69,7 @@ const MisionVision = () => {
           aria-label="Historia de la organización"
         >
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+            <div className="size-8 rounded-full bg-blue-100 flex items-center justify-center">
               <span className="text-blue-600 font-bold text-sm">H</span>
             </div>
             <p className="font-bold text-lg sm:text-xl lg:text-2xl text-blue-600">
@@ -88,7 +88,7 @@ const MisionVision = () => {
               aria-label="Leer más sobre la historia de la organización"
             >
               {Boton}
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </Link>

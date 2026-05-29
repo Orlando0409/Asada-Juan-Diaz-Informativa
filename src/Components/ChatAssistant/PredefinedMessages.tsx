@@ -15,13 +15,13 @@ export function PredefinedMessages({ onSelectMessage, isLoading, predefinedMessa
   return (
     <div className="space-y-3">
       <div className="flex items-center space-x-2 text-gray-600">
-        <HiSparkles className="w-4 h-4" />
+        <HiSparkles className="size-4" />
         <span className="text-sm font-medium">Preguntas frecuentes:</span>
       </div>
       
       <div className="grid gap-2">
         {predefinedMessages.map((msg) => (
-          <button
+          <button type="button"
             key={msg.label}
             onClick={() => {
               onSelectMessage(msg.id);

@@ -275,7 +275,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   />
                   {isLoading && (
                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                      <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+                      <Loader2 className="size-5 animate-spin text-blue-500" />
                     </div>
                   )}
                 </div>

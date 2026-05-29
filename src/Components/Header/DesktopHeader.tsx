@@ -94,7 +94,7 @@ const DesktopHeader = ({ menuItems }: DesktopHeaderProps) => {
                 onMouseEnter={() => handleMouseEnter(item.id)}
                 onMouseLeave={handleMouseLeave}
               >
-                <button className='flex items-center gap-1 hover:text-[#6FCAF1] transition-colors duration-10'>
+                <button type="button" className='flex items-center gap-1 hover:text-[#6FCAF1] transition-colors duration-10'>
                   {item.texto}
                   <ChevronDownIcon isOpen={expandedItem === item.id} />
                 </button>

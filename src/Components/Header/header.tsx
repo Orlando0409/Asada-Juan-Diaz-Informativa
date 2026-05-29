@@ -9,7 +9,7 @@ const Header = () => {
   return (
     <header className='fixed top-0 w-screen z-50 bg-transparent backdrop-blur-md px-4 md:px-8 py-3 flex items-center justify-between shadow-sm'>
       {/* Logo */}
-      <Link to={logo.ruta} className='flex items-center gap-2 h-13 w-13'>
+      <Link to={logo.ruta} className='flex items-center gap-2 size-13'>
         <img
           src={logo.src}
           alt='Logo de ASADA Juan Diaz'

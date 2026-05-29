@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { FiXCircle } from "react-icons/fi";
 import { alertConfig, type AlertProps } from '../../../types/Alert';
 
@@ -61,7 +61,7 @@ export const Alert: React.FC<AlertProps> = ({
   return (
     <AnimatePresence>
       {isVisible && (
-        <motion.div 
+        <m.div 
           initial={{ x: 400, opacity: 0, scale: 0.8 }}
           animate={{ x: 0, opacity: 1, scale: 1 }}
           exit={{ x: 400, opacity: 0, scale: 0.8 }}
@@ -80,7 +80,7 @@ export const Alert: React.FC<AlertProps> = ({
         >
           <div className="p-4">
             <div className="flex items-start">
-              <motion.div 
+              <m.div 
                 initial={{ y: 10, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.15 }}
@@ -90,44 +90,44 @@ export const Alert: React.FC<AlertProps> = ({
                   {title}
                 </h3>
                 {description && (
-                  <motion.p 
+                  <m.p 
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2 }}
                     className={`mt-1 text-sm ${config.textColor} leading-relaxed`}
                   >
                     {description}
-                  </motion.p>
+                  </m.p>
                 )}
                 {actionButton && (
-                  <motion.div 
+                  <m.div 
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.25 }}
                     className="mt-3 flex gap-2"
                   >
-                    <motion.button
+                    <m.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={actionButton.onClick}
                       className={`px-3 py-1 text-xs font-medium rounded-md ${config.titleColor} border border-current hover:bg-white/10 transition-colors`}
                     >
                       {actionButton.text}
-                    </motion.button>
-                  </motion.div>
+                    </m.button>
+                  </m.div>
                 )}
-              </motion.div>
+              </m.div>
               
               {onClose && (
-                <motion.button
+                <m.button
                   whileHover={{ scale: 1.1, rotate: 90 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={handleClose}
                   className={`ml-3 ${config.textColor} hover:${config.titleColor} transition-colors p-1 hover:bg-white/50 rounded flex-shrink-0`}
                   aria-label="Cerrar alerta"
                 >
-                  <FiXCircle className="h-5 w-5" />
-                </motion.button>
+                  <FiXCircle className="size-5" />
+                </m.button>
               )}
             </div>
           </div>
@@ -135,14 +135,14 @@ export const Alert: React.FC<AlertProps> = ({
           {/* Barra de Progreso Animada */}
           {showProgress && onClose && (
             <div className="h-1 bg-gray-200/30 relative overflow-hidden">
-              <motion.div
+              <m.div
                 initial={{ width: "100%" }}
                 animate={{ width: `${progress}%` }}
                 transition={{ duration: 0.1, ease: "linear" }}
                 className={`h-full ${config.progressColor} relative`}
               >
                 {/* Efecto de brillo animado */}
-                <motion.div 
+                <m.div 
                   animate={{ 
                     x: ['-100%', '100%'] 
                   }}
@@ -153,10 +153,10 @@ export const Alert: React.FC<AlertProps> = ({
                   }}
                   className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
                 />
-              </motion.div>
+              </m.div>
             </div>
           )}
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );
