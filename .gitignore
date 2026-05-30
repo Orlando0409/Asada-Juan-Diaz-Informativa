@@ -16,6 +16,7 @@ dist-ssr
 .tanstack\tmp
 .agents
 .claude
+.react-doctor
 
 # Editor directories and files
 .vscode/*
