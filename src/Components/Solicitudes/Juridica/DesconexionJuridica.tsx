@@ -162,7 +162,10 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                 console.error('Error al cargar datos guardados:', error);
             }
         }
-    }, []);
+    // Mount-only: restore a saved draft once. form.setFieldValue is stable; we
+    // intentionally do not re-run when form changes.
+    // react-doctor-disable-next-line react-doctor/exhaustive-deps
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     //strar alert cuando se verifica afiliación (igual que DesconexionFisica)
     useEffect(() => {

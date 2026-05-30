@@ -158,7 +158,10 @@ const FormularioAsociadoJuridico = ({ onClose }: Props) => {
                 console.error('Error al cargar datos guardados:', error);
             }
         }
-    }, []); //prueba 
+    // Mount-only: restore a saved draft once. form.setFieldValue is stable; we
+    // intentionally do not re-run when form changes.
+    // react-doctor-disable-next-line react-doctor/exhaustive-deps
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const commonClasses =
         "w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring focus:ring-blue-300";

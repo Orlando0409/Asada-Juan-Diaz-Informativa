@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { FiXCircle } from "react-icons/fi";
 import { alertConfig, type AlertProps } from '../../../types/Alert';
@@ -17,6 +17,18 @@ export const Alert: React.FC<AlertProps> = ({
 }) => {
   const [isVisible, setIsVisible] = useState(true);
   const [progress, setProgress] = useState(100);
+
+  // onClose is recreated each render by the parent (inline arrow); read it via
+  // a ref so handleClose stays stable and the progress effect runs mount-only.
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  const handleClose = useCallback(() => {
+    setIsVisible(false);
+    setTimeout(() => {
+      onCloseRef.current?.();
+    }, 300);
+  }, []);
 
   useEffect(() => {
     if (!showProgress || !duration) return;
@@ -47,14 +59,11 @@ export const Alert: React.FC<AlertProps> = ({
         cancelAnimationFrame(animationFrameId);
       }
     };
-  }, [duration, showProgress]);
-
-  const handleClose = () => {
-    setIsVisible(false);
-    setTimeout(() => {
-      onClose?.();
-    }, 300);
-  };
+    // handleClose is also the close button's onClick handler, so it must stay a
+    // stable useCallback (an Effect Event can't be used as a JSX event handler).
+    // It is already stable, so listing it here is safe and non-reactive.
+    // react-doctor-disable-next-line react-doctor/prefer-use-effect-event
+  }, [duration, showProgress, handleClose]);
 
   const config = alertConfig[type];
 

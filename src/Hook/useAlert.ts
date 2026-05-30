@@ -68,7 +68,7 @@ export const useAlert = () => {
       }
       return id;
     },
-    [isBlocked]
+    [isBlocked, generateUniqueId]
   );
 
   const removeAlert = useCallback((id: string) => {

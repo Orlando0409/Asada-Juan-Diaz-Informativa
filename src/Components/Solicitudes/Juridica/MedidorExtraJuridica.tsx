@@ -31,6 +31,10 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
     const [alertShown, setAlertShown] = useState<string>('');
     const planosInputRef = useRef<HTMLInputElement>(null);
     const escrituraInputRef = useRef<HTMLInputElement>(null);
+    // onClose comes from the parent as a fresh closure each render; read it via a
+    // ref so the success-close effect can depend only on mutation.isSuccess + form.
+    const onCloseRef = useRef(onClose);
+    onCloseRef.current = onClose;
 
     const mutation = useAgregarMedidorJuridica();
     const { lookupJuridica, isLoading: loadingCedula } = useCedulaLookup();
@@ -196,7 +200,10 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                 console.error('Error al cargar datos guardados:', error);
             }
         }
-    }, []);
+    // Mount-only: restore a saved draft once. form.setFieldValue is stable; we
+    // intentionally do not re-run when form changes.
+    // react-doctor-disable-next-line react-doctor/exhaustive-deps
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Usar un efecto para cerrar el formulario cuando se complete con éxito
     useEffect(() => {
@@ -208,10 +215,10 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
             setArchivoSeleccionado({});
             if (planosInputRef.current) planosInputRef.current.value = "";
             if (escrituraInputRef.current) escrituraInputRef.current.value = "";
-            const id = setTimeout(() => onClose(), 1500); // con retraso para que el usuario vea el mensaje de éxito
+            const id = setTimeout(() => onCloseRef.current(), 1500); // con retraso para que el usuario vea el mensaje de éxito
             return () => clearTimeout(id);
         }
-    }, [mutation.isSuccess]);
+    }, [mutation.isSuccess, form]);
 
     // Mostrar alert cuando se verifica afiliación
     useEffect(() => {
