@@ -4,7 +4,7 @@ import type { MenuItem } from '../../types/header/MenuItem'
 
 function MenuIcon({ open }: { open: boolean }) {
   return open ? (
-    <svg aria-hidden='true' viewBox='0 0 24 24' fill='none' className='h-5 w-5'>
+    <svg aria-hidden='true' viewBox='0 0 24 24' fill='none' className='size-5'>
       <path
         d='M6 6l12 12M18 6 6 18'
         stroke='currentColor'
@@ -13,7 +13,7 @@ function MenuIcon({ open }: { open: boolean }) {
       />
     </svg>
   ) : (
-    <svg aria-hidden='true' viewBox='0 0 24 24' fill='none' className='h-5 w-5'>
+    <svg aria-hidden='true' viewBox='0 0 24 24' fill='none' className='size-5'>
       <path
         d='M4 7h16M4 12h16M4 17h16'
         stroke='currentColor'
@@ -30,7 +30,7 @@ function ChevronDownIcon({ isOpen }: Readonly<{ isOpen: boolean }>) {
       aria-hidden='true'
       viewBox='0 0 20 20'
       fill='none'
-      className={`h-3.5 w-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+      className={`size-3.5 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
     >
       <path
         d='M5 8l5 5 5-5'
@@ -77,7 +77,7 @@ const MobileHeader = ({ menuItems }: { menuItems: MenuItem[] }) => {
   return (
     <>
       {/* Botón 3 Rayitas */}
-      <button 
+      <button type="button" 
         className='md:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100'
         onClick={toggleMenu}
         aria-label={isOpen ? 'Cerrar menu de navegacion' : 'Abrir menu de navegacion'}
@@ -90,13 +90,13 @@ const MobileHeader = ({ menuItems }: { menuItems: MenuItem[] }) => {
       {/* Menú móvil desplegado */}
       {isOpen && (
         <div id='mobile-navigation-menu' className='absolute top-full left-0 w-full bg-white border-t border-gray-200 shadow-lg md:hidden z-40'>
-          <div className='py-4 px-4 space-y-2'>
+          <div className='p-4 space-y-2'>
             {menuItems.map((item) => {
               // Primero verificar si es un ancla
               if (item.ruta?.startsWith('#')) {
                 return (
                   <div key={item.id}>
-                    <button
+                    <button type="button"
                       onClick={() => {
                      
                         if (currentPath === '/') {
@@ -123,7 +123,7 @@ const MobileHeader = ({ menuItems }: { menuItems: MenuItem[] }) => {
                 <div key={item.id}>
                   {item.tipo === 'dropdown' ? (
                     <>
-                      <button
+                      <button type="button"
                         className='flex items-center justify-between w-full py-2 px-3 text-gray-700 hover:bg-gray-100 rounded-md transition-colors duration-200'
                         onClick={() => toggleExpanded(item.id)}
                       >

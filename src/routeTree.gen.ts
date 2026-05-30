@@ -13,7 +13,7 @@ import { Route as ConsultaRouteImport } from './routes/Consulta'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SolicitudesMedidorExtraRouteImport } from './routes/(Solicitudes)/MedidorExtra'
 import { Route as SolicitudesDesconexionMedidorRouteImport } from './routes/(Solicitudes)/DesconexionMedidor'
-import { Route as SolicitudesCambiomedidorRouteImport } from './routes/(Solicitudes)/Cambiomedidor'
+import { Route as SolicitudesCambioMedidorRouteImport } from './routes/(Solicitudes)/CambioMedidor'
 import { Route as SolicitudesAsociadoRouteImport } from './routes/(Solicitudes)/Asociado'
 import { Route as SolicitudesAfiliacionRouteImport } from './routes/(Solicitudes)/Afiliacion'
 import { Route as ContactoSugerenciasRouteImport } from './routes/(Contacto)/Sugerencias'
@@ -43,10 +43,10 @@ const SolicitudesDesconexionMedidorRoute =
     path: '/DesconexionMedidor',
     getParentRoute: () => rootRouteImport,
   } as any)
-const SolicitudesCambiomedidorRoute =
-  SolicitudesCambiomedidorRouteImport.update({
-    id: '/(Solicitudes)/Cambiomedidor',
-    path: '/Cambiomedidor',
+const SolicitudesCambioMedidorRoute =
+  SolicitudesCambioMedidorRouteImport.update({
+    id: '/(Solicitudes)/CambioMedidor',
+    path: '/CambioMedidor',
     getParentRoute: () => rootRouteImport,
   } as any)
 const SolicitudesAsociadoRoute = SolicitudesAsociadoRouteImport.update({
@@ -95,7 +95,7 @@ export interface FileRoutesByFullPath {
   '/Sugerencias': typeof ContactoSugerenciasRoute
   '/Afiliacion': typeof SolicitudesAfiliacionRoute
   '/Asociado': typeof SolicitudesAsociadoRoute
-  '/Cambiomedidor': typeof SolicitudesCambiomedidorRoute
+  '/CambioMedidor': typeof SolicitudesCambioMedidorRoute
   '/DesconexionMedidor': typeof SolicitudesDesconexionMedidorRoute
   '/MedidorExtra': typeof SolicitudesMedidorExtraRoute
 }
@@ -109,7 +109,7 @@ export interface FileRoutesByTo {
   '/Sugerencias': typeof ContactoSugerenciasRoute
   '/Afiliacion': typeof SolicitudesAfiliacionRoute
   '/Asociado': typeof SolicitudesAsociadoRoute
-  '/Cambiomedidor': typeof SolicitudesCambiomedidorRoute
+  '/CambioMedidor': typeof SolicitudesCambioMedidorRoute
   '/DesconexionMedidor': typeof SolicitudesDesconexionMedidorRoute
   '/MedidorExtra': typeof SolicitudesMedidorExtraRoute
 }
@@ -124,7 +124,7 @@ export interface FileRoutesById {
   '/(Contacto)/Sugerencias': typeof ContactoSugerenciasRoute
   '/(Solicitudes)/Afiliacion': typeof SolicitudesAfiliacionRoute
   '/(Solicitudes)/Asociado': typeof SolicitudesAsociadoRoute
-  '/(Solicitudes)/Cambiomedidor': typeof SolicitudesCambiomedidorRoute
+  '/(Solicitudes)/CambioMedidor': typeof SolicitudesCambioMedidorRoute
   '/(Solicitudes)/DesconexionMedidor': typeof SolicitudesDesconexionMedidorRoute
   '/(Solicitudes)/MedidorExtra': typeof SolicitudesMedidorExtraRoute
 }
@@ -140,7 +140,7 @@ export interface FileRouteTypes {
     | '/Sugerencias'
     | '/Afiliacion'
     | '/Asociado'
-    | '/Cambiomedidor'
+    | '/CambioMedidor'
     | '/DesconexionMedidor'
     | '/MedidorExtra'
   fileRoutesByTo: FileRoutesByTo
@@ -154,7 +154,7 @@ export interface FileRouteTypes {
     | '/Sugerencias'
     | '/Afiliacion'
     | '/Asociado'
-    | '/Cambiomedidor'
+    | '/CambioMedidor'
     | '/DesconexionMedidor'
     | '/MedidorExtra'
   id:
@@ -168,7 +168,7 @@ export interface FileRouteTypes {
     | '/(Contacto)/Sugerencias'
     | '/(Solicitudes)/Afiliacion'
     | '/(Solicitudes)/Asociado'
-    | '/(Solicitudes)/Cambiomedidor'
+    | '/(Solicitudes)/CambioMedidor'
     | '/(Solicitudes)/DesconexionMedidor'
     | '/(Solicitudes)/MedidorExtra'
   fileRoutesById: FileRoutesById
@@ -183,7 +183,7 @@ export interface RootRouteChildren {
   ContactoSugerenciasRoute: typeof ContactoSugerenciasRoute
   SolicitudesAfiliacionRoute: typeof SolicitudesAfiliacionRoute
   SolicitudesAsociadoRoute: typeof SolicitudesAsociadoRoute
-  SolicitudesCambiomedidorRoute: typeof SolicitudesCambiomedidorRoute
+  SolicitudesCambioMedidorRoute: typeof SolicitudesCambioMedidorRoute
   SolicitudesDesconexionMedidorRoute: typeof SolicitudesDesconexionMedidorRoute
   SolicitudesMedidorExtraRoute: typeof SolicitudesMedidorExtraRoute
 }
@@ -218,11 +218,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SolicitudesDesconexionMedidorRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(Solicitudes)/Cambiomedidor': {
-      id: '/(Solicitudes)/Cambiomedidor'
-      path: '/Cambiomedidor'
-      fullPath: '/Cambiomedidor'
-      preLoaderRoute: typeof SolicitudesCambiomedidorRouteImport
+    '/(Solicitudes)/CambioMedidor': {
+      id: '/(Solicitudes)/CambioMedidor'
+      path: '/CambioMedidor'
+      fullPath: '/CambioMedidor'
+      preLoaderRoute: typeof SolicitudesCambioMedidorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(Solicitudes)/Asociado': {
@@ -287,7 +287,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactoSugerenciasRoute: ContactoSugerenciasRoute,
   SolicitudesAfiliacionRoute: SolicitudesAfiliacionRoute,
   SolicitudesAsociadoRoute: SolicitudesAsociadoRoute,
-  SolicitudesCambiomedidorRoute: SolicitudesCambiomedidorRoute,
+  SolicitudesCambioMedidorRoute: SolicitudesCambioMedidorRoute,
   SolicitudesDesconexionMedidorRoute: SolicitudesDesconexionMedidorRoute,
   SolicitudesMedidorExtraRoute: SolicitudesMedidorExtraRoute,
 }

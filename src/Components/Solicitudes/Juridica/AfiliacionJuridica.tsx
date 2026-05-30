@@ -161,7 +161,10 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                 console.error('Error al cargar datos guardados:', error);
             }
         }
-    }, []); //prueba 
+    // Mount-only: restore a saved draft once. form.setFieldValue is stable; we
+    // intentionally do not re-run when form changes.
+    // react-doctor-disable-next-line react-doctor/exhaustive-deps
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     if (!mostrarFormulario) return null;
 
@@ -236,7 +239,7 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                                         />
                                         {loadingCedula && (
                                             <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                                <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                <svg className="animate-spin size-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                                 </svg>
@@ -442,12 +445,11 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                             </form.Field>
                         </div>
 
-                    <div className="flex justify-center gap-4 mt-6 ml-50">
-
-                        <button
-                            type="submit"
-                            className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
-                            disabled={
+                <div className="flex justify-start md:justify-end items-center w-full md:w-auto gap-3 mt-6">
+                    <button
+                    type="submit"
+                    className="w-sm md:w-auto px-1 py-1.5 md:px-6 md:py-4 bg-blue-600 hover:bg-blue-700 rounded text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm md: text-lg font-medium"
+                    disabled={
                                 isSending ||
                                 [
                                     form.state.values.Razon_Social,
@@ -466,7 +468,7 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                             type="button"
                             onClick={onClose}
                             disabled={isSending}
-                            className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                            className="w-xs md:w-auto px-1 py-1.5 md:px-6 md:py-4 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 text-sm md: text-lg disabled:cursor-not-allowed"
                         >
                             Cancelar
                         </button>

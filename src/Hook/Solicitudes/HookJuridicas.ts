@@ -4,16 +4,18 @@ import { createAfiliacionJuridica, createAgregarMedidorJuridica, createAsociadoJ
 import type { Medidor } from "../../models/Medidor";
 import type { MedidoresResponse } from "../../models/Forms/Solicitudes/Fisico/CambioMedidor";
 import { useAlerts } from "../../context/AlertContext";
+import {useNavigate} from "@tanstack/react-router";
 
 export const useAfiliacionJuridica = () => {
     const queryClient = useQueryClient();
     const { showSuccess, showError } = useAlerts();
-
+    const navigate = useNavigate();
     const createAfiliacionJuridicaMutation = useMutation({
         mutationFn: (data: FormData) => createAfiliacionJuridica(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["afiliaciones"] });
             showSuccess("¡Solicitud creada!", "La solicitud de afiliación ha sido creada con éxito.");
+            navigate({ to: "/" });
         },
         onError: (error: any) => {
             const errorMessage = error?.response?.data?.message || 'Error al enviar el formulario.';
@@ -30,12 +32,14 @@ export const useAfiliacionJuridica = () => {
 export const useDesconexionJuridica = () => {
     const queryClient = useQueryClient();
     const { showSuccess, showError } = useAlerts();
+    const navigate = useNavigate();
 
     const createDesconexionJuridicaMutation = useMutation({
         mutationFn: (data: FormData) => createDesconexionJuridica(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["desconexion"] });
             showSuccess("¡Solicitud creada!", "La solicitud de desconexión ha sido creada con éxito.");
+            navigate({ to: "/" });
         },
         onError: (error: any) => {
             const errorMessage = error?.response?.data?.message || 'Error al enviar el formulario.';
@@ -52,12 +56,13 @@ export const useDesconexionJuridica = () => {
 export const useCambioMedidorJuridica = () => {
     const queryClient = useQueryClient();
     const { showSuccess, showError } = useAlerts();
-
+    const navigate = useNavigate();
     const createCambioMedidorJuridicaMutation = useMutation({
         mutationFn: (data: FormData) => createCambioMedidorJuridica(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["cambio-medidor"] });
             showSuccess("¡Solicitud creada!", "La solicitud de cambio de medidor ha sido creada con éxito.");
+            navigate({ to: "/" });  
         },
         onError: (error: any) => {
             const errorMessage = error?.response?.data?.message || 'Error al enviar el formulario.';
@@ -74,6 +79,7 @@ export const useCambioMedidorJuridica = () => {
 export const useAsociadoJuridica = () => {
     const queryClient = useQueryClient();
     const { showSuccess, showError } = useAlerts();
+    const navigate = useNavigate();
 
     const createAsociadoJuridicoMutation = useMutation({
         mutationFn: (data: FormData) => createAsociadoJuridica(data),
@@ -81,6 +87,7 @@ export const useAsociadoJuridica = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["asociado"] });
             showSuccess("¡Solicitud creada!", "La solicitud de asociado ha sido creada con éxito.");
+            navigate({ to: "/" });
         },
         onError: (error: any) => {
             const errorMessage = error?.response?.data?.message || 'Error al enviar el formulario.';
@@ -97,6 +104,7 @@ export const useAsociadoJuridica = () => {
 export const useAgregarMedidorJuridica = () => {
     const queryClient = useQueryClient();
     const { showSuccess, showError } = useAlerts();
+    const navigate = useNavigate();
 
     const mutation = useMutation({
         mutationFn: (data: FormData) => createAgregarMedidorJuridica(data),
@@ -104,6 +112,7 @@ export const useAgregarMedidorJuridica = () => {
             queryClient.invalidateQueries({ queryKey: ["agregar-medidor"] });
             queryClient.invalidateQueries({ queryKey: ["medidores-juridica"] });
             showSuccess("¡Solicitud creada!", "La solicitud para agregar medidor extra ha sido creada con éxito.");
+            navigate({ to: "/" });
         },
         onError: (error: any) => {
             const errorMessage = error?.response?.data?.message || error?.message || 'Error al enviar el formulario.';

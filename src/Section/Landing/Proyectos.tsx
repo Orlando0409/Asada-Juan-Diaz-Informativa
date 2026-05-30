@@ -60,8 +60,8 @@ function Proyectos() {
     return (
       <section className="py-8 md:py-16 bg-sky-50 text-center">
         <div className="container mx-auto px-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 text-lg">Cargando proyectos...</p>
+          <div className="animate-spin rounded-full size-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 text-lg">Cargando proyectos…</p>
         </div>
       </section>
     );

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useForm } from '@tanstack/react-form';
 import { Search, User, Landmark, CreditCard } from 'lucide-react';
-import { motion, type Variants } from 'framer-motion';
+import { m, type Variants } from 'framer-motion';
 import { useNavigate } from '@tanstack/react-router';
 import ModalConsulta from './ModalConsulta';
 import { useConsultaPago } from '../../Hook/ConsultaPagoHook';
@@ -348,7 +348,7 @@ const ConsultaRecibos = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-gray-50 flex items-center justify-center p-4">
-            <motion.div
+            <m.div
                 className="w-full max-w-6xl flex flex-col lg:flex-row items-stretch gap-6"
                 initial="hidden"
                 whileInView="visible"
@@ -357,7 +357,7 @@ const ConsultaRecibos = () => {
             >
 
                 {/* Panel Izquierdo */}
-                <motion.div
+                <m.div
                     className="flex-1 bg-white rounded-2xl shadow-xl p-6 space-y-6"
                     variants={panelVariants}
                 >
@@ -376,7 +376,7 @@ const ConsultaRecibos = () => {
                                         Tipo de persona
                                     </label>
                                     <div className="relative">
-                                        <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                        <User className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
                                         <select
                                             id={field.name}
                                             value={field.state.value as string}
@@ -393,7 +393,7 @@ const ConsultaRecibos = () => {
                                             }}
                                             className={commonInput}
                                         >
-                                            <option value="">Seleccione...</option>
+                                            <option value="">Seleccione…</option>
                                             <option value="fisica">Persona Física</option>
                                             <option value="juridica">Persona Jurídica</option>
                                         </select>
@@ -411,7 +411,7 @@ const ConsultaRecibos = () => {
                                             Tipo de identificación
                                         </label>
                                         <div className="relative">
-                                            <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                            <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
                                             <select
                                                 id={field.name}
                                                 value={field.state.value as string}
@@ -422,7 +422,7 @@ const ConsultaRecibos = () => {
                                                 }}
                                                 className={commonInput}
                                             >
-                                                <option value="">Seleccione...</option>
+                                                <option value="">Seleccione…</option>
                                                 <option value="Cedula Nacional">Cédula Nacional</option>
                                                 <option value="Dimex">DIMEX</option>
                                                 <option value="Pasaporte">Pasaporte</option>
@@ -443,9 +443,9 @@ const ConsultaRecibos = () => {
                                         </label>
                                         <div className="relative">
                                             {isFisica ? (
-                                                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                                <User className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
                                             ) : (
-                                                <Landmark className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                                <Landmark className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
                                             )}
                                             <input
                                                 type="text"
@@ -486,7 +486,7 @@ const ConsultaRecibos = () => {
                                         Número de medidor
                                     </label>
                                     <div className="relative">
-                                        <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                        <CreditCard className="absolute left-3 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
                                         <input
                                             type="text"
                                             value={String(field.state.value)}
@@ -510,20 +510,20 @@ const ConsultaRecibos = () => {
                         >
                             {form.state.isSubmitting ? (
                                 <>
-                                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                    Consultando...
+                                    <div className="size-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                    Consultando…
                                 </>
                             ) : (
                                 <>
-                                    <Search className="w-5 h-5" />
+                                    <Search className="size-5" />
                                     Consultar Recibos
                                 </>
                             )}
                         </button>
                     </form>
-                </motion.div>
+                </m.div>
 
-                <motion.div
+                <m.div
                     className="flex w-full lg:w-1/3 items-start justify-center"
                     variants={panelVariants}
                 >
@@ -532,15 +532,15 @@ const ConsultaRecibos = () => {
                         <p className="text-sm text-gray-600 mb-4 leading-relaxed">
                             Si aún no estás afiliado, podés hacerlo dando clic en el botón “Afiliarse” y completando el formulario.
                         </p>
-                        <button
+                        <button type="button"
                             onClick={handleAfiliarse}
                             className="w-full bg-white hover:bg-gray-50 text-blue-700 font-semibold py-2 rounded-xl border-2 border-blue-200 hover:border-blue-300 transition-all"
                         >
                             Afiliarse
                         </button>
                     </div>
-                </motion.div>
-            </motion.div>
+                </m.div>
+            </m.div>
 
             {/* Modal de Resultados */}
             <ModalConsulta 

@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 // Tipo para TipoIdentificacion - Debe coincidir con el backend
 export const TipoIdentificacionValues = ["Cedula Nacional", "Dimex", "Pasaporte"] as const;

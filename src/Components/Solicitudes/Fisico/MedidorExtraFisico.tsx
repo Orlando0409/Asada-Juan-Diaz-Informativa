@@ -27,6 +27,10 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
     const [alertShown, setAlertShown] = useState<string>('');
     const planosInputRef = useRef<HTMLInputElement>(null);
     const escrituraInputRef = useRef<HTMLInputElement>(null);
+    // onClose comes from the parent as a fresh closure each render; read it via a
+    // ref so the success-close effect can depend only on mutation.isSuccess + form.
+    const onCloseRef = useRef(onClose);
+    onCloseRef.current = onClose;
 
     const mutation = useAgregarMedidorFisica();
     const { showSuccess, showError } = useAlerts();
@@ -228,7 +232,10 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                 console.error('Error al cargar datos guardados:', error);
             }
         }
-    }, []);
+    // Mount-only: restore a saved draft once. form.setFieldValue is stable; we
+    // intentionally do not re-run when form changes.
+    // react-doctor-disable-next-line react-doctor/exhaustive-deps
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Mantener sincronizada la identificación usada para consultar medidores.
     useEffect(() => {
@@ -258,9 +265,10 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
             setArchivoSeleccionado({});
             if (planosInputRef.current) planosInputRef.current.value = "";
             if (escrituraInputRef.current) escrituraInputRef.current.value = "";
-            setTimeout(() => onClose(), 1500); // con retraso para que el usuario vea el mensaje de éxito
+            const id = setTimeout(() => onCloseRef.current(), 1500); // con retraso para que el usuario vea el mensaje de éxito
+            return () => clearTimeout(id);
         }
-    }, [mutation.isSuccess]);
+    }, [mutation.isSuccess, form]);
 
     // Mostrar alert cuando se verifica afiliación
     useEffect(() => {
@@ -286,6 +294,7 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
     const commonClasses = 'w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring focus:ring-blue-300';
 
     return (
+        <div className="flex justify-center text-gray-800 p-3 sm:p-4 w-full">
         <form
             className="w-full text-gray-800"
             onSubmit={(e) => {
@@ -505,11 +514,12 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
             </div>
 
             {/* Botones */}
-            <div className="flex justify-end items-center gap-3 mt-8">
-                <button
-                    type="submit"
-                    className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
-                    disabled={
+           
+          <div className="flex justify-start md:justify-end items-center w-full md:w-auto gap-3 mt-6">
+            <button
+              type="submit"
+              className="w-sm md:w-auto px-1 py-1.5 md:px-6 md:py-4 bg-blue-600 hover:bg-blue-700 rounded text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm md: text-lg font-medium"
+                 disabled={
                         mutation.isPending ||
                         [
                             form.state.values.Tipo_Identificacion,
@@ -526,12 +536,13 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                     type="button"
                     onClick={onClose}
                     disabled={mutation.isPending}
-                    className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-xs md:w-auto px-1 py-1.5 md:px-6 md:py-4 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 text-sm md: text-lg disabled:cursor-not-allowed"
                 >
                     Cancelar
                 </button>
             </div>
         </form>
+    </div>
     );
 };
 

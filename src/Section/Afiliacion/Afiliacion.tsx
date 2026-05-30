@@ -1,6 +1,7 @@
 import { useState, useRef } from "react"
 import type { IconType } from "react-icons"
 import {
+  FiArrowDown,
   FiArrowRight,
   FiBriefcase,
   FiCheckCircle,
@@ -12,7 +13,7 @@ import {
   FiUsers,
   FiX,
 } from "react-icons/fi"
-import { motion, AnimatePresence } from "framer-motion"
+import { m, AnimatePresence } from "framer-motion"
 import data from "../../data/Data.json"
 import FormularioAfiliacion from "../../Components/Solicitudes/Fisico/AfiliacionFisica"
 import FormularioAfiliacionJuridico from "../../Components/Solicitudes/Juridica/AfiliacionJuridica"
@@ -86,8 +87,8 @@ const TarjetaCliente = ({
             </span>
             <h2 className="mt-3 text-[clamp(0.95rem,1.6vw,1.15rem)] font-semibold tracking-tight break-words">{title}</h2>
           </div>
-          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-sky-100 ${iconClassName}`}>
-            <Icon className="h-5 w-5" />
+          <div className={`flex size-10 shrink-0 items-center justify-center rounded-2xl bg-sky-100 ${iconClassName}`}>
+            <Icon className="size-5" />
           </div>
         </div>
       </div>
@@ -101,8 +102,8 @@ const TarjetaCliente = ({
               className="rounded-xl border border-sky-100 bg-sky-50 px-3 py-2.5"
             >
               <div className="flex items-start gap-2.5">
-                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600">
-                  <FiCheckCircle className="h-3.5 w-3.5" />
+                <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                  <FiCheckCircle className="size-3.5" />
                 </span>
                 <p className="text-sm font-medium leading-5 text-slate-800">{requisito.label}</p>
               </div>
@@ -111,12 +112,12 @@ const TarjetaCliente = ({
         </ul>
       </div>
 
-      <button
+      <button type="button"
         className={`mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white shadow transition duration-300 hover:-translate-y-0.5 hover:shadow-lg ${buttonClassName}`}
         onClick={onOpen}
       >
         {isSelected ? 'Formulario abierto' : buttonLabel}
-        {isSelected ? <FiX className="h-4 w-4" /> : <FiArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />}
+        {isSelected ? <FiX className="size-4" /> : <FiArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />}
       </button>
     </article>
   )
@@ -138,8 +139,8 @@ const InformacionAfiliacion = () => {
 
   return (
     <section className="relative isolate min-h-screen bg-white px-4 py-8 sm:px-6 md:py-12 lg:px-8">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
-        <motion.div
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 pt-15">
+        <m.div
           className="overflow-hidden rounded-[32px] border border-sky-200 bg-white shadow-md"
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -155,6 +156,23 @@ const InformacionAfiliacion = () => {
               <h2 className="mt-4 text-2xl font-semibold tracking-tight text-slate-900 sm:text-[1.9rem]">Beneficios como abonado</h2>
             </div>
 
+            <m.div
+              className="mt-3 flex justify-center"
+              initial={{ opacity: 0, y: -8 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+            >
+              <m.div
+                className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-blue-700 shadow-sm"
+                animate={{ y: [0, 4, 0] }}
+                transition={{ duration: 1.4, repeat: Infinity, ease: 'easeInOut' }}
+              >
+                <FiArrowDown className="size-3.5" />
+                Desliza para ver requisitos
+              </m.div>
+            </m.div>
+
             {beneficios.length > 0 && (
               <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {beneficios.map(({ icon: Icon, title, description }) => (
@@ -162,8 +180,8 @@ const InformacionAfiliacion = () => {
                     key={title}
                     className="rounded-[20px] border border-sky-200 bg-white p-4 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-md hover:border-blue-300"
                   >
-                    <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-100 text-blue-600 shadow-sm">
-                      <Icon className="h-4 w-4" />
+                    <span className="flex size-10 items-center justify-center rounded-2xl bg-sky-100 text-blue-600 shadow-sm">
+                      <Icon className="size-4" />
                     </span>
                     <h3 className="mt-3 text-base font-semibold text-slate-900">{title}</h3>
                     <p className="mt-1.5 text-sm leading-5 text-slate-600">{description}</p>
@@ -172,7 +190,7 @@ const InformacionAfiliacion = () => {
               </div>
             )}
 
-            <motion.div
+            <m.div
               className="mt-6 grid gap-5 xl:grid-cols-2"
               initial="hidden"
               whileInView="visible"
@@ -182,7 +200,7 @@ const InformacionAfiliacion = () => {
                 visible: { opacity: 1, transition: { staggerChildren: 0.12 } }
               }}
             >
-              <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35 } } }}>
+              <m.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35 } } }}>
                 <TarjetaCliente
                   badge="Cliente jurídico"
                   title="Afiliación para empresas y organizaciones"
@@ -195,9 +213,9 @@ const InformacionAfiliacion = () => {
                   badgeClassName="bg-sky-100 text-blue-800 ring-1 ring-inset ring-sky-300"
                   iconClassName="text-blue-700"
                 />
-              </motion.div>
+              </m.div>
 
-              <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35 } } }}>
+              <m.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35 } } }}>
                 <TarjetaCliente
                   badge="Cliente físico"
                   title="Afiliación para personas individuales"
@@ -210,15 +228,15 @@ const InformacionAfiliacion = () => {
                   badgeClassName="bg-sky-100 text-blue-800 ring-1 ring-inset ring-sky-300"
                   iconClassName="text-blue-700"
                 />
-              </motion.div>
-            </motion.div>
+              </m.div>
+            </m.div>
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Formulario inline */}
         <AnimatePresence>
           {formularioSeleccionado && (
-            <motion.div
+            <m.div
               ref={formRef}
               key={formularioSeleccionado}
               initial={{ opacity: 0, y: 24 }}
@@ -231,12 +249,12 @@ const InformacionAfiliacion = () => {
                 <span className="text-sm font-semibold text-blue-700 uppercase tracking-wider">
                   {formularioSeleccionado === 'fisico' ? 'Formulario — Cliente Físico' : 'Formulario — Cliente Jurídico'}
                 </span>
-                <button
+                <button type="button"
                   onClick={() => setFormularioSeleccionado(null)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-sky-100 text-slate-500 hover:bg-red-100 hover:text-red-600 transition-colors duration-200"
+                  className="flex size-8 items-center justify-center rounded-full bg-sky-100 text-slate-500 hover:bg-red-100 hover:text-red-600 transition-colors duration-200"
                   aria-label="Cerrar formulario"
                 >
-                  <FiX className="h-4 w-4" />
+                  <FiX className="size-4" />
                 </button>
               </div>
               <div className="p-4 sm:p-6">
@@ -246,7 +264,7 @@ const InformacionAfiliacion = () => {
                   <FormularioAfiliacion onClose={() => setFormularioSeleccionado(null)} />
                 )}
               </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>

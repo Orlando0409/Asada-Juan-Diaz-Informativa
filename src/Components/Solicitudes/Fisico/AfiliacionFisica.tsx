@@ -126,7 +126,7 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
       Nombre: 'Juan Carlos',
       Apellido1: 'Pérez',
       Apellido2: 'González',
-      Correo: 'ejemplo@gmail.com',
+      Correo: 'ejemplo@correo.com',
       Numero_Telefono: '+50688887777',
       Direccion_Exacta: 'San José, del Banco Nacional 200m sur',
       Edad: '25',
@@ -255,7 +255,10 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
         console.error('Error al cargar datos guardados:', error);
       }
     }
-  }, []); //prueba 
+    // Mount-only: restore a saved draft once. form.setFieldValue is stable; we
+    // intentionally do not re-run when form changes.
+    // react-doctor-disable-next-line react-doctor/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
 
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring focus:ring-blue-300';
@@ -338,14 +341,14 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
                       />
                       {loadingCedula && (
                         <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                          <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <svg className="animate-spin size-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
                         </div>
                       )}
                     </div>
-                    {loadingCedula && <p className="text-xs text-blue-600 mt-1">Buscando información...</p>}
+                    {loadingCedula && <p className="text-xs text-blue-600 mt-1">Buscando información…</p>}
                     {/* Mostrar error de validación de formato */}
                     {fieldErrors['Identificacion'] && (
                       <span className="text-red-500 text-sm block mt-1">
@@ -670,10 +673,10 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
           </div>
 
 
-          <div className="flex justify-center gap-4 mt-6 ml-50">
+          <div className="flex justify-start md:justify-end items-center w-full md:w-auto gap-3 mt-6">
             <button
               type="submit"
-              className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
+              className="w-sm md:w-auto px-1 py-1.5 md:px-6 md:py-4 bg-blue-600 hover:bg-blue-700 rounded text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm md: text-lg font-medium"
               disabled={
                 isSending ||
                 Object.values(fieldErrors).some(Boolean) ||
@@ -697,7 +700,7 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
               type="button"
               onClick={onClose}
               disabled={isSending}
-              className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-xs md:w-auto px-1 py-1.5 md:px-6 md:py-4 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 text-sm md: text-lg disabled:cursor-not-allowed"
             >
               Cancelar
             </button>

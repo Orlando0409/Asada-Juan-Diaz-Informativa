@@ -207,7 +207,10 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
         console.error('Error al cargar datos guardados:', error);
       }
     }
-  }, []);
+  // Mount-only: restore a saved draft once. form.setFieldValue is stable; we
+  // intentionally do not re-run when form changes.
+  // react-doctor-disable-next-line react-doctor/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
 
 
@@ -275,7 +278,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   />
                   {isLoading && (
                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                      <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+                      <Loader2 className="size-5 animate-spin text-blue-500" />
                     </div>
                   )}
                 </div>
@@ -461,13 +464,11 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
             }}
           </form.Field>
         </div>
-        <div className="flex justify-center gap-4 mt-6 ml-50">
-          {/* Botones */}
 
-          <div className="flex justify-end items-center gap-3 mt-8">
+          <div className="flex justify-start md:justify-end items-center w-full md:w-auto gap-3 mt-6">
             <button
               type="submit"
-              className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
+              className="w-sm md:w-auto px-1 py-1.5 md:px-6 md:py-4 bg-blue-600 hover:bg-blue-700 rounded text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm md: text-lg font-medium"
               disabled={
                 isSending ||
                 Object.values(fieldErrors).some(Boolean) ||
@@ -486,13 +487,12 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
               type="button"
               onClick={onClose}
               disabled={isSending}
-              className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+             className="w-xs md:w-auto px-1 py-1.5 md:px-6 md:py-4 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 text-sm md: text-lg disabled:cursor-not-allowed"
             >
               Cancelar
             </button>
           </div>
 
-        </div>
       </form>
     </div>
   );

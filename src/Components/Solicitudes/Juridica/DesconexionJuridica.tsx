@@ -25,6 +25,8 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
     const [formErrors, setFormErrors] = useState<Record<string, string>>({});
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const [isSending, setIsSending] = useState(false);
+    const [motivoSeleccionado, setMotivoSeleccionado] = useState('');
+    const [motivoOtro, setMotivoOtro] = useState('');
     const mutation = useDesconexionJuridica();
     const { showError } = useAlerts();
 
@@ -57,6 +59,8 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                 Cedula_Juridica: values.Cedula_Juridica,
                 Id_Medidor: values.Id_Medidor,
                 Motivo_Desconexion: values.Motivo_Desconexion,
+                Motivo_Desconexion_Seleccionado: values.Motivo_Desconexion_Seleccionado,
+                Motivo_Desconexion_Otro: values.Motivo_Desconexion_Otro,
             };
             sessionStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
         } catch (error) {
@@ -95,12 +99,8 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                     return;
                 }
 
-                const payload = {
-                    ...value,
-                };
-
                 const formData = new FormData();
-                Object.entries(payload).forEach(([key, val]) => {
+                Object.entries(value).forEach(([key, val]) => {
                     if (val !== undefined && val !== null && val !== "") {
                         formData.append(key, val.toString());
                     }
@@ -136,19 +136,36 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
         if (savedData) {
             try {
                 const parsed = JSON.parse(savedData);
-                // Cargar los valores en el formulario
                 Object.entries(parsed).forEach(([key, value]) => {
-                    form.setFieldValue(key as any, value as any);
-                    // Si es la cédula jurídica, también actualizar el estado
                     if (key === 'Cedula_Juridica' && typeof value === 'string') {
+                        form.setFieldValue(key as any, value as any);
                         setCedulaJuridica(value.replace(/-/g, ''));
                     }
+
+                    if (key === 'Id_Medidor') {
+                        form.setFieldValue(key as any, value as any);
+                    }
                 });
+
+                const savedMotivo = typeof parsed.Motivo_Desconexion === 'string' ? parsed.Motivo_Desconexion : '';
+                const savedSeleccionado = typeof parsed.Motivo_Desconexion_Seleccionado === 'string'
+                    ? parsed.Motivo_Desconexion_Seleccionado
+                    : (MotivoDesconexionValues.includes(savedMotivo as any) ? savedMotivo : savedMotivo ? 'Otro' : '');
+                const savedOtro = typeof parsed.Motivo_Desconexion_Otro === 'string'
+                    ? parsed.Motivo_Desconexion_Otro
+                    : (savedSeleccionado === 'Otro' ? savedMotivo : '');
+
+                setMotivoSeleccionado(savedSeleccionado);
+                setMotivoOtro(savedOtro);
+                form.setFieldValue('Motivo_Desconexion', savedSeleccionado === 'Otro' ? savedOtro : savedMotivo);
             } catch (error) {
                 console.error('Error al cargar datos guardados:', error);
             }
         }
-    }, []);
+    // Mount-only: restore a saved draft once. form.setFieldValue is stable; we
+    // intentionally do not re-run when form changes.
+    // react-doctor-disable-next-line react-doctor/exhaustive-deps
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     //strar alert cuando se verifica afiliación (igual que DesconexionFisica)
     useEffect(() => {
@@ -175,7 +192,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                     e.preventDefault();
                     form.handleSubmit();
                 }}
-                className="bg-white gap-2 shadow-lg px-5 py-3 sm:px-6 sm:py-4 rounded-[24px] w-[95%] max-w-7xl mx-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
+                className="px-5 py-3 sm:px-6 sm:py-4 rounded-[24px] w-[95%] max-w-7xl mx-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100"
             >
                 <h2 className="text-center text-xl font-semibold mb-6">Formulario de desconexión de medidor - Jurídica</h2>
 
@@ -225,20 +242,69 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                                     <span className="text-red-500">*</span>
                                 </label>
                                 <select
-                                    value={(field.state.value as string) || ""}
+                                    value={motivoSeleccionado}
                                     onChange={(e) => {
-                                        const value = e.target.value as MotivoDesconexion;
+                                        const value = e.target.value;
+                                        setMotivoSeleccionado(value);
+
+                                        if (value === 'Otro') {
+                                            setMotivoOtro('');
+                                            field.handleChange('');
+                                            setFieldErrors(prev => {
+                                                const next = { ...prev };
+                                                delete next['Motivo_Desconexion'];
+                                                return next;
+                                            });
+                                            saveToSessionStorage({
+                                                ...form.state.values,
+                                                Motivo_Desconexion: '',
+                                                Motivo_Desconexion_Seleccionado: value,
+                                                Motivo_Desconexion_Otro: '',
+                                            });
+                                            return;
+                                        }
+
                                         field.handleChange(value);
                                         validateField("Motivo_Desconexion", value, form.state.values);
-                                        saveToSessionStorage({ ...form.state.values, Motivo_Desconexion: value });
+                                        saveToSessionStorage({
+                                            ...form.state.values,
+                                            Motivo_Desconexion: value,
+                                            Motivo_Desconexion_Seleccionado: value,
+                                            Motivo_Desconexion_Otro: '',
+                                        });
                                     }}
                                     className={commonClasses}
                                 >
-                                    <option value="" disabled selected>Elije una opcion</option>
+                                    <option value="" disabled>Elige una opción</option>
                                     {MotivoDesconexionValues.map((motivo) => (
                                         <option key={motivo} value={motivo}>{motivo}</option>
                                     ))}
                                 </select>
+                                {motivoSeleccionado === 'Otro' && (
+                                    <div className="mt-3">
+                                        <label className="block mb-1 font-medium">
+                                            Especifique el motivo <span className="text-red-500">*</span>
+                                        </label>
+                                        <textarea
+                                            value={motivoOtro}
+                                            onChange={(e) => {
+                                                const value = e.target.value;
+                                                setMotivoOtro(value);
+                                                field.handleChange(value);
+                                                validateField("Motivo_Desconexion", value, form.state.values);
+                                                saveToSessionStorage({
+                                                    ...form.state.values,
+                                                    Motivo_Desconexion: value,
+                                                    Motivo_Desconexion_Seleccionado: 'Otro',
+                                                    Motivo_Desconexion_Otro: value,
+                                                });
+                                            }}
+                                            placeholder="Escriba el motivo de desconexión"
+                                            maxLength={250}
+                                            className={`${commonClasses} resize-none h-24 overflow-y-auto scrollbar-thumb-blue-600 scrollbar-thin scrollbar-track-blue-100`}
+                                        />
+                                    </div>
+                                )}
                                 {fieldErrors["Motivo_Desconexion"] && (
                                     <span className="text-red-500 text-sm block mt-1">{fieldErrors["Motivo_Desconexion"]}</span>
                                 )}
@@ -285,7 +351,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
 
                                     {isMedidoresLoading && (
                                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                            <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+                                            <Loader2 className="size-5 animate-spin text-blue-500" />
                                         </div>
                                     )}
                                 </div>
@@ -301,16 +367,16 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                     </form.Field>
                 </div>
 
-                <div className="flex justify-center gap-4 mt-6 ml-50">
 
+                <div className="flex justify-start md:justify-end items-center w-full md:w-auto gap-3 mt-6">
                     <button
                         type="submit"
-                        className="w-[140px] py-2 rounded transition-colors bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm font-medium"
+                        className="w-sm md:w-auto px-1 py-1.5 md:px-6 md:py-4 bg-blue-600 hover:bg-blue-700 rounded text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm md: text-lg font-medium"
                         disabled={
                             isSending ||
                             !form.state.values.Cedula_Juridica ||
                             !form.state.values.Id_Medidor ||
-                            !form.state.values.Motivo_Desconexion ||
+                            !(motivoSeleccionado === 'Otro' ? motivoOtro.trim() : form.state.values.Motivo_Desconexion) ||
                             Object.values(fieldErrors).some(Boolean) ||
                             Object.values(formErrors).some(Boolean)
                         }
@@ -321,7 +387,7 @@ const DesconexionMedidorJuridica = ({ onClose }: Props) => {
                         type="button"
                         onClick={onClose}
                         disabled={isSending}
-                        className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                        className="w-xs md:w-auto px-1 py-1.5 md:px-6 md:py-4 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors disabled:opacity-60 text-sm md: text-lg disabled:cursor-not-allowed"
                     >
                         Cancelar
                     </button>
