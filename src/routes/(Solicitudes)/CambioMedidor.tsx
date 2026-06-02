@@ -4,7 +4,7 @@ import { LoadingSpinner } from '../../Components/LoadingSpinner'
 
 const CambioMedidor = lazy(() => import('../../Section/Afiliacion/CambioMedidor'))
 
-export const Route = createFileRoute('/(Solicitudes)/Cambiomedidor')({
+export const Route = createFileRoute('/(Solicitudes)/CambioMedidor')({
   component: RouteComponent,
 })
 
