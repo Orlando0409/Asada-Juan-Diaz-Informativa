@@ -1,5 +1,5 @@
 import { useForm } from '@tanstack/react-form'
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import data from '../data/Data.json'
 import { type ContactoTipo, getRequisitosKey, type RequisitosContacto } from '../types/ContactoForms'
 import { useMemo, useState } from 'react'
@@ -73,7 +73,7 @@ const FormularioContacto = ({ tipo }: Props) => {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 text-gray-800 p-7 pt-20">
-      <motion.div
+      <m.div
         className="w-[95%] max-w-md"
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -240,7 +240,7 @@ const FormularioContacto = ({ tipo }: Props) => {
           }}
         </form.Subscribe>
       </form>
-      </motion.div>
+      </m.div>
     </div>
   )
 }

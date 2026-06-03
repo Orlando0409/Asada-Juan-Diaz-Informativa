@@ -32,14 +32,16 @@ export function ChatBot() {
     // Scroll cuando cambien los mensajes o cuando esté cargando
     if (messages.length > 0 || isLoading) {
       // Pequeño delay para asegurar que el DOM se haya actualizado
-      setTimeout(scrollToBottom, 100);
+      const id = setTimeout(scrollToBottom, 100);
+      return () => clearTimeout(id);
     }
   }, [messages, isLoading]);
 
   //También scroll cuando se abre el chat
   useEffect(() => {
     if (isOpen && hasMessages) {
-      setTimeout(scrollToBottom, 300);
+      const id = setTimeout(scrollToBottom, 300);
+      return () => clearTimeout(id);
     }
   }, [isOpen, hasMessages]);
 
@@ -80,22 +82,22 @@ export function ChatBot() {
         <div className="relative">
           <Button
             onClick={() => setIsOpen(true)}
-            className="w-12 h-12 flex justify-center items-center rounded-full shadow-lg"
+            className="size-12 flex justify-center items-center rounded-full shadow-lg"
             aria-label="Abrir chat asistente"
             title="Abrir chat asistente"
           >
-            <BsChatDots className="w-10 h-10" />
+            <BsChatDots className="size-10" />
           </Button>
           
           {/*puntito indicador de estado en el botón flotante */}
-          <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-white bg-green-500`} />
+          <div className={`absolute -top-1 -right-1 size-3 rounded-full border-2 border-white bg-green-500`} />
         </div>
       </div>
 
       {/* Modal del chat */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-end justify-end p-4 ">
-          <button 
+          <button type="button" 
             className="absolute inset-0 bg-black/20 cursor-default" 
             onClick={() => setIsOpen(false)}
             aria-label="Close chat"
@@ -111,22 +113,22 @@ export function ChatBot() {
               
               <div className="flex space-x-1">
                 {hasMessages && (
-                    <button 
+                    <button type="button" 
                       onClick={clearMessages}
                       className="p-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
                       title="Limpiar conversación"
                       aria-label="Limpiar conversación"
                     >
-                      <IoRefresh className="w-4 h-4" />
+                      <IoRefresh className="size-4" />
                     </button>
                 )}
-                <button 
+                <button type="button" 
                   onClick={() => setIsOpen(false)}
                   className="p-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
                   title="Cerrar chat"
                   aria-label="Cerrar chat"
                 >
-                  <IoClose className="w-4 h-4" />
+                  <IoClose className="size-4" />
                 </button>
               </div>
             </div>
@@ -173,7 +175,7 @@ export function ChatBot() {
               <div className="mx-4 mb-2 p-3 bg-red-50 border border-red-200 rounded-md flex-shrink-0">
                 <p className="text-sm text-red-700 mb-2">{error.message}</p>
                 {error.isAPIError && (
-                  <button
+                  <button type="button"
                     onClick={retryLastMessage}
                     disabled={isLoading}
                     className="text-xs text-red-600 hover:text-red-800 underline disabled:opacity-50"
@@ -195,7 +197,7 @@ export function ChatBot() {
                 aria-label="Escribe tu mensaje"
               />
               <Button type="submit" disabled={!input.trim() || isLoading} title='Enviar mensaje' aria-label='Enviar mensaje'>
-                <IoSend className="w-4 h-4" />
+                <IoSend className="size-4" />
               </Button>
             </form>
           </Card>

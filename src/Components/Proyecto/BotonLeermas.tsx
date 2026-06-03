@@ -41,7 +41,7 @@ function BotonLeerMas({ descripcion, mostrarTodo, onToggle }: Readonly<Props>) {
           {/* Línea decorativa */}
           <div className="flex-1 h-px bg-gradient-to-r from-gray-200 to-transparent mr-3"></div>
           
-          <button
+          <button type="button"
             onClick={(e) => {
               e.stopPropagation();
               onToggle();
@@ -57,7 +57,7 @@ function BotonLeerMas({ descripcion, mostrarTodo, onToggle }: Readonly<Props>) {
             `}
           >
             {/* Ícono del libro */}
-            <IoBookOutline className={`w-4 h-4 transition-transform duration-300 ${
+            <IoBookOutline className={`size-4 transition-transform duration-300 ${
               mostrarTodo ? 'rotate-180' : 'rotate-0'
             }`} />
             
@@ -69,9 +69,9 @@ function BotonLeerMas({ descripcion, mostrarTodo, onToggle }: Readonly<Props>) {
             {/* Ícono de chevron */}
             <div className="transition-transform duration-300 group-hover:translate-y-0.5">
               {mostrarTodo ? (
-                <IoChevronUp className="w-4 h-4" />
+                <IoChevronUp className="size-4" />
               ) : (
-                <IoChevronDown className="w-4 h-4" />
+                <IoChevronDown className="size-4" />
               )}
             </div>
           </button>

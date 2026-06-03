@@ -207,7 +207,10 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
         console.error('Error al cargar datos guardados:', error);
       }
     }
-  }, []);
+  // Mount-only: restore a saved draft once. form.setFieldValue is stable; we
+  // intentionally do not re-run when form changes.
+  // react-doctor-disable-next-line react-doctor/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
 
 
@@ -275,7 +278,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   />
                   {isLoading && (
                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                      <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+                      <Loader2 className="size-5 animate-spin text-blue-500" />
                     </div>
                   )}
                 </div>
