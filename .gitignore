@@ -13,7 +13,7 @@ dist
 dist-ssr
 *.local
 .env
-/.tanstack
+.tanstack
 .agents
 .claude
 .react-doctor
