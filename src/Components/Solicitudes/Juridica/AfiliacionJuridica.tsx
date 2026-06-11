@@ -338,7 +338,7 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                                     const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
                                     return (
                                         <div className="mb-3">
-                                            <label className="block mb-1 font-semibold text-gray-700">Planos del terreno <span className="text-red-500">*</span></label>
+                                            <label className="block mb-1 font-semibold text-gray-700">Planos del terreno <span className="text-gray-400 text-xs">(opcional)</span></label>
                                             <input
                                                 type="file"
                                                 accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -368,10 +368,6 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                                                         onClick={() => {
                                                             field.handleChange(undefined);
                                                             setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
-                                                            setFieldErrors(prev => ({
-                                                                ...prev,
-                                                                ["Planos_Terreno"]: `Debe subir el plano del terreno`,
-                                                            }));
                                                             if (planosInputRef.current) {
                                                                 planosInputRef.current.value = '';
                                                             }
@@ -397,7 +393,7 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                                     const archivoActual = archivoSeleccionado["Certificacion_Literal"] ?? null;
                                     return (
                                         <div className="mb-3">
-                                            <label className="block mb-1 font-semibold text-gray-700">Certificacion Literal del terreno <span className="text-red-500">*</span></label>
+                                            <label className="block mb-1 font-semibold text-gray-700">Certificacion Literal del terreno <span className="text-gray-400 text-xs">(opcional)</span></label>
                                             <input
                                                 type="file"
                                                 accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -427,10 +423,6 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                                                         onClick={() => {
                                                             field.handleChange(undefined);
                                                             setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: null }));
-                                                            setFieldErrors(prev => ({
-                                                                ...prev,
-                                                                ["Certificacion_Literal"]: `Debe subir la certificacion literal del terreno`,
-                                                            }));
                                                             if (escrituraInputRef.current) {
                                                                 escrituraInputRef.current.value = '';
                                                             }
@@ -459,7 +451,13 @@ const FormularioAfiliacionJuridico = ({ onClose }: Props) => {
                     className="w-sm md:w-auto px-1 py-1.5 md:px-6 md:py-4 bg-blue-600 hover:bg-blue-700 rounded text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm md: text-lg font-medium"
                     disabled={
                                 isSending ||
-                                Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
+                                [
+                                    form.state.values.Razon_Social,
+                                    form.state.values.Cedula_Juridica,
+                                    form.state.values.Correo,
+                                    form.state.values.Numero_Telefono,
+                                    form.state.values.Direccion_Exacta,
+                                ].some(val => val === undefined || val === null || val === "") ||
                                 Object.values(fieldErrors).some(Boolean) ||
                                 Object.values(formErrors).some(Boolean)
                             }

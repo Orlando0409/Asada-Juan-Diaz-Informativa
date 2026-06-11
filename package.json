@@ -20,7 +20,7 @@
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/zod-form-adapter": "^0.42.1",
     "autoprefixer": "^10.4.21",
-    "axios": "^1.12.2",
+    "axios": "^1.17.0",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.34.2",
     "leaflet": "^1.9.4",
