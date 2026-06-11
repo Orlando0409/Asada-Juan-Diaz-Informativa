@@ -7,7 +7,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 routeTree.gen.ts
-
+pnpm-workspace.yaml
 node_modules
 dist
 dist-ssr

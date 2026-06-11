@@ -6,6 +6,7 @@ import { useNavigate } from '@tanstack/react-router';
 import ModalConsulta from './ModalConsulta';
 import { useConsultaPago } from '../../Hook/ConsultaPagoHook';
 import { useAlerts } from '../../context/AlertContext';
+import { isTooManyRequests, TOO_MANY_REQUESTS_TITLE, TOO_MANY_REQUESTS_MSG } from '../../api/httpError';
 import type {
     GenerarFacturaConsultaDTO,
     ConsultaResultado,
@@ -256,6 +257,10 @@ const ConsultaRecibos = () => {
 
             showSuccess('PDF generado', 'La descarga del comprobante inicio correctamente.');
         } catch (error) {
+            if (isTooManyRequests(error)) {
+                showWarning(TOO_MANY_REQUESTS_TITLE, TOO_MANY_REQUESTS_MSG, 5000);
+                return;
+            }
             showError('Error al generar PDF', getBackendErrorMessage(error));
         } finally {
             setIsGeneratingPdf(false);
@@ -304,6 +309,10 @@ const ConsultaRecibos = () => {
                     await handleConsultaJuridica(value);
                 }
             } catch (error) {
+                if (isTooManyRequests(error)) {
+                    showWarning(TOO_MANY_REQUESTS_TITLE, TOO_MANY_REQUESTS_MSG, 5000);
+                    return;
+                }
                 console.error('Error al consultar pagos:', error);
                 showError(
                     'Error en la consulta',

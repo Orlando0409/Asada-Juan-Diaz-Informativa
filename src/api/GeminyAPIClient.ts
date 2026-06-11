@@ -1,20 +1,18 @@
 import dataJson from '../data/Data.json';
 import chatContexto from '../data/ChatContexto.json';
 
-// Cliente para la API de Google Gemini
+// Cliente para el asistente (Gemini) vía proxy del backend.
+// La API key NO vive en el cliente: el backend la inyecta del lado del servidor.
 export class GeminiAPIClient {
-  private readonly ApiKey: string;
   private readonly apiUrl: string;
 
   constructor() {
-    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    if (!apiKey) {
-      throw new Error('VITE_GEMINI_API_KEY no está configurada');
+    const apiBase = import.meta.env.VITE_API_URL;
+    if (!apiBase) {
+      throw new Error('VITE_API_URL no está configurada');
     }
-    
-    this.ApiKey = apiKey;
-    // Usar gemini-2.5-flash que está disponible en GA según las notas de versión
-   this.apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${this.ApiKey}`;
+    // Proxy del backend: /chatbot reenvía la petición a Gemini con la key protegida.
+    this.apiUrl = `${apiBase}/chatbot`;
   }
 
   //Envía un prompt a la API de Gemini
