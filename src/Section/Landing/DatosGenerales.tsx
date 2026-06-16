@@ -2,7 +2,7 @@ import { FiMapPin, FiCalendar, FiHome } from 'react-icons/fi'
 import Data from '../../data/Data.json'
 
 const DatosGenerales = () => {
-  const { ubicacion, nombre, añoFundacion, descripcion } = Data.DatosGenerales
+  const { ubicacion, nombre, añoFundacion, descripcion, juntaDirectiva } = Data.DatosGenerales
 
   const datos = [
     { icon: FiHome, label: 'Nombre', value: nombre },
@@ -45,6 +45,30 @@ const DatosGenerales = () => {
         >
           {descripcion}
         </p>
+      )}
+
+      {juntaDirectiva && juntaDirectiva.length > 0 && (
+        <div
+          className="mx-auto mt-12 max-w-3xl animate-rise-in"
+          style={{ animationDelay: '280ms' }}
+        >
+          <h3 className="text-center text-xl sm:text-2xl font-bold text-gray-800 mb-6">
+            Junta Directiva
+          </h3>
+          <div className="bg-white rounded-xl border border-sky-200 shadow-md p-6">
+            <ul className="space-y-3">
+              {juntaDirectiva.map((miembro, index) => (
+                <li
+                  key={index}
+                  className="text-gray-700 text-sm sm:text-base flex items-start gap-3"
+                >
+                  <span className="h-2 w-2 rounded-full bg-blue-600 mt-1.5 flex-shrink-0" />
+                  {miembro}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       )}
     </section>
   )
