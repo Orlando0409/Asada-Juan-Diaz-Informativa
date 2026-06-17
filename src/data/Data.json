@@ -9,9 +9,18 @@
       "imagen": "/agua-web.mp4",
       "descripcion": "Brindando agua potable para las comunidades de Juan Díaz y Oriente"
     },
-    "descripcion": "En la ASADA de Juan Díaz trabajamos para brindar un servicio  de agua potable eficiente,sostenible y de alta calidad.Nuestro Compromiso es con la comunidad y el ambiente,garantizando una gestion responsable de este recurso."
+    "descripcion": "En la ASADA de Juan Díaz trabajamos para brindar un servicio  de agua potable eficiente,sostenible y de alta calidad.Nuestro Compromiso es con la comunidad y el ambiente,garantizando una gestion responsable de este recurso.",
+    "juntaDirectiva": [
+      "Presidente: Daniel Agüero Valverde",
+      "Vicepresidente: Santos Everardo Corea Gutiérrez",
+      "Secretario: Oscar Javier Cerdas Ramos",
+      "Tesorero: Eugenio José Rodríguez Peña",
+      "Vocal 1: María de los Ángeles Álvarez Martínez",
+      "Vocal 2: María Norberta Zúñiga Baltodano",
+      "Vocal 3: Bertilia Mena Gutiérrez"
+    ]
   },
-  "historia": "La ASADA de Juan Díaz fue fundada en el año 2005. En un inicio, la idea principal era construir un acueducto para uso agrícola, pensando en beneficiar a los agricultores de la zona. Sin embargo, un vecino de la zona donó un terreno para un pozo. Las personas de la comunidad pensaron en la necesidad de acceso al agua potable en los hogares, y llegaron a la conclusión de que el agua para consumo humano era prioridad más que para el uso agrícola. Ante esta situación, se decidió cambiar el destino del proyecto y enfocarlo en llevar agua a las casas. Con este nuevo propósito se logró concretar un convenio con la delegación, lo que permitió la formalización de la creación de la ASADA. De esta manera, un proyecto que estaba destinado a la agricultura se transformó en una solución para la comunidad de Juan Díaz y sus alrededores.",
+  "historia": "La ASADA de Juan Díaz fue fundada en el año 2005, con Daniel Agüero Valverde como primer presidente. En un inicio, la idea principal era construir un acueducto para uso agrícola, pensando en beneficiar a los agricultores de la zona. \n El vecino Edgar Mora vendió el pozo debido a que le robaron la bomba en dos ocasiones, y el grupo de agricultores decidió comprarle el pozo. Este grupo de vecinos, con la iniciativa del señor Daniel Agüero, pensó en la necesidad de contar con acceso al agua potable en los hogares y llegó a la conclusión de que el agua para consumo humano era una prioridad.\n Ante esta situación, se decidió cambiar el destino del proyecto y enfocarlo en llevar agua a las casas. Con este nuevo propósito, se logró concretar un convenio de delegación con el AyA, lo que permitió la formalización y la creación de la ASADA de Juan Díaz.\n De esta manera, un proyecto que estaba destinado a la agricultura se transformó en una solución para la comunidad de Juan Díaz y sus alrededores, llevando agua a 96 hogares. El Club Rotario Internacional y otras dos organizaciones dieron un aporte económico importante para la compra e instalación de tuberías, la construcción del tanque y los insumos para la red de aproximadamente 4 kilómetros.",
   "imagenHistoria": {
     "src": "HISTORIA_ASADA.png",
     "ruta": "/Historia"
@@ -541,5 +550,56 @@
   "ProyectoSeccion": {
     "titulo": "Proyectos",
     "descripcion": "Descubre nuestros proyectos de desarrollo e infraestructura que transforman nuestra comunidad."
+  },
+  "EquipoSeccion": {
+    "Andres": {
+      "nombre": "Andrés",
+      "apellido1": "Alvarado",
+      "apellido2": "Quesada",
+      "rol": "Desarrollador Backend",
+      "imagen": "/devTeam/andres.png",
+      "contacto": {
+        "correo": "andres.alvaque@gmail.com",
+        "linkedin": "https://www.linkedin.com/in/andr%C3%A9s-alvarado-quesada-8a9080366/",
+        "github": "https://github.com/AndresAlvarado08"
+      }
+    },
+    "Orlando": {
+      "nombre": "Luis Orlando",
+      "apellido1": "Baltodano",
+      "apellido2": "Espinoza",
+      "rol": "Desarrollador Full-Stack",
+      "imagen": "/devTeam/orlando.png",
+      "contacto": {
+        "correo": "obaltodano13@gmail.com",
+        "linkedin": "https://www.linkedin.com/in/orlando-baltodano",
+        "github": "https://github.com/Orlando0409"
+      }
+    },
+    "Diana": {
+      "nombre": "Diana Paola",
+      "apellido1": "Cerdas",
+      "apellido2": "Alvarez",
+      "rol": "Desarrolladora Frontend",
+      "imagen": "/devTeam/diana.png",
+      "contacto": {
+        "correo": "paolacerdas345@gmail.com",
+        "linkedin": "https://www.linkedin.com/in/paola-álvarez-6b7891400",
+        "github": " https://github.com/PaolaAlvarez28"
+      }
+    },
+    "Alondra": {
+      "nombre": "Alondra",
+      "apellido1": "Espinoza",
+      "apellido2": "Flores",
+      "rol": "Desarrolladora Full-Stack",
+      "imagen": "/devTeam/alondra.png",
+      "contacto": {
+        "correo": "alondraespinoza897@gmail.com",
+        "linkedin": "www.linkedin.com/in/alofe",
+        "github": "https://github.com/FloresAlondra"
+      }
+    }
   }
+
 }
