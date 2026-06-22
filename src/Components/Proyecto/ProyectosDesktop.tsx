@@ -58,8 +58,8 @@ function ProyectosDesktop({
     <section className="hidden lg:block py-16 bg-white relative">
       
       {/* Fondo decorativo desktop */}
-      <div className="absolute top-20 left-10 w-32 h-32 bg-blue-200/20 rounded-full blur-3xl"></div>
-      <div className="absolute bottom-20 right-10 w-40 h-40 bg-indigo-200/20 rounded-full blur-3xl"></div>
+      <div className="absolute top-20 left-10 size-32 bg-blue-200/20 rounded-full blur-3xl"></div>
+      <div className="absolute bottom-20 right-10 size-40 bg-indigo-200/20 rounded-full blur-3xl"></div>
       
       {/* Contenido principal desktop */}
       <div className="container mx-auto px-4 flex justify-center items-center min-h-[500px] gap-16 animate-fade-rise">
@@ -118,7 +118,7 @@ function ProyectosDesktop({
                           {proyecto.Titulo}
                         </h3>
                         <div className="flex items-center space-x-2 text-sm text-gray-700 mb-4">
-                          <span className={`w-2 h-2 rounded-full ${getDotColor(nombreEstado)}`}></span>
+                          <span className={`size-2 rounded-full ${getDotColor(nombreEstado)}`}></span>
                           <span className="text-gray-700">
                             Actualizado: {new Date(proyecto.Fecha_Actualizacion).toLocaleDateString('es-ES')}
                           </span>
@@ -139,18 +139,18 @@ function ProyectosDesktop({
           {/* Botones navegación desktop - Solo mostrar si hay más de un proyecto */}
           {proyectos.length > 1 && (
             <>
-              <button
+              <button type="button"
                 onClick={irAAnterior}
                 className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 border border-gray-200"
               >
-                <IoChevronBack className="w-5 h-5 text-gray-700" />
+                <IoChevronBack className="size-5 text-gray-700" />
               </button>
               
-              <button
+              <button type="button"
                 onClick={irASiguiente}
                 className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-3 shadow-lg transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110 border border-gray-200"
               >
-                <IoChevronForward className="w-5 h-5 text-gray-700" />
+                <IoChevronForward className="size-5 text-gray-700" />
               </button>
             </>
           )}
@@ -159,13 +159,13 @@ function ProyectosDesktop({
           {proyectos.length > 1 && (
             <div className="flex justify-center mt-6 space-x-3">
               {proyectos.map((proyecto, index) => (
-                <button
+                <button type="button"
                   key={proyecto.Id_Proyecto}
                   onClick={() => irASlide(index)}
                   className={`transition-all duration-300 rounded-full ${
                     index === slideActual 
                       ? 'w-8 h-3 bg-gradient-to-r from-blue-500 to-indigo-500 shadow-lg' 
-                      : 'w-3 h-3 bg-gray-300 hover:bg-gray-400 hover:scale-110'
+                      : 'size-3 bg-gray-300 hover:bg-gray-400 hover:scale-110'
                   }`}
                 />
               ))}

@@ -126,7 +126,7 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
       Nombre: 'Juan Carlos',
       Apellido1: 'Pérez',
       Apellido2: 'González',
-      Correo: 'ejemplo@gmail.com',
+      Correo: 'ejemplo@correo.com',
       Numero_Telefono: '+50688887777',
       Direccion_Exacta: 'San José, del Banco Nacional 200m sur',
       Edad: '25',
@@ -255,7 +255,10 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
         console.error('Error al cargar datos guardados:', error);
       }
     }
-  }, []); //prueba 
+    // Mount-only: restore a saved draft once. form.setFieldValue is stable; we
+    // intentionally do not re-run when form changes.
+    // react-doctor-disable-next-line react-doctor/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
 
   const commonClasses = 'w-full border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring focus:ring-blue-300';
@@ -338,14 +341,14 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
                       />
                       {loadingCedula && (
                         <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                          <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <svg className="animate-spin size-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
                         </div>
                       )}
                     </div>
-                    {loadingCedula && <p className="text-xs text-blue-600 mt-1">Buscando información...</p>}
+                    {loadingCedula && <p className="text-xs text-blue-600 mt-1">Buscando información…</p>}
                     {/* Mostrar error de validación de formato */}
                     {fieldErrors['Identificacion'] && (
                       <span className="text-red-500 text-sm block mt-1">
@@ -558,7 +561,7 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
                 const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
                 return (
                   <div className="w-full mb-2">
-                    <label htmlFor="Planos_Terreno" className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
+                    <label htmlFor="Planos_Terreno" className="block mb-1 font-medium">Planos del terreno <span className="text-gray-400 text-xs">(opcional)</span></label>
                     <input
                       type="file"
                       accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -588,10 +591,6 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
                           onClick={() => {
                             field.handleChange(undefined);
                             setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
-                            setFieldErrors(prev => ({
-                              ...prev,
-                              ["Planos_Terreno"]: `Debe subir el plano del terreno`,
-                            }));
                             if (planosInputRef.current) planosInputRef.current.value = "";
                           }}
                           className="text-red-500 hover:underline text-xs"
@@ -619,7 +618,7 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
                 const archivoActual = archivoSeleccionado["Certificacion_Literal"] ?? null;
                 return (
                   <div className="w-full mb-2">
-                    <label htmlFor="Certificacion_Literal" className="block mb-1 font-medium">Certificacion Literal del terreno <span className="text-red-500">*</span></label>
+                    <label htmlFor="Certificacion_Literal" className="block mb-1 font-medium">Certificacion Literal del terreno <span className="text-gray-400 text-xs">(opcional)</span></label>
                     <input
                       type="file"
                       accept=".png,.jpg,.jpeg,.heic,.pdf"  // 🔥 CAMBIO: Agregué .pdf
@@ -649,10 +648,6 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
                           onClick={() => {
                             field.handleChange(undefined);
                             setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: null }));
-                            setFieldErrors(prev => ({
-                              ...prev,
-                              ["Certificacion_Literal"]: `Debe subir la certificacion literal del terreno`,
-                            }));
                             if (escrituraInputRef.current) escrituraInputRef.current.value = "";
                           }}
                           className="text-red-500 hover:underline text-xs"
@@ -696,8 +691,6 @@ const FormularioAfiliacion = ({ onClose, initialView = "afiliacion" }: Props) =>
                   form.state.values.Direccion_Exacta,
                   form.state.values.Numero_Telefono,
                   form.state.values.Edad,
-                  form.state.values.Planos_Terreno,
-                  form.state.values.Certificacion_Literal
                 ].some(val => val === undefined || val === null || val === "")
               }
             >

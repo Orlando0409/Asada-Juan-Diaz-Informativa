@@ -195,7 +195,10 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                 console.error('Error al cargar datos guardados:', error);
             }
         }
-    }, []); //prueba
+    // Mount-only: restore a saved draft once. form.setFieldValue is stable; we
+    // intentionally do not re-run when form changes.
+    // react-doctor-disable-next-line react-doctor/exhaustive-deps
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
 
 
@@ -234,7 +237,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                     />
                                     {loadingCedula && (
                                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                            <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <svg className="animate-spin size-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                             </svg>
@@ -283,7 +286,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                         </select>
                                         {isMedidoresLoading && (
                                             <div className="absolute right-10 top-1/2 -translate-y-1/2">
-                                                <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+                                                <Loader2 className="size-5 animate-spin text-blue-500" />
                                             </div>
                                         )}
                                     </div>
@@ -335,7 +338,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                             const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
                             return (
                                 <div className="mb-3 w-full">
-                                    <label className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
+                                    <label className="block mb-1 font-medium">Planos del terreno <span className="text-gray-400 text-xs">(opcional)</span></label>
                                     <input
                                         type="file"
                                         accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -365,7 +368,6 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                                 onClick={() => {
                                                     field.handleChange(undefined);
                                                     setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
-                                                    setFieldErrors(prev => ({ ...prev, ["Planos_Terreno"]: 'Debe subir el plano del terreno' }));
                                                     if (planosInputRef.current) planosInputRef.current.value = '';
                                                 }}
                                                 className="text-red-500 hover:underline text-xs"
@@ -391,7 +393,7 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                             const archivoActual = archivoSeleccionado["Certificacion_Literal"] ?? null;
                             return (
                                 <div className="mb-3 w-full">
-                                    <label className="block mb-1 font-medium">Certificacion Literal del terreno <span className="text-red-500">*</span></label>
+                                    <label className="block mb-1 font-medium">Certificacion Literal del terreno <span className="text-gray-400 text-xs">(opcional)</span></label>
                                     <input
                                         type="file"
                                         accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -421,7 +423,6 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                                 onClick={() => {
                                                     field.handleChange(undefined);
                                                     setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: null }));
-                                                    setFieldErrors(prev => ({ ...prev, ["Certificacion_Literal"]: 'Debe subir la certificacion literal del terreno' }));
                                                     if (escrituraInputRef.current) escrituraInputRef.current.value = '';
                                                 }}
                                                 className="text-red-500 hover:underline text-xs"
@@ -458,8 +459,6 @@ const CambioMedidorJuridica = ({ onClose }: Props) => {
                                 form.state.values.Cedula_Juridica,
                                 form.state.values.Id_Medidor,
                                 form.state.values.Motivo_Solicitud,
-                                form.state.values.Planos_Terreno,
-                                form.state.values.Certificacion_Literal
                             ].some(val => val === undefined || val === null || val === "")
                         }
                     >

@@ -8,7 +8,8 @@
     "build": "tsc -b && vite build",
     "build:sitemap": "set ENABLE_SITEMAP=1&& tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "doctor": "npx react-doctor@latest"
   },
   "dependencies": {
     "@material-tailwind/react": "^2.1.10",
@@ -19,7 +20,7 @@
     "@tanstack/react-table": "^8.21.3",
     "@tanstack/zod-form-adapter": "^0.42.1",
     "autoprefixer": "^10.4.21",
-    "axios": "^1.12.2",
+    "axios": "^1.17.0",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.34.2",
     "leaflet": "^1.9.4",
@@ -53,6 +54,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.2.0",
+    "react-doctor": "^0.2.10",
     "tailwind-scrollbar": "^4.0.2",
     "tailwindcss": "^4.1.12",
     "typescript": "~5.8.3",

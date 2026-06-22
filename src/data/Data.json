@@ -110,7 +110,7 @@
         "required": true
       },
       "Certificacion_Literal": {
-        "label": "Certificacion Literal del terreno",
+        "label": "Certificación Literal del terreno",
         "type": "file",
         "required": true
       }
@@ -370,7 +370,7 @@
         "required": true
       },
       "Descripcion": {
-        "label": "Descripción de tu queja",
+        "label": "Descripción de tu reporte",
         "type": "textarea",
         "required": true
       },
@@ -550,5 +550,56 @@
   "ProyectoSeccion": {
     "titulo": "Proyectos",
     "descripcion": "Descubre nuestros proyectos de desarrollo e infraestructura que transforman nuestra comunidad."
+  },
+  "EquipoSeccion": {
+    "Andres": {
+      "nombre": "Andrés",
+      "apellido1": "Alvarado",
+      "apellido2": "Quesada",
+      "rol": "Desarrollador Backend",
+      "imagen": "/devTeam/andres.png",
+      "contacto": {
+        "correo": "andres.alvaque@gmail.com",
+        "linkedin": "https://www.linkedin.com/in/andr%C3%A9s-alvarado-quesada-8a9080366/",
+        "github": "https://github.com/AndresAlvarado08"
+      }
+    },
+    "Orlando": {
+      "nombre": "Luis Orlando",
+      "apellido1": "Baltodano",
+      "apellido2": "Espinoza",
+      "rol": "Desarrollador Full-Stack",
+      "imagen": "/devTeam/orlando.png",
+      "contacto": {
+        "correo": "obaltodano13@gmail.com",
+        "linkedin": "https://www.linkedin.com/in/orlando-baltodano",
+        "github": "https://github.com/Orlando0409"
+      }
+    },
+    "Diana": {
+      "nombre": "Diana Paola",
+      "apellido1": "Cerdas",
+      "apellido2": "Alvarez",
+      "rol": "Desarrolladora Frontend",
+      "imagen": "/devTeam/diana.png",
+      "contacto": {
+        "correo": "paolacerdas345@gmail.com",
+        "linkedin": "https://www.linkedin.com/in/paola-álvarez-6b7891400",
+        "github": " https://github.com/PaolaAlvarez28"
+      }
+    },
+    "Alondra": {
+      "nombre": "Alondra",
+      "apellido1": "Espinoza",
+      "apellido2": "Flores",
+      "rol": "Desarrolladora Full-Stack",
+      "imagen": "/devTeam/alondra.png",
+      "contacto": {
+        "correo": "alondraespinoza897@gmail.com",
+        "linkedin": "www.linkedin.com/in/alofe",
+        "github": "https://github.com/FloresAlondra"
+      }
+    }
   }
+
 }

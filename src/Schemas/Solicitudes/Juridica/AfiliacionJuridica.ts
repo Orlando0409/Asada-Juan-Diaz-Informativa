@@ -14,7 +14,7 @@ export const AfiliacionJuridicaSchema = z.object({
   Correo: z.string()
     .min(1, 'El correo electrónico es obligatorio')
     .max(255, 'El correo no puede tener más de 255 caracteres')
-    .email('El correo electrónico no es válido'),
+    .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, { message: 'El formato del correo electrónico no es válido' }),
 
   Numero_Telefono: z.string()
     .min(1, 'El número de teléfono es obligatorio')
@@ -29,18 +29,17 @@ export const AfiliacionJuridicaSchema = z.object({
     .min(10, 'La dirección debe tener al menos 10 caracteres')
     .max(254, 'La dirección no puede tener más de 255 caracteres'),
 
-   Planos_Terreno: z.instanceof(File, { message: "Debe subir el plano del terreno" })
-    
+  Planos_Terreno: z.instanceof(File)
     .refine(
       file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
       'El plano del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
-    ),
+    )
+    .optional(),
 
-  
-  Certificacion_Literal: z.instanceof(File, { message: "Debe subir la certificacion literal del terreno" })
-   
+  Certificacion_Literal: z.instanceof(File)
     .refine(
       file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
       'La certificacion literal del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
-    ),
+    )
+    .optional(),
 });

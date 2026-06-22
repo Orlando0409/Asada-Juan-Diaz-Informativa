@@ -106,7 +106,7 @@ function ProyectosMobile({
                         </h3>
                         
                         <div className="flex items-center space-x-2 text-sm text-gray-700">
-                          <span className={`w-2 h-2 rounded-full ${getDotColor(nombreEstado)}`}></span>
+                          <span className={`size-2 rounded-full ${getDotColor(nombreEstado)}`}></span>
                           <span className="text-xs text-gray-700">
                             {new Date(proyecto.Fecha_Actualizacion).toLocaleDateString('es-ES')}
                           </span>
@@ -128,18 +128,18 @@ function ProyectosMobile({
           {/* Botones navegación móvil - Solo mostrar si hay más de un proyecto */}
           {proyectos.length > 1 && (
             <>
-              <button
+              <button type="button"
                 onClick={irAAnterior}
                 className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-2 shadow-md transition-all duration-200 border border-gray-200"
               >
-                <IoChevronBack className="w-4 h-4 text-gray-700" />
+                <IoChevronBack className="size-4 text-gray-700" />
               </button>
               
-              <button
+              <button type="button"
                 onClick={irASiguiente}
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white rounded-full p-2 shadow-md transition-all duration-200 border border-gray-200"
               >
-                <IoChevronForward className="w-4 h-4 text-gray-700" />
+                <IoChevronForward className="size-4 text-gray-700" />
               </button>
             </>
           )}
@@ -148,13 +148,13 @@ function ProyectosMobile({
           {proyectos.length > 1 && (
             <div className="flex justify-center mt-4 space-x-2">
               {proyectos.map((proyecto, index) => (
-                <button
+                <button type="button"
                   key={`${proyecto.Id_Proyecto}-dot-${index}`}
                   onClick={() => irASlide(index)}
                   className={`transition-all duration-300 rounded-full ${
                     index === slideActual 
                       ? 'w-6 h-2 bg-gradient-to-r from-blue-500 to-indigo-500' 
-                      : 'w-2 h-2 bg-gray-300 hover:bg-gray-400'
+                      : 'size-2 bg-gray-300 hover:bg-gray-400'
                   }`}
                 />
               ))}

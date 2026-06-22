@@ -67,21 +67,16 @@ function getManualChunk(id: string): string | undefined {
   if (
     normalizedId.includes('/react/') ||
     normalizedId.includes('/react-dom/') ||
-    normalizedId.includes('/scheduler/')
+    normalizedId.includes('/scheduler/') ||
+    normalizedId.includes('/framer-motion/') ||
+    normalizedId.includes('/lucide-react/') ||
+    normalizedId.includes('/react-icons/')
   ) {
     return 'react-vendor'
   }
 
   if (normalizedId.includes('/@tanstack/')) {
     return 'tanstack-vendor'
-  }
-
-  if (
-    normalizedId.includes('/framer-motion/') ||
-    normalizedId.includes('/lucide-react/') ||
-    normalizedId.includes('/react-icons/')
-  ) {
-    return 'motion-icons-vendor'
   }
 
   if (normalizedId.includes('/leaflet/')) {
@@ -155,7 +150,7 @@ export default defineConfig({
       resolveDependencies: (_filename, deps) =>
         deps.filter(
           (d) =>
-            !/(?:maps-vendor|forms-ui-vendor|carousel-vendor|motion-icons-vendor|utils-vendor)-[^/]+\.js$/.test(d)
+            !/(?:maps-vendor|forms-ui-vendor|carousel-vendor|utils-vendor)-[^/]+\.js$/.test(d)
         ),
     },
     rollupOptions: {

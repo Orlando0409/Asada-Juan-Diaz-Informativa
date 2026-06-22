@@ -31,6 +31,10 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
     const [alertShown, setAlertShown] = useState<string>('');
     const planosInputRef = useRef<HTMLInputElement>(null);
     const escrituraInputRef = useRef<HTMLInputElement>(null);
+    // onClose comes from the parent as a fresh closure each render; read it via a
+    // ref so the success-close effect can depend only on mutation.isSuccess + form.
+    const onCloseRef = useRef(onClose);
+    onCloseRef.current = onClose;
 
     const mutation = useAgregarMedidorJuridica();
     const { lookupJuridica, isLoading: loadingCedula } = useCedulaLookup();
@@ -196,7 +200,10 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                 console.error('Error al cargar datos guardados:', error);
             }
         }
-    }, []);
+    // Mount-only: restore a saved draft once. form.setFieldValue is stable; we
+    // intentionally do not re-run when form changes.
+    // react-doctor-disable-next-line react-doctor/exhaustive-deps
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Usar un efecto para cerrar el formulario cuando se complete con éxito
     useEffect(() => {
@@ -208,9 +215,10 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
             setArchivoSeleccionado({});
             if (planosInputRef.current) planosInputRef.current.value = "";
             if (escrituraInputRef.current) escrituraInputRef.current.value = "";
-            setTimeout(() => onClose(), 1500); // con retraso para que el usuario vea el mensaje de éxito
+            const id = setTimeout(() => onCloseRef.current(), 1500); // con retraso para que el usuario vea el mensaje de éxito
+            return () => clearTimeout(id);
         }
-    }, [mutation.isSuccess]);
+    }, [mutation.isSuccess, form]);
 
     // Mostrar alert cuando se verifica afiliación
     useEffect(() => {
@@ -285,7 +293,7 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                                     />
                                     {loadingCedula && (
                                         <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                                            <svg className="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <svg className="animate-spin size-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                             </svg>
@@ -336,7 +344,7 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                             const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
                             return (
                                 <div className="w-full mb-2">
-                                    <label className="block mb-1 font-semibold text-gray-700">Planos del terreno <span className="text-red-500">*</span></label>
+                                    <label className="block mb-1 font-semibold text-gray-700">Planos del terreno <span className="text-gray-400 text-xs">(opcional)</span></label>
                                     <input
                                         type="file"
                                         accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -366,10 +374,11 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                                                 onClick={() => {
                                                     field.handleChange(undefined);
                                                     setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
-                                                    setFieldErrors(prev => ({
-                                                        ...prev,
-                                                        ["Planos_Terreno"]: `Debe subir el plano del terreno`,
-                                                    }));
+                                                    setFieldErrors(prev => {
+                                                        const next = { ...prev };
+                                                        delete next["Planos_Terreno"];
+                                                        return next;
+                                                    });
                                                     if (planosInputRef.current) planosInputRef.current.value = "";
                                                 }}
                                                 className="text-red-500 hover:underline text-xs"
@@ -393,7 +402,7 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                             const archivoActual = archivoSeleccionado["Certificacion_Literal"] ?? null;
                             return (
                                 <div className="w-full mb-2">
-                                    <label className="block mb-1 font-semibold text-gray-700">Certificacion Literal del terreno <span className="text-red-500">*</span></label>
+                                    <label className="block mb-1 font-semibold text-gray-700">Certificacion Literal del terreno <span className="text-gray-400 text-xs">(opcional)</span></label>
                                     <input
                                         type="file"
                                         accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -423,10 +432,11 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                                                 onClick={() => {
                                                     field.handleChange(undefined);
                                                     setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: null }));
-                                                    setFieldErrors(prev => ({
-                                                        ...prev,
-                                                        ["Certificacion_Literal"]: `Debe subir la certificacion literal del terreno`,
-                                                    }));
+                                                    setFieldErrors(prev => {
+                                                        const next = { ...prev };
+                                                        delete next["Certificacion_Literal"];
+                                                        return next;
+                                                    });
                                                     if (escrituraInputRef.current) escrituraInputRef.current.value = "";
                                                 }}
                                                 className="text-red-500 hover:underline text-xs"
@@ -456,7 +466,11 @@ const MedidorExtraJuridica = ({ onClose }: Props) => {
                         disabled={
                             mutation.isPending ||
                             loadingMedidores ||
-                            Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
+                            // Solo los campos obligatorios bloquean el envío; los archivos son opcionales
+                            [
+                                form.state.values.Cedula_Juridica,
+                                form.state.values.Direccion_Exacta,
+                            ].some(val => val === undefined || val === null || val === "") ||
                             Object.values(fieldErrors).some(Boolean) ||
                             hasBlockingFormErrors
                         }

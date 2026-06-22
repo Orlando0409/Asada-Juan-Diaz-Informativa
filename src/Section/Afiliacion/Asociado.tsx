@@ -1,7 +1,7 @@
 import { useState, useRef } from "react"
 import type { IconType } from "react-icons"
 import { FiArrowRight, FiBriefcase, FiCheckCircle, FiUser, FiX } from "react-icons/fi"
-import { motion, AnimatePresence } from "framer-motion"
+import { m, AnimatePresence } from "framer-motion"
 import data from "../../data/Data.json"
 import FormularioAsociadoJuridico from "../../Components/Solicitudes/Juridica/AsociadoJurica"
 import FormularioAsociado from "../../Components/Solicitudes/Fisico/AsociadoFisico"
@@ -48,8 +48,8 @@ const TarjetaCliente = ({
             </span>
             <h2 className="mt-3 whitespace-nowrap text-[clamp(0.95rem,1.6vw,1.15rem)] font-semibold tracking-tight">{title}</h2>
           </div>
-          <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-sky-100 ${iconClassName}`}>
-            <Icon className="h-5 w-5" />
+          <div className={`flex size-10 shrink-0 items-center justify-center rounded-2xl bg-sky-100 ${iconClassName}`}>
+            <Icon className="size-5" />
           </div>
         </div>
       </div>
@@ -60,8 +60,8 @@ const TarjetaCliente = ({
           {requisitos.map((requisito) => (
             <li key={requisito.label} className="rounded-xl border border-sky-100 bg-sky-50 px-3 py-2.5">
               <div className="flex items-start gap-2.5">
-                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600">
-                  <FiCheckCircle className="h-3.5 w-3.5" />
+                <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                  <FiCheckCircle className="size-3.5" />
                 </span>
                 <p className="text-sm font-medium leading-5 text-slate-800">{requisito.label}</p>
               </div>
@@ -70,12 +70,12 @@ const TarjetaCliente = ({
         </ul>
       </div>
 
-      <button
+      <button type="button"
         className={`mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white shadow transition duration-300 hover:-translate-y-0.5 hover:shadow-lg ${buttonClassName}`}
         onClick={onOpen}
       >
         {isSelected ? 'Formulario abierto' : buttonLabel}
-        {isSelected ? <FiX className="h-4 w-4" /> : <FiArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />}
+        {isSelected ? <FiX className="size-4" /> : <FiArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />}
       </button>
     </article>
   )
@@ -98,7 +98,7 @@ const Asociado = () => {
   return (
     <section className="relative isolate min-h-screen bg-white px-4 py-8 sm:px-6 md:py-12 lg:px-8">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 pt-15">
-        <motion.div
+        <m.div
           className="overflow-hidden rounded-[32px] border border-sky-200 bg-white shadow-md"
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -114,7 +114,7 @@ const Asociado = () => {
               <p className="mt-2 text-sm text-slate-600">Ser asociado en la ASADA es formar parte de la organización comunal con derecho a participar en la toma de decisiones.</p>
             </div>
 
-            <motion.div
+            <m.div
               className="mt-6 grid gap-5 xl:grid-cols-2 items-stretch"
               initial="hidden"
               whileInView="visible"
@@ -124,7 +124,7 @@ const Asociado = () => {
                 visible: { opacity: 1, transition: { staggerChildren: 0.12 } }
               }}
             >
-              <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35 } } }}>
+              <m.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35 } } }}>
                 <TarjetaCliente
                   badge="Cliente jurídico"
                   title="Asociado para empresas"
@@ -137,8 +137,8 @@ const Asociado = () => {
                   badgeClassName="bg-sky-100 text-blue-800 ring-1 ring-inset ring-sky-300"
                   iconClassName="text-blue-700"
                 />
-              </motion.div>
-              <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35 } } }}>
+              </m.div>
+              <m.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.35 } } }}>
                 <TarjetaCliente
                   badge="Cliente físico"
                   title="Asociado para personas"
@@ -151,15 +151,15 @@ const Asociado = () => {
                   badgeClassName="bg-sky-100 text-blue-800 ring-1 ring-inset ring-sky-300"
                   iconClassName="text-blue-700"
                 />
-              </motion.div>
-            </motion.div>
+              </m.div>
+            </m.div>
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Formulario inline */}
         <AnimatePresence>
           {formularioSeleccionado && (
-            <motion.div
+            <m.div
               ref={formRef}
               key={formularioSeleccionado}
               initial={{ opacity: 0, y: 24 }}
@@ -172,12 +172,12 @@ const Asociado = () => {
                 <span className="text-sm font-semibold text-blue-700 uppercase tracking-wider">
                   {formularioSeleccionado === 'fisico' ? 'Formulario — Cliente Físico' : 'Formulario — Cliente Jurídico'}
                 </span>
-                <button
+                <button type="button"
                   onClick={() => setFormularioSeleccionado(null)}
-                  className="flex h-8 w-8 items-center justify-center rounded-full bg-sky-100 text-slate-500 hover:bg-red-100 hover:text-red-600 transition-colors duration-200"
+                  className="flex size-8 items-center justify-center rounded-full bg-sky-100 text-slate-500 hover:bg-red-100 hover:text-red-600 transition-colors duration-200"
                   aria-label="Cerrar formulario"
                 >
-                  <FiX className="h-4 w-4" />
+                  <FiX className="size-4" />
                 </button>
               </div>
               <div className="p-4 sm:p-6">
@@ -187,7 +187,7 @@ const Asociado = () => {
                   <FormularioAsociado onClose={() => setFormularioSeleccionado(null)} />
                 )}
               </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       </div>

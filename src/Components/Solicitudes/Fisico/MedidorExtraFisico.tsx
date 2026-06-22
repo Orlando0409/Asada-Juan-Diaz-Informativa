@@ -27,6 +27,10 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
     const [alertShown, setAlertShown] = useState<string>('');
     const planosInputRef = useRef<HTMLInputElement>(null);
     const escrituraInputRef = useRef<HTMLInputElement>(null);
+    // onClose comes from the parent as a fresh closure each render; read it via a
+    // ref so the success-close effect can depend only on mutation.isSuccess + form.
+    const onCloseRef = useRef(onClose);
+    onCloseRef.current = onClose;
 
     const mutation = useAgregarMedidorFisica();
     const { showSuccess, showError } = useAlerts();
@@ -228,7 +232,10 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                 console.error('Error al cargar datos guardados:', error);
             }
         }
-    }, []);
+    // Mount-only: restore a saved draft once. form.setFieldValue is stable; we
+    // intentionally do not re-run when form changes.
+    // react-doctor-disable-next-line react-doctor/exhaustive-deps
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     // Mantener sincronizada la identificación usada para consultar medidores.
     useEffect(() => {
@@ -258,9 +265,10 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
             setArchivoSeleccionado({});
             if (planosInputRef.current) planosInputRef.current.value = "";
             if (escrituraInputRef.current) escrituraInputRef.current.value = "";
-            setTimeout(() => onClose(), 1500); // con retraso para que el usuario vea el mensaje de éxito
+            const id = setTimeout(() => onCloseRef.current(), 1500); // con retraso para que el usuario vea el mensaje de éxito
+            return () => clearTimeout(id);
         }
-    }, [mutation.isSuccess]);
+    }, [mutation.isSuccess, form]);
 
     // Mostrar alert cuando se verifica afiliación
     useEffect(() => {
@@ -402,7 +410,7 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                         const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
                         return (
                             <div className="w-full mb-2">
-                                <label className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
+                                <label className="block mb-1 font-medium">Planos del terreno <span className="text-gray-400 text-xs">(opcional)</span></label>
                                 <input
                                     type="file"
                                     accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -432,10 +440,6 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                                             onClick={() => {
                                                 field.handleChange(undefined);
                                                 setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
-                                                setFieldErrors(prev => ({
-                                                    ...prev,
-                                                    ["Planos_Terreno"]: `Debe subir el plano del terreno`,
-                                                }));
                                                 if (planosInputRef.current) planosInputRef.current.value = "";
                                             }}
                                             className="text-red-500 hover:underline text-xs"
@@ -459,7 +463,7 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                         const archivoActual = archivoSeleccionado["Certificacion_Literal"] ?? null;
                         return (
                             <div className="w-full mb-2">
-                                <label className="block mb-1 font-medium">Certificacion Literal del terreno <span className="text-red-500">*</span></label>
+                                <label className="block mb-1 font-medium">Certificacion Literal del terreno <span className="text-gray-400 text-xs">(opcional)</span></label>
                                 <input
                                     type="file"
                                     accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -489,10 +493,6 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
                                             onClick={() => {
                                                 field.handleChange(undefined);
                                                 setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: null }));
-                                                setFieldErrors(prev => ({
-                                                    ...prev,
-                                                    ["Certificacion_Literal"]: `Debe subir la certificacion literal del terreno`,
-                                                }));
                                                 if (escrituraInputRef.current) escrituraInputRef.current.value = "";
                                             }}
                                             className="text-red-500 hover:underline text-xs"
@@ -521,7 +521,11 @@ const MedidorExtraFisico = ({ onClose }: Props) => {
               className="w-sm md:w-auto px-1 py-1.5 md:px-6 md:py-4 bg-blue-600 hover:bg-blue-700 rounded text-white disabled:bg-gray-400 disabled:cursor-not-allowed text-sm md: text-lg font-medium"
                  disabled={
                         mutation.isPending ||
-                        Object.values(form.state.values).some(val => val === undefined || val === null || val === "") ||
+                        [
+                            form.state.values.Tipo_Identificacion,
+                            form.state.values.Identificacion,
+                            form.state.values.Direccion_Exacta,
+                        ].some(val => val === undefined || val === null || val === "") ||
                         Object.values(fieldErrors).some(Boolean) ||
                         Object.values(formErrors).some(Boolean)
                     }

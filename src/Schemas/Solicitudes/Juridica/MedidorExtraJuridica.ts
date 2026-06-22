@@ -14,17 +14,19 @@ export const MedidorExtraJuridicaSchema = z.object({
     .regex(/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s.,#-]+$/, 'La dirección solo puede contener letras, números, espacios y los caracteres .,-#')
     .transform((val) => val.trim().charAt(0).toUpperCase() + val.trim().slice(1).toLowerCase()),
 
-  Planos_Terreno: z.instanceof(File, { message: "Debe subir el plano del terreno" })
+  Planos_Terreno: z.instanceof(File)
     .refine(
       file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
       'El plano del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
-    ),
+    )
+    .optional(),
 
-  Certificacion_Literal: z.instanceof(File, { message: "Debe subir la certificacion literal del terreno" })
+  Certificacion_Literal: z.instanceof(File)
     .refine(
       file => ['image/jpeg', 'image/jpg', 'image/png', 'image/heic', 'application/pdf'].includes(file.type),
       'La certificacion literal del terreno debe ser JPG, JPEG, PNG, HEIC o PDF'
-    ),
+    )
+    .optional(),
 });
 
 export type MedidorExtraJuridica = z.infer<typeof MedidorExtraJuridicaSchema>;

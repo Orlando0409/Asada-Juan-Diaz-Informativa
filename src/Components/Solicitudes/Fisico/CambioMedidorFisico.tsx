@@ -207,7 +207,10 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
         console.error('Error al cargar datos guardados:', error);
       }
     }
-  }, []);
+  // Mount-only: restore a saved draft once. form.setFieldValue is stable; we
+  // intentionally do not re-run when form changes.
+  // react-doctor-disable-next-line react-doctor/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
 
 
@@ -275,7 +278,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   />
                   {isLoading && (
                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                      <Loader2 className="h-5 w-5 animate-spin text-blue-500" />
+                      <Loader2 className="size-5 animate-spin text-blue-500" />
                     </div>
                   )}
                 </div>
@@ -357,7 +360,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
               const archivoActual = archivoSeleccionado["Planos_Terreno"] ?? null;
               return (
                 <div className="mb-3 w-full">
-                  <label className="block mb-1 font-medium">Planos del terreno <span className="text-red-500">*</span></label>
+                  <label className="block mb-1 font-medium">Planos del terreno <span className="text-gray-400 text-xs">(opcional)</span></label>
                   <input
                     type="file"
                     accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -387,7 +390,6 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                         onClick={() => {
                           field.handleChange(undefined);
                           setArchivoSeleccionado(prev => ({ ...prev, ["Planos_Terreno"]: null }));
-                          setFieldErrors(prev => ({ ...prev, ["Planos_Terreno"]: 'Debe subir el plano del terreno' }));
                           if (planosInputRef.current) planosInputRef.current.value = '';
                         }}
                         className="text-red-500 hover:underline text-xs"
@@ -413,7 +415,7 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
               const archivoActual = archivoSeleccionado["Certificacion_Literal"] ?? null;
               return (
                 <div className="mb-3 w-full">
-                  <label className="block mb-1 font-medium">Certificacion Literal del terreno <span className="text-red-500">*</span></label>
+                  <label className="block mb-1 font-medium">Certificacion Literal del terreno <span className="text-gray-400 text-xs">(opcional)</span></label>
                   <input
                     type="file"
                     accept=".png,.jpg,.jpeg,.heic,.pdf"
@@ -443,7 +445,6 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                         onClick={() => {
                           field.handleChange(undefined);
                           setArchivoSeleccionado(prev => ({ ...prev, ["Certificacion_Literal"]: null }));
-                          setFieldErrors(prev => ({ ...prev, ["Certificacion_Literal"]: 'Debe subir la certificacion literal del terreno' }));
                           if (escrituraInputRef.current) escrituraInputRef.current.value = '';
                         }}
                         className="text-red-500 hover:underline text-xs"
@@ -477,8 +478,6 @@ const FormularioCambioMedidor = ({ onClose }: Props) => {
                   form.state.values.Identificacion,
                   form.state.values.Id_Medidor,
                   form.state.values.Motivo_Solicitud,
-                  form.state.values.Planos_Terreno,
-                  form.state.values.Certificacion_Literal
                 ].some(val => val === undefined || val === null || val === "")
               }
             >

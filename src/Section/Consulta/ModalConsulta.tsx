@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { motion, type Variants } from 'framer-motion';
+import { m, type Variants } from 'framer-motion';
 import {
     AlertCircle,
     Building2,
@@ -108,7 +108,7 @@ const getTitularDesdeMedidor = (medidor: MedidorConsultaResultado) => {
     // If it has 'Afiliado' directly (like the new por medidor response)
     if (medidor.Afiliado) {
         return {
-            nombre: medidor.Afiliado.Nombre_Completo || medidor.Afiliado.Razon_Social || medidor.Afiliado.Nombre || 'No disponible',
+            nombre: medidor.Afiliado.Nombre_Completo || medidor.Afiliado.Razon_Social || 'No disponible',
             documento: medidor.Afiliado.Identificacion || medidor.Afiliado.Cedula_Juridica || 'No disponible',
             esJuridico: !!medidor.Afiliado.Cedula_Juridica || !!medidor.Afiliado.Razon_Social,
         };
@@ -160,7 +160,7 @@ const hasJuridicoAfiliado = (
 
 const hasFisicoAfiliado = (
     value: unknown
-): value is { Afiliado: { Nombre: string; Identificacion: string } } => {
+): value is { Afiliado: { Nombre_Completo: string; Identificacion: string } } => {
     if (!value || typeof value !== 'object') {
         return false;
     }
@@ -170,7 +170,7 @@ const hasFisicoAfiliado = (
         return false;
     }
 
-    return 'Nombre' in maybe.Afiliado && 'Identificacion' in maybe.Afiliado;
+    return 'Nombre_Completo' in maybe.Afiliado && 'Identificacion' in maybe.Afiliado;
 };
 
 const isSingleMedidor = (value: unknown): value is MedidorConsultaResultado => {
@@ -213,7 +213,7 @@ const getTitularResumen = (
     if (resultado.tipo === 'fisica') {
         if (hasFisicoAfiliado(resultado.data)) {
             return {
-                nombreAfiliado: resultado.data.Afiliado.Nombre,
+                nombreAfiliado: resultado.data.Afiliado.Nombre_Completo,
                 documentoAfiliado: resultado.data.Afiliado.Identificacion,
                 esTitularJuridico: false,
             };
@@ -273,17 +273,16 @@ const renderMedidor = (medidor: MedidorConsultaResultado, index: number) => {
     let cedulaAfiliado: string | undefined;
     let tipoAfiliado = 'Nombre';
 
-        if (esJuridico && afiliadoMedidor) {
-            const afiliadoJur = afiliadoMedidor as any;
-            nombreAfiliadorMedidor = afiliadoJur.Nombre_Completo || afiliadoJur.Razon_Social;
-            cedulaAfiliado = afiliadoJur.Cedula_Juridica || afiliadoJur.Identificacion;
+    if (esJuridico && afiliadoMedidor) {
+        const afiliadoJur = afiliadoMedidor as any;
+        nombreAfiliadorMedidor = afiliadoJur.Razon_Social || 'No disponible';
+        cedulaAfiliado = afiliadoJur.Identificacion || afiliadoJur.Cedula_Juridica;
         tipoAfiliado = 'Razón Social';
     } else if (afiliadoMedidor) {
         const afiliadoFisico = afiliadoMedidor as any;
-        nombreAfiliadorMedidor = afiliadoFisico.Nombre_Completo || afiliadoFisico.Nombre ? `${afiliadoFisico.Nombre} ${afiliadoFisico.Primer_Apellido || ''}` : 'No disponible';
-        if (nombreAfiliadorMedidor === ' No disponible' && afiliadoFisico.Nombre_Completo) {
-            nombreAfiliadorMedidor = afiliadoFisico.Nombre_Completo;
-        }
+        nombreAfiliadorMedidor = afiliadoFisico.Nombre_Completo
+            || (afiliadoFisico.Nombre ? `${afiliadoFisico.Nombre} ${afiliadoFisico.Primer_Apellido || ''}`.trim() : '')
+            || 'No disponible';
         cedulaAfiliado = afiliadoFisico.Identificacion;
     }
 
@@ -297,8 +296,8 @@ const renderMedidor = (medidor: MedidorConsultaResultado, index: number) => {
         >
             <div className="bg-blue-50 border-b border-gray-200 px-5 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100">
-                        <Gauge className="h-5 w-5 text-blue-600" />
+                    <div className="flex size-10 items-center justify-center rounded-lg bg-blue-100">
+                        <Gauge className="size-5 text-blue-600" />
                     </div>
                     <div>
                         <h4 className="font-bold text-gray-900">Medidor #{medidor.Numero_Medidor}</h4>
@@ -394,10 +393,10 @@ const renderMedidor = (medidor: MedidorConsultaResultado, index: number) => {
                             <details className="group" open={true}>
                                 <summary className="flex cursor-pointer list-none items-center justify-between rounded-lg bg-gray-50 px-4 py-3 font-medium text-gray-900 hover:bg-gray-100">
                                     <span className="flex items-center gap-2">
-                                        <Calendar className="h-4 w-4 text-blue-600" />
+                                        <Calendar className="size-4 text-blue-600" />
                                         Historial de lecturas ({historial.length})
                                     </span>
-                                    <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
+                                    <ChevronDown className="size-4 transition-transform group-open:rotate-180" />
                                 </summary>
 
                                 <div className="mt-4 space-y-3">
@@ -408,15 +407,15 @@ const renderMedidor = (medidor: MedidorConsultaResultado, index: number) => {
                                         >
                                             <div className="mb-3 flex flex-wrap items-center gap-4 text-sm">
                                                 <span className="inline-flex items-center gap-2 font-medium text-gray-900">
-                                                    <Calendar className="h-4 w-4 text-blue-600" />
+                                                    <Calendar className="size-4 text-blue-600" />
                                                     {formatDate(lectura.Fecha_Lectura)}
                                                 </span>
                                                 <span className="inline-flex items-center gap-2 font-medium text-gray-900">
-                                                    <Droplets className="h-4 w-4 text-cyan-600" />
+                                                    <Droplets className="size-4 text-cyan-600" />
                                                     {lectura.Consumo_Calculado_M3} m³
                                                 </span>
                                                 <span className="inline-flex items-center gap-2 font-medium text-gray-900">
-                                                    <Gauge className="h-4 w-4 text-indigo-600" />
+                                                    <Gauge className="size-4 text-indigo-600" />
                                                     {lectura.Tipo_Tarifa.Nombre_Tipo_Tarifa}
                                                 </span>
                                             </div>
@@ -437,10 +436,10 @@ const renderMedidor = (medidor: MedidorConsultaResultado, index: number) => {
                             <details className="group" open={true}>
                                 <summary className="flex cursor-pointer list-none items-center justify-between rounded-lg bg-gray-50 px-4 py-3 font-medium text-gray-900 hover:bg-gray-100">
                                     <span className="flex items-center gap-2">
-                                        <FileText className="h-4 w-4 text-blue-600" />
+                                        <FileText className="size-4 text-blue-600" />
                                         Facturas ({facturas.length})
                                     </span>
-                                    <ChevronDown className="h-4 w-4 transition-transform group-open:rotate-180" />
+                                    <ChevronDown className="size-4 transition-transform group-open:rotate-180" />
                                 </summary>
 
                                 <div className="mt-4 space-y-3">
@@ -512,7 +511,7 @@ const ModalConsulta = ({ isOpen, onClose, resultado, onDownload, isDownloading }
             open
             className="w-full h-full fixed inset-0 z-50 m-0 flex items-center justify-center border-0 bg-black/25 p-4 backdrop-blur-sm"
         >
-            <motion.div
+            <m.div
                 className="bg-white rounded-lg shadow-2xl border border-gray-200 w-full max-w-4xl flex flex-col overflow-hidden max-h-[90vh]"
                 variants={modalVariants}
                 initial="hidden"
@@ -526,20 +525,20 @@ const ModalConsulta = ({ isOpen, onClose, resultado, onDownload, isDownloading }
                                 {subtitulo}
                             </p>
                         </div>
-                        <button
+                        <button type="button"
                             ref={closeButtonRef}
                             onClick={onClose}
                             aria-label="Cerrar"
                             className="text-gray-400 hover:text-gray-600 transition-colors"
                         >
-                            <X className="h-5 w-5" />
+                            <X className="size-5" />
                         </button>
                     </div>
                 </div>
 
                 <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100 p-6">
-                    <motion.div className="space-y-6" variants={sectionContainerVariants}>
-                        <motion.div
+                    <m.div className="space-y-6" variants={sectionContainerVariants}>
+                        <m.div
                             className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm"
                             variants={sectionItemVariants}
                         >
@@ -554,9 +553,9 @@ const ModalConsulta = ({ isOpen, onClose, resultado, onDownload, isDownloading }
                                         </p>
                                         <p className="inline-flex items-center gap-1 text-sm font-medium text-gray-900">
                                             {esTitularJuridico ? (
-                                                <Building2 className="h-4 w-4 text-blue-600" />
+                                                <Building2 className="size-4 text-blue-600" />
                                             ) : (
-                                                <UserRound className="h-4 w-4 text-blue-600" />
+                                                <UserRound className="size-4 text-blue-600" />
                                             )}
                                             {nombreAfiliado}
                                         </p>
@@ -580,7 +579,7 @@ const ModalConsulta = ({ isOpen, onClose, resultado, onDownload, isDownloading }
                                             Total a pagar
                                         </p>
                                         <p className="inline-flex items-center gap-1 text-lg font-bold text-blue-600">
-                                            <Wallet className="h-4 w-4" />
+                                            <Wallet className="size-4" />
                                             {formatCurrency(totalAPagar)}
                                         </p>
                                     </div>
@@ -588,14 +587,14 @@ const ModalConsulta = ({ isOpen, onClose, resultado, onDownload, isDownloading }
 
                                 {medidoresConError > 0 && (
                                     <p className="mt-4 inline-flex items-center gap-2 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-4 py-3" aria-live="polite">
-                                        <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                                        <AlertCircle className="size-4 flex-shrink-0" />
                                         {medidoresConError} medidor(es) no tienen lectura disponible.
                                     </p>
                                 )}
                             </div>
-                        </motion.div>
+                        </m.div>
 
-                        <motion.div
+                        <m.div
                             className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm"
                             variants={sectionItemVariants}
                         >
@@ -605,12 +604,12 @@ const ModalConsulta = ({ isOpen, onClose, resultado, onDownload, isDownloading }
                             <div className="p-5 space-y-4">
                                 {medidores.map((medidor, index) => renderMedidor(medidor, index))}
                             </div>
-                        </motion.div>
-                    </motion.div>
+                        </m.div>
+                    </m.div>
                 </div>
 
                 <footer className="sticky bottom-0 flex justify-end gap-3 p-6 border-t bg-gray-50 z-10">
-                    <button
+                    <button type="button"
                         onClick={onDownload}
                         disabled={isDownloading}
                         className={`px-6 py-2 rounded-lg font-medium transition-colors ${
@@ -621,14 +620,14 @@ const ModalConsulta = ({ isOpen, onClose, resultado, onDownload, isDownloading }
                     >
                         {isDownloading ? 'Generando PDF...' : 'Descargar PDF'}
                     </button>
-                    <button
+                    <button type="button"
                         onClick={onClose}
                         className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
                     >
                         Cerrar
                     </button>
                 </footer>
-            </motion.div>
+            </m.div>
         </dialog>
     );
 };
