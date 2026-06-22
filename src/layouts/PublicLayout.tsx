@@ -4,7 +4,7 @@ import Footer from '../Components/Footer/Footer';
 import Header from '../Components/Header/header';
 import { ModalProvider } from '../context/ModalContext';
 import { InformacionLegalProvider } from '../context/InformacionLegalContext';
-
+import InformacionLegalModal from '../Components/InformacionLegal/InformacionLegalModal';
 const ChatBot = lazy(() => import('../Components/ChatAssistant/ChatBot').then((module) => ({ default: module.ChatBot })));
 const ChatProvider = lazy(() => import('../Provider/ChatProvider').then((module) => ({ default: module.ChatProvider })));
 
