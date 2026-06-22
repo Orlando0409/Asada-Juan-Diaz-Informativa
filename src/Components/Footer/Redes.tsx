@@ -1,3 +1,4 @@
+import { useInformacionLegal } from '../../context/InformacionLegalContext'
 import Data from '../../data/Data.json'
 
 const IconPhone = () => (
@@ -28,56 +29,78 @@ const IconWhatsapp = () => (
 )
 
 const Redes = () => {
+  const { openModal } = useInformacionLegal()
   const { contacto, horarioAtencion, redesSociales } = Data.footer
 
   return (
     <>
       <div
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 text-center sm:text-left p-4 animate-fadeInUp"
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-10 text-center sm:text-left p-4 animate-fadeInUp"
         style={{ animation: 'fadeInUp 0.5s ease-out forwards' }}
       >
-      {/* Contacto */}
-      <div
-        className="flex flex-col gap-2 justify-center items-center sm:items-start"
-      >
-        <h2 className="font-semibold text-base sm:text-lg lg:text-xl">Contacto</h2>
-        <p className="flex justify-start sm:justify-center items-center gap-2 text-sm sm:text-base lg:text-lg">
-          <IconPhone /> {contacto.telefono}
-        </p>
-        <p className="flex justify-start sm:justify-center items-center gap-2 text-sm sm:text-base lg:text-lg">
-          <IconEnvelope /> {contacto.correo}
-        </p>
-      </div>
-
-      {/* Horario */}
-      <div
-        className="flex flex-col gap-2 justify-start items-center sm:items-start"
-      >
-        <h2 className="font-semibold text-base sm:text-lg lg:text-xl">
-          Horario de Atención
-        </h2>
-        <p className="text-sm sm:text-base lg:text-lg">{horarioAtencion}</p>
-      </div>
-
-      {/* Redes Sociales */}
-      <div
-        className="flex flex-col gap-2 justify-start items-center sm:items-start"
-      >
-        <h2 className="font-semibold text-base sm:text-lg lg:text-xl">
-          Redes Sociales
-        </h2>
-        <a
-          href={redesSociales.WhatsApp}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex justify-center max-w-[120px] sm:justify-center items-center gap-2 text-green-500 hover:underline hover:text-green-400 transition-colors text-sm sm:text-base lg:text-lg"
+        {/* Contacto */}
+        <div
+          className="flex flex-col gap-2 justify-center items-center sm:items-start"
         >
-          <IconWhatsapp /> WhatsApp
-        </a>
-      </div>
-    </div>
+          <h2 className="font-semibold text-base sm:text-lg lg:text-xl">Contacto</h2>
+          <p className="flex justify-start sm:justify-center items-center gap-2 text-sm sm:text-base lg:text-lg">
+            <IconPhone /> {contacto.telefono}
+          </p>
+          <p className="flex justify-start sm:justify-center items-center gap-2 text-sm sm:text-base lg:text-lg">
+            <IconEnvelope /> {contacto.correo}
+          </p>
+        </div>
 
-    <style>{`
+        {/* Horario */}
+        <div
+          className="flex flex-col gap-2 justify-start items-center sm:items-start"
+        >
+          <h2 className="font-semibold text-base sm:text-lg lg:text-xl">
+            Horario de Atención
+          </h2>
+          <p className="text-sm sm:text-base lg:text-lg">{horarioAtencion}</p>
+        </div>
+
+        {/* Redes Sociales */}
+        <div
+          className="flex flex-col gap-2 justify-start items-center sm:items-start ml-8"
+        >
+          <h2 className="font-semibold text-base sm:text-lg lg:text-xl">
+            Redes Sociales
+          </h2>
+          <a
+            href={redesSociales.WhatsApp}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex justify-center max-w-[120px] sm:justify-center items-center gap-2 text-green-500 hover:underline hover:text-green-400 transition-colors text-sm sm:text-base lg:text-lg"
+          >
+            <IconWhatsapp /> WhatsApp
+          </a>
+        </div>
+
+        {/* Información Legal */}
+        <div
+          className="flex flex-col gap-2 justify-start items-center sm:items-start"
+        >
+          <h2 className="font-semibold text-base sm:text-lg lg:text-xl">
+            Información Legal
+          </h2>
+          <button
+            onClick={() => openModal('privacidad')}
+            className="text-blue-400 hover:underline hover:text-blue-300 transition-colors text-sm sm:text-base lg:text-lg text-left"
+          >
+            Política de Privacidad
+          </button>
+          <button
+            onClick={() => openModal('terminos')}
+            className="text-blue-400 hover:underline hover:text-blue-300 transition-colors text-sm sm:text-base lg:text-lg text-left"
+          >
+            Términos y Condiciones
+          </button>
+        </div>
+      </div>
+
+      <style>{`
       @keyframes fadeInUp {
         from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }

@@ -1,0 +1,75 @@
+{
+"titulo": "Política de Privacidad, Términos y Condiciones",
+
+"politicaPrivacidad": {
+"introduccion": "La ASADA de Juan Díaz se compromete a proteger la privacidad y confidencialidad de la información proporcionada por los usuarios a través de la plataforma SAGA-JD.",
+
+
+"secciones": [
+  {
+    "titulo": "Responsable de la Información",
+    "contenido": "La ASADA de Juan Díaz es la responsable de administrar y resguardar la información recopilada mediante la plataforma SAGA-JD."
+  },
+  {
+    "titulo": "Información Recopilada",
+    "contenido": "La plataforma puede recopilar información como nombre completo, número de identificación, dirección, correo electrónico, número telefónico y cualquier otro dato requerido para la gestión de solicitudes y servicios."
+  },
+  {
+    "titulo": "Uso de la Información",
+    "contenido": "Los datos proporcionados serán utilizados únicamente para la gestión, atención, seguimiento y resolución de solicitudes, consultas, reportes, sugerencias y demás servicios ofrecidos por la ASADA."
+  },
+  {
+    "titulo": "Confidencialidad de los Datos",
+    "contenido": "La información suministrada por los usuarios será tratada de forma confidencial y no será compartida con terceros ajenos a la organización, salvo cuando exista una obligación legal que así lo requiera."
+  },
+  {
+    "titulo": "Seguridad de la Información",
+    "contenido": "La ASADA implementa medidas de seguridad razonables para proteger la información contra accesos no autorizados, pérdida, alteración o divulgación indebida."
+  },
+  {
+    "titulo": "Derechos de los Usuarios",
+    "contenido": "Los usuarios podrán solicitar la actualización, corrección o revisión de la información personal suministrada mediante los canales oficiales de atención de la ASADA."
+  }
+]
+
+
+},
+
+"terminosCondiciones": {
+"introduccion": "El acceso y uso de la plataforma SAGA-JD implica la aceptación de los presentes Términos y Condiciones.",
+
+
+"secciones": [
+  {
+    "titulo": "Uso de la Plataforma",
+    "contenido": "La plataforma está destinada a brindar información y facilitar la realización de trámites y solicitudes relacionadas con los servicios de la ASADA."
+  },
+  {
+    "titulo": "Veracidad de la Información",
+    "contenido": "Los usuarios se comprometen a proporcionar información verídica, completa y actualizada al utilizar los formularios y servicios disponibles en la plataforma."
+  },
+  {
+    "titulo": "Gestión de Solicitudes",
+    "contenido": "La ASADA podrá revisar, validar y dar seguimiento a las solicitudes presentadas a través de la plataforma, así como requerir información adicional cuando sea necesario."
+  },
+  {
+    "titulo": "Disponibilidad del Servicio",
+    "contenido": "La ASADA procurará mantener la plataforma disponible de forma continua; sin embargo, podrán existir interrupciones temporales por mantenimiento, mejoras técnicas o situaciones fuera de su control."
+  },
+  {
+    "titulo": "Uso Adecuado",
+    "contenido": "Queda prohibido realizar acciones que afecten el funcionamiento de la plataforma, intenten acceder a información no autorizada o comprometan la seguridad del sistema."
+  },
+  {
+    "titulo": "Propiedad del Contenido",
+    "contenido": "La información, imágenes, documentos y demás contenidos publicados en la plataforma forman parte de los recursos institucionales de la ASADA de Juan Díaz."
+  },
+  {
+    "titulo": "Modificaciones",
+    "contenido": "La ASADA podrá actualizar la presente Política de Privacidad y los Términos y Condiciones cuando sea necesario para mejorar los servicios o cumplir con cambios normativos."
+  }
+]
+
+
+}
+}
