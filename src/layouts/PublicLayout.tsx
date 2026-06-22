@@ -3,7 +3,6 @@ import { useRouterState } from '@tanstack/react-router';
 import Footer from '../Components/Footer/Footer';
 import Header from '../Components/Header/header';
 import { ModalProvider } from '../context/ModalContext';
-
 const ChatBot = lazy(() => import('../Components/ChatAssistant/ChatBot').then((module) => ({ default: module.ChatBot })));
 const ChatProvider = lazy(() => import('../Provider/ChatProvider').then((module) => ({ default: module.ChatProvider })));
 

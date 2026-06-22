@@ -1,16 +1,18 @@
 import Mapa from './mapa';
 import Redes from './Redes';
+import InformacionLegalModal from '../InformacionLegal/InformacionLegalModal';
+import { InformacionLegalProvider } from '../../context/InformacionLegalContext';
 import { useModal } from '../../context/ModalContext';
-import Modal from '../../Section/DevTeam/Modal';
 import { useState } from 'react';
-
+import Modal from '../../Section/DevTeam/Modal';
 
 const Footer = () => {
     const year = new Date().getFullYear();
     const { isAnyModalOpen } = useModal();
-     const [showDevTeamModal, setShowDevTeamModal] = useState(false);
+    const [showDevTeamModal, setShowDevTeamModal] = useState(false);
 
   return (
+  <InformacionLegalProvider>
     <footer className="w-full flex flex-col items-center gap-6 pt-8 pb-4 bg-gray-800 text-white overflow-hidden">
 
       <div
@@ -54,11 +56,12 @@ const Footer = () => {
           to { opacity: 1; }
         }
       `}</style>
-
+   
+     </footer>
       <Modal isOpen={showDevTeamModal} onClose={() => setShowDevTeamModal(false)} />
-    </footer>
+    <InformacionLegalModal />
+  </InformacionLegalProvider>
   )
-
 }
 
 export default Footer
