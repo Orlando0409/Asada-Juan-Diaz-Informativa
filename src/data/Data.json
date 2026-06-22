@@ -560,7 +560,7 @@
       "imagen": "/devTeam/andres.png",
       "contacto": {
         "correo": "andres.alvaque@gmail.com",
-        "linkedin": "https://www.linkedin.com/in/andr%C3%A9s-alvarado-quesada-8a9080366/",
+        "linkedin": "https://www.linkedin.com/in/AndrésAQ",
         "github": "https://github.com/AndresAlvarado08"
       }
     },
@@ -579,7 +579,7 @@
     "Diana": {
       "nombre": "Diana Paola",
       "apellido1": "Cerdas",
-      "apellido2": "Alvarez",
+      "apellido2": "Álvarez",
       "rol": "Desarrolladora Frontend",
       "imagen": "/devTeam/diana.png",
       "contacto": {
@@ -596,7 +596,7 @@
       "imagen": "/devTeam/alondra.png",
       "contacto": {
         "correo": "alondraespinoza897@gmail.com",
-        "linkedin": "www.linkedin.com/in/alofe",
+        "linkedin": "https://www.linkedin.com/in/alofe",
         "github": "https://github.com/FloresAlondra"
       }
     }
