@@ -28,7 +28,7 @@ const InformacionLegalModal = () => {
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-lg shadow-xl max-h-[90vh] w-full max-w-2xl overflow-hidden flex flex-col">
                 {/* Header */}
-                <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white px-6 py-4 flex items-center justify-between">
+                <div className="bg-blue-600 text-white px-6 py-4 flex items-center justify-between">
                     <h2 className="text-2xl font-bold">
                         {activeTab === 'privacidad' ? 'Política de Privacidad' : 'Términos y Condiciones'}
                     </h2>
@@ -81,7 +81,7 @@ const InformacionLegalModal = () => {
                 <div className="border-t border-gray-200 bg-gray-50 px-6 py-4 flex justify-end">
                     <button
                         onClick={closeModal}
-                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                        className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
                     >
                         Cerrar
                     </button>
