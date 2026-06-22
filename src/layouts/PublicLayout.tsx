@@ -3,6 +3,7 @@ import { useRouterState } from '@tanstack/react-router';
 import Footer from '../Components/Footer/Footer';
 import Header from '../Components/Header/header';
 import { ModalProvider } from '../context/ModalContext';
+import { InformacionLegalProvider } from '../context/InformacionLegalContext';
 
 const ChatBot = lazy(() => import('../Components/ChatAssistant/ChatBot').then((module) => ({ default: module.ChatBot })));
 const ChatProvider = lazy(() => import('../Provider/ChatProvider').then((module) => ({ default: module.ChatProvider })));
@@ -44,20 +45,22 @@ const PublicLayout: React.FC<PublicLayoutProps> = ({ children }) => {
 
   return (
     <ModalProvider>
-      <div ref={containerRef} className='overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100'>
-        <Header />
-        <main className="flex flex-col">
-          {children}
-          {showChat && (
-            <Suspense fallback={null}>
-              <ChatProvider>
-                <ChatBot />
-              </ChatProvider>
-            </Suspense>
-          )}
-        </main>
-        <Footer />
-      </div>
+      <InformacionLegalProvider>
+        <div ref={containerRef} className='overflow-y-auto scrollbar-thin scrollbar-thumb-blue-600 scrollbar-track-blue-100'>
+          <Header />
+          <main className="flex flex-col">
+            {children}
+            {showChat && (
+              <Suspense fallback={null}>
+                <ChatProvider>
+                  <ChatBot />
+                </ChatProvider>
+              </Suspense>
+            )}
+          </main>
+          <Footer />
+        </div>
+      </InformacionLegalProvider>
     </ModalProvider>
   );
 };

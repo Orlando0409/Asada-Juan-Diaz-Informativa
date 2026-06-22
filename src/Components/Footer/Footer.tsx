@@ -1,10 +1,11 @@
 import Mapa from './mapa';
 import Redes from './Redes';
+import InformacionLegalModal from '../InformacionLegal/InformacionLegalModal';
 import { useModal } from '../../context/ModalContext';
 
 const Footer = () => {
-    const year = new Date().getFullYear();
-    const { isAnyModalOpen } = useModal();
+  const year = new Date().getFullYear();
+  const { isAnyModalOpen } = useModal();
 
   return (
     <footer className="w-full flex flex-col items-center gap-6 pt-8 pb-4 bg-gray-800 text-white overflow-hidden">
@@ -44,6 +45,8 @@ const Footer = () => {
           to { opacity: 1; }
         }
       `}</style>
+
+      <InformacionLegalModal />
     </footer>
   )
 }
